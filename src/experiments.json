@@ -1,0 +1,419 @@
+{
+  "concurrency": 8,
+  "experiments": [
+    {
+      "name": "mixed_basic_d1024l4_r16_t16_e30",
+      "task": "mixed_ab",
+      "config": {
+        "D_MODEL": 1024,
+        "N_LAYER": 4,
+        "MLP_RATIO": 16,
+        "TRAIN_LEN": 16,
+        "USE_AB_TAG": false,
+        "USE_CONDITIONAL_WTE": false,
+        "MIXED_AB_MAX_UNIQUE_RATIOS": [
+          0.3,
+          0.3
+        ]
+      }
+    },
+    {
+      "name": "mixed_basic_d1024l4_r16_t16_e35",
+      "task": "mixed_ab",
+      "config": {
+        "D_MODEL": 1024,
+        "N_LAYER": 4,
+        "MLP_RATIO": 16,
+        "TRAIN_LEN": 16,
+        "USE_AB_TAG": false,
+        "USE_CONDITIONAL_WTE": false,
+        "MIXED_AB_MAX_UNIQUE_RATIOS": [
+          0.35,
+          0.35
+        ]
+      }
+    },
+    {
+      "name": "mixed_basic_d1024l4_r16_t16_e40",
+      "task": "mixed_ab",
+      "config": {
+        "D_MODEL": 1024,
+        "N_LAYER": 4,
+        "MLP_RATIO": 16,
+        "TRAIN_LEN": 16,
+        "USE_AB_TAG": false,
+        "USE_CONDITIONAL_WTE": false,
+        "MIXED_AB_MAX_UNIQUE_RATIOS": [
+          0.4,
+          0.4
+        ]
+      }
+    },
+    {
+      "name": "mixed_basic_d1024l4_r16_t16_e45",
+      "task": "mixed_ab",
+      "config": {
+        "D_MODEL": 1024,
+        "N_LAYER": 4,
+        "MLP_RATIO": 16,
+        "TRAIN_LEN": 16,
+        "USE_AB_TAG": false,
+        "USE_CONDITIONAL_WTE": false,
+        "MIXED_AB_MAX_UNIQUE_RATIOS": [
+          0.45,
+          0.45
+        ]
+      }
+    },
+    {
+      "name": "mixed_basic_d1024l4_r16_t16_e50",
+      "task": "mixed_ab",
+      "config": {
+        "D_MODEL": 1024,
+        "N_LAYER": 4,
+        "MLP_RATIO": 16,
+        "TRAIN_LEN": 16,
+        "USE_AB_TAG": false,
+        "USE_CONDITIONAL_WTE": false,
+        "MIXED_AB_MAX_UNIQUE_RATIOS": [
+          0.5,
+          0.5
+        ]
+      }
+    },
+    {
+      "name": "mixed_basic_d1024l4_r16_t16_e55",
+      "task": "mixed_ab",
+      "config": {
+        "D_MODEL": 1024,
+        "N_LAYER": 4,
+        "MLP_RATIO": 16,
+        "TRAIN_LEN": 16,
+        "USE_AB_TAG": false,
+        "USE_CONDITIONAL_WTE": false,
+        "MIXED_AB_MAX_UNIQUE_RATIOS": [
+          0.55,
+          0.55
+        ]
+      }
+    },
+    {
+      "name": "mixed_basic_d1024l4_r16_t16_e60",
+      "task": "mixed_ab",
+      "config": {
+        "D_MODEL": 1024,
+        "N_LAYER": 4,
+        "MLP_RATIO": 16,
+        "TRAIN_LEN": 16,
+        "USE_AB_TAG": false,
+        "USE_CONDITIONAL_WTE": false,
+        "MIXED_AB_MAX_UNIQUE_RATIOS": [
+          0.6,
+          0.6
+        ]
+      }
+    },
+    {
+      "name": "mixed_basic_d1024l4_r16_t16_e65",
+      "task": "mixed_ab",
+      "config": {
+        "D_MODEL": 1024,
+        "N_LAYER": 4,
+        "MLP_RATIO": 16,
+        "TRAIN_LEN": 16,
+        "USE_AB_TAG": false,
+        "USE_CONDITIONAL_WTE": false,
+        "MIXED_AB_MAX_UNIQUE_RATIOS": [
+          0.65,
+          0.65
+        ]
+      }
+    },
+    {
+      "name": "mixed_basic_d1024l4_r16_t16_e70",
+      "task": "mixed_ab",
+      "config": {
+        "D_MODEL": 1024,
+        "N_LAYER": 4,
+        "MLP_RATIO": 16,
+        "TRAIN_LEN": 16,
+        "USE_AB_TAG": false,
+        "USE_CONDITIONAL_WTE": false,
+        "MIXED_AB_MAX_UNIQUE_RATIOS": [
+          0.7,
+          0.7
+        ]
+      }
+    },
+    {
+      "name": "mixed_cond_d128l1_r8_e30",
+      "task": "mixed_ab",
+      "config": {
+        "D_MODEL": 128,
+        "N_LAYER": 1,
+        "MLP_RATIO": 8,
+        "USE_AB_TAG": false,
+        "USE_CONDITIONAL_WTE": true,
+        "MIXED_AB_MAX_UNIQUE_RATIOS": [
+          0.3,
+          0.3
+        ]
+      }
+    },
+    {
+      "name": "mixed_cond_d128l1_r8_e35",
+      "task": "mixed_ab",
+      "config": {
+        "D_MODEL": 128,
+        "N_LAYER": 1,
+        "MLP_RATIO": 8,
+        "USE_AB_TAG": false,
+        "USE_CONDITIONAL_WTE": true,
+        "MIXED_AB_MAX_UNIQUE_RATIOS": [
+          0.35,
+          0.35
+        ]
+      }
+    },
+    {
+      "name": "mixed_cond_d128l1_r8_e40",
+      "task": "mixed_ab",
+      "config": {
+        "D_MODEL": 128,
+        "N_LAYER": 1,
+        "MLP_RATIO": 8,
+        "USE_AB_TAG": false,
+        "USE_CONDITIONAL_WTE": true,
+        "MIXED_AB_MAX_UNIQUE_RATIOS": [
+          0.4,
+          0.4
+        ]
+      }
+    },
+    {
+      "name": "mixed_cond_d128l1_r8_e45",
+      "task": "mixed_ab",
+      "config": {
+        "D_MODEL": 128,
+        "N_LAYER": 1,
+        "MLP_RATIO": 8,
+        "USE_AB_TAG": false,
+        "USE_CONDITIONAL_WTE": true,
+        "MIXED_AB_MAX_UNIQUE_RATIOS": [
+          0.45,
+          0.45
+        ]
+      }
+    },
+    {
+      "name": "mixed_cond_d128l1_r8_e50",
+      "task": "mixed_ab",
+      "config": {
+        "D_MODEL": 128,
+        "N_LAYER": 1,
+        "MLP_RATIO": 8,
+        "USE_AB_TAG": false,
+        "USE_CONDITIONAL_WTE": true,
+        "MIXED_AB_MAX_UNIQUE_RATIOS": [
+          0.5,
+          0.5
+        ]
+      }
+    },
+    {
+      "name": "mixed_cond_d128l1_r8_e55",
+      "task": "mixed_ab",
+      "config": {
+        "D_MODEL": 128,
+        "N_LAYER": 1,
+        "MLP_RATIO": 8,
+        "USE_AB_TAG": false,
+        "USE_CONDITIONAL_WTE": true,
+        "MIXED_AB_MAX_UNIQUE_RATIOS": [
+          0.55,
+          0.55
+        ]
+      }
+    },
+    {
+      "name": "mixed_cond_d128l1_r8_e60",
+      "task": "mixed_ab",
+      "config": {
+        "D_MODEL": 128,
+        "N_LAYER": 1,
+        "MLP_RATIO": 8,
+        "USE_AB_TAG": false,
+        "USE_CONDITIONAL_WTE": true,
+        "MIXED_AB_MAX_UNIQUE_RATIOS": [
+          0.6,
+          0.6
+        ]
+      }
+    },
+    {
+      "name": "mixed_cond_d128l1_r8_e65",
+      "task": "mixed_ab",
+      "config": {
+        "D_MODEL": 128,
+        "N_LAYER": 1,
+        "MLP_RATIO": 8,
+        "USE_AB_TAG": false,
+        "USE_CONDITIONAL_WTE": true,
+        "MIXED_AB_MAX_UNIQUE_RATIOS": [
+          0.65,
+          0.65
+        ]
+      }
+    },
+    {
+      "name": "mixed_cond_d128l1_r8_e70",
+      "task": "mixed_ab",
+      "config": {
+        "D_MODEL": 128,
+        "N_LAYER": 1,
+        "MLP_RATIO": 8,
+        "USE_AB_TAG": false,
+        "USE_CONDITIONAL_WTE": true,
+        "MIXED_AB_MAX_UNIQUE_RATIOS": [
+          0.7,
+          0.7
+        ]
+      }
+    },
+    {
+      "name": "mixed_label_d128l1_r8_e30",
+      "task": "mixed_ab",
+      "config": {
+        "D_MODEL": 128,
+        "N_LAYER": 1,
+        "MLP_RATIO": 8,
+        "USE_AB_TAG": true,
+        "USE_CONDITIONAL_WTE": false,
+        "MIXED_AB_MAX_UNIQUE_RATIOS": [
+          0.3,
+          0.3
+        ]
+      }
+    },
+    {
+      "name": "mixed_label_d128l1_r8_e35",
+      "task": "mixed_ab",
+      "config": {
+        "D_MODEL": 128,
+        "N_LAYER": 1,
+        "MLP_RATIO": 8,
+        "USE_AB_TAG": true,
+        "USE_CONDITIONAL_WTE": false,
+        "MIXED_AB_MAX_UNIQUE_RATIOS": [
+          0.35,
+          0.35
+        ]
+      }
+    },
+    {
+      "name": "mixed_label_d128l1_r8_e40",
+      "task": "mixed_ab",
+      "config": {
+        "D_MODEL": 128,
+        "N_LAYER": 1,
+        "MLP_RATIO": 8,
+        "USE_AB_TAG": true,
+        "USE_CONDITIONAL_WTE": false,
+        "MIXED_AB_MAX_UNIQUE_RATIOS": [
+          0.4,
+          0.4
+        ]
+      }
+    },
+    {
+      "name": "mixed_label_d128l1_r8_e45",
+      "task": "mixed_ab",
+      "config": {
+        "D_MODEL": 128,
+        "N_LAYER": 1,
+        "MLP_RATIO": 8,
+        "USE_AB_TAG": true,
+        "USE_CONDITIONAL_WTE": false,
+        "MIXED_AB_MAX_UNIQUE_RATIOS": [
+          0.45,
+          0.45
+        ]
+      }
+    },
+    {
+      "name": "mixed_label_d128l1_r8_e50",
+      "task": "mixed_ab",
+      "config": {
+        "D_MODEL": 128,
+        "N_LAYER": 1,
+        "MLP_RATIO": 8,
+        "USE_AB_TAG": true,
+        "USE_CONDITIONAL_WTE": false,
+        "MIXED_AB_MAX_UNIQUE_RATIOS": [
+          0.5,
+          0.5
+        ]
+      }
+    },
+    {
+      "name": "mixed_label_d128l1_r8_e55",
+      "task": "mixed_ab",
+      "config": {
+        "D_MODEL": 128,
+        "N_LAYER": 1,
+        "MLP_RATIO": 8,
+        "USE_AB_TAG": true,
+        "USE_CONDITIONAL_WTE": false,
+        "MIXED_AB_MAX_UNIQUE_RATIOS": [
+          0.55,
+          0.55
+        ]
+      }
+    },
+    {
+      "name": "mixed_label_d128l1_r8_e60",
+      "task": "mixed_ab",
+      "config": {
+        "D_MODEL": 128,
+        "N_LAYER": 1,
+        "MLP_RATIO": 8,
+        "USE_AB_TAG": true,
+        "USE_CONDITIONAL_WTE": false,
+        "MIXED_AB_MAX_UNIQUE_RATIOS": [
+          0.6,
+          0.6
+        ]
+      }
+    },
+    {
+      "name": "mixed_label_d128l1_r8_e65",
+      "task": "mixed_ab",
+      "config": {
+        "D_MODEL": 128,
+        "N_LAYER": 1,
+        "MLP_RATIO": 8,
+        "USE_AB_TAG": true,
+        "USE_CONDITIONAL_WTE": false,
+        "MIXED_AB_MAX_UNIQUE_RATIOS": [
+          0.65,
+          0.65
+        ]
+      }
+    },
+    {
+      "name": "mixed_label_d128l1_r8_e70",
+      "task": "mixed_ab",
+      "config": {
+        "D_MODEL": 128,
+        "N_LAYER": 1,
+        "MLP_RATIO": 8,
+        "USE_AB_TAG": true,
+        "USE_CONDITIONAL_WTE": false,
+        "MIXED_AB_MAX_UNIQUE_RATIOS": [
+          0.7,
+          0.7
+        ]
+      }
+    }
+  ]
+}
