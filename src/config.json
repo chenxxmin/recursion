@@ -24,6 +24,10 @@
     "WEIGHT_DECAY": 1,
     "ENTROPY_PENALTY_WEIGHT": 0.0,
     "FIRST_TASK_WEIGHT": 1.0,
+    "COND_FIX": null,
+    "COND_FIX_START": null,
+    "COND_FIX_START_A1": null,
+    "COND_FIX_START_A2": null,
     "RANDOM_SEED": 42,
     "EVAL_INTERVAL": 20,
     "EARLY_STOP_NO_IMPROVE": 1000,
@@ -39,7 +43,7 @@
   "multiplicative": {
   },
   "mixed_ab": {
-    "USE_AB_TAG": true,
+    "USE_AB_TAG": false,
     "USE_CONDITIONAL_WTE": false,
     "COND_WTE_SHARED_RATIO": 0.0,
     "MIXED_AB_MAX_UNIQUE_RATIOS": [0.5, 0.5]

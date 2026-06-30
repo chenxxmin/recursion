@@ -545,7 +545,8 @@ def evaluate(model, dataloader, device, num_mask=1, extra_kwargs_fn=None):
 def run_training_engine(model, train_loader, test_loader, optimizer, scheduler, device,
                         epochs, eval_interval, early_stop_accuracy, early_stop_no_improve,
                         save_path, save_config, num_mask=1, extra_kwargs_fn=None, first_task_weight=1.0,
-                        cond_fix=None, cond_fix_start=None):
+                        cond_fix=None, cond_fix_start=None,
+                        cond_fix_start_a1=None, cond_fix_start_a2=None):
     print(f"\nStart training...")
     best_acc = 0.0
     best_epoch = 0
@@ -566,17 +567,33 @@ def run_training_engine(model, train_loader, test_loader, optimizer, scheduler, 
                 model, test_loader, device,
                 num_mask=num_mask, extra_kwargs_fn=extra_kwargs_fn)
 
-            # Conditional freeze: when any rule reaches the threshold, freeze cond_fix params
-            if cond_fix is not None and cond_fix_start is not None and not cond_fix_triggered:
-                if test_group_acc:
-                    trigger = any(acc >= cond_fix_start for acc in test_group_acc.values())
+            # Conditional freeze: freeze cond_fix params when the start condition is met.
+            # New behavior: max per-rule acc >= a1 AND min per-rule acc >= a2.
+            # Old behavior (backward compat): any per-rule acc >= cond_fix_start.
+            if cond_fix is not None and not cond_fix_triggered:
+                use_new_cond = (cond_fix_start_a1 is not None) and (cond_fix_start_a2 is not None)
+                use_old_cond = cond_fix_start is not None
+
+                if use_new_cond and test_group_acc:
+                    max_acc = max(test_group_acc.values())
+                    min_acc = min(test_group_acc.values())
+                    trigger = (max_acc >= cond_fix_start_a1) and (min_acc >= cond_fix_start_a2)
+                    trigger_desc = f"max>=a1 ({cond_fix_start_a1:.2f}) & min>=a2 ({cond_fix_start_a2:.2f})"
+                elif use_old_cond:
+                    if test_group_acc:
+                        trigger = any(acc >= cond_fix_start for acc in test_group_acc.values())
+                    else:
+                        trigger = test_acc >= cond_fix_start
+                    trigger_desc = f"threshold {cond_fix_start:.2f}"
                 else:
-                    trigger = test_acc >= cond_fix_start
+                    trigger = False
+                    trigger_desc = ""
+
                 if trigger:
                     frozen_param_states = freeze_partial(model, cond_fix)
                     cond_fix_triggered = True
                     no_improve = 0  # reset patience after freeze
-                    print(f"[CondFix] Epoch {epoch}: triggered at threshold {cond_fix_start:.2f}")
+                    print(f"[CondFix] Epoch {epoch}: triggered at {trigger_desc}")
                     accs = ' '.join(f"{test_group_acc[g]:.2f}" for g in sorted(test_group_acc.keys()))
                     print(f"  per-rule acc: {accs}")
             
@@ -1097,7 +1114,9 @@ def run_experiment(config_path=None):
         num_mask=num_mask, extra_kwargs_fn=extra_kwargs_fn,
         first_task_weight=cfg.get('FIRST_TASK_WEIGHT', 1.0),
         cond_fix=cfg.get('COND_FIX', None),
-        cond_fix_start=cfg.get('COND_FIX_START', None)
+        cond_fix_start=cfg.get('COND_FIX_START', None),
+        cond_fix_start_a1=cfg.get('COND_FIX_START_A1', None),
+        cond_fix_start_a2=cfg.get('COND_FIX_START_A2', None)
     )
 
     # ========================================================================
