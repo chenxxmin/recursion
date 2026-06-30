@@ -397,7 +397,36 @@ class FibonacciTransformer(nn.Module):
         return idx
 
 # ==================== Training Functions ====================
-def train_epoch(model, dataloader, optimizer, device, num_mask=1, extra_kwargs_fn=None, first_task_weight=1.0):
+def freeze_partial(model, cond_fix):
+    """
+    Freeze part of the model for conditional_wte analysis.
+    cond_fix: 'WTE'    -> freeze embedding-related params (cond_wte, ab_emb, wte, wpe)
+              'LINEAR' -> freeze transformer backbone + rule head
+    Returns a list of (param, saved_value) for restoring after optimizer steps.
+    """
+    if cond_fix is None:
+        return []
+    
+    frozen = []
+    for name, param in model.named_parameters():
+        freeze = False
+        if cond_fix == "WTE":
+            if any(k in name for k in ('cond_wte', 'ab_emb', 'transformer.wte', 'transformer.wpe')):
+                freeze = True
+        elif cond_fix == "LINEAR":
+            if (name.startswith('transformer.h.') or 
+                name.startswith('transformer.ln_f.') or
+                name.startswith('rule_head.')):
+                freeze = True
+        if freeze:
+            param.requires_grad = False
+            frozen.append((param, param.detach().clone()))
+    
+    print(f"[CondFix] Frozen {cond_fix}: {len(frozen)} param groups")
+    return frozen
+
+
+def train_epoch(model, dataloader, optimizer, device, num_mask=1, extra_kwargs_fn=None, first_task_weight=1.0, frozen_param_states=None):
     model.train()
     total_loss = 0
     total_correct = 0
@@ -432,6 +461,11 @@ def train_epoch(model, dataloader, optimizer, device, num_mask=1, extra_kwargs_f
             loss.backward()
             torch.nn.utils.clip_grad_norm_(model.parameters(), 1.0)
             optimizer.step()
+            # Restore frozen parameters (AdamW weight decay would otherwise drift them)
+            if frozen_param_states:
+                with torch.no_grad():
+                    for param, saved_value in frozen_param_states:
+                        param.copy_(saved_value)
         
         with torch.no_grad():
             preds = logits.argmax(dim=-1)
@@ -510,23 +544,41 @@ def evaluate(model, dataloader, device, num_mask=1, extra_kwargs_fn=None):
 
 def run_training_engine(model, train_loader, test_loader, optimizer, scheduler, device,
                         epochs, eval_interval, early_stop_accuracy, early_stop_no_improve,
-                        save_path, save_config, num_mask=1, extra_kwargs_fn=None, first_task_weight=1.0):
+                        save_path, save_config, num_mask=1, extra_kwargs_fn=None, first_task_weight=1.0,
+                        cond_fix=None, cond_fix_start=None):
     print(f"\nStart training...")
     best_acc = 0.0
     best_epoch = 0
     no_improve = 0
+    frozen_param_states = None
+    cond_fix_triggered = False
 
     for epoch in range(epochs):
         train_loss, train_acc, train_pos_acc = train_epoch(
             model, train_loader, optimizer, device,
             num_mask=num_mask, extra_kwargs_fn=extra_kwargs_fn,
-            first_task_weight=first_task_weight)
+            first_task_weight=first_task_weight,
+            frozen_param_states=frozen_param_states)
         scheduler.step()
         
         if epoch % eval_interval == 0 or epoch == epochs - 1:
             _, test_acc, test_pos_acc, test_group_acc = evaluate(
                 model, test_loader, device,
                 num_mask=num_mask, extra_kwargs_fn=extra_kwargs_fn)
+
+            # Conditional freeze: when any rule reaches the threshold, freeze cond_fix params
+            if cond_fix is not None and cond_fix_start is not None and not cond_fix_triggered:
+                if test_group_acc:
+                    trigger = any(acc >= cond_fix_start for acc in test_group_acc.values())
+                else:
+                    trigger = test_acc >= cond_fix_start
+                if trigger:
+                    frozen_param_states = freeze_partial(model, cond_fix)
+                    cond_fix_triggered = True
+                    no_improve = 0  # reset patience after freeze
+                    print(f"[CondFix] Epoch {epoch}: triggered at threshold {cond_fix_start:.2f}")
+                    accs = ' '.join(f"{test_group_acc[g]:.2f}" for g in sorted(test_group_acc.keys()))
+                    print(f"  per-rule acc: {accs}")
             
             if test_acc > best_acc:
                 best_acc = test_acc
@@ -1043,13 +1095,17 @@ def run_experiment(config_path=None):
         early_stop_no_improve=cfg.get('EARLY_STOP_NO_IMPROVE', 100),
         save_path=SAVE_PATH, save_config=save_config,
         num_mask=num_mask, extra_kwargs_fn=extra_kwargs_fn,
-        first_task_weight=cfg.get('FIRST_TASK_WEIGHT', 1.0)
+        first_task_weight=cfg.get('FIRST_TASK_WEIGHT', 1.0),
+        cond_fix=cfg.get('COND_FIX', None),
+        cond_fix_start=cfg.get('COND_FIX_START', None)
     )
 
     # ========================================================================
     # Stage 3: Post-processing (mixed_ab final generation test with exposure split)
     # ========================================================================
-    if post_train_mode == 'mixed_ab':
+    if cfg.get('SKIP_FINAL_GENERATION_TEST', False):
+        print("\n[Config] SKIP_FINAL_GENERATION_TEST=true, skipping final generation test.")
+    elif post_train_mode == 'mixed_ab':
         print(f"\n{'='*50}")
         print("Final generation test (given first two items, AB generates 3rd as prompt, validate from 4th)")
         print(f"{'='*50}")
@@ -1216,4 +1272,3 @@ def run_experiment(config_path=None):
                     parts.append(f"{label}: {cnt}/{tot} ({_safe_div(cnt, tot)*100:5.1f}%)")
             if parts:
                 print(f"  Position {pos:3d}: " + " | ".join(parts))
-

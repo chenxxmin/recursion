@@ -455,4 +455,3 @@ if __name__ == "__main__":
     pth_path = sys.argv[1]
     device = 'cuda' if torch.cuda.is_available() else 'cpu'
     analyze_model_attention(pth_path, device=device)
-
