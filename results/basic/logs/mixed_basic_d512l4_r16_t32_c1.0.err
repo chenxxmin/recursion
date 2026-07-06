@@ -1,0 +1,30 @@
+Traceback (most recent call last):
+  File "/home/cxm/ai/test0617-basic/main.py", line 12, in <module>
+    main(config_path)
+    ~~~~^^^^^^^^^^^^^
+  File "/home/cxm/ai/test0617-basic/main.py", line 7, in main
+    run_experiment(config_path)
+    ~~~~~~~~~~~~~~^^^^^^^^^^^^^
+  File "/home/cxm/ai/test0617-basic/core.py", line 1009, in run_experiment
+    best_acc, epoch = run_training_engine(
+                      ~~~~~~~~~~~~~~~~~~~^
+        model, train_loader, test_loader, optimizer, scheduler, device,
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    ...<5 lines>...
+        first_task_weight=cfg.get('FIRST_TASK_WEIGHT', 1.0)
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    )
+    ^
+  File "/home/cxm/ai/test0617-basic/core.py", line 514, in run_training_engine
+    train_loss, train_acc, train_pos_acc = train_epoch(
+                                           ~~~~~~~~~~~^
+        model, train_loader, optimizer, device,
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+        num_mask=num_mask, extra_kwargs_fn=extra_kwargs_fn,
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+        first_task_weight=first_task_weight)
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/cxm/ai/test0617-basic/core.py", line 446, in train_epoch
+    return total_loss / len(dataloader), overall_acc, per_pos_acc
+           ~~~~~~~~~~~^~~~~~~~~~~~~~~~~
+ZeroDivisionError: division by zero

@@ -1,0 +1,60 @@
+=== Experiment: mixed_basic_d1024l2_r32_t32_c1.0 ===
+Time: 2026-06-18T05:32:37.660250
+Task type: mixed_ab
+Merged config: {
+  "P": 53,
+  "TASK": "mixed_ab",
+  "NUM_MASK": 2,
+  "A": 1,
+  "B": 1,
+  "AB_PAIRS": [
+    [
+      1,
+      1
+    ],
+    [
+      1,
+      2
+    ]
+  ],
+  "D_MODEL": 1024,
+  "N_HEAD": 1,
+  "N_LAYER": 2,
+  "BATCH_SIZE": 128,
+  "EPOCHS": 10000,
+  "LR": 0.0003,
+  "SAVE_PATH": "models/mixed_basic_d1024l2_r32_t32_c1.0.pth",
+  "USE_GREEDY_GENERATE": true,
+  "USE_LEARNABLE_PE": false,
+  "MLP_RATIO": 32,
+  "TRAIN_LEN": 32,
+  "OOD_LEN": 64,
+  "DROPOUT": 0.0,
+  "TARGET_INIT_COVERAGE": 0.5,
+  "MAX_UNIQUE_RATIO": 1.0,
+  "WEIGHT_DECAY": 1,
+  "ENTROPY_PENALTY_WEIGHT": 0.0,
+  "FIRST_TASK_WEIGHT": 1.0,
+  "RANDOM_SEED": 42,
+  "EVAL_INTERVAL": 20,
+  "EARLY_STOP_NO_IMPROVE": 2000,
+  "EARLY_STOP_ACCURACY": 0.99,
+  "USE_AB_TAG": false,
+  "USE_CONDITIONAL_WTE": false,
+  "COND_WTE_SHARED_RATIO": 0.0
+}
+--- output ---
+Using device: cuda
+
+[Dataset] Mixed mode: generated 0 + 5618 samples, length 32
+AB parameter pairs: [(1, 1), (1, 2)]
+--------------------------------------------------
+[Model config] block_size: 64, train length: 32
+[Number theory] AB parameter pairs: [(1, 1), (1, 2)]
+
+
+Model parameters: 143.28M
+
+Start training...
+
+--- Return code: 1 ---
