@@ -50,28 +50,54 @@ def load_model(pth_path, device='cpu'):
     return model, checkpoint
 
 
-def get_attention_weights(model, input_ids):
+def _build_input_embedding(model, input_ids, ab_label=None):
+    """
+    Build the input embedding used by the model during forward pass.
+
+    Handles standard wte, learnable position embeddings, and conditional WTE
+    (used by MixedABTransformer in cond_wte mode).
+    """
+    device = input_ids.device
+    b, t = input_ids.size()
+
+    if getattr(model, 'use_conditional_wte', False):
+        if ab_label is None:
+            # Default to the first rule. For attention analysis the rule choice
+            # only affects which conditional embedding segment is used.
+            ab_label = torch.zeros(b, dtype=torch.long, device=device)
+        tok_emb = torch.zeros(b, t, model.d_model, device=device)
+        shared_size = model.cond_wte_shared_size
+        shared_mask = (input_ids < shared_size)
+        if shared_mask.any():
+            tok_emb[shared_mask] = model.cond_wte(input_ids[shared_mask])
+        rule_mask = ~shared_mask
+        if rule_mask.any():
+            rule_idx = input_ids[rule_mask] - shared_size
+            shifted_rule_idx = (
+                rule_idx
+                + ab_label.unsqueeze(1).expand(b, t)[rule_mask] * model.cond_wte_rule_size
+                + shared_size
+            )
+            tok_emb[rule_mask] = model.cond_wte(shifted_rule_idx)
+    elif getattr(model, 'use_embedding', True):
+        tok_emb = model.transformer.wte(input_ids)
+    else:
+        tok_emb = F.one_hot(input_ids, num_classes=model.vocab_size).float()
+
+    if getattr(model, 'wpe', None) is not None:
+        pos = torch.arange(0, t, dtype=torch.long, device=device)
+        tok_emb = tok_emb + model.wpe(pos)
+
+    return model.transformer.drop(tok_emb)
+
+
+def get_attention_weights(model, input_ids, ab_label=None):
     """
     Manually compute attention map for each layer and head given input.
     
     Returns: list of (n_head, T, T) tensors, one per layer.
     """
-    device = input_ids.device
-    b, t = input_ids.size()
-    
-    # embedding
-    if getattr(model, 'use_embedding', True):
-        x = model.transformer.wte(input_ids)
-    else:
-        x = F.one_hot(input_ids, num_classes=model.vocab_size).float()
-    
-    # Learnable position embedding (if model has it)
-    if getattr(model, 'wpe', None) is not None:
-        b, t = input_ids.size()
-        pos = torch.arange(0, t, dtype=torch.long, device=input_ids.device)
-        x = x + model.wpe(pos)
-    
-    x = model.transformer.drop(x)
+    x = _build_input_embedding(model, input_ids, ab_label=ab_label)
     
     attention_maps = []
     
@@ -117,7 +143,7 @@ def get_attention_weights(model, input_ids):
     return attention_maps
 
 
-def extract_qk_raw_scores(model, input_ids):
+def extract_qk_raw_scores(model, input_ids, ab_label=None):
     """
     Extract Q, K and raw QK scores (before softmax) for each layer.
     
@@ -127,17 +153,7 @@ def extract_qk_raw_scores(model, input_ids):
         - 'raw_scores': (n_head, T, T), i.e. q @ k^T / sqrt(d)
         - 'attn_weights': (n_head, T, T), attention after softmax
     """
-    device = input_ids.device
-    b, t = input_ids.size()
-    
-    x = model.transformer.wte(input_ids)
-    
-    if getattr(model, 'wpe', None) is not None:
-        b, t = input_ids.size()
-        pos = torch.arange(0, t, dtype=torch.long, device=input_ids.device)
-        x = x + model.wpe(pos)
-    
-    x = model.transformer.drop(x)
+    x = _build_input_embedding(model, input_ids, ab_label=ab_label)
     
     layer_outputs = []
     

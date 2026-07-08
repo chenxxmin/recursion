@@ -10,7 +10,7 @@ from torch.utils.data import Dataset, DataLoader, Sampler
 # ==================== Data Generation ====================
 class RecurrenceDataset(Dataset):
     def __init__(self, p=127, recurrence_fn=None, recurrence_name="X(k)=?", init_len=2, num_samples=1000, len=10,
-                 verbose=True, exposed_ratio_mode=False):
+                 verbose=True):
         self.length = len
         self.p = p
         self.recurrence_fn = recurrence_fn
@@ -18,7 +18,6 @@ class RecurrenceDataset(Dataset):
         self.init_len = init_len
         self.num_samples = num_samples
         self.verbose = verbose
-        self.exposed_ratio_mode = exposed_ratio_mode
         self.part1 = []
         self.part2 = []
         self.seen_indices = set()
@@ -59,32 +58,29 @@ class RecurrenceDataset(Dataset):
 
     def run(self):
         state_space = self.p ** self.init_len
-        
+
         # Randomly shuffle all state indices
         all_indices = list(range(state_space))
         random.shuffle(all_indices)
-        
+
         for start_idx in all_indices:
             if start_idx in self.seen_indices:
                 continue
 
-            if self.exposed_ratio_mode:
-                # ratio means exposed (train) proportion: first num_samples go to train, rest to test
-                where = 1 if len(self.seen_indices) < self.num_samples else 2
-            else:
-                # ratio means unexposed (test) proportion: first num_samples go to test, rest to train
-                where = 1 if len(self.seen_indices) >= self.num_samples else 2
+            # MAX_UNIQUE_RATIO is the proportion of initial states exposed to training.
+            # The first num_samples states (in shuffled order) go to train, the rest to test.
+            where = 1 if len(self.seen_indices) < self.num_samples else 2
 
             # Traverse the entire cycle
             self.seen_indices.add(start_idx)
             seq = self.generate_cycle(start_idx)
-            
+
             # Extend cycle by self.length
-            num_inits = len(seq)  
+            num_inits = len(seq)
             len_to_be_extended = num_inits + self.length - 1
             while len(seq) > 0 and len(seq) < len_to_be_extended:
                 seq = seq + seq
-            
+
             # Append to train/test set
             if where == 1:
                 for i in range(num_inits):
@@ -92,7 +88,7 @@ class RecurrenceDataset(Dataset):
             else:
                 for i in range(num_inits):
                     self.part2.append(torch.tensor(seq[i:i + self.length], dtype=torch.long))
-        
+
         # Shuffle sample order
         random.shuffle(self.part1)
 
@@ -102,14 +98,12 @@ class RecurrenceDataset(Dataset):
             print(f"  - Initial state coverage: {len(self.part1)}/{state_space} ({cov*100:.1f}%)")
             print(f"Recurrence: {self.recurrence_name}")
             print("-" * 50)
-            start_target = self.init_len + 1
-           
             print("-" * 50)
-       
+
     def __len__(self):
         data = self.part1 if self.split == 'train' else self.part2
         return len(data)
-    
+
     def __getitem__(self, idx):
         data = self.part1 if self.split == 'train' else self.part2
         return data[idx]
@@ -450,7 +444,7 @@ def train_epoch(model, dataloader, optimizer, device, num_mask=1, extra_kwargs_f
         loss_len = targets.size(1)
         loss_mask = torch.zeros(B, loss_len, dtype=torch.float, device=device)
         if loss_len > num_mask:
-            loss_mask[:, num_mask:] = 1.0  
+            loss_mask[:, num_mask:] = 1.0
             if first_task_weight != 1.0:
                 loss_mask[:, num_mask] = first_task_weight
         
@@ -512,21 +506,22 @@ def evaluate(model, dataloader, device, num_mask=1, extra_kwargs_fn=None):
             
             targets = x[:, 1:]  # (B, L-1)
             loss_len = targets.size(1)
-            loss_mask = torch.zeros(B, loss_len, dtype=torch.bool, device=device)
+            loss_mask = torch.zeros(B, loss_len, dtype=torch.float, device=device)
             if loss_len > num_mask:
-                loss_mask[:, num_mask:] = True  # Start calculating from predicting item (num_mask+2)
+                loss_mask[:, num_mask:] = 1.0  # Start calculating from predicting item (num_mask+2)
             
             logits, loss, *_ = model(x, targets, loss_mask, **kwargs)
             
             preds = logits.argmax(dim=-1)
             preds = preds[:, :targets.size(1)]  # Align length with targets
-            match = ((preds == targets) & loss_mask).float()
+            valid_mask = loss_mask > 0
+            match = ((preds == targets) & valid_mask).float()
             for pos in range(loss_mask.size(1)):
-                if loss_mask[:, pos].any():
+                if valid_mask[:, pos].any():
                     pos_correct[pos] = pos_correct.get(pos, 0) + match[:, pos].sum().item()
-                    pos_total[pos] = pos_total.get(pos, 0) + loss_mask[:, pos].sum().item()
+                    pos_total[pos] = pos_total.get(pos, 0) + valid_mask[:, pos].sum().item()
             total_correct += match.sum().item()
-            total_samples += loss_mask.float().sum().item()
+            total_samples += valid_mask.float().sum().item()
             total_loss += loss.item()
             
             # Per-rule/group accuracy for mixed_ab
@@ -653,10 +648,9 @@ def run_training_engine(model, train_loader, test_loader, optimizer, scheduler, 
 
 class MixedABDataset(Dataset):
     def __init__(self, p=127, ab_pairs=None, fixed_ab_idx=None, num_samples=1000, len=10,
-                 verbose=True, use_ab_tag=False, exposed_ratio_mode=False):
+                 verbose=True, use_ab_tag=False):
         self.p = p
         self.use_ab_tag = use_ab_tag
-        self.exposed_ratio_mode = exposed_ratio_mode
         self.ab_pairs = ab_pairs if ab_pairs is not None else [(3, 5), (7, 11)]
         self.part1 = []
         self.part2 = []
@@ -682,7 +676,7 @@ class MixedABDataset(Dataset):
             p=self.p, recurrence_fn=recurrence_fn,
             recurrence_name=f"X(k)={a}*X(k-1)+{b}*X(k-2)",
             init_len=2, num_samples=num_samples, len=length,
-            verbose=verbose, exposed_ratio_mode=self.exposed_ratio_mode
+            verbose=verbose
         )
         ds.run()
         self.part1 = ds.part1
@@ -917,11 +911,12 @@ def run_experiment(config_path=None):
     OOD_LEN = cfg_main['OOD_LEN']
     DROPOUT = cfg_main['DROPOUT']
     ENTROPY_PENALTY_WEIGHT = cfg_main.get('ENTROPY_PENALTY_WEIGHT', 0.0)
-    USE_LEARNABLE_PE = cfg_main.get('USE_LEARNABLE_PE', False)
-    MAX_UNIQUE_RATIO = cfg_main.get('MAX_UNIQUE_RATIO', None)
+    MAX_UNIQUE_RATIO = cfg_main.get('MAX_UNIQUE_RATIO', 0.5)
 
-    BLOCK_SIZE = max(TRAIN_LEN, OOD_LEN)
-    BLOCK_SIZE = 2 ** (BLOCK_SIZE - 1).bit_length()
+    # Determine if we need extra room for rule token in mixed_ab label mode.
+    # We cannot compute final BLOCK_SIZE until we know the task and use_ab_tag,
+    # so defer block_size calculation to the task branches below.
+    USE_LEARNABLE_PE = cfg_main.get('USE_LEARNABLE_PE', False)
     seed = cfg_main['RANDOM_SEED']
     random.seed(seed)
     torch.manual_seed(seed)
@@ -936,19 +931,25 @@ def run_experiment(config_path=None):
     # Stage 1: Task branch -- prepare dataset, model, loader, training params
     # ========================================================================
     if TASK == 'mixed_ab':
-        cfg = dict(config.get('mixed_ab', {}))
-        cfg.update(cfg_main)
+        if not config.get('_BATCH_RUN_MERGED'):
+            print("[Error] Config not merged. Please run via batch_run.py or merge config manually.")
+            return
+        cfg = dict(cfg_main)
         ab_pairs_raw = cfg.get('AB_PAIRS', [(3, 5), [7, 11]])
         AB_PAIRS = [tuple(pair) for pair in ab_pairs_raw] if ab_pairs_raw else [(3, 5), (7, 11)]
         state_space_size = P ** 2
 
-        # Per-rule exposure ratio for mixed_ab. If provided, ratio means exposed (train) proportion.
+        # block_size must accommodate max sequence length plus an optional leading rule token
+        max_seq_len = max(TRAIN_LEN, OOD_LEN)
+        if cfg.get('USE_AB_TAG', True):
+            max_seq_len += 1
+        BLOCK_SIZE = 2 ** (max_seq_len - 1).bit_length()
+
+        # Per-rule exposure ratio for mixed_ab. MAX_UNIQUE_RATIO means exposed (train) proportion.
         if 'MIXED_AB_MAX_UNIQUE_RATIOS' in cfg:
             ratios = cfg['MIXED_AB_MAX_UNIQUE_RATIOS']
-            exposed_ratio_mode = True
         else:
             ratios = [MAX_UNIQUE_RATIO] * len(AB_PAIRS)
-            exposed_ratio_mode = False
         if isinstance(ratios, (int, float)):
             ratios = [ratios] * len(AB_PAIRS)
         assert len(ratios) == len(AB_PAIRS), \
@@ -956,8 +957,7 @@ def run_experiment(config_path=None):
         NUM_TRAIN_SAMPLES = [max(1, int(state_space_size * r)) for r in ratios]
 
         ds = MixedABDataset(p=P, ab_pairs=AB_PAIRS, num_samples=NUM_TRAIN_SAMPLES, len=TRAIN_LEN,
-                            verbose=True, use_ab_tag=cfg.get('USE_AB_TAG', True),
-                            exposed_ratio_mode=exposed_ratio_mode)
+                            verbose=True, use_ab_tag=cfg.get('USE_AB_TAG', True))
         train_dataset = ds.train_data
         test_dataset = ds.test_data
         
@@ -1029,6 +1029,9 @@ def run_experiment(config_path=None):
         if not config.get('_BATCH_RUN_MERGED'):
             print("[Error] Config not merged. Please run via batch_run.py or merge config manually.")
             return
+
+        BLOCK_SIZE = max(TRAIN_LEN, OOD_LEN)
+        BLOCK_SIZE = 2 ** (BLOCK_SIZE - 1).bit_length()
         
         cfg = dict(cfg_main)
 
