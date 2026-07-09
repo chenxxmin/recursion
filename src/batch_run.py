@@ -1,3 +1,5 @@
+import argparse
+
 import glob
 import json
 import os
@@ -10,7 +12,7 @@ from concurrent.futures import ThreadPoolExecutor, as_completed
 from datetime import datetime
 
 BASE_CONFIG_PATH = 'config.json'
-EXPERIMENTS_PATH = 'experiments.json'
+DEFAULT_EXPERIMENTS_PATH = 'experiments.json'
 LOG_DIR = 'logs'
 MODEL_DIR = 'models'
 PLOT_DIR = 'plots'
@@ -242,16 +244,26 @@ def run_single(exp, base_config, concurrency=1, gpu_id=None):
 
 
 def main():
+    parser = argparse.ArgumentParser(description='Run a batch of experiments defined in a JSON file.')
+    parser.add_argument(
+        'experiments_path',
+        nargs='?',
+        default=DEFAULT_EXPERIMENTS_PATH,
+        help=f'Path to experiments config JSON (default: {DEFAULT_EXPERIMENTS_PATH})'
+    )
+    args = parser.parse_args()
+    experiments_path = args.experiments_path
+
     os.makedirs(LOG_DIR, exist_ok=True)
     os.makedirs(MODEL_DIR, exist_ok=True)
 
-    if not os.path.exists(EXPERIMENTS_PATH):
-        print(f"Error: experiments config file {EXPERIMENTS_PATH} not found")
-        print(f"Please create {EXPERIMENTS_PATH} and define the experiment list.")
+    if not os.path.exists(experiments_path):
+        print(f"Error: experiments config file {experiments_path} not found")
+        print(f"Please create {experiments_path} and define the experiment list.")
         sys.exit(1)
 
     base_config = load_json(BASE_CONFIG_PATH)
-    raw_experiments = load_json(EXPERIMENTS_PATH)
+    raw_experiments = load_json(experiments_path)
 
     # Support two formats:
     # Old format: [{"name": "...", "config": {...}}, ...]
@@ -267,6 +279,7 @@ def main():
         print("Error: experiment list is empty")
         sys.exit(1)
 
+    print(f"Using experiments config: {experiments_path}")
     print(f"Total experiments: {len(experiments)}, concurrency: {concurrency}")
     print("-" * 50)
 
