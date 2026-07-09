@@ -1198,15 +1198,15 @@ def run_experiment(config_path=None):
             exp_mask = loss_mask[exposed]
             unexp_mask = loss_mask[~exposed]
 
-            exp_id_correct = (exp_corr * in_dist_mask).sum().item()
-            exp_id_total = (exp_mask * in_dist_mask).sum().item()
-            exp_ood_correct = (exp_corr * ood_mask).sum().item()
-            exp_ood_total = (exp_mask * ood_mask).sum().item()
+            exp_id_correct = int((exp_corr * in_dist_mask).sum().item())
+            exp_id_total = int((exp_mask * in_dist_mask).sum().item())
+            exp_ood_correct = int((exp_corr * ood_mask).sum().item())
+            exp_ood_total = int((exp_mask * ood_mask).sum().item())
 
-            unexp_id_correct = (unexp_corr * in_dist_mask).sum().item()
-            unexp_id_total = (unexp_mask * in_dist_mask).sum().item()
-            unexp_ood_correct = (unexp_corr * ood_mask).sum().item()
-            unexp_ood_total = (unexp_mask * ood_mask).sum().item()
+            unexp_id_correct = int((unexp_corr * in_dist_mask).sum().item())
+            unexp_id_total = int((unexp_mask * in_dist_mask).sum().item())
+            unexp_ood_correct = int((unexp_corr * ood_mask).sum().item())
+            unexp_ood_total = int((unexp_mask * ood_mask).sum().item())
 
             def _safe_div(a, b):
                 return a / b if b > 0 else 0
@@ -1293,15 +1293,15 @@ def run_experiment(config_path=None):
         exp_mask = loss_mask[exposed]
         unexp_mask = loss_mask[~exposed]
 
-        exp_id_correct = (exp_corr * in_dist_mask).sum().item()
-        exp_id_total = (exp_mask * in_dist_mask).sum().item()
-        exp_ood_correct = (exp_corr * ood_mask).sum().item()
-        exp_ood_total = (exp_mask * ood_mask).sum().item()
+        exp_id_correct = int((exp_corr * in_dist_mask).sum().item())
+        exp_id_total = int((exp_mask * in_dist_mask).sum().item())
+        exp_ood_correct = int((exp_corr * ood_mask).sum().item())
+        exp_ood_total = int((exp_mask * ood_mask).sum().item())
 
-        unexp_id_correct = (unexp_corr * in_dist_mask).sum().item()
-        unexp_id_total = (unexp_mask * in_dist_mask).sum().item()
-        unexp_ood_correct = (unexp_corr * ood_mask).sum().item()
-        unexp_ood_total = (unexp_mask * ood_mask).sum().item()
+        unexp_id_correct = int((unexp_corr * in_dist_mask).sum().item())
+        unexp_id_total = int((unexp_mask * in_dist_mask).sum().item())
+        unexp_ood_correct = int((unexp_corr * ood_mask).sum().item())
+        unexp_ood_total = int((unexp_mask * ood_mask).sum().item())
 
         # Per-position statistics
         pos_exp_id = {}
@@ -1315,11 +1315,11 @@ def run_experiment(config_path=None):
             exp_pos = exposed & (loss_pos > 0)
             unexp_pos = (~exposed) & (loss_pos > 0)
             if i < TRAIN_LEN:
-                pos_exp_id[pos] = (corr_pos[exp_pos].sum().item(), exp_pos.sum().item())
-                pos_unexp_id[pos] = (corr_pos[unexp_pos].sum().item(), unexp_pos.sum().item())
+                pos_exp_id[pos] = (int(corr_pos[exp_pos].sum().item()), int(exp_pos.sum().item()))
+                pos_unexp_id[pos] = (int(corr_pos[unexp_pos].sum().item()), int(unexp_pos.sum().item()))
             else:
-                pos_exp_ood[pos] = (corr_pos[exp_pos].sum().item(), exp_pos.sum().item())
-                pos_unexp_ood[pos] = (corr_pos[unexp_pos].sum().item(), unexp_pos.sum().item())
+                pos_exp_ood[pos] = (int(corr_pos[exp_pos].sum().item()), int(exp_pos.sum().item()))
+                pos_unexp_ood[pos] = (int(corr_pos[unexp_pos].sum().item()), int(unexp_pos.sum().item()))
 
         def _safe_div(a, b):
             return a / b if b > 0 else 0
