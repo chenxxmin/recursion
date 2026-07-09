@@ -28,6 +28,70 @@ def save_json(path, data):
         json.dump(data, f, indent=2, ensure_ascii=False)
 
 
+def format_config_table(config):
+    """Format merged config into a readable three-section table."""
+    net_keys = [
+        'D_MODEL', 'N_HEAD', 'N_LAYER', 'MLP_RATIO', 'DROPOUT',
+        'USE_LEARNABLE_PE'
+    ]
+    data_keys = [
+        'P', 'TASK', 'TRAIN_LEN', 'OOD_LEN', 'MAX_UNIQUE_RATIO',
+        'MIXED_AB_MAX_UNIQUE_RATIOS', 'AB_PAIRS', 'A', 'B', 'C',
+        'NUM_MASK'
+    ]
+    train_keys = [
+        'BATCH_SIZE', 'LR', 'WEIGHT_DECAY', 'EPOCHS', 'RANDOM_SEED',
+        'FIRST_TASK_WEIGHT', 'ENTROPY_PENALTY_WEIGHT', 'EVAL_INTERVAL',
+        'EARLY_STOP_ACCURACY', 'EARLY_STOP_NO_IMPROVE', 'USE_GREEDY_GENERATE'
+    ]
+
+    lines = []
+    lines.append("-" * 50)
+    lines.append("Network Config")
+    lines.append("-" * 50)
+    for key in net_keys:
+        if key in config:
+            value = config[key]
+            if isinstance(value, float):
+                lines.append(f"{key:<25} {value}")
+            elif isinstance(value, bool):
+                lines.append(f"{key:<25} {value}")
+            else:
+                lines.append(f"{key:<25} {value}")
+
+    lines.append("-" * 50)
+    lines.append("Dataset Config")
+    lines.append("-" * 50)
+    for key in data_keys:
+        if key in config:
+            value = config[key]
+            if isinstance(value, (list, tuple)):
+                lines.append(f"{key:<25} {value}")
+            elif isinstance(value, float):
+                lines.append(f"{key:<25} {value}")
+            else:
+                lines.append(f"{key:<25} {value}")
+
+    lines.append("-" * 50)
+    lines.append("Training Config")
+    lines.append("-" * 50)
+    lines.append(f"{'OPTIMIZER':<25} AdamW")
+    lines.append(f"{'SCHEDULER':<25} CosineAnnealingLR(T_max=EPOCHS)")
+    for key in train_keys:
+        if key in config:
+            value = config[key]
+            if isinstance(value, float):
+                lines.append(f"{key:<25} {value}")
+            elif isinstance(value, bool):
+                lines.append(f"{key:<25} {value}")
+            else:
+                lines.append(f"{key:<25} {value}")
+    lines.append("-" * 50)
+    lines.append("")
+
+    return "\n".join(lines)
+
+
 def run_single(exp, base_config, concurrency=1, gpu_id=None):
     name = exp['name']
     override = exp.get('config', {})
@@ -88,8 +152,9 @@ def run_single(exp, base_config, concurrency=1, gpu_id=None):
             f.write(f"=== Experiment: {name} ===\n")
             f.write(f"Time: {datetime.now().isoformat()}\n")
             f.write(f"Task type: {task}\n")
-            f.write(f"Merged config: {json.dumps(merged_main, indent=2, ensure_ascii=False)}\n")
-            f.write("--- output ---\n")
+            f.write("\n=== Merged Config ===\n")
+            f.write(format_config_table(merged_main))
+            f.write("\n--- output ---\n")
             f.flush()
             for raw in process.stdout:
                 line = _decode(raw)
