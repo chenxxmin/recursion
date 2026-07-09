@@ -1175,7 +1175,7 @@ def run_experiment(config_path=None):
                     end = min(start + batch_size, len(test_cases))
                     batch_seq = full_sequences[start:end]
                     batch_labels = ab_labels[start:end]
-                    logits, _ = model(batch_seq, ab_labels=batch_labels)
+                    logits, _, _ = model(batch_seq, ab_labels=batch_labels)
                     preds = logits.argmax(dim=-1)[:, :-1]
                     all_preds.append(preds)
             all_preds = torch.cat(all_preds, dim=0)
