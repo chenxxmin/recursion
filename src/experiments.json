@@ -2,59 +2,75 @@
   "concurrency": 8,
   "experiments": [
     {
-      "name": "addition_seed0",
-      "task": "addition",
+      "name": "mixed_basic_seed0",
+      "task": "mixed_ab",
       "config": {
-        "RANDOM_SEED": 0
+        "RANDOM_SEED": 0,
+        "USE_AB_TAG": false,
+        "USE_CONDITIONAL_WTE": false
       }
     },
     {
-      "name": "addition_seed1",
-      "task": "addition",
+      "name": "mixed_basic_seed1",
+      "task": "mixed_ab",
       "config": {
-        "RANDOM_SEED": 1
+        "RANDOM_SEED": 1,
+        "USE_AB_TAG": false,
+        "USE_CONDITIONAL_WTE": false
       }
     },
     {
-      "name": "addition_seed2",
-      "task": "addition",
+      "name": "mixed_basic_seed2",
+      "task": "mixed_ab",
       "config": {
-        "RANDOM_SEED": 2
+        "RANDOM_SEED": 2,
+        "USE_AB_TAG": false,
+        "USE_CONDITIONAL_WTE": false
       }
     },
     {
-      "name": "addition_seed3",
-      "task": "addition",
+      "name": "mixed_basic_seed3",
+      "task": "mixed_ab",
       "config": {
-        "RANDOM_SEED": 3
+        "RANDOM_SEED": 3,
+        "USE_AB_TAG": false,
+        "USE_CONDITIONAL_WTE": false
       }
     },
     {
-      "name": "addition_seed4",
-      "task": "addition",
+      "name": "mixed_basic_seed4",
+      "task": "mixed_ab",
       "config": {
-        "RANDOM_SEED": 4
+        "RANDOM_SEED": 4,
+        "USE_AB_TAG": false,
+        "USE_CONDITIONAL_WTE": false
       }
     },
     {
-      "name": "addition_seed5",
-      "task": "addition",
+      "name": "mixed_basic_seed5",
+      "task": "mixed_ab",
       "config": {
-        "RANDOM_SEED": 5
+        "RANDOM_SEED": 5,
+        "USE_AB_TAG": false,
+        "USE_CONDITIONAL_WTE": false
       }
     },
     {
-      "name": "addition_seed6",
-      "task": "addition",
+      "name": "mixed_basic_seed6",
+      "task": "mixed_ab",
       "config": {
-        "RANDOM_SEED": 6
+        "RANDOM_SEED": 6,
+        "USE_AB_TAG": false,
+        "USE_CONDITIONAL_WTE": false
       }
     },
     {
-      "name": "addition_seed7",
-      "task": "addition",
+      "name": "mixed_basic_seed7",
+      "task": "mixed_ab",
       "config": {
-        "RANDOM_SEED": 7
+        "RANDOM_SEED": 7,
+        "USE_AB_TAG": false,
+        "USE_CONDITIONAL_WTE": false
       }
     }
   ]
