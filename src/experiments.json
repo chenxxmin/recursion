@@ -2,73 +2,97 @@
   "concurrency": 8,
   "experiments": [
     {
-      "name": "mixed_basic_seed0",
+      "name": "mixed_basic_d512l2r8_seed0",
       "task": "mixed_ab",
       "config": {
         "RANDOM_SEED": 0,
+        "D_MODEL": 512,
+        "N_LAYER": 2,
+        "MLP_RATIO": 8,
         "USE_AB_TAG": false,
         "USE_CONDITIONAL_WTE": false
       }
     },
     {
-      "name": "mixed_basic_seed1",
+      "name": "mixed_basic_d512l2r8_seed1",
       "task": "mixed_ab",
       "config": {
         "RANDOM_SEED": 1,
+        "D_MODEL": 512,
+        "N_LAYER": 2,
+        "MLP_RATIO": 8,
         "USE_AB_TAG": false,
         "USE_CONDITIONAL_WTE": false
       }
     },
     {
-      "name": "mixed_basic_seed2",
+      "name": "mixed_basic_d512l2r8_seed2",
       "task": "mixed_ab",
       "config": {
         "RANDOM_SEED": 2,
+        "D_MODEL": 512,
+        "N_LAYER": 2,
+        "MLP_RATIO": 8,
         "USE_AB_TAG": false,
         "USE_CONDITIONAL_WTE": false
       }
     },
     {
-      "name": "mixed_basic_seed3",
+      "name": "mixed_basic_d512l2r8_seed3",
       "task": "mixed_ab",
       "config": {
         "RANDOM_SEED": 3,
+        "D_MODEL": 512,
+        "N_LAYER": 2,
+        "MLP_RATIO": 8,
         "USE_AB_TAG": false,
         "USE_CONDITIONAL_WTE": false
       }
     },
     {
-      "name": "mixed_basic_seed4",
+      "name": "mixed_basic_d512l2r8_seed4",
       "task": "mixed_ab",
       "config": {
         "RANDOM_SEED": 4,
+        "D_MODEL": 512,
+        "N_LAYER": 2,
+        "MLP_RATIO": 8,
         "USE_AB_TAG": false,
         "USE_CONDITIONAL_WTE": false
       }
     },
     {
-      "name": "mixed_basic_seed5",
+      "name": "mixed_basic_d512l2r8_seed5",
       "task": "mixed_ab",
       "config": {
         "RANDOM_SEED": 5,
+        "D_MODEL": 512,
+        "N_LAYER": 2,
+        "MLP_RATIO": 8,
         "USE_AB_TAG": false,
         "USE_CONDITIONAL_WTE": false
       }
     },
     {
-      "name": "mixed_basic_seed6",
+      "name": "mixed_basic_d512l2r8_seed6",
       "task": "mixed_ab",
       "config": {
         "RANDOM_SEED": 6,
+        "D_MODEL": 512,
+        "N_LAYER": 2,
+        "MLP_RATIO": 8,
         "USE_AB_TAG": false,
         "USE_CONDITIONAL_WTE": false
       }
     },
     {
-      "name": "mixed_basic_seed7",
+      "name": "mixed_basic_d512l2r8_seed7",
       "task": "mixed_ab",
       "config": {
         "RANDOM_SEED": 7,
+        "D_MODEL": 512,
+        "N_LAYER": 2,
+        "MLP_RATIO": 8,
         "USE_AB_TAG": false,
         "USE_CONDITIONAL_WTE": false
       }
