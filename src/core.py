@@ -1129,7 +1129,7 @@ def run_experiment(config_path=None):
         print("\n[Config] SKIP_FINAL_GENERATION_TEST=true, skipping final generation test.")
     elif post_train_mode == 'mixed_ab':
         print(f"\n{'='*50}")
-        print("Final generation test (given first two items, AB generates 3rd as prompt, validate from 4th)")
+        print("Final generation test (batched teacher forcing, validate from position 3)")
         print(f"{'='*50}")
         model.eval()
         test_cases = list(itertools.product(range(P), repeat=2))
@@ -1144,54 +1144,69 @@ def run_experiment(config_path=None):
                 x0, x1 = seq[0].item(), seq[1].item()
             train_seen_inits[ab_idx].add((x0, x1))
 
+        batch_size = 1024
+
         for ab_idx, (a, b) in enumerate(AB_PAIRS):
             print(f"\n--- AB pair {ab_idx+1}: ({a}, {b}) ---")
-            ab_label = torch.tensor([ab_idx], dtype=torch.long).to(device)
             seen = train_seen_inits[ab_idx]
 
-            # Accumulators for exposed / unexposed
-            exp_id_correct = exp_id_total = 0
-            exp_ood_correct = exp_ood_total = 0
-            unexp_id_correct = unexp_id_total = 0
-            unexp_ood_correct = unexp_ood_total = 0
-
+            # Build full true sequences for all initial states under this rule
+            full_sequences = []
             for x0, x1 in test_cases:
-                is_exposed = (x0, x1) in seen
-                x2 = (a * x1 + b * x0) % P
+                seq = [x0, x1]
+                while len(seq) < OOD_LEN:
+                    seq.append((a * seq[-1] + b * seq[-2]) % P)
                 if model.use_ab_tag:
-                    prompt = torch.tensor([[P + ab_idx, x0, x1, x2]], dtype=torch.long).to(device)
-                else:
-                    prompt = torch.tensor([[x0, x1, x2]], dtype=torch.long).to(device)
-                generated = model.generate(prompt, max_new_tokens=OOD_LEN - 3, ab_labels=ab_label)
-                seq = generated[0].tolist()
-                check_len = min(OOD_LEN, len(seq))
-                in_dist_end = min(TRAIN_LEN, check_len)
+                    seq = [P + ab_idx] + seq
+                full_sequences.append(seq)
+            full_sequences = torch.tensor(full_sequences, dtype=torch.long, device=device)
 
-                # In-dist (positions 3 .. in_dist_end-1)
-                for i in range(3, in_dist_end):
-                    correct = (seq[i] == (a * seq[i-1] + b * seq[i-2]) % P)
-                    if is_exposed:
-                        exp_id_total += 1
-                        if correct:
-                            exp_id_correct += 1
-                    else:
-                        unexp_id_total += 1
-                        if correct:
-                            unexp_id_correct += 1
+            ab_labels = torch.full((len(test_cases),), ab_idx, dtype=torch.long, device=device)
+            exposed_list = [(x0, x1) in seen for x0, x1 in test_cases]
+            exposed = torch.tensor(exposed_list, dtype=torch.bool, device=device)
 
-                # OOD (positions TRAIN_MAX_LEN .. check_len-1)
-                for i in range(TRAIN_LEN, check_len):
-                    correct = (seq[i] == (a * seq[i-1] + b * seq[i-2]) % P)
-                    if is_exposed:
-                        exp_ood_total += 1
-                        if correct:
-                            exp_ood_correct += 1
-                    else:
-                        unexp_ood_total += 1
-                        if correct:
-                            unexp_ood_correct += 1
+            seq_len = full_sequences.size(1)
+            target_len = seq_len - 1
 
-                # (per-test-case details omitted for brevity)
+            # Teacher-forced forward in batches
+            all_preds = []
+            with torch.no_grad():
+                for start in range(0, len(test_cases), batch_size):
+                    end = min(start + batch_size, len(test_cases))
+                    batch_seq = full_sequences[start:end]
+                    batch_labels = ab_labels[start:end]
+                    logits, _ = model(batch_seq, ab_labels=batch_labels)
+                    preds = logits.argmax(dim=-1)[:, :-1]
+                    all_preds.append(preds)
+            all_preds = torch.cat(all_preds, dim=0)
+
+            targets = full_sequences[:, 1:]
+            correct = (all_preds == targets).float()
+
+            # Loss mask: ignore first num_mask=2 positions
+            loss_mask = torch.zeros(len(test_cases), target_len, dtype=torch.float, device=device)
+            if target_len > 2:
+                loss_mask[:, 2:] = 1.0
+
+            # Position masks (absolute position i = t + 1)
+            in_dist_mask = torch.arange(target_len, device=device) < (TRAIN_LEN - 1)
+            ood_mask = torch.arange(target_len, device=device) >= (TRAIN_LEN - 1)
+
+            masked_correct = correct * loss_mask
+            exp_corr = masked_correct[exposed]
+            unexp_corr = masked_correct[~exposed]
+            exp_mask = loss_mask[exposed]
+            unexp_mask = loss_mask[~exposed]
+
+            exp_id_correct = (exp_corr * in_dist_mask).sum().item()
+            exp_id_total = (exp_mask * in_dist_mask).sum().item()
+            exp_ood_correct = (exp_corr * ood_mask).sum().item()
+            exp_ood_total = (exp_mask * ood_mask).sum().item()
+
+            unexp_id_correct = (unexp_corr * in_dist_mask).sum().item()
+            unexp_id_total = (unexp_mask * in_dist_mask).sum().item()
+            unexp_ood_correct = (unexp_corr * ood_mask).sum().item()
+            unexp_ood_total = (unexp_mask * ood_mask).sum().item()
 
             def _safe_div(a, b):
                 return a / b if b > 0 else 0
@@ -1200,9 +1215,28 @@ def run_experiment(config_path=None):
             print(f"Exposed    samples: {len([tc for tc in test_cases if tc in seen]):5d} | In-dist: {exp_id_correct:5d}/{exp_id_total:5d} ({_safe_div(exp_id_correct, exp_id_total)*100:5.1f}%) | OOD: {exp_ood_correct:5d}/{exp_ood_total:5d} ({_safe_div(exp_ood_correct, exp_ood_total)*100:5.1f}%)")
             print(f"Unexposed  samples: {len([tc for tc in test_cases if tc not in seen]):5d} | In-dist: {unexp_id_correct:5d}/{unexp_id_total:5d} ({_safe_div(unexp_id_correct, unexp_id_total)*100:5.1f}%) | OOD: {unexp_ood_correct:5d}/{unexp_ood_total:5d} ({_safe_div(unexp_ood_correct, unexp_ood_total)*100:5.1f}%)")
 
+            # Per-position accuracy for this rule
+            print(f"\n--- Per-position accuracy for AB=({a},{b}) ---")
+            for pos in range(2, target_len):
+                i = pos + 1
+                loss_pos = loss_mask[:, pos]
+                corr_pos = correct[:, pos]
+                exp_pos = exposed & (loss_pos > 0)
+                unexp_pos = (~exposed) & (loss_pos > 0)
+                is_id = i < TRAIN_LEN
+                parts = []
+                for label, mask in [('Exposed-ID' if is_id else 'Exposed-OOD', exp_pos),
+                                     ('Unexposed-ID' if is_id else 'Unexposed-OOD', unexp_pos)]:
+                    if mask.any():
+                        cnt = corr_pos[mask].sum().item()
+                        tot = mask.sum().item()
+                        parts.append(f"{label}: {cnt}/{tot} ({_safe_div(cnt, tot)*100:5.1f}%)")
+                if parts:
+                    print(f"  Position {i:3d}: " + " | ".join(parts))
+
     elif post_train_mode == 'single_recurrence':
         print(f"\n{'='*50}")
-        print(f"Final generation test (full enumeration, validate from position {num_mask+1})")
+        print(f"Final generation test (batched teacher forcing, validate from position {num_mask+1})")
         print(f"{'='*50}")
         model.eval()
         # Collect exposed initial states from training set
@@ -1212,80 +1246,92 @@ def run_experiment(config_path=None):
             init_state = tuple(seq[:init_len].tolist())
             train_seen_inits.add(init_state)
 
-        prompt_len = num_mask + 1
-        verify_start = prompt_len
+        all_inits = list(itertools.product(range(P), repeat=init_len))
+        total_states = len(all_inits)
 
-        exp_id_correct = exp_id_total = 0
-        exp_ood_correct = exp_ood_total = 0
-        unexp_id_correct = unexp_id_total = 0
-        unexp_ood_correct = unexp_ood_total = 0
+        # Build full true sequences of length OOD_LEN for every initial state
+        full_sequences = []
+        for init_vals in all_inits:
+            seq = list(init_vals)
+            while len(seq) < OOD_LEN:
+                seq.append(recurrence_fn(seq, P))
+            full_sequences.append(seq)
+        full_sequences = torch.tensor(full_sequences, dtype=torch.long, device=device)
 
-        # Per-position statistics: {position: (correct, total)}
+        # Teacher-forced forward in batches
+        batch_size = 1024
+        all_preds = []
+        with torch.no_grad():
+            for start in range(0, total_states, batch_size):
+                end = min(start + batch_size, total_states)
+                batch_seq = full_sequences[start:end]
+                logits, _ = model(batch_seq)
+                preds = logits.argmax(dim=-1)[:, :-1]
+                all_preds.append(preds)
+        all_preds = torch.cat(all_preds, dim=0)
+
+        targets = full_sequences[:, 1:]
+        correct = (all_preds == targets).float()
+
+        # Loss mask: ignore first num_mask positions
+        loss_mask = torch.zeros(total_states, OOD_LEN - 1, dtype=torch.float, device=device)
+        if OOD_LEN - 1 > num_mask:
+            loss_mask[:, num_mask:] = 1.0
+
+        # Position masks (t indexes targets, absolute position i = t + 1)
+        in_dist_mask = torch.arange(OOD_LEN - 1, device=device) < (TRAIN_LEN - 1)
+        ood_mask = torch.arange(OOD_LEN - 1, device=device) >= (TRAIN_LEN - 1)
+
+        # Exposed / unexposed mask
+        exposed_list = [init_vals in train_seen_inits for init_vals in all_inits]
+        exposed = torch.tensor(exposed_list, dtype=torch.bool, device=device)
+
+        # Accumulate statistics
+        masked_correct = correct * loss_mask
+        exp_corr = masked_correct[exposed]
+        unexp_corr = masked_correct[~exposed]
+        exp_mask = loss_mask[exposed]
+        unexp_mask = loss_mask[~exposed]
+
+        exp_id_correct = (exp_corr * in_dist_mask).sum().item()
+        exp_id_total = (exp_mask * in_dist_mask).sum().item()
+        exp_ood_correct = (exp_corr * ood_mask).sum().item()
+        exp_ood_total = (exp_mask * ood_mask).sum().item()
+
+        unexp_id_correct = (unexp_corr * in_dist_mask).sum().item()
+        unexp_id_total = (unexp_mask * in_dist_mask).sum().item()
+        unexp_ood_correct = (unexp_corr * ood_mask).sum().item()
+        unexp_ood_total = (unexp_mask * ood_mask).sum().item()
+
+        # Per-position statistics
         pos_exp_id = {}
         pos_exp_ood = {}
         pos_unexp_id = {}
         pos_unexp_ood = {}
-
-        for init_vals in itertools.product(range(P), repeat=init_len):
-            is_exposed = init_vals in train_seen_inits
-
-            # Build prompt: init_vals + next (prompt_len - init_len) true values
-            seq = list(init_vals)
-            for _ in range(max(0, prompt_len - init_len)):
-                next_val = recurrence_fn(seq, P)
-                seq.append(next_val)
-
-            prompt = torch.tensor([seq], dtype=torch.long).to(device)
-            generated = model.generate(prompt, max_new_tokens=OOD_LEN - prompt_len)
-            gen_seq = generated[0].tolist()
-            check_len = min(OOD_LEN, len(gen_seq))
-            in_dist_end = min(TRAIN_LEN, check_len)
-
-            # In-dist
-            for i in range(verify_start, in_dist_end):
-                expected = recurrence_fn(gen_seq[i-init_len:i], P)
-                correct = (gen_seq[i] == expected)
-                if is_exposed:
-                    exp_id_total += 1
-                    if correct:
-                        exp_id_correct += 1
-                    cnt, tot = pos_exp_id.get(i, (0, 0))
-                    pos_exp_id[i] = (cnt + int(correct), tot + 1)
-                else:
-                    unexp_id_total += 1
-                    if correct:
-                        unexp_id_correct += 1
-                    cnt, tot = pos_unexp_id.get(i, (0, 0))
-                    pos_unexp_id[i] = (cnt + int(correct), tot + 1)
-
-            # OOD
-            for i in range(TRAIN_LEN, check_len):
-                expected = recurrence_fn(gen_seq[i-init_len:i], P)
-                correct = (gen_seq[i] == expected)
-                if is_exposed:
-                    exp_ood_total += 1
-                    if correct:
-                        exp_ood_correct += 1
-                    cnt, tot = pos_exp_ood.get(i, (0, 0))
-                    pos_exp_ood[i] = (cnt + int(correct), tot + 1)
-                else:
-                    unexp_ood_total += 1
-                    if correct:
-                        unexp_ood_correct += 1
-                    cnt, tot = pos_unexp_ood.get(i, (0, 0))
-                    pos_unexp_ood[i] = (cnt + int(correct), tot + 1)
+        for pos in range(num_mask, OOD_LEN - 1):
+            i = pos + 1
+            loss_pos = loss_mask[:, pos]
+            corr_pos = correct[:, pos]
+            exp_pos = exposed & (loss_pos > 0)
+            unexp_pos = (~exposed) & (loss_pos > 0)
+            if i < TRAIN_LEN:
+                pos_exp_id[pos] = (corr_pos[exp_pos].sum().item(), exp_pos.sum().item())
+                pos_unexp_id[pos] = (corr_pos[unexp_pos].sum().item(), unexp_pos.sum().item())
+            else:
+                pos_exp_ood[pos] = (corr_pos[exp_pos].sum().item(), exp_pos.sum().item())
+                pos_unexp_ood[pos] = (corr_pos[unexp_pos].sum().item(), unexp_pos.sum().item())
 
         def _safe_div(a, b):
             return a / b if b > 0 else 0
 
-        total_states = P ** init_len
         print(f"\n--- Statistics for {recurrence_name} ---")
-        print(f"Exposed    samples: {len(train_seen_inits):5d} | In-dist: {exp_id_correct:5d}/{exp_id_total:5d} ({_safe_div(exp_id_correct, exp_id_total)*100:5.1f}%) | OOD: {exp_ood_correct:5d}/{exp_ood_total:5d} ({_safe_div(exp_ood_correct, exp_ood_total)*100:5.1f}%)")
-        print(f"Unexposed  samples: {total_states - len(train_seen_inits):5d} | In-dist: {unexp_id_correct:5d}/{unexp_id_total:5d} ({_safe_div(unexp_id_correct, unexp_id_total)*100:5.1f}%) | OOD: {unexp_ood_correct:5d}/{unexp_ood_total:5d} ({_safe_div(unexp_ood_correct, unexp_ood_total)*100:5.1f}%)")
+        print(f"Exposed    samples: {exposed.sum().item():5d} | In-dist: {exp_id_correct:5d}/{exp_id_total:5d} ({_safe_div(exp_id_correct, exp_id_total)*100:5.1f}%) | OOD: {exp_ood_correct:5d}/{exp_ood_total:5d} ({_safe_div(exp_ood_correct, exp_ood_total)*100:5.1f}%)")
+        print(f"Unexposed  samples: {(~exposed).sum().item():5d} | In-dist: {unexp_id_correct:5d}/{unexp_id_total:5d} ({_safe_div(unexp_id_correct, unexp_id_total)*100:5.1f}%) | OOD: {unexp_ood_correct:5d}/{unexp_ood_total:5d} ({_safe_div(unexp_ood_correct, unexp_ood_total)*100:5.1f}%)")
 
         print(f"\n--- Per-position accuracy ---")
         all_positions = sorted(set().union(pos_exp_id, pos_exp_ood, pos_unexp_id, pos_unexp_ood))
         for pos in all_positions:
+            i = pos + 1
             parts = []
             for label, d in [('Exposed-ID', pos_exp_id), ('Exposed-OOD', pos_exp_ood),
                              ('Unexposed-ID', pos_unexp_id), ('Unexposed-OOD', pos_unexp_ood)]:
@@ -1293,4 +1339,4 @@ def run_experiment(config_path=None):
                 if tot > 0:
                     parts.append(f"{label}: {cnt}/{tot} ({_safe_div(cnt, tot)*100:5.1f}%)")
             if parts:
-                print(f"  Position {pos:3d}: " + " | ".join(parts))
+                print(f"  Position {i:3d}: " + " | ".join(parts))
