@@ -186,6 +186,39 @@ def plot_per_position(data, title, save_path=None):
     data : dict or list of (label, dict)
         Single experiment or a list of runs (e.g. different seeds).
     """
+    def _regularize(per_pos, epochs):
+        """Return (epochs, matrix) aligned to a common position axis.
+
+        Per-position rows may have different lengths or start positions.
+        Missing values are filled with NaN so imshow receives a regular array.
+        """
+        entries = []
+        min_start = None
+        max_end = None
+        for ep, pp in zip(epochs, per_pos):
+            if pp is None:
+                continue
+            start_x, accs = pp
+            entries.append((ep, start_x, list(accs)))
+            if min_start is None or start_x < min_start:
+                min_start = start_x
+            end = start_x + len(accs)
+            if max_end is None or end > max_end:
+                max_end = end
+        if not entries or min_start is None or max_end is None:
+            return [], []
+
+        n_cols = max_end - min_start
+        matrix = []
+        out_epochs = []
+        for ep, start_x, accs in entries:
+            row = [float('nan')] * n_cols
+            offset = start_x - min_start
+            row[offset:offset + len(accs)] = accs
+            matrix.append(row)
+            out_epochs.append(ep)
+        return out_epochs, matrix
+
     items = _data_items(data)
     single_mode = len(items) == 1 and items[0][0] == ''
 
@@ -196,12 +229,7 @@ def plot_per_position(data, title, save_path=None):
             print("No per-position accuracy data to plot.")
             return
 
-        epochs = []
-        matrix = []
-        for ep, pp in zip(d['epochs'], per_pos):
-            if pp is not None:
-                epochs.append(ep)
-                matrix.append(pp[1])
+        epochs, matrix = _regularize(per_pos, d['epochs'])
         if not matrix:
             print("No per-position accuracy data to plot.")
             return
@@ -221,13 +249,7 @@ def plot_per_position(data, title, save_path=None):
     else:
         valid_items = []
         for label, d in items:
-            per_pos = d['per_pos']
-            epochs = []
-            matrix = []
-            for ep, pp in zip(d['epochs'], per_pos):
-                if pp is not None:
-                    epochs.append(ep)
-                    matrix.append(pp[1])
+            epochs, matrix = _regularize(d['per_pos'], d['epochs'])
             if matrix:
                 matrix = list(reversed(matrix))
                 epochs = list(reversed(epochs))
