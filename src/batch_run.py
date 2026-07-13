@@ -215,20 +215,6 @@ def run_single(exp, base_config, concurrency=1, gpu_id=None):
     if os.path.exists(err_log_path) and os.path.getsize(err_log_path) == 0:
         os.remove(err_log_path)
 
-    # Generate learning curve plots
-    if returncode == 0:
-        try:
-            os.makedirs(PLOT_DIR, exist_ok=True)
-            data = visualize.parse_log(log_path)
-            if data['epochs']:
-                base = os.path.join(PLOT_DIR, name)
-                visualize.plot_learning_curve(data, name, save_path=f'{base}_curve.png')
-                visualize.plot_per_position(data, name, save_path=f'{base}_per_pos.png')
-                visualize.plot_per_rule(data, name, save_path=f'{base}_per_rule.png')
-                print(f"[{datetime.now().strftime('%H:%M:%S')}] Plots saved to {PLOT_DIR}/: {name}")
-        except Exception as e:
-            print(f"[{datetime.now().strftime('%H:%M:%S')}] Warning: failed to generate plots for {name}: {e}")
-
     # Clean up temp config files
     if os.path.exists(tmp_config_path):
         os.remove(tmp_config_path)
@@ -322,6 +308,36 @@ def main():
 
     # Run detailed summary
     summarize_experiments()
+
+    # Generate grouped plots (one figure per setting, all seeds overlaid)
+    generate_grouped_plots()
+
+
+def generate_grouped_plots():
+    """Group logs by experiment setting and plot all seeds together."""
+    os.makedirs(PLOT_DIR, exist_ok=True)
+    log_files = sorted(glob.glob(os.path.join(LOG_DIR, '*.log')))
+
+    groups = {}
+    for log_path in log_files:
+        name = os.path.basename(log_path)[:-4]  # remove .log
+        setting, seed = visualize.extract_setting_and_seed(name)
+        groups.setdefault(setting, []).append((seed or '', log_path))
+
+    for setting in sorted(groups.keys()):
+        items = groups[setting]
+        data_items = []
+        for seed, log_path in sorted(items, key=visualize._seed_sort_key):
+            data = visualize.parse_log(log_path)
+            if data['epochs']:
+                data_items.append((seed, data))
+        if not data_items:
+            continue
+        try:
+            visualize.plot_setting_group(setting, data_items, PLOT_DIR)
+            print(f"[{datetime.now().strftime('%H:%M:%S')}] Grouped plots saved: {setting}")
+        except Exception as e:
+            print(f"[{datetime.now().strftime('%H:%M:%S')}] Warning: failed to generate grouped plots for {setting}: {e}")
 
 
 def summarize_experiments():

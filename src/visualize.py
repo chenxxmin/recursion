@@ -79,123 +79,340 @@ def parse_percent(s):
     return float(s)
 
 
-def plot_learning_curve(data, title, save_path=None):
-    """Plot train/test accuracy and train loss over epochs."""
-    fig, axes = plt.subplots(1, 2, figsize=(12, 4))
+def extract_setting_and_seed(name):
+    """Split experiment name into setting and seed.
 
-    epochs = data['epochs']
+    Example: 'mixed_basic_d512l2r8_e0.5_0.5_seed0'
+             -> ('mixed_basic_d512l2r8_e0.5_0.5', '0')
+    Returns (name, None) if no seed suffix.
+    """
+    m = re.match(r'(.+)_seed(\d+)$', name)
+    if m:
+        return m.group(1), m.group(2)
+    return name, None
+
+
+def _data_items(data):
+    """Normalize input to a list of (label, data_dict)."""
+    if isinstance(data, dict):
+        return [('', data)]
+    return data
+
+
+def _seed_sort_key(item):
+    """Sort key for (seed_label, ...) items."""
+    seed = item[0]
+    return int(seed) if seed.isdigit() else -1
+
+
+def plot_learning_curve(data, title, save_path=None):
+    """Plot train/test accuracy and train loss over epochs.
+
+    Parameters
+    ----------
+    data : dict or list of (label, dict)
+        If a dict, plot a single experiment (legacy behaviour).
+        If a list, plot multiple runs on the same axes; label is used to
+        annotate curves (e.g. the seed number).
+    """
+    items = _data_items(data)
+    single_mode = len(items) == 1 and items[0][0] == ''
+
+    fig, axes = plt.subplots(1, 2, figsize=(12, 4))
+    colors = plt.cm.tab10.colors
 
     ax = axes[0]
-    ax.plot(epochs, data['train_acc'], label='Train Acc', linewidth=1.5)
-    ax.plot(epochs, data['test_acc'], label='Test Acc', linewidth=1.5)
-    ax.plot(epochs, data['best_acc'], label='Best Test Acc', linewidth=1.5, linestyle='--')
+    for idx, (label, d) in enumerate(items):
+        epochs = d['epochs']
+        if not epochs:
+            continue
+        if single_mode:
+            ax.plot(epochs, d['train_acc'], label='Train Acc', linewidth=1.5)
+            ax.plot(epochs, d['test_acc'], label='Test Acc', linewidth=1.5)
+            ax.plot(epochs, d['best_acc'], label='Best Test Acc',
+                    linewidth=1.5, linestyle='--')
+        else:
+            color = colors[idx % len(colors)]
+            line, = ax.plot(epochs, d['test_acc'], label=f'seed {label}',
+                            linewidth=1.5, color=color, alpha=0.85)
+            ax.plot(epochs, d['best_acc'], linewidth=1.2, linestyle='--',
+                    color=color, alpha=0.5)
+            # small seed label at the end of the test curve
+            ax.annotate(label, xy=(epochs[-1], d['test_acc'][-1]),
+                        fontsize=7, color=color,
+                        textcoords='offset points', xytext=(5, 0),
+                        va='center', clip_on=False)
     ax.set_xlabel('Epoch')
     ax.set_ylabel('Accuracy')
     ax.set_title(f'{title} - Accuracy')
-    ax.legend()
+    ax.legend(loc='best', fontsize=8)
     ax.grid(True, alpha=0.3)
     ax.set_ylim(-0.05, 1.05)
 
     ax = axes[1]
-    ax.plot(epochs, data['train_loss'], label='Train Loss', color='tab:red', linewidth=1.5)
+    for idx, (label, d) in enumerate(items):
+        epochs = d['epochs']
+        if not epochs:
+            continue
+        if single_mode:
+            ax.plot(epochs, d['train_loss'], label='Train Loss',
+                    linewidth=1.5, color='tab:red')
+        else:
+            color = colors[idx % len(colors)]
+            line, = ax.plot(epochs, d['train_loss'], label=f'seed {label}',
+                            linewidth=1.5, color=color, alpha=0.85)
+            ax.annotate(label, xy=(epochs[-1], d['train_loss'][-1]),
+                        fontsize=7, color=color,
+                        textcoords='offset points', xytext=(5, 0),
+                        va='center', clip_on=False)
     ax.set_xlabel('Epoch')
     ax.set_ylabel('Loss')
     ax.set_title(f'{title} - Loss')
-    ax.legend()
+    ax.legend(loc='best', fontsize=8)
     ax.grid(True, alpha=0.3)
 
     fig.tight_layout()
-    if save_path:
-        fig.savefig(save_path, dpi=150)
-        print(f"Saved learning curve to {save_path}")
-    else:
-        fig.savefig('learning_curve.png', dpi=150)
-        print("Saved learning curve to learning_curve.png")
+    out = save_path or ('learning_curve.png' if single_mode else f'{title}_curve.png')
+    fig.savefig(out, dpi=150)
+    print(f"Saved learning curve to {out}")
     plt.close(fig)
 
 
 def plot_per_position(data, title, save_path=None):
-    """Plot per-position accuracy heatmap over epochs."""
-    per_pos = data['per_pos']
-    if not per_pos or all(p is None for p in per_pos):
-        print("No per-position accuracy data to plot.")
-        return
+    """Plot per-position accuracy heatmap over epochs.
 
-    # Filter epochs with per_pos data
-    epochs = []
-    matrix = []
-    for ep, pp in zip(data['epochs'], per_pos):
-        if pp is not None:
-            epochs.append(ep)
-            matrix.append(pp[1])
-    if not matrix:
-        print("No per-position accuracy data to plot.")
-        return
+    Parameters
+    ----------
+    data : dict or list of (label, dict)
+        Single experiment or a list of runs (e.g. different seeds).
+    """
+    items = _data_items(data)
+    single_mode = len(items) == 1 and items[0][0] == ''
 
-    matrix = list(reversed(matrix))  # oldest at bottom
-    epochs = list(reversed(epochs))
+    if single_mode:
+        d = items[0][1]
+        per_pos = d['per_pos']
+        if not per_pos or all(p is None for p in per_pos):
+            print("No per-position accuracy data to plot.")
+            return
 
-    fig, ax = plt.subplots(figsize=(10, 6))
-    im = ax.imshow(matrix, aspect='auto', cmap='RdYlGn', vmin=0, vmax=1)
-    ax.set_xlabel('Position (relative to from-x)')
-    ax.set_ylabel('Epoch')
-    ax.set_title(f'{title} - Per-position Accuracy')
-    ax.set_yticks(range(0, len(epochs), max(1, len(epochs)//10)))
-    ax.set_yticklabels([epochs[i] for i in range(0, len(epochs), max(1, len(epochs)//10))])
-    fig.colorbar(im, ax=ax, label='Accuracy')
-    fig.tight_layout()
-    out = save_path or 'per_position.png'
+        epochs = []
+        matrix = []
+        for ep, pp in zip(d['epochs'], per_pos):
+            if pp is not None:
+                epochs.append(ep)
+                matrix.append(pp[1])
+        if not matrix:
+            print("No per-position accuracy data to plot.")
+            return
+
+        matrix = list(reversed(matrix))
+        epochs = list(reversed(epochs))
+
+        fig, ax = plt.subplots(figsize=(10, 6))
+        im = ax.imshow(matrix, aspect='auto', cmap='RdYlGn', vmin=0, vmax=1)
+        ax.set_xlabel('Position (relative to from-x)')
+        ax.set_ylabel('Epoch')
+        ax.set_title(f'{title} - Per-position Accuracy')
+        ax.set_yticks(range(0, len(epochs), max(1, len(epochs)//10)))
+        ax.set_yticklabels([epochs[i] for i in range(0, len(epochs), max(1, len(epochs)//10))])
+        fig.colorbar(im, ax=ax, label='Accuracy')
+        fig.tight_layout()
+    else:
+        valid_items = []
+        for label, d in items:
+            per_pos = d['per_pos']
+            epochs = []
+            matrix = []
+            for ep, pp in zip(d['epochs'], per_pos):
+                if pp is not None:
+                    epochs.append(ep)
+                    matrix.append(pp[1])
+            if matrix:
+                matrix = list(reversed(matrix))
+                epochs = list(reversed(epochs))
+                valid_items.append((label, epochs, matrix))
+        if not valid_items:
+            print("No per-position accuracy data to plot.")
+            return
+
+        n = len(valid_items)
+        ncols = 4
+        nrows = (n + ncols - 1) // ncols
+        fig, axes = plt.subplots(nrows, ncols, figsize=(3.2*ncols, 2.5*nrows),
+                                 squeeze=False, constrained_layout=True)
+        axes = axes.flatten()
+        for idx, (label, epochs, matrix) in enumerate(valid_items):
+            ax = axes[idx]
+            im = ax.imshow(matrix, aspect='auto', cmap='RdYlGn', vmin=0, vmax=1)
+            ax.set_title(f'seed {label}', fontsize=9)
+            ax.set_xlabel('Position', fontsize=8)
+            ax.set_ylabel('Epoch', fontsize=8)
+            ax.tick_params(axis='both', which='major', labelsize=7)
+            step = max(1, len(epochs)//5)
+            ax.set_yticks(range(0, len(epochs), step))
+            ax.set_yticklabels([epochs[i] for i in range(0, len(epochs), step)], fontsize=6)
+        for idx in range(n, len(axes)):
+            axes[idx].axis('off')
+        fig.suptitle(f'{title} - Per-position Accuracy', fontsize=12)
+        fig.colorbar(im, ax=axes.ravel().tolist(), label='Accuracy')
+
+    out = save_path or ('per_position.png' if single_mode else f'{title}_per_pos.png')
     fig.savefig(out, dpi=150)
     print(f"Saved per-position heatmap to {out}")
     plt.close(fig)
 
 
 def plot_per_rule(data, title, save_path=None):
-    """Plot per-rule accuracy over epochs."""
-    per_rule = data['per_rule']
-    if not per_rule or all(r is None for r in per_rule):
-        print("No per-rule accuracy data to plot.")
-        return
+    """Plot per-rule accuracy over epochs.
 
-    epochs = []
-    rule_data = []
-    n_rules = None
-    for ep, pr in zip(data['epochs'], per_rule):
-        if pr is not None:
-            epochs.append(ep)
-            rule_data.append(pr)
-            if n_rules is None:
-                n_rules = len(pr)
-
-    if not rule_data or n_rules is None:
-        print("No per-rule accuracy data to plot.")
-        return
+    Parameters
+    ----------
+    data : dict or list of (label, dict)
+        Single experiment or a list of runs.
+    """
+    items = _data_items(data)
+    single_mode = len(items) == 1 and items[0][0] == ''
 
     fig, ax = plt.subplots(figsize=(8, 5))
-    for r in range(n_rules):
-        accs = [rd[r] for rd in rule_data]
-        ax.plot(epochs, accs, label=f'Rule {r}', linewidth=1.5)
+    colors = plt.cm.tab10.colors
+    linestyles = ['-', '--', ':', '-.']
+
+    if single_mode:
+        d = items[0][1]
+        per_rule = d['per_rule']
+        if not per_rule or all(r is None for r in per_rule):
+            print("No per-rule accuracy data to plot.")
+            return
+
+        epochs = []
+        rule_data = []
+        n_rules = None
+        for ep, pr in zip(d['epochs'], per_rule):
+            if pr is not None:
+                epochs.append(ep)
+                rule_data.append(pr)
+                if n_rules is None:
+                    n_rules = len(pr)
+
+        if not rule_data or n_rules is None:
+            print("No per-rule accuracy data to plot.")
+            return
+
+        for r in range(n_rules):
+            accs = [rd[r] for rd in rule_data]
+            ax.plot(epochs, accs, label=f'Rule {r}', linewidth=1.5)
+        ax.set_title(f'{title} - Per-rule Accuracy')
+        ax.legend(fontsize=8)
+    else:
+        for idx, (label, d) in enumerate(items):
+            per_rule = d['per_rule']
+            epochs = []
+            rule_data = []
+            n_rules = None
+            for ep, pr in zip(d['epochs'], per_rule):
+                if pr is not None:
+                    epochs.append(ep)
+                    rule_data.append(pr)
+                    if n_rules is None:
+                        n_rules = len(pr)
+            if not rule_data or n_rules is None:
+                continue
+
+            color = colors[idx % len(colors)]
+            for r in range(n_rules):
+                accs = [rd[r] for rd in rule_data]
+                line, = ax.plot(epochs, accs,
+                                label=f'seed {label} rule {r}',
+                                linewidth=1.2, linestyle=linestyles[r % 4],
+                                color=color, alpha=0.85)
+            if epochs:
+                ax.annotate(label, xy=(epochs[-1], rule_data[-1][0]),
+                            fontsize=7, color=color,
+                            textcoords='offset points', xytext=(5, 0),
+                            va='center', clip_on=False)
+        ax.set_title(f'{title} - Per-rule Accuracy')
+        ax.legend(fontsize=7, ncol=2)
+
     ax.set_xlabel('Epoch')
     ax.set_ylabel('Accuracy')
-    ax.set_title(f'{title} - Per-rule Accuracy')
-    ax.legend()
     ax.grid(True, alpha=0.3)
     ax.set_ylim(-0.05, 1.05)
+
     fig.tight_layout()
-    out = save_path or 'per_rule.png'
+    out = save_path or ('per_rule.png' if single_mode else f'{title}_per_rule.png')
     fig.savefig(out, dpi=150)
     print(f"Saved per-rule curve to {out}")
     plt.close(fig)
 
 
+def collect_log_groups(names, log_dir):
+    """Collect log files and group them by experiment setting.
+
+    Returns a dict mapping setting name to a list of (seed_label, log_path).
+    Names that do not contain a seed suffix are treated as standalone
+    experiments and grouped under themselves with seed label ''.
+    """
+    groups = {}
+    for name in names:
+        log_path = os.path.join(log_dir, f'{name}.log')
+        if os.path.exists(log_path):
+            setting, seed = extract_setting_and_seed(name)
+            groups.setdefault(setting, []).append((seed or '', log_path))
+            continue
+
+        # Treat name as a setting prefix and collect matching seeds.
+        pattern = os.path.join(log_dir, f'{name}_seed*.log')
+        found = glob.glob(pattern)
+        if found:
+            for lp in found:
+                stem = os.path.basename(lp)[:-4]
+                setting, seed = extract_setting_and_seed(stem)
+                groups.setdefault(setting, []).append((seed, lp))
+            continue
+
+        print(f"Log not found: {log_path}, skipping.")
+    return groups
+
+
+def plot_setting_group(setting, seed_data_items, out_dir,
+                       no_per_pos=False, no_per_rule=False):
+    """Plot all seeds of one experiment setting on shared figures.
+
+    Parameters
+    ----------
+    setting : str
+        Experiment setting name (without seed suffix).
+    seed_data_items : list of (seed_label, data_dict)
+        Parsed data for each seed, sorted as desired.
+    out_dir : str
+        Directory where the PNGs are saved.
+    no_per_pos, no_per_rule : bool
+        Skip corresponding plot types.
+    """
+    data_items = [(seed, d) for seed, d in seed_data_items if d['epochs']]
+    if not data_items:
+        print(f"No epoch data for setting {setting}, skipping.")
+        return
+
+    os.makedirs(out_dir, exist_ok=True)
+    base = os.path.join(out_dir, setting)
+    plot_learning_curve(data_items, setting, save_path=f'{base}_curve.png')
+    if not no_per_pos:
+        plot_per_position(data_items, setting, save_path=f'{base}_per_pos.png')
+    if not no_per_rule:
+        plot_per_rule(data_items, setting, save_path=f'{base}_per_rule.png')
+
+
 def main():
     parser = argparse.ArgumentParser(description='Visualize learning curves from training logs.')
-    parser.add_argument('names', nargs='*', help='Experiment name(s).')
+    parser.add_argument('names', nargs='*', help='Experiment name(s) or setting prefix(es).')
     parser.add_argument('--all', action='store_true', help='Visualize all experiments in experiments.json.')
     parser.add_argument('--log-dir', default='logs', help='Directory containing .log files.')
     parser.add_argument('--out-dir', default='plots', help='Directory to save plots.')
     parser.add_argument('--no-per-pos', action='store_true', help='Skip per-position plot.')
     parser.add_argument('--no-per-rule', action='store_true', help='Skip per-rule plot.')
+    parser.add_argument('--no-group', action='store_true', help='Plot each log separately (do not group seeds).')
     args = parser.parse_args()
 
     os.makedirs(args.out_dir, exist_ok=True)
@@ -214,22 +431,43 @@ def main():
         print("No experiment names provided. Usage: python visualize.py <exp_name> [--all]")
         sys.exit(1)
 
-    for name in names:
-        log_path = os.path.join(args.log_dir, f'{name}.log')
-        if not os.path.exists(log_path):
-            print(f"Log not found: {log_path}, skipping.")
-            continue
-        data = parse_log(log_path)
-        if not data['epochs']:
-            print(f"No epoch data found in {log_path}, skipping.")
-            continue
+    groups = collect_log_groups(names, args.log_dir)
 
-        base = os.path.join(args.out_dir, name)
-        plot_learning_curve(data, name, save_path=f'{base}_curve.png')
-        if not args.no_per_pos:
-            plot_per_position(data, name, save_path=f'{base}_per_pos.png')
-        if not args.no_per_rule:
-            plot_per_rule(data, name, save_path=f'{base}_per_rule.png')
+    if args.no_group:
+        # Legacy behaviour: one figure per log file.
+        for setting, items in groups.items():
+            for seed, log_path in sorted(items, key=_seed_sort_key):
+                name = f'{setting}_seed{seed}' if seed else setting
+                data = parse_log(log_path)
+                if not data['epochs']:
+                    print(f"No epoch data found in {log_path}, skipping.")
+                    continue
+                base = os.path.join(args.out_dir, name)
+                plot_learning_curve(data, name, save_path=f'{base}_curve.png')
+                if not args.no_per_pos:
+                    plot_per_position(data, name, save_path=f'{base}_per_pos.png')
+                if not args.no_per_rule:
+                    plot_per_rule(data, name, save_path=f'{base}_per_rule.png')
+    else:
+        # New behaviour: group by setting, plot all seeds on the same figure.
+        for setting in sorted(groups.keys()):
+            items = groups[setting]
+            data_items = []
+            for seed, log_path in sorted(items, key=_seed_sort_key):
+                data = parse_log(log_path)
+                if not data['epochs']:
+                    print(f"No epoch data found in {log_path}, skipping.")
+                    continue
+                data_items.append((seed, data))
+            if not data_items:
+                continue
+
+            base = os.path.join(args.out_dir, setting)
+            plot_learning_curve(data_items, setting, save_path=f'{base}_curve.png')
+            if not args.no_per_pos:
+                plot_per_position(data_items, setting, save_path=f'{base}_per_pos.png')
+            if not args.no_per_rule:
+                plot_per_rule(data_items, setting, save_path=f'{base}_per_rule.png')
 
 
 if __name__ == '__main__':
