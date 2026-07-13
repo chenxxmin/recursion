@@ -377,10 +377,17 @@ def collect_log_groups(names, log_dir):
     """
     groups = {}
     for name in names:
+        setting, seed = extract_setting_and_seed(name)
         log_path = os.path.join(log_dir, f'{name}.log')
+
         if os.path.exists(log_path):
-            setting, seed = extract_setting_and_seed(name)
             groups.setdefault(setting, []).append((seed or '', log_path))
+            continue
+
+        if seed is not None:
+            # The name is a full experiment with a seed suffix but its log
+            # is missing; this is common when using --all with partial runs,
+            # so skip silently.
             continue
 
         # Treat name as a setting prefix and collect matching seeds.
