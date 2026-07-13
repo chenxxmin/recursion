@@ -1,0 +1,863 @@
+=== Experiment: mixed_basic_d512l2r8_seed7 ===
+Time: 2026-07-09T14:36:48.404751
+Task type: mixed_ab
+
+=== Merged Config ===
+--------------------------------------------------
+Network Config
+--------------------------------------------------
+D_MODEL                   512
+N_HEAD                    1
+N_LAYER                   2
+MLP_RATIO                 8
+DROPOUT                   0.0
+USE_LEARNABLE_PE          False
+--------------------------------------------------
+Dataset Config
+--------------------------------------------------
+P                         53
+TASK                      mixed_ab
+TRAIN_LEN                 16
+OOD_LEN                   32
+MAX_UNIQUE_RATIO          0.5
+MIXED_AB_MAX_UNIQUE_RATIOS [0.7, 0.7]
+AB_PAIRS                  [[1, 1], [1, 2]]
+A                         1
+B                         1
+NUM_MASK                  0
+--------------------------------------------------
+Training Config
+--------------------------------------------------
+OPTIMIZER                 AdamW
+SCHEDULER                 CosineAnnealingLR(T_max=EPOCHS)
+BATCH_SIZE                128
+LR                        0.0003
+WEIGHT_DECAY              1
+EPOCHS                    10000
+RANDOM_SEED               7
+FIRST_TASK_WEIGHT         1.0
+ENTROPY_PENALTY_WEIGHT    0.0
+EVAL_INTERVAL             20
+EARLY_STOP_ACCURACY       0.99
+EARLY_STOP_NO_IMPROVE     3000
+USE_GREEDY_GENERATE       True
+--------------------------------------------------
+
+--- output ---
+Using device: cuda
+
+[Dataset] Mixed mode: generated 4030 + 1588 samples, length 16
+AB parameter pairs: [(1, 1), (1, 2)]
+  - AB=(1,1): train 2052 | test 757 | exposed ~73.1%
+  - AB=(1,2): train 1978 | test 831 | exposed ~70.4%
+--------------------------------------------------
+[Model config] block_size: 32, train length: 16
+[Number theory] AB parameter pairs: [(1, 1), (1, 2)]
+
+
+Model parameters: 10.66M
+
+Start training...
+Epoch   0 | Train: Loss=4.1400 Acc=7.2% | Test: Acc=0.4% | Best=0.4%(@0)
+  from x3: 0.01 0.01 0.00 0.01 0.00 0.00 0.00 0.00 0.00 0.00 0.00 0.01 0.01
+  per-rule acc: 0.00 0.00
+Epoch  20 | Train: Loss=0.0145 Acc=99.8% | Test: Acc=2.4% | Best=2.4%(@20)
+  from x3: 0.03 0.03 0.02 0.02 0.02 0.02 0.03 0.03 0.02 0.03 0.02 0.02 0.02
+  per-rule acc: 0.04 0.01
+Epoch  40 | Train: Loss=0.0052 Acc=99.9% | Test: Acc=2.9% | Best=2.9%(@40)
+  from x3: 0.03 0.03 0.03 0.03 0.03 0.03 0.03 0.03 0.03 0.03 0.03 0.03 0.03
+  per-rule acc: 0.04 0.02
+Epoch  60 | Train: Loss=0.0211 Acc=99.7% | Test: Acc=4.0% | Best=4.0%(@60)
+  from x3: 0.05 0.06 0.04 0.04 0.04 0.04 0.04 0.04 0.04 0.04 0.04 0.04 0.04
+  per-rule acc: 0.07 0.02
+Epoch  80 | Train: Loss=0.0041 Acc=99.9% | Test: Acc=5.6% | Best=5.6%(@80)
+  from x3: 0.06 0.06 0.06 0.05 0.05 0.05 0.06 0.05 0.05 0.06 0.06 0.06 0.06
+  per-rule acc: 0.06 0.05
+Epoch 100 | Train: Loss=0.0168 Acc=99.7% | Test: Acc=10.4% | Best=10.4%(@100)
+  from x3: 0.10 0.11 0.10 0.10 0.10 0.10 0.10 0.10 0.11 0.11 0.10 0.10 0.10
+  per-rule acc: 0.16 0.05
+Epoch 120 | Train: Loss=0.0038 Acc=99.9% | Test: Acc=9.9% | Best=10.4%(@100)
+  from x3: 0.11 0.11 0.10 0.10 0.10 0.10 0.09 0.10 0.09 0.09 0.10 0.10 0.09
+  per-rule acc: 0.12 0.07
+Epoch 140 | Train: Loss=0.0050 Acc=99.9% | Test: Acc=18.7% | Best=18.7%(@140)
+  from x3: 0.19 0.20 0.19 0.19 0.19 0.19 0.19 0.18 0.19 0.19 0.18 0.19 0.19
+  per-rule acc: 0.28 0.10
+Epoch 160 | Train: Loss=0.0034 Acc=99.9% | Test: Acc=19.2% | Best=19.2%(@160)
+  from x3: 0.21 0.21 0.19 0.19 0.19 0.19 0.19 0.19 0.19 0.19 0.19 0.19 0.18
+  per-rule acc: 0.27 0.12
+Epoch 180 | Train: Loss=0.0023 Acc=99.9% | Test: Acc=29.1% | Best=29.1%(@180)
+  from x3: 0.32 0.31 0.28 0.29 0.29 0.29 0.29 0.29 0.28 0.28 0.29 0.29 0.28
+  per-rule acc: 0.45 0.15
+Epoch 200 | Train: Loss=0.0034 Acc=99.9% | Test: Acc=32.3% | Best=32.3%(@200)
+  from x3: 0.34 0.35 0.32 0.33 0.32 0.32 0.33 0.32 0.32 0.31 0.31 0.31 0.31
+  per-rule acc: 0.46 0.20
+Epoch 220 | Train: Loss=0.0025 Acc=99.9% | Test: Acc=43.2% | Best=43.2%(@220)
+  from x3: 0.44 0.44 0.43 0.43 0.44 0.43 0.43 0.43 0.43 0.43 0.43 0.43 0.43
+  per-rule acc: 0.61 0.27
+Epoch 240 | Train: Loss=0.0035 Acc=99.9% | Test: Acc=49.1% | Best=49.1%(@240)
+  from x3: 0.49 0.50 0.49 0.50 0.49 0.50 0.49 0.49 0.49 0.49 0.49 0.49 0.48
+  per-rule acc: 0.64 0.36
+Epoch 260 | Train: Loss=0.0027 Acc=99.9% | Test: Acc=55.8% | Best=55.8%(@260)
+  from x3: 0.57 0.57 0.56 0.56 0.56 0.56 0.56 0.56 0.55 0.55 0.55 0.55 0.55
+  per-rule acc: 0.71 0.42
+Epoch 280 | Train: Loss=0.0067 Acc=99.8% | Test: Acc=58.1% | Best=58.1%(@280)
+  from x3: 0.59 0.58 0.58 0.58 0.58 0.58 0.58 0.58 0.58 0.58 0.58 0.58 0.58
+  per-rule acc: 0.74 0.44
+Epoch 300 | Train: Loss=0.0024 Acc=99.9% | Test: Acc=66.9% | Best=66.9%(@300)
+  from x3: 0.68 0.67 0.66 0.67 0.67 0.67 0.67 0.67 0.67 0.67 0.67 0.67 0.67
+  per-rule acc: 0.78 0.57
+Epoch 320 | Train: Loss=0.0692 Acc=99.2% | Test: Acc=61.0% | Best=66.9%(@300)
+  from x3: 0.60 0.61 0.61 0.61 0.61 0.61 0.61 0.61 0.61 0.61 0.61 0.61 0.61
+  per-rule acc: 0.77 0.47
+Epoch 340 | Train: Loss=0.0032 Acc=99.9% | Test: Acc=76.7% | Best=76.7%(@340)
+  from x3: 0.79 0.77 0.77 0.77 0.77 0.77 0.77 0.76 0.77 0.77 0.76 0.76 0.76
+  per-rule acc: 0.82 0.72
+Epoch 360 | Train: Loss=0.0035 Acc=99.9% | Test: Acc=75.8% | Best=76.7%(@340)
+  from x3: 0.75 0.76 0.76 0.76 0.76 0.76 0.76 0.76 0.76 0.76 0.76 0.76 0.76
+  per-rule acc: 0.84 0.68
+Epoch 380 | Train: Loss=0.0036 Acc=99.9% | Test: Acc=83.6% | Best=83.6%(@380)
+  from x3: 0.83 0.84 0.84 0.84 0.84 0.84 0.84 0.84 0.84 0.83 0.83 0.83 0.83
+  per-rule acc: 0.87 0.80
+Epoch 400 | Train: Loss=0.0029 Acc=99.9% | Test: Acc=84.8% | Best=84.8%(@400)
+  from x3: 0.85 0.85 0.85 0.85 0.84 0.85 0.85 0.85 0.85 0.85 0.85 0.85 0.85
+  per-rule acc: 0.88 0.82
+Epoch 420 | Train: Loss=0.0025 Acc=99.9% | Test: Acc=87.6% | Best=87.6%(@420)
+  from x3: 0.88 0.88 0.87 0.87 0.87 0.87 0.87 0.87 0.88 0.88 0.88 0.88 0.88
+  per-rule acc: 0.91 0.85
+Epoch 440 | Train: Loss=0.0064 Acc=99.9% | Test: Acc=86.4% | Best=87.6%(@420)
+  from x3: 0.87 0.87 0.87 0.86 0.86 0.86 0.86 0.86 0.86 0.86 0.86 0.86 0.86
+  per-rule acc: 0.90 0.83
+Epoch 460 | Train: Loss=0.0036 Acc=99.9% | Test: Acc=90.2% | Best=90.2%(@460)
+  from x3: 0.91 0.90 0.90 0.90 0.90 0.90 0.90 0.90 0.90 0.90 0.90 0.90 0.90
+  per-rule acc: 0.92 0.88
+Epoch 480 | Train: Loss=0.0032 Acc=99.9% | Test: Acc=92.1% | Best=92.1%(@480)
+  from x3: 0.93 0.92 0.92 0.92 0.92 0.92 0.92 0.92 0.92 0.92 0.92 0.92 0.92
+  per-rule acc: 0.95 0.90
+Epoch 500 | Train: Loss=0.0026 Acc=99.9% | Test: Acc=93.8% | Best=93.8%(@500)
+  from x3: 0.94 0.94 0.94 0.94 0.94 0.94 0.94 0.94 0.94 0.94 0.94 0.94 0.94
+  per-rule acc: 0.96 0.92
+Epoch 520 | Train: Loss=0.0094 Acc=99.9% | Test: Acc=91.3% | Best=93.8%(@500)
+  from x3: 0.91 0.91 0.91 0.91 0.91 0.91 0.91 0.91 0.91 0.91 0.91 0.91 0.91
+  per-rule acc: 0.95 0.88
+Epoch 540 | Train: Loss=0.0034 Acc=99.9% | Test: Acc=94.9% | Best=94.9%(@540)
+  from x3: 0.95 0.95 0.95 0.95 0.95 0.95 0.95 0.95 0.95 0.95 0.95 0.95 0.95
+  per-rule acc: 0.96 0.94
+Epoch 560 | Train: Loss=0.0026 Acc=99.9% | Test: Acc=96.4% | Best=96.4%(@560)
+  from x3: 0.96 0.96 0.96 0.96 0.96 0.96 0.96 0.96 0.96 0.96 0.96 0.96 0.96
+  per-rule acc: 0.98 0.95
+Epoch 580 | Train: Loss=0.0025 Acc=99.9% | Test: Acc=96.6% | Best=96.6%(@580)
+  from x3: 0.96 0.97 0.97 0.97 0.97 0.97 0.97 0.97 0.97 0.97 0.97 0.97 0.97
+  per-rule acc: 0.97 0.96
+Epoch 600 | Train: Loss=0.0035 Acc=99.9% | Test: Acc=96.8% | Best=96.8%(@600)
+  from x3: 0.97 0.97 0.97 0.97 0.97 0.97 0.97 0.97 0.97 0.97 0.97 0.97 0.97
+  per-rule acc: 0.97 0.96
+Epoch 620 | Train: Loss=0.0026 Acc=99.9% | Test: Acc=96.2% | Best=96.8%(@600)
+  from x3: 0.97 0.96 0.96 0.96 0.96 0.96 0.96 0.96 0.96 0.96 0.96 0.96 0.96
+  per-rule acc: 0.97 0.96
+Epoch 640 | Train: Loss=0.0373 Acc=99.5% | Test: Acc=91.6% | Best=96.8%(@600)
+  from x3: 0.91 0.92 0.92 0.92 0.92 0.92 0.92 0.92 0.92 0.92 0.92 0.92 0.92
+  per-rule acc: 0.93 0.90
+Epoch 660 | Train: Loss=0.0030 Acc=99.9% | Test: Acc=97.0% | Best=97.0%(@660)
+  from x3: 0.97 0.97 0.97 0.97 0.97 0.97 0.97 0.97 0.97 0.97 0.97 0.97 0.97
+  per-rule acc: 0.98 0.96
+Epoch 680 | Train: Loss=0.0056 Acc=99.9% | Test: Acc=96.7% | Best=97.0%(@660)
+  from x3: 0.96 0.96 0.97 0.97 0.97 0.97 0.97 0.97 0.97 0.97 0.97 0.97 0.97
+  per-rule acc: 0.98 0.96
+Epoch 700 | Train: Loss=0.0032 Acc=99.9% | Test: Acc=97.2% | Best=97.2%(@700)
+  from x3: 0.97 0.97 0.97 0.97 0.97 0.97 0.97 0.97 0.97 0.97 0.97 0.97 0.97
+  per-rule acc: 0.98 0.97
+Epoch 720 | Train: Loss=0.0030 Acc=99.9% | Test: Acc=96.8% | Best=97.2%(@700)
+  from x3: 0.97 0.97 0.97 0.97 0.97 0.97 0.97 0.97 0.97 0.97 0.97 0.97 0.97
+  per-rule acc: 0.97 0.96
+Epoch 740 | Train: Loss=0.0181 Acc=99.7% | Test: Acc=88.0% | Best=97.2%(@700)
+  from x3: 0.87 0.88 0.88 0.88 0.88 0.88 0.88 0.88 0.88 0.88 0.88 0.88 0.88
+  per-rule acc: 0.91 0.85
+Epoch 760 | Train: Loss=0.0028 Acc=99.9% | Test: Acc=97.6% | Best=97.6%(@760)
+  from x3: 0.98 0.98 0.98 0.98 0.98 0.98 0.98 0.98 0.98 0.98 0.98 0.98 0.98
+  per-rule acc: 0.98 0.97
+Epoch 780 | Train: Loss=0.0389 Acc=99.5% | Test: Acc=90.4% | Best=97.6%(@760)
+  from x3: 0.89 0.90 0.91 0.91 0.91 0.91 0.91 0.91 0.91 0.91 0.91 0.91 0.90
+  per-rule acc: 0.93 0.89
+Epoch 800 | Train: Loss=0.0029 Acc=99.9% | Test: Acc=97.4% | Best=97.6%(@760)
+  from x3: 0.97 0.97 0.97 0.97 0.97 0.97 0.97 0.97 0.97 0.97 0.97 0.97 0.97
+  per-rule acc: 0.98 0.97
+Epoch 820 | Train: Loss=0.0680 Acc=99.1% | Test: Acc=86.4% | Best=97.6%(@760)
+  from x3: 0.84 0.86 0.87 0.87 0.87 0.87 0.87 0.87 0.87 0.87 0.87 0.87 0.87
+  per-rule acc: 0.89 0.84
+Epoch 840 | Train: Loss=0.0026 Acc=99.9% | Test: Acc=97.7% | Best=97.7%(@840)
+  from x3: 0.98 0.98 0.98 0.98 0.98 0.98 0.98 0.98 0.98 0.98 0.98 0.98 0.98
+  per-rule acc: 0.98 0.97
+Epoch 860 | Train: Loss=0.0033 Acc=99.9% | Test: Acc=97.3% | Best=97.7%(@840)
+  from x3: 0.97 0.97 0.97 0.97 0.97 0.97 0.97 0.97 0.97 0.97 0.97 0.97 0.97
+  per-rule acc: 0.98 0.97
+Epoch 880 | Train: Loss=0.0022 Acc=99.9% | Test: Acc=97.6% | Best=97.7%(@840)
+  from x3: 0.97 0.98 0.98 0.98 0.98 0.98 0.98 0.98 0.98 0.98 0.98 0.98 0.98
+  per-rule acc: 0.98 0.97
+Epoch 900 | Train: Loss=0.0031 Acc=99.9% | Test: Acc=97.4% | Best=97.7%(@840)
+  from x3: 0.97 0.97 0.97 0.97 0.97 0.97 0.97 0.97 0.97 0.97 0.97 0.97 0.97
+  per-rule acc: 0.98 0.97
+Epoch 920 | Train: Loss=0.0022 Acc=99.9% | Test: Acc=98.0% | Best=98.0%(@920)
+  from x3: 0.98 0.98 0.98 0.98 0.98 0.98 0.98 0.98 0.98 0.98 0.98 0.98 0.98
+  per-rule acc: 0.99 0.97
+Epoch 940 | Train: Loss=0.0030 Acc=99.9% | Test: Acc=97.5% | Best=98.0%(@920)
+  from x3: 0.97 0.97 0.97 0.97 0.97 0.97 0.97 0.97 0.97 0.97 0.97 0.97 0.97
+  per-rule acc: 0.98 0.97
+Epoch 960 | Train: Loss=0.0242 Acc=99.8% | Test: Acc=93.4% | Best=98.0%(@920)
+  from x3: 0.92 0.93 0.94 0.94 0.94 0.94 0.94 0.94 0.94 0.94 0.94 0.94 0.94
+  per-rule acc: 0.96 0.91
+Epoch 980 | Train: Loss=0.0028 Acc=99.9% | Test: Acc=97.6% | Best=98.0%(@920)
+  from x3: 0.98 0.98 0.98 0.98 0.98 0.98 0.98 0.98 0.98 0.98 0.98 0.98 0.98
+  per-rule acc: 0.98 0.97
+Epoch 1000 | Train: Loss=0.0032 Acc=99.9% | Test: Acc=97.2% | Best=98.0%(@920)
+  from x3: 0.97 0.97 0.97 0.97 0.97 0.97 0.97 0.97 0.97 0.97 0.97 0.97 0.97
+  per-rule acc: 0.98 0.97
+Epoch 1020 | Train: Loss=0.0021 Acc=99.9% | Test: Acc=97.7% | Best=98.0%(@920)
+  from x3: 0.98 0.98 0.98 0.98 0.98 0.98 0.98 0.98 0.98 0.98 0.98 0.98 0.98
+  per-rule acc: 0.98 0.97
+Epoch 1040 | Train: Loss=0.0031 Acc=99.9% | Test: Acc=97.3% | Best=98.0%(@920)
+  from x3: 0.97 0.97 0.97 0.97 0.97 0.97 0.97 0.97 0.97 0.97 0.97 0.97 0.97
+  per-rule acc: 0.98 0.97
+Epoch 1060 | Train: Loss=0.0246 Acc=99.8% | Test: Acc=93.1% | Best=98.0%(@920)
+  from x3: 0.92 0.93 0.93 0.93 0.93 0.93 0.93 0.93 0.93 0.93 0.93 0.93 0.93
+  per-rule acc: 0.96 0.91
+Epoch 1080 | Train: Loss=0.0027 Acc=99.9% | Test: Acc=97.5% | Best=98.0%(@920)
+  from x3: 0.97 0.97 0.97 0.97 0.97 0.97 0.97 0.97 0.97 0.97 0.97 0.97 0.97
+  per-rule acc: 0.98 0.97
+Epoch 1100 | Train: Loss=0.0032 Acc=99.9% | Test: Acc=97.1% | Best=98.0%(@920)
+  from x3: 0.97 0.97 0.97 0.97 0.97 0.97 0.97 0.97 0.97 0.97 0.97 0.97 0.97
+  per-rule acc: 0.98 0.97
+Epoch 1120 | Train: Loss=0.0020 Acc=99.9% | Test: Acc=97.8% | Best=98.0%(@920)
+  from x3: 0.98 0.98 0.98 0.98 0.98 0.98 0.98 0.98 0.98 0.98 0.98 0.98 0.98
+  per-rule acc: 0.98 0.97
+Epoch 1140 | Train: Loss=0.0029 Acc=99.9% | Test: Acc=97.1% | Best=98.0%(@920)
+  from x3: 0.97 0.97 0.97 0.97 0.97 0.97 0.97 0.97 0.97 0.97 0.97 0.97 0.97
+  per-rule acc: 0.98 0.97
+Epoch 1160 | Train: Loss=0.0032 Acc=99.9% | Test: Acc=96.9% | Best=98.0%(@920)
+  from x3: 0.97 0.97 0.97 0.97 0.97 0.97 0.97 0.97 0.97 0.97 0.97 0.97 0.97
+  per-rule acc: 0.97 0.97
+Epoch 1180 | Train: Loss=0.0023 Acc=99.9% | Test: Acc=97.8% | Best=98.0%(@920)
+  from x3: 0.97 0.98 0.98 0.98 0.98 0.98 0.98 0.98 0.98 0.98 0.98 0.98 0.98
+  per-rule acc: 0.98 0.97
+Epoch 1200 | Train: Loss=0.0031 Acc=99.9% | Test: Acc=97.2% | Best=98.0%(@920)
+  from x3: 0.97 0.97 0.97 0.97 0.97 0.97 0.97 0.97 0.97 0.97 0.97 0.97 0.97
+  per-rule acc: 0.98 0.97
+Epoch 1220 | Train: Loss=0.0021 Acc=99.9% | Test: Acc=98.0% | Best=98.0%(@920)
+  from x3: 0.98 0.98 0.98 0.98 0.98 0.98 0.98 0.98 0.98 0.98 0.98 0.98 0.98
+  per-rule acc: 0.98 0.98
+Epoch 1240 | Train: Loss=0.0031 Acc=99.9% | Test: Acc=97.2% | Best=98.0%(@920)
+  from x3: 0.97 0.97 0.97 0.97 0.97 0.97 0.97 0.97 0.97 0.97 0.97 0.97 0.97
+  per-rule acc: 0.98 0.97
+Epoch 1260 | Train: Loss=0.0556 Acc=99.4% | Test: Acc=90.6% | Best=98.0%(@920)
+  from x3: 0.89 0.91 0.91 0.91 0.91 0.91 0.91 0.91 0.91 0.91 0.91 0.91 0.91
+  per-rule acc: 0.93 0.89
+Epoch 1280 | Train: Loss=0.0024 Acc=99.9% | Test: Acc=97.6% | Best=98.0%(@920)
+  from x3: 0.98 0.98 0.98 0.98 0.98 0.98 0.98 0.98 0.98 0.98 0.98 0.98 0.98
+  per-rule acc: 0.98 0.97
+Epoch 1300 | Train: Loss=0.0032 Acc=99.9% | Test: Acc=97.2% | Best=98.0%(@920)
+  from x3: 0.97 0.97 0.97 0.97 0.97 0.97 0.97 0.97 0.97 0.97 0.97 0.97 0.97
+  per-rule acc: 0.98 0.97
+Epoch 1320 | Train: Loss=0.0057 Acc=99.9% | Test: Acc=96.4% | Best=98.0%(@920)
+  from x3: 0.96 0.96 0.96 0.96 0.96 0.96 0.96 0.96 0.96 0.96 0.96 0.96 0.96
+  per-rule acc: 0.98 0.95
+Epoch 1340 | Train: Loss=0.0027 Acc=99.9% | Test: Acc=97.4% | Best=98.0%(@920)
+  from x3: 0.97 0.97 0.97 0.97 0.97 0.97 0.97 0.97 0.97 0.97 0.97 0.97 0.97
+  per-rule acc: 0.98 0.97
+Epoch 1360 | Train: Loss=0.0032 Acc=99.9% | Test: Acc=97.1% | Best=98.0%(@920)
+  from x3: 0.97 0.97 0.97 0.97 0.97 0.97 0.97 0.97 0.97 0.97 0.97 0.97 0.97
+  per-rule acc: 0.98 0.97
+Epoch 1380 | Train: Loss=0.0022 Acc=99.9% | Test: Acc=97.3% | Best=98.0%(@920)
+  from x3: 0.97 0.97 0.97 0.97 0.97 0.97 0.97 0.97 0.97 0.97 0.97 0.97 0.97
+  per-rule acc: 0.98 0.97
+Epoch 1400 | Train: Loss=0.0029 Acc=99.9% | Test: Acc=97.1% | Best=98.0%(@920)
+  from x3: 0.97 0.97 0.97 0.97 0.97 0.97 0.97 0.97 0.97 0.97 0.97 0.97 0.97
+  per-rule acc: 0.98 0.97
+Epoch 1420 | Train: Loss=0.0031 Acc=99.9% | Test: Acc=96.7% | Best=98.0%(@920)
+  from x3: 0.96 0.97 0.97 0.97 0.97 0.97 0.97 0.97 0.97 0.97 0.97 0.97 0.97
+  per-rule acc: 0.97 0.96
+Epoch 1440 | Train: Loss=0.0019 Acc=99.9% | Test: Acc=97.6% | Best=98.0%(@920)
+  from x3: 0.97 0.98 0.98 0.98 0.98 0.98 0.98 0.98 0.98 0.98 0.98 0.98 0.98
+  per-rule acc: 0.98 0.97
+Epoch 1460 | Train: Loss=0.0029 Acc=99.9% | Test: Acc=96.9% | Best=98.0%(@920)
+  from x3: 0.97 0.97 0.97 0.97 0.97 0.97 0.97 0.97 0.97 0.97 0.97 0.97 0.97
+  per-rule acc: 0.98 0.96
+Epoch 1480 | Train: Loss=0.0031 Acc=99.9% | Test: Acc=96.8% | Best=98.0%(@920)
+  from x3: 0.96 0.97 0.97 0.97 0.97 0.97 0.97 0.97 0.97 0.97 0.97 0.97 0.97
+  per-rule acc: 0.98 0.96
+Epoch 1500 | Train: Loss=0.0020 Acc=99.9% | Test: Acc=97.7% | Best=98.0%(@920)
+  from x3: 0.97 0.98 0.98 0.98 0.98 0.98 0.98 0.98 0.98 0.98 0.98 0.98 0.98
+  per-rule acc: 0.98 0.97
+Epoch 1520 | Train: Loss=0.0030 Acc=99.9% | Test: Acc=97.3% | Best=98.0%(@920)
+  from x3: 0.97 0.97 0.97 0.97 0.97 0.97 0.97 0.97 0.97 0.97 0.97 0.97 0.97
+  per-rule acc: 0.98 0.97
+Epoch 1540 | Train: Loss=0.0031 Acc=99.9% | Test: Acc=96.8% | Best=98.0%(@920)
+  from x3: 0.96 0.97 0.97 0.97 0.97 0.97 0.97 0.97 0.97 0.97 0.97 0.97 0.97
+  per-rule acc: 0.97 0.96
+Epoch 1560 | Train: Loss=0.0021 Acc=99.9% | Test: Acc=97.5% | Best=98.0%(@920)
+  from x3: 0.97 0.97 0.97 0.97 0.97 0.97 0.97 0.97 0.98 0.98 0.98 0.98 0.98
+  per-rule acc: 0.98 0.97
+Epoch 1580 | Train: Loss=0.0031 Acc=99.9% | Test: Acc=97.4% | Best=98.0%(@920)
+  from x3: 0.97 0.97 0.97 0.97 0.97 0.97 0.97 0.97 0.97 0.97 0.97 0.97 0.97
+  per-rule acc: 0.98 0.97
+Epoch 1600 | Train: Loss=0.1744 Acc=98.1% | Test: Acc=89.6% | Best=98.0%(@920)
+  from x3: 0.87 0.90 0.90 0.90 0.90 0.90 0.90 0.90 0.90 0.90 0.90 0.90 0.90
+  per-rule acc: 0.92 0.88
+Epoch 1620 | Train: Loss=0.0021 Acc=99.9% | Test: Acc=97.3% | Best=98.0%(@920)
+  from x3: 0.97 0.97 0.97 0.97 0.97 0.97 0.97 0.97 0.97 0.97 0.97 0.97 0.97
+  per-rule acc: 0.98 0.97
+Epoch 1640 | Train: Loss=0.0031 Acc=99.9% | Test: Acc=97.0% | Best=98.0%(@920)
+  from x3: 0.97 0.97 0.97 0.97 0.97 0.97 0.97 0.97 0.97 0.97 0.97 0.97 0.97
+  per-rule acc: 0.98 0.97
+Epoch 1660 | Train: Loss=0.1039 Acc=99.1% | Test: Acc=88.6% | Best=98.0%(@920)
+  from x3: 0.86 0.89 0.89 0.89 0.89 0.89 0.89 0.89 0.89 0.89 0.89 0.89 0.89
+  per-rule acc: 0.91 0.86
+Epoch 1680 | Train: Loss=0.0021 Acc=99.9% | Test: Acc=97.7% | Best=98.0%(@920)
+  from x3: 0.97 0.98 0.98 0.98 0.98 0.98 0.98 0.98 0.98 0.98 0.98 0.98 0.98
+  per-rule acc: 0.98 0.97
+Epoch 1700 | Train: Loss=0.0030 Acc=99.9% | Test: Acc=97.2% | Best=98.0%(@920)
+  from x3: 0.97 0.97 0.97 0.97 0.97 0.97 0.97 0.97 0.97 0.97 0.97 0.97 0.97
+  per-rule acc: 0.98 0.97
+Epoch 1720 | Train: Loss=0.0753 Acc=99.4% | Test: Acc=88.1% | Best=98.0%(@920)
+  from x3: 0.87 0.88 0.88 0.88 0.88 0.88 0.88 0.88 0.88 0.88 0.88 0.88 0.88
+  per-rule acc: 0.92 0.85
+Epoch 1740 | Train: Loss=0.0022 Acc=99.9% | Test: Acc=97.4% | Best=98.0%(@920)
+  from x3: 0.97 0.97 0.97 0.97 0.97 0.97 0.97 0.97 0.97 0.97 0.97 0.97 0.97
+  per-rule acc: 0.98 0.97
+Epoch 1760 | Train: Loss=0.0030 Acc=99.9% | Test: Acc=97.2% | Best=98.0%(@920)
+  from x3: 0.97 0.97 0.97 0.97 0.97 0.97 0.97 0.97 0.97 0.97 0.97 0.97 0.97
+  per-rule acc: 0.98 0.97
+Epoch 1780 | Train: Loss=0.0523 Acc=99.4% | Test: Acc=91.4% | Best=98.0%(@920)
+  from x3: 0.90 0.91 0.91 0.91 0.91 0.91 0.91 0.92 0.92 0.92 0.92 0.92 0.92
+  per-rule acc: 0.95 0.88
+Epoch 1800 | Train: Loss=0.0023 Acc=99.9% | Test: Acc=97.5% | Best=98.0%(@920)
+  from x3: 0.98 0.97 0.97 0.97 0.97 0.97 0.97 0.97 0.97 0.97 0.97 0.97 0.97
+  per-rule acc: 0.98 0.97
+Epoch 1820 | Train: Loss=0.0031 Acc=99.9% | Test: Acc=97.2% | Best=98.0%(@920)
+  from x3: 0.97 0.97 0.97 0.97 0.97 0.97 0.97 0.97 0.97 0.97 0.97 0.97 0.97
+  per-rule acc: 0.98 0.97
+Epoch 1840 | Train: Loss=0.0761 Acc=99.4% | Test: Acc=90.4% | Best=98.0%(@920)
+  from x3: 0.89 0.90 0.91 0.91 0.91 0.91 0.91 0.91 0.90 0.90 0.90 0.90 0.91
+  per-rule acc: 0.92 0.89
+Epoch 1860 | Train: Loss=0.0022 Acc=99.9% | Test: Acc=97.5% | Best=98.0%(@920)
+  from x3: 0.97 0.97 0.97 0.97 0.97 0.97 0.97 0.97 0.97 0.97 0.97 0.97 0.97
+  per-rule acc: 0.98 0.97
+Epoch 1880 | Train: Loss=0.0030 Acc=99.9% | Test: Acc=97.1% | Best=98.0%(@920)
+  from x3: 0.97 0.97 0.97 0.97 0.97 0.97 0.97 0.97 0.97 0.97 0.97 0.97 0.97
+  per-rule acc: 0.97 0.97
+Epoch 1900 | Train: Loss=0.1662 Acc=99.0% | Test: Acc=89.6% | Best=98.0%(@920)
+  from x3: 0.87 0.90 0.90 0.90 0.90 0.90 0.90 0.90 0.90 0.90 0.90 0.90 0.90
+  per-rule acc: 0.91 0.88
+Epoch 1920 | Train: Loss=0.0021 Acc=99.9% | Test: Acc=97.4% | Best=98.0%(@920)
+  from x3: 0.97 0.97 0.97 0.97 0.97 0.97 0.97 0.97 0.97 0.97 0.97 0.97 0.97
+  per-rule acc: 0.98 0.97
+Epoch 1940 | Train: Loss=0.0029 Acc=99.9% | Test: Acc=97.2% | Best=98.0%(@920)
+  from x3: 0.97 0.97 0.97 0.97 0.97 0.97 0.97 0.97 0.97 0.97 0.97 0.97 0.97
+  per-rule acc: 0.98 0.97
+Epoch 1960 | Train: Loss=0.0029 Acc=99.9% | Test: Acc=96.7% | Best=98.0%(@920)
+  from x3: 0.96 0.97 0.97 0.97 0.97 0.97 0.97 0.97 0.97 0.97 0.97 0.97 0.97
+  per-rule acc: 0.97 0.96
+Epoch 1980 | Train: Loss=0.0020 Acc=99.9% | Test: Acc=97.6% | Best=98.0%(@920)
+  from x3: 0.97 0.98 0.98 0.98 0.98 0.98 0.98 0.98 0.98 0.98 0.98 0.98 0.98
+  per-rule acc: 0.98 0.97
+Epoch 2000 | Train: Loss=0.0028 Acc=99.9% | Test: Acc=97.2% | Best=98.0%(@920)
+  from x3: 0.97 0.97 0.97 0.97 0.97 0.97 0.97 0.97 0.97 0.97 0.97 0.97 0.97
+  per-rule acc: 0.98 0.97
+Epoch 2020 | Train: Loss=0.0028 Acc=99.9% | Test: Acc=96.9% | Best=98.0%(@920)
+  from x3: 0.96 0.97 0.97 0.97 0.97 0.97 0.97 0.97 0.97 0.97 0.97 0.97 0.97
+  per-rule acc: 0.97 0.97
+Epoch 2040 | Train: Loss=0.0018 Acc=99.9% | Test: Acc=97.4% | Best=98.0%(@920)
+  from x3: 0.98 0.97 0.97 0.97 0.97 0.97 0.97 0.97 0.97 0.97 0.97 0.97 0.97
+  per-rule acc: 0.98 0.97
+Epoch 2060 | Train: Loss=0.0027 Acc=99.9% | Test: Acc=97.3% | Best=98.0%(@920)
+  from x3: 0.97 0.97 0.97 0.97 0.97 0.97 0.97 0.97 0.97 0.97 0.97 0.97 0.97
+  per-rule acc: 0.98 0.97
+Epoch 2080 | Train: Loss=0.0029 Acc=99.9% | Test: Acc=97.1% | Best=98.0%(@920)
+  from x3: 0.96 0.97 0.97 0.97 0.97 0.97 0.97 0.97 0.97 0.97 0.97 0.97 0.97
+  per-rule acc: 0.97 0.97
+Epoch 2100 | Train: Loss=0.0033 Acc=99.9% | Test: Acc=97.3% | Best=98.0%(@920)
+  from x3: 0.97 0.97 0.97 0.97 0.97 0.97 0.97 0.97 0.97 0.97 0.97 0.97 0.97
+  per-rule acc: 0.98 0.97
+Epoch 2120 | Train: Loss=0.0025 Acc=99.9% | Test: Acc=97.4% | Best=98.0%(@920)
+  from x3: 0.97 0.97 0.97 0.97 0.97 0.97 0.97 0.97 0.97 0.97 0.97 0.97 0.97
+  per-rule acc: 0.98 0.97
+Epoch 2140 | Train: Loss=0.0029 Acc=99.9% | Test: Acc=97.1% | Best=98.0%(@920)
+  from x3: 0.97 0.97 0.97 0.97 0.97 0.97 0.97 0.97 0.97 0.97 0.97 0.97 0.97
+  per-rule acc: 0.97 0.97
+Epoch 2160 | Train: Loss=0.0027 Acc=99.9% | Test: Acc=96.7% | Best=98.0%(@920)
+  from x3: 0.96 0.97 0.97 0.97 0.97 0.97 0.97 0.97 0.97 0.97 0.97 0.97 0.97
+  per-rule acc: 0.97 0.96
+Epoch 2180 | Train: Loss=0.0019 Acc=99.9% | Test: Acc=97.4% | Best=98.0%(@920)
+  from x3: 0.98 0.97 0.97 0.97 0.97 0.97 0.97 0.97 0.97 0.97 0.97 0.97 0.97
+  per-rule acc: 0.98 0.97
+Epoch 2200 | Train: Loss=0.0027 Acc=99.9% | Test: Acc=97.3% | Best=98.0%(@920)
+  from x3: 0.97 0.97 0.97 0.97 0.97 0.97 0.97 0.97 0.97 0.97 0.97 0.97 0.97
+  per-rule acc: 0.98 0.97
+Epoch 2220 | Train: Loss=0.0028 Acc=99.9% | Test: Acc=97.0% | Best=98.0%(@920)
+  from x3: 0.96 0.97 0.97 0.97 0.97 0.97 0.97 0.97 0.97 0.97 0.97 0.97 0.97
+  per-rule acc: 0.97 0.97
+Epoch 2240 | Train: Loss=0.0021 Acc=99.9% | Test: Acc=97.6% | Best=98.0%(@920)
+  from x3: 0.97 0.98 0.98 0.98 0.98 0.98 0.98 0.98 0.98 0.98 0.98 0.98 0.98
+  per-rule acc: 0.98 0.97
+Epoch 2260 | Train: Loss=0.0026 Acc=99.9% | Test: Acc=97.4% | Best=98.0%(@920)
+  from x3: 0.97 0.97 0.97 0.97 0.97 0.97 0.97 0.97 0.97 0.97 0.97 0.97 0.97
+  per-rule acc: 0.98 0.97
+Epoch 2280 | Train: Loss=0.0029 Acc=99.9% | Test: Acc=97.2% | Best=98.0%(@920)
+  from x3: 0.97 0.97 0.97 0.97 0.97 0.97 0.97 0.97 0.97 0.97 0.97 0.97 0.97
+  per-rule acc: 0.97 0.97
+Epoch 2300 | Train: Loss=0.0148 Acc=99.9% | Test: Acc=94.9% | Best=98.0%(@920)
+  from x3: 0.94 0.95 0.95 0.95 0.95 0.95 0.95 0.95 0.95 0.95 0.95 0.95 0.95
+  per-rule acc: 0.96 0.94
+Epoch 2320 | Train: Loss=0.0023 Acc=99.9% | Test: Acc=97.1% | Best=98.0%(@920)
+  from x3: 0.97 0.97 0.97 0.97 0.97 0.97 0.97 0.97 0.97 0.97 0.97 0.97 0.97
+  per-rule acc: 0.97 0.97
+Epoch 2340 | Train: Loss=0.0029 Acc=99.9% | Test: Acc=97.3% | Best=98.0%(@920)
+  from x3: 0.97 0.97 0.97 0.97 0.97 0.97 0.97 0.97 0.97 0.97 0.97 0.97 0.97
+  per-rule acc: 0.98 0.97
+Epoch 2360 | Train: Loss=0.0027 Acc=99.9% | Test: Acc=96.9% | Best=98.0%(@920)
+  from x3: 0.96 0.97 0.97 0.97 0.97 0.97 0.97 0.97 0.97 0.97 0.97 0.97 0.97
+  per-rule acc: 0.97 0.97
+Epoch 2380 | Train: Loss=0.0018 Acc=99.9% | Test: Acc=97.5% | Best=98.0%(@920)
+  from x3: 0.97 0.97 0.97 0.97 0.97 0.97 0.97 0.97 0.98 0.98 0.98 0.98 0.98
+  per-rule acc: 0.98 0.97
+Epoch 2400 | Train: Loss=0.0025 Acc=99.9% | Test: Acc=97.5% | Best=98.0%(@920)
+  from x3: 0.98 0.97 0.97 0.97 0.97 0.97 0.97 0.98 0.98 0.98 0.98 0.98 0.98
+  per-rule acc: 0.98 0.97
+Epoch 2420 | Train: Loss=0.0028 Acc=99.9% | Test: Acc=97.3% | Best=98.0%(@920)
+  from x3: 0.97 0.97 0.97 0.97 0.97 0.97 0.97 0.97 0.97 0.97 0.97 0.97 0.97
+  per-rule acc: 0.98 0.97
+Epoch 2440 | Train: Loss=0.0790 Acc=99.2% | Test: Acc=90.8% | Best=98.0%(@920)
+  from x3: 0.89 0.91 0.91 0.91 0.91 0.91 0.91 0.91 0.91 0.91 0.91 0.91 0.91
+  per-rule acc: 0.93 0.89
+Epoch 2460 | Train: Loss=0.0020 Acc=99.9% | Test: Acc=97.7% | Best=98.0%(@920)
+  from x3: 0.97 0.98 0.98 0.98 0.98 0.98 0.98 0.98 0.98 0.98 0.98 0.98 0.98
+  per-rule acc: 0.98 0.97
+Epoch 2480 | Train: Loss=0.0028 Acc=99.9% | Test: Acc=97.2% | Best=98.0%(@920)
+  from x3: 0.97 0.97 0.97 0.97 0.97 0.97 0.97 0.97 0.97 0.97 0.97 0.97 0.97
+  per-rule acc: 0.98 0.97
+Epoch 2500 | Train: Loss=0.0027 Acc=99.9% | Test: Acc=97.1% | Best=98.0%(@920)
+  from x3: 0.97 0.97 0.97 0.97 0.97 0.97 0.97 0.97 0.97 0.97 0.97 0.97 0.97
+  per-rule acc: 0.97 0.97
+Epoch 2520 | Train: Loss=0.0019 Acc=99.9% | Test: Acc=97.7% | Best=98.0%(@920)
+  from x3: 0.98 0.98 0.98 0.98 0.98 0.98 0.98 0.98 0.98 0.98 0.98 0.98 0.98
+  per-rule acc: 0.98 0.97
+Epoch 2540 | Train: Loss=0.0026 Acc=99.9% | Test: Acc=97.3% | Best=98.0%(@920)
+  from x3: 0.97 0.97 0.97 0.97 0.97 0.97 0.97 0.97 0.97 0.97 0.97 0.97 0.97
+  per-rule acc: 0.98 0.97
+Epoch 2560 | Train: Loss=0.0028 Acc=99.9% | Test: Acc=97.1% | Best=98.0%(@920)
+  from x3: 0.96 0.97 0.97 0.97 0.97 0.97 0.97 0.97 0.97 0.97 0.97 0.97 0.97
+  per-rule acc: 0.97 0.97
+Epoch 2580 | Train: Loss=0.0081 Acc=99.9% | Test: Acc=96.0% | Best=98.0%(@920)
+  from x3: 0.95 0.96 0.96 0.96 0.96 0.96 0.96 0.96 0.96 0.96 0.96 0.96 0.96
+  per-rule acc: 0.97 0.96
+Epoch 2600 | Train: Loss=0.0024 Acc=99.9% | Test: Acc=97.5% | Best=98.0%(@920)
+  from x3: 0.97 0.97 0.98 0.98 0.98 0.98 0.98 0.98 0.98 0.98 0.98 0.98 0.98
+  per-rule acc: 0.98 0.97
+Epoch 2620 | Train: Loss=0.0028 Acc=99.9% | Test: Acc=97.2% | Best=98.0%(@920)
+  from x3: 0.97 0.97 0.97 0.97 0.97 0.97 0.97 0.97 0.97 0.97 0.97 0.97 0.97
+  per-rule acc: 0.98 0.97
+Epoch 2640 | Train: Loss=0.0026 Acc=99.9% | Test: Acc=97.0% | Best=98.0%(@920)
+  from x3: 0.96 0.97 0.97 0.97 0.97 0.97 0.97 0.97 0.97 0.97 0.97 0.97 0.97
+  per-rule acc: 0.97 0.97
+Epoch 2660 | Train: Loss=0.0027 Acc=99.9% | Test: Acc=97.6% | Best=98.0%(@920)
+  from x3: 0.97 0.98 0.98 0.98 0.98 0.98 0.98 0.98 0.98 0.98 0.98 0.98 0.98
+  per-rule acc: 0.98 0.97
+Epoch 2680 | Train: Loss=0.0024 Acc=99.9% | Test: Acc=97.3% | Best=98.0%(@920)
+  from x3: 0.97 0.97 0.97 0.97 0.97 0.97 0.97 0.97 0.97 0.97 0.97 0.97 0.97
+  per-rule acc: 0.97 0.97
+Epoch 2700 | Train: Loss=0.0028 Acc=99.9% | Test: Acc=97.2% | Best=98.0%(@920)
+  from x3: 0.97 0.97 0.97 0.97 0.97 0.97 0.97 0.97 0.97 0.97 0.97 0.97 0.97
+  per-rule acc: 0.98 0.97
+Epoch 2720 | Train: Loss=0.0026 Acc=99.9% | Test: Acc=96.9% | Best=98.0%(@920)
+  from x3: 0.96 0.97 0.97 0.97 0.97 0.97 0.97 0.97 0.97 0.97 0.97 0.97 0.97
+  per-rule acc: 0.97 0.97
+Epoch 2740 | Train: Loss=0.0018 Acc=99.9% | Test: Acc=97.7% | Best=98.0%(@920)
+  from x3: 0.98 0.98 0.98 0.98 0.98 0.98 0.98 0.98 0.98 0.98 0.98 0.98 0.98
+  per-rule acc: 0.98 0.97
+Epoch 2760 | Train: Loss=0.0026 Acc=99.9% | Test: Acc=97.4% | Best=98.0%(@920)
+  from x3: 0.97 0.97 0.97 0.97 0.97 0.97 0.97 0.97 0.97 0.97 0.97 0.97 0.97
+  per-rule acc: 0.98 0.97
+Epoch 2780 | Train: Loss=0.0027 Acc=99.9% | Test: Acc=97.1% | Best=98.0%(@920)
+  from x3: 0.96 0.97 0.97 0.97 0.97 0.97 0.97 0.97 0.97 0.97 0.97 0.97 0.97
+  per-rule acc: 0.97 0.97
+Epoch 2800 | Train: Loss=0.0518 Acc=99.3% | Test: Acc=91.4% | Best=98.0%(@920)
+  from x3: 0.89 0.92 0.92 0.92 0.92 0.92 0.92 0.92 0.92 0.92 0.92 0.92 0.92
+  per-rule acc: 0.94 0.89
+Epoch 2820 | Train: Loss=0.0020 Acc=99.9% | Test: Acc=97.7% | Best=98.0%(@920)
+  from x3: 0.98 0.98 0.98 0.98 0.98 0.98 0.98 0.98 0.98 0.98 0.98 0.98 0.98
+  per-rule acc: 0.98 0.97
+Epoch 2840 | Train: Loss=0.0027 Acc=99.9% | Test: Acc=97.4% | Best=98.0%(@920)
+  from x3: 0.97 0.97 0.97 0.97 0.97 0.97 0.97 0.97 0.97 0.97 0.97 0.97 0.97
+  per-rule acc: 0.98 0.97
+Epoch 2860 | Train: Loss=0.0027 Acc=99.9% | Test: Acc=97.1% | Best=98.0%(@920)
+  from x3: 0.96 0.97 0.97 0.97 0.97 0.97 0.97 0.97 0.97 0.97 0.97 0.97 0.97
+  per-rule acc: 0.97 0.97
+Epoch 2880 | Train: Loss=0.0406 Acc=99.5% | Test: Acc=92.8% | Best=98.0%(@920)
+  from x3: 0.91 0.93 0.93 0.93 0.93 0.93 0.93 0.93 0.93 0.93 0.93 0.93 0.93
+  per-rule acc: 0.95 0.91
+Epoch 2900 | Train: Loss=0.0020 Acc=99.9% | Test: Acc=97.8% | Best=98.0%(@920)
+  from x3: 0.98 0.98 0.98 0.98 0.98 0.98 0.98 0.98 0.98 0.98 0.98 0.98 0.98
+  per-rule acc: 0.98 0.98
+Epoch 2920 | Train: Loss=0.0026 Acc=99.9% | Test: Acc=97.4% | Best=98.0%(@920)
+  from x3: 0.97 0.97 0.97 0.97 0.97 0.97 0.97 0.97 0.97 0.97 0.97 0.97 0.97
+  per-rule acc: 0.98 0.97
+Epoch 2940 | Train: Loss=0.0026 Acc=99.9% | Test: Acc=97.0% | Best=98.0%(@920)
+  from x3: 0.97 0.97 0.97 0.97 0.97 0.97 0.97 0.97 0.97 0.97 0.97 0.97 0.97
+  per-rule acc: 0.97 0.97
+Epoch 2960 | Train: Loss=0.0236 Acc=99.7% | Test: Acc=94.7% | Best=98.0%(@920)
+  from x3: 0.94 0.95 0.95 0.95 0.95 0.95 0.95 0.95 0.95 0.95 0.95 0.95 0.95
+  per-rule acc: 0.97 0.93
+Epoch 2980 | Train: Loss=0.0019 Acc=99.9% | Test: Acc=97.8% | Best=98.0%(@920)
+  from x3: 0.98 0.98 0.98 0.98 0.98 0.98 0.98 0.98 0.98 0.98 0.98 0.98 0.98
+  per-rule acc: 0.98 0.98
+Epoch 3000 | Train: Loss=0.0026 Acc=99.9% | Test: Acc=97.4% | Best=98.0%(@920)
+  from x3: 0.97 0.97 0.97 0.97 0.97 0.97 0.97 0.97 0.97 0.97 0.97 0.97 0.97
+  per-rule acc: 0.98 0.97
+Epoch 3020 | Train: Loss=0.0026 Acc=99.9% | Test: Acc=97.1% | Best=98.0%(@920)
+  from x3: 0.97 0.97 0.97 0.97 0.97 0.97 0.97 0.97 0.97 0.97 0.97 0.97 0.97
+  per-rule acc: 0.97 0.97
+Epoch 3040 | Train: Loss=0.0904 Acc=98.9% | Test: Acc=90.0% | Best=98.0%(@920)
+  from x3: 0.88 0.90 0.90 0.90 0.90 0.90 0.90 0.90 0.90 0.90 0.90 0.90 0.90
+  per-rule acc: 0.92 0.88
+Epoch 3060 | Train: Loss=0.0018 Acc=99.9% | Test: Acc=97.8% | Best=98.0%(@920)
+  from x3: 0.98 0.98 0.98 0.98 0.98 0.98 0.98 0.98 0.98 0.98 0.98 0.98 0.98
+  per-rule acc: 0.98 0.98
+Epoch 3080 | Train: Loss=0.0026 Acc=99.9% | Test: Acc=97.4% | Best=98.0%(@920)
+  from x3: 0.97 0.97 0.97 0.97 0.97 0.97 0.97 0.97 0.97 0.97 0.97 0.97 0.97
+  per-rule acc: 0.98 0.97
+Epoch 3100 | Train: Loss=0.0026 Acc=99.9% | Test: Acc=97.2% | Best=98.0%(@920)
+  from x3: 0.97 0.97 0.97 0.97 0.97 0.97 0.97 0.97 0.97 0.97 0.97 0.97 0.97
+  per-rule acc: 0.97 0.97
+Epoch 3120 | Train: Loss=0.1187 Acc=98.7% | Test: Acc=90.9% | Best=98.0%(@920)
+  from x3: 0.88 0.91 0.91 0.91 0.91 0.91 0.91 0.91 0.91 0.91 0.91 0.91 0.91
+  per-rule acc: 0.92 0.90
+Epoch 3140 | Train: Loss=0.0019 Acc=99.9% | Test: Acc=97.7% | Best=98.0%(@920)
+  from x3: 0.98 0.98 0.98 0.98 0.98 0.98 0.98 0.98 0.98 0.98 0.98 0.98 0.98
+  per-rule acc: 0.98 0.97
+Epoch 3160 | Train: Loss=0.0026 Acc=99.9% | Test: Acc=97.2% | Best=98.0%(@920)
+  from x3: 0.97 0.97 0.97 0.97 0.97 0.97 0.97 0.97 0.97 0.97 0.97 0.97 0.97
+  per-rule acc: 0.97 0.97
+Epoch 3180 | Train: Loss=0.0026 Acc=99.9% | Test: Acc=97.2% | Best=98.0%(@920)
+  from x3: 0.97 0.97 0.97 0.97 0.97 0.97 0.97 0.97 0.97 0.97 0.97 0.97 0.97
+  per-rule acc: 0.98 0.97
+Epoch 3200 | Train: Loss=0.0265 Acc=99.7% | Test: Acc=92.6% | Best=98.0%(@920)
+  from x3: 0.91 0.93 0.93 0.93 0.93 0.93 0.93 0.93 0.93 0.93 0.93 0.93 0.93
+  per-rule acc: 0.94 0.91
+Epoch 3220 | Train: Loss=0.0020 Acc=99.9% | Test: Acc=97.8% | Best=98.0%(@920)
+  from x3: 0.97 0.98 0.98 0.98 0.98 0.98 0.98 0.98 0.98 0.98 0.98 0.98 0.98
+  per-rule acc: 0.98 0.98
+Epoch 3240 | Train: Loss=0.0026 Acc=99.9% | Test: Acc=97.2% | Best=98.0%(@920)
+  from x3: 0.97 0.97 0.97 0.97 0.97 0.97 0.97 0.97 0.97 0.97 0.97 0.97 0.97
+  per-rule acc: 0.97 0.97
+Epoch 3260 | Train: Loss=0.0025 Acc=99.9% | Test: Acc=97.1% | Best=98.0%(@920)
+  from x3: 0.97 0.97 0.97 0.97 0.97 0.97 0.97 0.97 0.97 0.97 0.97 0.97 0.97
+  per-rule acc: 0.97 0.97
+Epoch 3280 | Train: Loss=0.0176 Acc=99.8% | Test: Acc=94.3% | Best=98.0%(@920)
+  from x3: 0.93 0.94 0.94 0.94 0.94 0.94 0.94 0.94 0.94 0.94 0.94 0.94 0.94
+  per-rule acc: 0.97 0.92
+Epoch 3300 | Train: Loss=0.0021 Acc=99.9% | Test: Acc=97.5% | Best=98.0%(@920)
+  from x3: 0.97 0.97 0.98 0.98 0.98 0.98 0.98 0.98 0.98 0.98 0.98 0.98 0.98
+  per-rule acc: 0.98 0.97
+Epoch 3320 | Train: Loss=0.0026 Acc=99.9% | Test: Acc=97.3% | Best=98.0%(@920)
+  from x3: 0.97 0.97 0.97 0.97 0.97 0.97 0.97 0.97 0.97 0.97 0.97 0.97 0.97
+  per-rule acc: 0.98 0.97
+Epoch 3340 | Train: Loss=0.0025 Acc=99.9% | Test: Acc=97.3% | Best=98.0%(@920)
+  from x3: 0.97 0.97 0.97 0.97 0.97 0.97 0.97 0.97 0.97 0.97 0.97 0.97 0.97
+  per-rule acc: 0.97 0.97
+Epoch 3360 | Train: Loss=0.0128 Acc=99.8% | Test: Acc=95.2% | Best=98.0%(@920)
+  from x3: 0.94 0.95 0.95 0.95 0.95 0.95 0.95 0.95 0.95 0.95 0.95 0.95 0.95
+  per-rule acc: 0.96 0.94
+Epoch 3380 | Train: Loss=0.0021 Acc=99.9% | Test: Acc=97.7% | Best=98.0%(@920)
+  from x3: 0.98 0.98 0.98 0.98 0.98 0.98 0.98 0.98 0.98 0.98 0.98 0.98 0.98
+  per-rule acc: 0.98 0.97
+Epoch 3400 | Train: Loss=0.0026 Acc=99.9% | Test: Acc=97.2% | Best=98.0%(@920)
+  from x3: 0.97 0.97 0.97 0.97 0.97 0.97 0.97 0.97 0.97 0.97 0.97 0.97 0.97
+  per-rule acc: 0.98 0.97
+Epoch 3420 | Train: Loss=0.0025 Acc=99.9% | Test: Acc=97.2% | Best=98.0%(@920)
+  from x3: 0.97 0.97 0.97 0.97 0.97 0.97 0.97 0.97 0.97 0.97 0.97 0.97 0.97
+  per-rule acc: 0.97 0.97
+Epoch 3440 | Train: Loss=0.0059 Acc=99.9% | Test: Acc=97.1% | Best=98.0%(@920)
+  from x3: 0.96 0.97 0.97 0.97 0.97 0.97 0.97 0.97 0.97 0.97 0.97 0.97 0.97
+  per-rule acc: 0.98 0.96
+Epoch 3460 | Train: Loss=0.0022 Acc=99.9% | Test: Acc=97.5% | Best=98.0%(@920)
+  from x3: 0.97 0.98 0.98 0.98 0.98 0.98 0.98 0.98 0.98 0.98 0.98 0.98 0.98
+  per-rule acc: 0.98 0.97
+Epoch 3480 | Train: Loss=0.0026 Acc=99.9% | Test: Acc=97.3% | Best=98.0%(@920)
+  from x3: 0.97 0.97 0.97 0.97 0.97 0.97 0.97 0.97 0.97 0.97 0.97 0.97 0.97
+  per-rule acc: 0.98 0.97
+Epoch 3500 | Train: Loss=0.0024 Acc=99.9% | Test: Acc=97.2% | Best=98.0%(@920)
+  from x3: 0.97 0.97 0.97 0.97 0.97 0.97 0.97 0.97 0.97 0.97 0.97 0.97 0.97
+  per-rule acc: 0.97 0.97
+Epoch 3520 | Train: Loss=0.0075 Acc=99.9% | Test: Acc=95.8% | Best=98.0%(@920)
+  from x3: 0.95 0.96 0.96 0.96 0.96 0.96 0.96 0.96 0.96 0.96 0.96 0.96 0.96
+  per-rule acc: 0.97 0.95
+Epoch 3540 | Train: Loss=0.0020 Acc=99.9% | Test: Acc=97.5% | Best=98.0%(@920)
+  from x3: 0.97 0.97 0.97 0.98 0.98 0.98 0.98 0.98 0.98 0.98 0.98 0.98 0.98
+  per-rule acc: 0.98 0.97
+Epoch 3560 | Train: Loss=0.0026 Acc=99.9% | Test: Acc=97.1% | Best=98.0%(@920)
+  from x3: 0.97 0.97 0.97 0.97 0.97 0.97 0.97 0.97 0.97 0.97 0.97 0.97 0.97
+  per-rule acc: 0.97 0.97
+Epoch 3580 | Train: Loss=0.0025 Acc=99.9% | Test: Acc=97.1% | Best=98.0%(@920)
+  from x3: 0.96 0.97 0.97 0.97 0.97 0.97 0.97 0.97 0.97 0.97 0.97 0.97 0.97
+  per-rule acc: 0.97 0.97
+Epoch 3600 | Train: Loss=0.0181 Acc=99.7% | Test: Acc=81.4% | Best=98.0%(@920)
+  from x3: 0.79 0.82 0.82 0.82 0.82 0.82 0.82 0.81 0.82 0.82 0.82 0.82 0.82
+  per-rule acc: 0.89 0.75
+Epoch 3620 | Train: Loss=0.0017 Acc=99.9% | Test: Acc=97.6% | Best=98.0%(@920)
+  from x3: 0.98 0.98 0.98 0.98 0.98 0.98 0.98 0.98 0.98 0.98 0.98 0.98 0.98
+  per-rule acc: 0.98 0.97
+Epoch 3640 | Train: Loss=0.0024 Acc=99.9% | Test: Acc=97.4% | Best=98.0%(@920)
+  from x3: 0.97 0.97 0.97 0.97 0.97 0.97 0.97 0.97 0.97 0.97 0.97 0.97 0.97
+  per-rule acc: 0.98 0.97
+Epoch 3660 | Train: Loss=0.0025 Acc=99.9% | Test: Acc=97.2% | Best=98.0%(@920)
+  from x3: 0.97 0.97 0.97 0.97 0.97 0.97 0.97 0.97 0.97 0.97 0.97 0.97 0.97
+  per-rule acc: 0.98 0.97
+Epoch 3680 | Train: Loss=0.0023 Acc=99.9% | Test: Acc=97.1% | Best=98.0%(@920)
+  from x3: 0.97 0.97 0.97 0.97 0.97 0.97 0.97 0.97 0.97 0.97 0.97 0.97 0.97
+  per-rule acc: 0.97 0.97
+Epoch 3700 | Train: Loss=0.0017 Acc=99.9% | Test: Acc=97.7% | Best=98.0%(@920)
+  from x3: 0.97 0.98 0.98 0.98 0.98 0.98 0.98 0.98 0.98 0.98 0.98 0.98 0.98
+  per-rule acc: 0.98 0.97
+Epoch 3720 | Train: Loss=0.0023 Acc=99.9% | Test: Acc=97.4% | Best=98.0%(@920)
+  from x3: 0.97 0.97 0.97 0.97 0.97 0.97 0.97 0.97 0.97 0.97 0.97 0.97 0.97
+  per-rule acc: 0.98 0.97
+Epoch 3740 | Train: Loss=0.0025 Acc=99.9% | Test: Acc=97.2% | Best=98.0%(@920)
+  from x3: 0.97 0.97 0.97 0.97 0.97 0.97 0.97 0.97 0.97 0.97 0.97 0.97 0.97
+  per-rule acc: 0.98 0.97
+Epoch 3760 | Train: Loss=0.0023 Acc=99.9% | Test: Acc=97.1% | Best=98.0%(@920)
+  from x3: 0.97 0.97 0.97 0.97 0.97 0.97 0.97 0.97 0.97 0.97 0.97 0.97 0.97
+  per-rule acc: 0.97 0.97
+Epoch 3780 | Train: Loss=0.0016 Acc=99.9% | Test: Acc=97.6% | Best=98.0%(@920)
+  from x3: 0.97 0.98 0.98 0.98 0.98 0.98 0.98 0.98 0.98 0.98 0.98 0.98 0.98
+  per-rule acc: 0.98 0.98
+Epoch 3800 | Train: Loss=0.0022 Acc=99.9% | Test: Acc=97.5% | Best=98.0%(@920)
+  from x3: 0.97 0.97 0.98 0.98 0.98 0.98 0.98 0.98 0.98 0.98 0.98 0.98 0.98
+  per-rule acc: 0.98 0.97
+Epoch 3820 | Train: Loss=0.0025 Acc=99.9% | Test: Acc=97.3% | Best=98.0%(@920)
+  from x3: 0.97 0.97 0.97 0.97 0.97 0.97 0.97 0.97 0.97 0.97 0.97 0.97 0.97
+  per-rule acc: 0.98 0.97
+Epoch 3840 | Train: Loss=0.0023 Acc=99.9% | Test: Acc=97.2% | Best=98.0%(@920)
+  from x3: 0.97 0.97 0.97 0.97 0.97 0.97 0.97 0.97 0.97 0.97 0.97 0.97 0.97
+  per-rule acc: 0.97 0.97
+Epoch 3860 | Train: Loss=0.0017 Acc=99.9% | Test: Acc=97.7% | Best=98.0%(@920)
+  from x3: 0.98 0.98 0.98 0.98 0.98 0.98 0.98 0.98 0.98 0.98 0.98 0.98 0.98
+  per-rule acc: 0.98 0.97
+Epoch 3880 | Train: Loss=0.0023 Acc=99.9% | Test: Acc=97.6% | Best=98.0%(@920)
+  from x3: 0.97 0.98 0.98 0.98 0.98 0.98 0.98 0.98 0.98 0.98 0.98 0.98 0.98
+  per-rule acc: 0.98 0.97
+Epoch 3900 | Train: Loss=0.0025 Acc=99.9% | Test: Acc=97.3% | Best=98.0%(@920)
+  from x3: 0.97 0.97 0.97 0.97 0.97 0.97 0.97 0.97 0.97 0.97 0.97 0.97 0.97
+  per-rule acc: 0.98 0.97
+Epoch 3920 | Train: Loss=0.0023 Acc=99.9% | Test: Acc=97.1% | Best=98.0%(@920)
+  from x3: 0.97 0.97 0.97 0.97 0.97 0.97 0.97 0.97 0.97 0.97 0.97 0.97 0.97
+  per-rule acc: 0.97 0.97
+[Early stop] No improvement for 3000 consecutive epochs
+
+==================================================
+Saving model...
+[OK] Model saved to: /home/cxm/ai/test0709/models/mixed_basic_d512l2r8_seed7.pth
+  File size: 41682.3 KB
+  Best test accuracy: 98.02%
+
+==================================================
+Final generation test (batched teacher forcing, validate from position 3)
+==================================================
+
+--- AB pair 1: (1, 1) ---
+
+--- Statistics for AB=(1,1) ---
+Exposed    samples:  2052 | In-dist: 26660/26676 ( 99.9%) | OOD: 32832/32832 (100.0%)
+Unexposed  samples:   757 | In-dist:  9584/ 9841 ( 97.4%) | OOD: 11824/12112 ( 97.6%)
+
+--- Per-position accuracy for AB=(1,1) ---
+  Position   3: Exposed-ID: 2036.0/2052 ( 99.2%) | Unexposed-ID: 732.0/757 ( 96.7%)
+  Position   4: Exposed-ID: 2052.0/2052 (100.0%) | Unexposed-ID: 737.0/757 ( 97.4%)
+  Position   5: Exposed-ID: 2052.0/2052 (100.0%) | Unexposed-ID: 737.0/757 ( 97.4%)
+  Position   6: Exposed-ID: 2052.0/2052 (100.0%) | Unexposed-ID: 737.0/757 ( 97.4%)
+  Position   7: Exposed-ID: 2052.0/2052 (100.0%) | Unexposed-ID: 737.0/757 ( 97.4%)
+  Position   8: Exposed-ID: 2052.0/2052 (100.0%) | Unexposed-ID: 737.0/757 ( 97.4%)
+  Position   9: Exposed-ID: 2052.0/2052 (100.0%) | Unexposed-ID: 738.0/757 ( 97.5%)
+  Position  10: Exposed-ID: 2052.0/2052 (100.0%) | Unexposed-ID: 738.0/757 ( 97.5%)
+  Position  11: Exposed-ID: 2052.0/2052 (100.0%) | Unexposed-ID: 738.0/757 ( 97.5%)
+  Position  12: Exposed-ID: 2052.0/2052 (100.0%) | Unexposed-ID: 738.0/757 ( 97.5%)
+  Position  13: Exposed-ID: 2052.0/2052 (100.0%) | Unexposed-ID: 738.0/757 ( 97.5%)
+  Position  14: Exposed-ID: 2052.0/2052 (100.0%) | Unexposed-ID: 739.0/757 ( 97.6%)
+  Position  15: Exposed-ID: 2052.0/2052 (100.0%) | Unexposed-ID: 738.0/757 ( 97.5%)
+  Position  16: Exposed-OOD: 2052.0/2052 (100.0%) | Unexposed-OOD: 739.0/757 ( 97.6%)
+  Position  17: Exposed-OOD: 2052.0/2052 (100.0%) | Unexposed-OOD: 739.0/757 ( 97.6%)
+  Position  18: Exposed-OOD: 2052.0/2052 (100.0%) | Unexposed-OOD: 739.0/757 ( 97.6%)
+  Position  19: Exposed-OOD: 2052.0/2052 (100.0%) | Unexposed-OOD: 739.0/757 ( 97.6%)
+  Position  20: Exposed-OOD: 2052.0/2052 (100.0%) | Unexposed-OOD: 739.0/757 ( 97.6%)
+  Position  21: Exposed-OOD: 2052.0/2052 (100.0%) | Unexposed-OOD: 739.0/757 ( 97.6%)
+  Position  22: Exposed-OOD: 2052.0/2052 (100.0%) | Unexposed-OOD: 739.0/757 ( 97.6%)
+  Position  23: Exposed-OOD: 2052.0/2052 (100.0%) | Unexposed-OOD: 739.0/757 ( 97.6%)
+  Position  24: Exposed-OOD: 2052.0/2052 (100.0%) | Unexposed-OOD: 739.0/757 ( 97.6%)
+  Position  25: Exposed-OOD: 2052.0/2052 (100.0%) | Unexposed-OOD: 739.0/757 ( 97.6%)
+  Position  26: Exposed-OOD: 2052.0/2052 (100.0%) | Unexposed-OOD: 739.0/757 ( 97.6%)
+  Position  27: Exposed-OOD: 2052.0/2052 (100.0%) | Unexposed-OOD: 739.0/757 ( 97.6%)
+  Position  28: Exposed-OOD: 2052.0/2052 (100.0%) | Unexposed-OOD: 739.0/757 ( 97.6%)
+  Position  29: Exposed-OOD: 2052.0/2052 (100.0%) | Unexposed-OOD: 739.0/757 ( 97.6%)
+  Position  30: Exposed-OOD: 2052.0/2052 (100.0%) | Unexposed-OOD: 739.0/757 ( 97.6%)
+  Position  31: Exposed-OOD: 2052.0/2052 (100.0%) | Unexposed-OOD: 739.0/757 ( 97.6%)
+
+--- AB pair 2: (1, 2) ---
+
+--- Statistics for AB=(1,2) ---
+Exposed    samples:  1978 | In-dist: 25702/25714 (100.0%) | OOD: 31648/31648 (100.0%)
+Unexposed  samples:   831 | In-dist: 10465/10803 ( 96.9%) | OOD: 12865/13296 ( 96.8%)
+
+--- Per-position accuracy for AB=(1,2) ---
+  Position   3: Exposed-ID: 1966.0/1978 ( 99.4%) | Unexposed-ID: 805.0/831 ( 96.9%)
+  Position   4: Exposed-ID: 1978.0/1978 (100.0%) | Unexposed-ID: 805.0/831 ( 96.9%)
+  Position   5: Exposed-ID: 1978.0/1978 (100.0%) | Unexposed-ID: 805.0/831 ( 96.9%)
+  Position   6: Exposed-ID: 1978.0/1978 (100.0%) | Unexposed-ID: 805.0/831 ( 96.9%)
+  Position   7: Exposed-ID: 1978.0/1978 (100.0%) | Unexposed-ID: 805.0/831 ( 96.9%)
+  Position   8: Exposed-ID: 1978.0/1978 (100.0%) | Unexposed-ID: 805.0/831 ( 96.9%)
+  Position   9: Exposed-ID: 1978.0/1978 (100.0%) | Unexposed-ID: 805.0/831 ( 96.9%)
+  Position  10: Exposed-ID: 1978.0/1978 (100.0%) | Unexposed-ID: 805.0/831 ( 96.9%)
+  Position  11: Exposed-ID: 1978.0/1978 (100.0%) | Unexposed-ID: 805.0/831 ( 96.9%)
+  Position  12: Exposed-ID: 1978.0/1978 (100.0%) | Unexposed-ID: 805.0/831 ( 96.9%)
+  Position  13: Exposed-ID: 1978.0/1978 (100.0%) | Unexposed-ID: 805.0/831 ( 96.9%)
+  Position  14: Exposed-ID: 1978.0/1978 (100.0%) | Unexposed-ID: 805.0/831 ( 96.9%)
+  Position  15: Exposed-ID: 1978.0/1978 (100.0%) | Unexposed-ID: 805.0/831 ( 96.9%)
+  Position  16: Exposed-OOD: 1978.0/1978 (100.0%) | Unexposed-OOD: 805.0/831 ( 96.9%)
+  Position  17: Exposed-OOD: 1978.0/1978 (100.0%) | Unexposed-OOD: 804.0/831 ( 96.8%)
+  Position  18: Exposed-OOD: 1978.0/1978 (100.0%) | Unexposed-OOD: 804.0/831 ( 96.8%)
+  Position  19: Exposed-OOD: 1978.0/1978 (100.0%) | Unexposed-OOD: 804.0/831 ( 96.8%)
+  Position  20: Exposed-OOD: 1978.0/1978 (100.0%) | Unexposed-OOD: 804.0/831 ( 96.8%)
+  Position  21: Exposed-OOD: 1978.0/1978 (100.0%) | Unexposed-OOD: 804.0/831 ( 96.8%)
+  Position  22: Exposed-OOD: 1978.0/1978 (100.0%) | Unexposed-OOD: 804.0/831 ( 96.8%)
+  Position  23: Exposed-OOD: 1978.0/1978 (100.0%) | Unexposed-OOD: 804.0/831 ( 96.8%)
+  Position  24: Exposed-OOD: 1978.0/1978 (100.0%) | Unexposed-OOD: 804.0/831 ( 96.8%)
+  Position  25: Exposed-OOD: 1978.0/1978 (100.0%) | Unexposed-OOD: 804.0/831 ( 96.8%)
+  Position  26: Exposed-OOD: 1978.0/1978 (100.0%) | Unexposed-OOD: 804.0/831 ( 96.8%)
+  Position  27: Exposed-OOD: 1978.0/1978 (100.0%) | Unexposed-OOD: 804.0/831 ( 96.8%)
+  Position  28: Exposed-OOD: 1978.0/1978 (100.0%) | Unexposed-OOD: 804.0/831 ( 96.8%)
+  Position  29: Exposed-OOD: 1978.0/1978 (100.0%) | Unexposed-OOD: 804.0/831 ( 96.8%)
+  Position  30: Exposed-OOD: 1978.0/1978 (100.0%) | Unexposed-OOD: 804.0/831 ( 96.8%)
+  Position  31: Exposed-OOD: 1978.0/1978 (100.0%) | Unexposed-OOD: 804.0/831 ( 96.8%)
+
+--- Return code: 0 ---
+
+======================================================================
+Attention Analysis
+======================================================================
+Model config: addition (default), p=53
+Best test accuracy: 0.9801879480720791
+Training epochs: 3920
+
+Random test sequence 1/5 (length 32): [21, 36, 4, 40, 44, 31, 22, 0, 22, 22, 44, 13, 4, 17, 21, 38, 6, 44, 50, 41]...
+
+======================================================================
+Attention Layer Training Result Summary
+======================================================================
+Input sequence: [21, 36, 4, 40, 44, 31, 22, 0, 22, 22, 44, 13, 4, 17, 21, 38, 6, 44, 50, 41, 38, 26, 11, 37, 48, 32, 27, 6, 33, 39, 19, 5]
+
+--- Layer 0 ---
+  Head 0: Entropy=0.296
+    Attention coefficients from each query position to previous positions:
+      i= 0 -> j=0:1.000
+      i= 1 -> j=0:0.954, j=1:0.046
+      i= 2 -> j=0:0.028, j=1:0.932, j=2:0.040
+      i= 3 -> j=0:0.000, j=1:0.036, j=2:0.922, j=3:0.042
+      i= 4 -> j=0:0.000, j=1:0.000, j=2:0.036, j=3:0.913, j=4:0.051
+      i= 5 -> j=0:0.000, j=1:0.000, j=2:0.000, j=3:0.019, j=4:0.939, j=5:0.042
+      i= 6 -> j=0:0.000, j=1:0.000, j=2:0.000, j=3:0.000, j=4:0.029, j=5:0.928, j=6:0.042
+      i= 7 -> j=0:0.000, j=1:0.000, j=2:0.000, j=3:0.000, j=4:0.000, j=5:0.019, j=6:0.962, j=7:0.019
+      i= 8 -> j=0:0.000, j=1:0.000, j=2:0.000, j=3:0.000, j=4:0.000, j=5:0.000, j=6:0.049, j=7:0.879, j=8:0.071
+      i= 9 -> j=0:0.000, j=1:0.000, j=2:0.000, j=3:0.000, j=4:0.000, j=5:0.000, j=6:0.000, j=7:0.013, j=8:0.944, j=9:0.042
+      i=10 -> j=0:0.000, j=1:0.000, j=2:0.000, j=3:0.000, j=4:0.000, j=5:0.000, j=6:0.000, j=7:0.000, j=8:0.030, j=9:0.928, j=10:0.042
+      i=11 -> j=0:0.000, j=1:0.000, j=2:0.000, j=3:0.000, j=4:0.000, j=5:0.000, j=6:0.000, j=7:0.000, j=8:0.000, j=9:0.036, j=10:0.919, j=11:0.045
+      i=12 -> j=0:0.000, j=1:0.000, j=2:0.000, j=3:0.000, j=4:0.000, j=5:0.000, j=6:0.000, j=7:0.000, j=8:0.000, j=9:0.000, j=10:0.038, j=11:0.913, j=12:0.049
+      i=13 -> j=0:0.000, j=1:0.000, j=2:0.000, j=3:0.000, j=4:0.000, j=5:0.000, j=6:0.000, j=7:0.000, j=8:0.000, j=9:0.000, j=10:0.000, j=11:0.020, j=12:0.942, j=13:0.039
+      i=14 -> j=0:0.000, j=1:0.000, j=2:0.000, j=3:0.000, j=4:0.000, j=5:0.000, j=6:0.000, j=7:0.000, j=8:0.000, j=9:0.000, j=10:0.000, j=11:0.000, j=12:0.030, j=13:0.928, j=14:0.042
+      i=15 -> j=0:0.000, j=1:0.000, j=2:0.000, j=3:0.000, j=4:0.000, j=5:0.000, j=6:0.000, j=7:0.000, j=8:0.000, j=9:0.000, j=10:0.000, j=11:0.000, j=12:0.000, j=13:0.029, j=14:0.927, j=15:0.044
+      i=16 -> j=0:0.000, j=1:0.000, j=2:0.000, j=3:0.000, j=4:0.000, j=5:0.000, j=6:0.000, j=7:0.000, j=8:0.000, j=9:0.000, j=10:0.000, j=11:0.000, j=12:0.000, j=13:0.000, j=14:0.028, j=15:0.930, j=16:0.042
+      i=17 -> j=0:0.000, j=1:0.000, j=2:0.000, j=3:0.000, j=4:0.000, j=5:0.000, j=6:0.000, j=7:0.000, j=8:0.000, j=9:0.000, j=10:0.000, j=11:0.000, j=12:0.000, j=13:0.000, j=14:0.000, j=15:0.033, j=16:0.922, j=17:0.045
+      i=18 -> j=0:0.000, j=1:0.000, j=2:0.000, j=3:0.000, j=4:0.000, j=5:0.000, j=6:0.000, j=7:0.000, j=8:0.000, j=9:0.000, j=10:0.000, j=11:0.000, j=12:0.000, j=13:0.000, j=14:0.000, j=15:0.000, j=16:0.029, j=17:0.927, j=18:0.044
+      i=19 -> j=0:0.000, j=1:0.000, j=2:0.000, j=3:0.000, j=4:0.000, j=5:0.000, j=6:0.000, j=7:0.000, j=8:0.000, j=9:0.000, j=10:0.000, j=11:0.000, j=12:0.000, j=13:0.000, j=14:0.000, j=15:0.000, j=16:0.000, j=17:0.032, j=18:0.917, j=19:0.051
+      i=20 -> j=0:0.000, j=1:0.000, j=2:0.000, j=3:0.000, j=4:0.000, j=5:0.000, j=6:0.000, j=7:0.000, j=8:0.000, j=9:0.000, j=10:0.000, j=11:0.000, j=12:0.000, j=13:0.000, j=14:0.000, j=15:0.000, j=16:0.000, j=17:0.000, j=18:0.020, j=19:0.941, j=20:0.039
+      i=21 -> j=0:0.000, j=1:0.000, j=2:0.000, j=3:0.000, j=4:0.000, j=5:0.000, j=6:0.000, j=7:0.000, j=8:0.000, j=9:0.000, j=10:0.000, j=11:0.000, j=12:0.000, j=13:0.000, j=14:0.000, j=15:0.000, j=16:0.000, j=17:0.000, j=18:0.000, j=19:0.035, j=20:0.921, j=21:0.043
+      i=22 -> j=0:0.000, j=1:0.000, j=2:0.000, j=3:0.000, j=4:0.000, j=5:0.000, j=6:0.000, j=7:0.000, j=8:0.000, j=9:0.000, j=10:0.000, j=11:0.000, j=12:0.000, j=13:0.000, j=14:0.000, j=15:0.000, j=16:0.000, j=17:0.000, j=18:0.000, j=19:0.000, j=20:0.035, j=21:0.921, j=22:0.043
+      i=23 -> j=0:0.000, j=1:0.000, j=2:0.000, j=3:0.000, j=4:0.000, j=5:0.000, j=6:0.000, j=7:0.000, j=8:0.000, j=9:0.000, j=10:0.000, j=11:0.000, j=12:0.000, j=13:0.000, j=14:0.000, j=15:0.000, j=16:0.000, j=17:0.000, j=18:0.000, j=19:0.000, j=20:0.000, j=21:0.023, j=22:0.936, j=23:0.041
+      i=24 -> j=0:0.000, j=1:0.000, j=2:0.000, j=3:0.000, j=4:0.000, j=5:0.000, j=6:0.000, j=7:0.000, j=8:0.000, j=9:0.000, j=10:0.000, j=11:0.000, j=12:0.000, j=13:0.000, j=14:0.000, j=15:0.000, j=16:0.000, j=17:0.000, j=18:0.000, j=19:0.000, j=20:0.000, j=21:0.000, j=22:0.031, j=23:0.927, j=24:0.042
+      i=25 -> j=0:0.000, j=1:0.000, j=2:0.000, j=3:0.000, j=4:0.000, j=5:0.000, j=6:0.000, j=7:0.000, j=8:0.000, j=9:0.000, j=10:0.000, j=11:0.000, j=12:0.000, j=13:0.000, j=14:0.000, j=15:0.000, j=16:0.000, j=17:0.000, j=18:0.000, j=19:0.000, j=20:0.000, j=21:0.000, j=22:0.000, j=23:0.031, j=24:0.930, j=25:0.039
+      i=26 -> j=0:0.000, j=1:0.000, j=2:0.000, j=3:0.000, j=4:0.000, j=5:0.000, j=6:0.000, j=7:0.000, j=8:0.000, j=9:0.000, j=10:0.000, j=11:0.000, j=12:0.000, j=13:0.000, j=14:0.000, j=15:0.000, j=16:0.000, j=17:0.000, j=18:0.000, j=19:0.000, j=20:0.000, j=21:0.000, j=22:0.000, j=23:0.000, j=24:0.031, j=25:0.922, j=26:0.047
+      i=27 -> j=0:0.000, j=1:0.000, j=2:0.000, j=3:0.000, j=4:0.000, j=5:0.000, j=6:0.000, j=7:0.000, j=8:0.000, j=9:0.000, j=10:0.000, j=11:0.000, j=12:0.000, j=13:0.000, j=14:0.000, j=15:0.000, j=16:0.000, j=17:0.000, j=18:0.000, j=19:0.000, j=20:0.000, j=21:0.000, j=22:0.000, j=23:0.000, j=24:0.000, j=25:0.034, j=26:0.918, j=27:0.048
+      i=28 -> j=0:0.000, j=1:0.000, j=2:0.000, j=3:0.000, j=4:0.000, j=5:0.000, j=6:0.000, j=7:0.000, j=8:0.000, j=9:0.000, j=10:0.000, j=11:0.000, j=12:0.000, j=13:0.000, j=14:0.000, j=15:0.000, j=16:0.000, j=17:0.000, j=18:0.000, j=19:0.000, j=20:0.000, j=21:0.000, j=22:0.000, j=23:0.000, j=24:0.000, j=25:0.000, j=26:0.033, j=27:0.919, j=28:0.048
+      i=29 -> j=0:0.000, j=1:0.000, j=2:0.000, j=3:0.000, j=4:0.000, j=5:0.000, j=6:0.000, j=7:0.000, j=8:0.000, j=9:0.000, j=10:0.000, j=11:0.000, j=12:0.000, j=13:0.000, j=14:0.000, j=15:0.000, j=16:0.000, j=17:0.000, j=18:0.000, j=19:0.000, j=20:0.000, j=21:0.000, j=22:0.000, j=23:0.000, j=24:0.000, j=25:0.000, j=26:0.000, j=27:0.028, j=28:0.932, j=29:0.040
+      i=30 -> j=0:0.000, j=1:0.000, j=2:0.000, j=3:0.000, j=4:0.000, j=5:0.000, j=6:0.000, j=7:0.000, j=8:0.000, j=9:0.000, j=10:0.000, j=11:0.000, j=12:0.000, j=13:0.000, j=14:0.000, j=15:0.000, j=16:0.000, j=17:0.000, j=18:0.000, j=19:0.000, j=20:0.000, j=21:0.000, j=22:0.000, j=23:0.000, j=24:0.000, j=25:0.000, j=26:0.000, j=27:0.000, j=28:0.024, j=29:0.929, j=30:0.047
+      i=31 -> j=0:0.000, j=1:0.000, j=2:0.000, j=3:0.000, j=4:0.000, j=5:0.000, j=6:0.000, j=7:0.000, j=8:0.000, j=9:0.000, j=10:0.000, j=11:0.000, j=12:0.000, j=13:0.000, j=14:0.000, j=15:0.000, j=16:0.000, j=17:0.000, j=18:0.000, j=19:0.000, j=20:0.000, j=21:0.000, j=22:0.000, j=23:0.000, j=24:0.000, j=25:0.000, j=26:0.000, j=27:0.000, j=28:0.000, j=29:0.027, j=30:0.931, j=31:0.042
+    Average attention per distance:
+      d=0:0.074, d=1:0.928, d=2:0.030
+
+--- Layer 1 ---
+  Head 0: Entropy=0.871
+    Attention coefficients from each query position to previous positions:
+      i= 0 -> j=0:1.000
+      i= 1 -> j=0:0.856, j=1:0.144
+      i= 2 -> j=0:0.167, j=1:0.766, j=2:0.068
+      i= 3 -> j=0:0.005, j=1:0.226, j=2:0.558, j=3:0.211
+      i= 4 -> j=0:0.000, j=1:0.004, j=2:0.127, j=3:0.751, j=4:0.118
+      i= 5 -> j=0:0.000, j=1:0.000, j=2:0.001, j=3:0.144, j=4:0.780, j=5:0.075
+      i= 6 -> j=0:0.000, j=1:0.000, j=2:0.000, j=3:0.003, j=4:0.205, j=5:0.693, j=6:0.099
+      i= 7 -> j=0:0.001, j=1:0.000, j=2:0.000, j=3:0.001, j=4:0.012, j=5:0.255, j=6:0.671, j=7:0.059
+      i= 8 -> j=0:0.026, j=1:0.011, j=2:0.003, j=3:0.003, j=4:0.008, j=5:0.048, j=6:0.358, j=7:0.435, j=8:0.108
+      i= 9 -> j=0:0.010, j=1:0.007, j=2:0.001, j=3:0.000, j=4:0.000, j=5:0.000, j=6:0.022, j=7:0.561, j=8:0.140, j=9:0.259
+      i=10 -> j=0:0.003, j=1:0.006, j=2:0.003, j=3:0.001, j=4:0.000, j=5:0.000, j=6:0.000, j=7:0.046, j=8:0.045, j=9:0.704, j=10:0.191
+      i=11 -> j=0:0.000, j=1:0.001, j=2:0.002, j=3:0.003, j=4:0.000, j=5:0.000, j=6:0.000, j=7:0.001, j=8:0.004, j=9:0.170, j=10:0.645, j=11:0.175
+      i=12 -> j=0:0.000, j=1:0.000, j=2:0.000, j=3:0.002, j=4:0.001, j=5:0.000, j=6:0.000, j=7:0.000, j=8:0.000, j=9:0.003, j=10:0.140, j=11:0.781, j=12:0.072
+      i=13 -> j=0:0.000, j=1:0.000, j=2:0.000, j=3:0.001, j=4:0.002, j=5:0.001, j=6:0.000, j=7:0.000, j=8:0.000, j=9:0.000, j=10:0.005, j=11:0.211, j=12:0.703, j=13:0.075
+      i=14 -> j=0:0.001, j=1:0.000, j=2:0.000, j=3:0.000, j=4:0.001, j=5:0.001, j=6:0.001, j=7:0.001, j=8:0.000, j=9:0.000, j=10:0.000, j=11:0.007, j=12:0.295, j=13:0.549, j=14:0.143
+      i=15 -> j=0:0.001, j=1:0.001, j=2:0.000, j=3:0.000, j=4:0.000, j=5:0.000, j=6:0.001, j=7:0.002, j=8:0.000, j=9:0.000, j=10:0.000, j=11:0.000, j=12:0.002, j=13:0.180, j=14:0.751, j=15:0.062
+      i=16 -> j=0:0.002, j=1:0.003, j=2:0.001, j=3:0.001, j=4:0.000, j=5:0.000, j=6:0.001, j=7:0.007, j=8:0.002, j=9:0.000, j=10:0.000, j=11:0.000, j=12:0.000, j=13:0.006, j=14:0.207, j=15:0.691, j=16:0.079
+      i=17 -> j=0:0.002, j=1:0.004, j=2:0.003, j=3:0.004, j=4:0.001, j=5:0.000, j=6:0.001, j=7:0.007, j=8:0.003, j=9:0.003, j=10:0.001, j=11:0.000, j=12:0.000, j=13:0.000, j=14:0.009, j=15:0.256, j=16:0.608, j=17:0.098
+      i=18 -> j=0:0.001, j=1:0.001, j=2:0.001, j=3:0.004, j=4:0.002, j=5:0.000, j=6:0.000, j=7:0.002, j=8:0.001, j=9:0.002, j=10:0.002, j=11:0.000, j=12:0.000, j=13:0.000, j=14:0.000, j=15:0.003, j=16:0.184, j=17:0.701, j=18:0.096
+      i=19 -> j=0:0.001, j=1:0.001, j=2:0.001, j=3:0.002, j=4:0.002, j=5:0.001, j=6:0.000, j=7:0.003, j=8:0.001, j=9:0.001, j=10:0.003, j=11:0.002, j=12:0.000, j=13:0.000, j=14:0.000, j=15:0.000, j=16:0.005, j=17:0.231, j=18:0.670, j=19:0.076
+      i=20 -> j=0:0.002, j=1:0.001, j=2:0.001, j=3:0.001, j=4:0.002, j=5:0.001, j=6:0.001, j=7:0.003, j=8:0.001, j=9:0.000, j=10:0.001, j=11:0.002, j=12:0.001, j=13:0.000, j=14:0.000, j=15:0.000, j=16:0.000, j=17:0.008, j=18:0.229, j=19:0.689, j=20:0.056
+      i=21 -> j=0:0.003, j=1:0.002, j=2:0.001, j=3:0.001, j=4:0.001, j=5:0.002, j=6:0.004, j=7:0.006, j=8:0.001, j=9:0.001, j=10:0.001, j=11:0.002, j=12:0.003, j=13:0.001, j=14:0.000, j=15:0.000, j=16:0.000, j=17:0.000, j=18:0.006, j=19:0.216, j=20:0.530, j=21:0.218
+      i=22 -> j=0:0.001, j=1:0.002, j=2:0.001, j=3:0.001, j=4:0.000, j=5:0.000, j=6:0.001, j=7:0.006, j=8:0.001, j=9:0.000, j=10:0.000, j=11:0.000, j=12:0.000, j=13:0.002, j=14:0.001, j=15:0.000, j=16:0.000, j=17:0.000, j=18:0.000, j=19:0.003, j=20:0.124, j=21:0.741, j=22:0.116
+      i=23 -> j=0:0.001, j=1:0.001, j=2:0.001, j=3:0.001, j=4:0.000, j=5:0.000, j=6:0.001, j=7:0.003, j=8:0.001, j=9:0.001, j=10:0.000, j=11:0.000, j=12:0.000, j=13:0.000, j=14:0.001, j=15:0.000, j=16:0.000, j=17:0.000, j=18:0.000, j=19:0.000, j=20:0.002, j=21:0.163, j=22:0.729, j=23:0.094
+      i=24 -> j=0:0.001, j=1:0.001, j=2:0.002, j=3:0.002, j=4:0.002, j=5:0.001, j=6:0.001, j=7:0.003, j=8:0.001, j=9:0.002, j=10:0.002, j=11:0.001, j=12:0.000, j=13:0.000, j=14:0.001, j=15:0.001, j=16:0.001, j=17:0.000, j=18:0.000, j=19:0.000, j=20:0.000, j=21:0.008, j=22:0.181, j=23:0.702, j=24:0.087
+      i=25 -> j=0:0.001, j=1:0.001, j=2:0.001, j=3:0.002, j=4:0.003, j=5:0.001, j=6:0.001, j=7:0.007, j=8:0.001, j=9:0.003, j=10:0.004, j=11:0.002, j=12:0.001, j=13:0.000, j=14:0.000, j=15:0.000, j=16:0.002, j=17:0.002, j=18:0.000, j=19:0.000, j=20:0.000, j=21:0.000, j=22:0.004, j=23:0.218, j=24:0.687, j=25:0.057
+      i=26 -> j=0:0.001, j=1:0.000, j=2:0.000, j=3:0.001, j=4:0.001, j=5:0.001, j=6:0.001, j=7:0.004, j=8:0.001, j=9:0.001, j=10:0.002, j=11:0.002, j=12:0.001, j=13:0.000, j=14:0.000, j=15:0.000, j=16:0.001, j=17:0.001, j=18:0.000, j=19:0.000, j=20:0.000, j=21:0.000, j=22:0.000, j=23:0.003, j=24:0.232, j=25:0.623, j=26:0.126
+      i=27 -> j=0:0.001, j=1:0.001, j=2:0.000, j=3:0.000, j=4:0.001, j=5:0.000, j=6:0.001, j=7:0.005, j=8:0.001, j=9:0.001, j=10:0.001, j=11:0.001, j=12:0.001, j=13:0.001, j=14:0.000, j=15:0.000, j=16:0.000, j=17:0.001, j=18:0.001, j=19:0.001, j=20:0.000, j=21:0.000, j=22:0.000, j=23:0.000, j=24:0.004, j=25:0.104, j=26:0.805, j=27:0.069
+      i=28 -> j=0:0.001, j=1:0.001, j=2:0.001, j=3:0.000, j=4:0.000, j=5:0.000, j=6:0.001, j=7:0.007, j=8:0.001, j=9:0.001, j=10:0.001, j=11:0.001, j=12:0.001, j=13:0.001, j=14:0.001, j=15:0.000, j=16:0.000, j=17:0.000, j=18:0.000, j=19:0.001, j=20:0.000, j=21:0.000, j=22:0.000, j=23:0.000, j=24:0.000, j=25:0.002, j=26:0.185, j=27:0.693, j=28:0.099
+      i=29 -> j=0:0.001, j=1:0.001, j=2:0.001, j=3:0.001, j=4:0.000, j=5:0.000, j=6:0.001, j=7:0.005, j=8:0.001, j=9:0.001, j=10:0.001, j=11:0.001, j=12:0.001, j=13:0.002, j=14:0.002, j=15:0.001, j=16:0.000, j=17:0.000, j=18:0.000, j=19:0.001, j=20:0.001, j=21:0.001, j=22:0.000, j=23:0.000, j=24:0.000, j=25:0.000, j=26:0.002, j=27:0.205, j=28:0.664, j=29:0.108
+      i=30 -> j=0:0.000, j=1:0.001, j=2:0.001, j=3:0.001, j=4:0.001, j=5:0.000, j=6:0.000, j=7:0.002, j=8:0.001, j=9:0.001, j=10:0.001, j=11:0.001, j=12:0.000, j=13:0.001, j=14:0.001, j=15:0.001, j=16:0.001, j=17:0.000, j=18:0.000, j=19:0.000, j=20:0.001, j=21:0.002, j=22:0.001, j=23:0.000, j=24:0.000, j=25:0.000, j=26:0.000, j=27:0.003, j=28:0.134, j=29:0.758, j=30:0.086
+      i=31 -> j=0:0.000, j=1:0.001, j=2:0.001, j=3:0.001, j=4:0.001, j=5:0.000, j=6:0.000, j=7:0.003, j=8:0.001, j=9:0.001, j=10:0.002, j=11:0.001, j=12:0.001, j=13:0.001, j=14:0.001, j=15:0.001, j=16:0.002, j=17:0.001, j=18:0.000, j=19:0.000, j=20:0.000, j=21:0.001, j=22:0.001, j=23:0.001, j=24:0.000, j=25:0.000, j=26:0.000, j=27:0.000, j=28:0.003, j=29:0.144, j=30:0.754, j=31:0.077
+    Average attention per distance:
+      d=0:0.137, d=1:0.672, d=2:0.203
+
+
+======================================================================
+QK Property Verification (Raw Scores, before Softmax)
+======================================================================
+Recurrence order init_len=2, num test sequences=1
+
+--- [P1] Long-distance Orthogonality Verification ---
+Ideal: raw_score mean ≈ 0 and small std when d > init_len
+
+  Layer 0, Head 0:
+    d= 1 (effective): mean= 22.467, std= 0.407, n=31
+    d= 2 (effective): mean= 18.990, std= 0.326, n=30
+    d>2 (long-distance): mean= -1.266, std= 4.081, n=435
+
+  Layer 1, Head 0:
+    d= 1 (effective): mean=  5.463, std= 0.848, n=31
+    d= 2 (effective): mean=  4.226, std= 0.622, n=30
+    d>2 (long-distance): mean= -1.589, std= 1.703, n=435
+
+--- [P2] Time-homogeneous Verification ---
+Ideal: CV of raw_score across positions i ≈ 0 for fixed distance d
+(CV = std / |mean|, smaller = more constant)
+
+  Layer 0, Head 0:
+    d= 1: mean= 22.467, std= 0.407, CV=0.018, n=31
+    d= 2: mean= 18.990, std= 0.326, CV=0.017, n=30
+
+  Layer 1, Head 0:
+    d= 1: mean=  5.463, std= 0.848, CV=0.155, n=31
+    d= 2: mean=  4.226, std= 0.622, CV=0.147, n=30
+
+======================================================================
+QK Property Verification Completed
+======================================================================
