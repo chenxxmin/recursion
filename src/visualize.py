@@ -437,30 +437,44 @@ def main():
     parser = argparse.ArgumentParser(description='Visualize learning curves from training logs.')
     parser.add_argument('names', nargs='*', help='Experiment name(s) or setting prefix(es).')
     parser.add_argument('--all', action='store_true', help='Visualize all experiments in experiments.json.')
-    parser.add_argument('--log-dir', default='logs', help='Directory containing .log files.')
-    parser.add_argument('--out-dir', default='plots', help='Directory to save plots.')
+    parser.add_argument('--base-dir', default='/data/cxm', help='Base output directory (default: /data/cxm).')
+    parser.add_argument('--log-dir', default=None, help='Directory containing .log files.')
+    parser.add_argument('--out-dir', default=None, help='Directory to save plots.')
     parser.add_argument('--no-per-pos', action='store_true', help='Skip per-position plot.')
     parser.add_argument('--no-per-rule', action='store_true', help='Skip per-rule plot.')
     parser.add_argument('--no-group', action='store_true', help='Plot each log separately (do not group seeds).')
     args = parser.parse_args()
 
-    os.makedirs(args.out_dir, exist_ok=True)
+    log_dir = args.log_dir
+    out_dir = args.out_dir
 
     names = args.names
     if args.all:
         exp_path = 'experiments.json'
         if os.path.exists(exp_path):
+            exp_name = os.path.splitext(os.path.basename(exp_path))[0]
+            default_log = os.path.join(args.base_dir, exp_name, 'logs')
+            default_out = os.path.join(args.base_dir, exp_name, 'plots')
+            log_dir = log_dir or default_log
+            out_dir = out_dir or default_out
             with open(exp_path, 'r', encoding='utf-8') as f:
                 names = [e['name'] for e in json.load(f)['experiments']]
         else:
-            # fallback: all logs
-            names = [Path(p).stem for p in glob.glob(os.path.join(args.log_dir, '*.log'))]
+            # fallback: all logs in the explicit/default log dir
+            log_dir = log_dir or 'logs'
+            out_dir = out_dir or 'plots'
+            names = [Path(p).stem for p in glob.glob(os.path.join(log_dir, '*.log'))]
+    else:
+        log_dir = log_dir or 'logs'
+        out_dir = out_dir or 'plots'
+
+    os.makedirs(out_dir, exist_ok=True)
 
     if not names:
         print("No experiment names provided. Usage: python visualize.py <exp_name> [--all]")
         sys.exit(1)
 
-    groups = collect_log_groups(names, args.log_dir)
+    groups = collect_log_groups(names, log_dir)
 
     if args.no_group:
         # Legacy behaviour: one figure per log file.
@@ -471,7 +485,7 @@ def main():
                 if not data['epochs']:
                     print(f"No epoch data found in {log_path}, skipping.")
                     continue
-                base = os.path.join(args.out_dir, name)
+                base = os.path.join(out_dir, name)
                 plot_learning_curve(data, name, save_path=f'{base}_curve.png')
                 if not args.no_per_pos:
                     plot_per_position(data, name, save_path=f'{base}_per_pos.png')
@@ -491,7 +505,7 @@ def main():
             if not data_items:
                 continue
 
-            base = os.path.join(args.out_dir, setting)
+            base = os.path.join(out_dir, setting)
             plot_learning_curve(data_items, setting, save_path=f'{base}_curve.png')
             if not args.no_per_pos:
                 plot_per_position(data_items, setting, save_path=f'{base}_per_pos.png')
