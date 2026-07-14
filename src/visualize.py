@@ -296,10 +296,6 @@ def plot_per_rule(data, title, save_path=None):
     items = _data_items(data)
     single_mode = len(items) == 1 and items[0][0] == ''
 
-    fig, ax = plt.subplots(figsize=(8, 5))
-    colors = plt.cm.tab10.colors
-    linestyles = ['-', '--', ':', '-.']
-
     if single_mode:
         d = items[0][1]
         per_rule = d['per_rule']
@@ -321,14 +317,18 @@ def plot_per_rule(data, title, save_path=None):
             print("No per-rule accuracy data to plot.")
             return
 
+        fig, ax = plt.subplots(figsize=(8, 5))
         for r in range(n_rules):
             accs = [rd[r] for rd in rule_data]
             ax.plot(epochs, accs, label=f'Rule {r}', linewidth=1.5)
+        ax.set_xlabel('Epoch')
+        ax.set_ylabel('Accuracy')
         ax.set_title(f'{title} - Per-rule Accuracy')
         ax.legend(fontsize=8)
+        ax.grid(True, alpha=0.3)
+        ax.set_ylim(-0.05, 1.05)
+        fig.tight_layout()
     else:
-        from matplotlib.lines import Line2D
-
         parsed = []
         n_rules = None
         for label, d in items:
@@ -347,49 +347,33 @@ def plot_per_rule(data, title, save_path=None):
             print("No per-rule accuracy data to plot.")
             return
 
-        markers = ['o', 's', '^', 'D', 'v', '<', '>', 'p']
+        n = len(parsed)
+        ncols = 4
+        nrows = (n + ncols - 1) // ncols
+        fig, axes = plt.subplots(nrows, ncols, figsize=(3.2*ncols, 2.5*nrows),
+                                 squeeze=False, constrained_layout=True)
+        axes = axes.flatten()
+        colors = plt.cm.tab10.colors
 
         for idx, (label, epochs, rule_data) in enumerate(parsed):
-            color = colors[idx % len(colors)]
+            ax = axes[idx]
             for r in range(n_rules):
                 accs = [rd[r] for rd in rule_data]
-                marker = markers[r % len(markers)]
-                ax.plot(epochs, accs, marker=marker, color=color,
-                        linewidth=0.5, alpha=0.3, markersize=4,
-                        markerfacecolor=color, markeredgecolor='none')
-            if epochs:
-                ax.annotate(label, xy=(epochs[-1], rule_data[-1][0]),
-                            fontsize=7, color=color,
-                            textcoords='offset points', xytext=(5, 0),
-                            va='center', clip_on=False)
+                ax.plot(epochs, accs, label=f'rule {r}',
+                        linewidth=1.5, color=colors[r % len(colors)])
+            ax.set_title(f'seed {label}', fontsize=9)
+            ax.set_xlabel('Epoch', fontsize=8)
+            ax.set_ylabel('Accuracy', fontsize=8)
+            ax.tick_params(axis='both', which='major', labelsize=7)
+            ax.legend(fontsize=7)
+            ax.grid(True, alpha=0.3)
+            ax.set_ylim(-0.05, 1.05)
 
-        # Legend for seeds (colors)
-        color_handles = [
-            Line2D([0], [0], color=colors[i % len(colors)], linewidth=2,
-                   label=f'seed {parsed[i][0]}')
-            for i in range(len(parsed))
-        ]
-        legend1 = ax.legend(handles=color_handles, loc='upper left',
-                            fontsize=7, title='seed')
-        ax.add_artist(legend1)
+        for idx in range(n, len(axes)):
+            axes[idx].axis('off')
 
-        # Legend for rules (markers)
-        marker_handles = [
-            Line2D([0], [0], color='black', marker=markers[r % len(markers)],
-                   linewidth=0, markersize=6, label=f'rule {r}')
-            for r in range(n_rules)
-        ]
-        ax.legend(handles=marker_handles, loc='lower right',
-                  fontsize=7, title='rule')
+        fig.suptitle(f'{title} - Per-rule Accuracy', fontsize=12)
 
-        ax.set_title(f'{title} - Per-rule Accuracy')
-
-    ax.set_xlabel('Epoch')
-    ax.set_ylabel('Accuracy')
-    ax.grid(True, alpha=0.3)
-    ax.set_ylim(-0.05, 1.05)
-
-    fig.tight_layout()
     out = save_path or ('per_rule.png' if single_mode else f'{title}_per_rule.png')
     fig.savefig(out, dpi=150)
     print(f"Saved per-rule curve to {out}")
