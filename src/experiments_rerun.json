@@ -1,0 +1,39 @@
+{
+  "concurrency": 8,
+  "experiments": [
+    {
+      "name": "mixed_label_d512l2r8_e0.8_0.8_seed0",
+      "task": "mixed_ab",
+      "config": {
+        "RANDOM_SEED": 0,
+        "D_MODEL": 512,
+        "N_LAYER": 2,
+        "MLP_RATIO": 8,
+        "MIXED_AB_MAX_UNIQUE_RATIOS": [
+          0.8,
+          0.8
+        ],
+        "USE_AB_TAG": true,
+        "USE_CONDITIONAL_WTE": false,
+        "NUM_MASK": 1
+      }
+    },
+    {
+      "name": "mixed_label_d512l2r8_e0.8_0.8_seed7",
+      "task": "mixed_ab",
+      "config": {
+        "RANDOM_SEED": 7,
+        "D_MODEL": 512,
+        "N_LAYER": 2,
+        "MLP_RATIO": 8,
+        "MIXED_AB_MAX_UNIQUE_RATIOS": [
+          0.8,
+          0.8
+        ],
+        "USE_AB_TAG": true,
+        "USE_CONDITIONAL_WTE": false,
+        "NUM_MASK": 1
+      }
+    }
+  ]
+}
