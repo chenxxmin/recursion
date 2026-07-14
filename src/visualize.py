@@ -327,34 +327,62 @@ def plot_per_rule(data, title, save_path=None):
         ax.set_title(f'{title} - Per-rule Accuracy')
         ax.legend(fontsize=8)
     else:
-        for idx, (label, d) in enumerate(items):
-            per_rule = d['per_rule']
+        from matplotlib.lines import Line2D
+
+        parsed = []
+        n_rules = None
+        for label, d in items:
             epochs = []
             rule_data = []
-            n_rules = None
-            for ep, pr in zip(d['epochs'], per_rule):
+            for ep, pr in zip(d['epochs'], d['per_rule']):
                 if pr is not None:
                     epochs.append(ep)
                     rule_data.append(pr)
                     if n_rules is None:
                         n_rules = len(pr)
-            if not rule_data or n_rules is None:
-                continue
+            if rule_data and n_rules is not None:
+                parsed.append((label, epochs, rule_data))
 
+        if not parsed or n_rules is None:
+            print("No per-rule accuracy data to plot.")
+            return
+
+        markers = ['o', 's', '^', 'D', 'v', '<', '>', 'p']
+
+        for idx, (label, epochs, rule_data) in enumerate(parsed):
             color = colors[idx % len(colors)]
             for r in range(n_rules):
                 accs = [rd[r] for rd in rule_data]
-                line, = ax.plot(epochs, accs,
-                                label=f'seed {label} rule {r}',
-                                linewidth=1.2, linestyle=linestyles[r % 4],
-                                color=color, alpha=0.85)
+                marker = markers[r % len(markers)]
+                ax.plot(epochs, accs, marker=marker, color=color,
+                        linewidth=0.5, alpha=0.3, markersize=4,
+                        markerfacecolor=color, markeredgecolor='none')
             if epochs:
                 ax.annotate(label, xy=(epochs[-1], rule_data[-1][0]),
                             fontsize=7, color=color,
                             textcoords='offset points', xytext=(5, 0),
                             va='center', clip_on=False)
+
+        # Legend for seeds (colors)
+        color_handles = [
+            Line2D([0], [0], color=colors[i % len(colors)], linewidth=2,
+                   label=f'seed {parsed[i][0]}')
+            for i in range(len(parsed))
+        ]
+        legend1 = ax.legend(handles=color_handles, loc='upper left',
+                            fontsize=7, title='seed')
+        ax.add_artist(legend1)
+
+        # Legend for rules (markers)
+        marker_handles = [
+            Line2D([0], [0], color='black', marker=markers[r % len(markers)],
+                   linewidth=0, markersize=6, label=f'rule {r}')
+            for r in range(n_rules)
+        ]
+        ax.legend(handles=marker_handles, loc='lower right',
+                  fontsize=7, title='rule')
+
         ax.set_title(f'{title} - Per-rule Accuracy')
-        ax.legend(fontsize=7, ncol=2)
 
     ax.set_xlabel('Epoch')
     ax.set_ylabel('Accuracy')
