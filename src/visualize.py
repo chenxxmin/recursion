@@ -112,66 +112,92 @@ def plot_learning_curve(data, title, save_path=None):
     ----------
     data : dict or list of (label, dict)
         If a dict, plot a single experiment (legacy behaviour).
-        If a list, plot multiple runs on the same axes; label is used to
-        annotate curves (e.g. the seed number).
+        If a list, plot multiple runs; label is used to annotate curves
+        (e.g. the seed number).
     """
     items = _data_items(data)
     single_mode = len(items) == 1 and items[0][0] == ''
 
-    fig, axes = plt.subplots(1, 2, figsize=(12, 4))
-    colors = plt.cm.tab10.colors
+    if single_mode:
+        fig, axes = plt.subplots(1, 2, figsize=(12, 4))
 
-    ax = axes[0]
-    for idx, (label, d) in enumerate(items):
+        ax = axes[0]
+        d = items[0][1]
         epochs = d['epochs']
-        if not epochs:
-            continue
-        if single_mode:
-            ax.plot(epochs, d['train_acc'], label='Train Acc', linewidth=1.5)
-            ax.plot(epochs, d['test_acc'], label='Test Acc', linewidth=1.5)
-            ax.plot(epochs, d['best_acc'], label='Best Test Acc',
-                    linewidth=1.5, linestyle='--')
-        else:
-            color = colors[idx % len(colors)]
-            line, = ax.plot(epochs, d['test_acc'], label=f'seed {label}',
-                            linewidth=1.5, color=color, alpha=0.85)
-            ax.plot(epochs, d['best_acc'], linewidth=1.2, linestyle='--',
-                    color=color, alpha=0.5)
-            # small seed label at the end of the test curve
-            ax.annotate(label, xy=(epochs[-1], d['test_acc'][-1]),
-                        fontsize=7, color=color,
-                        textcoords='offset points', xytext=(5, 0),
-                        va='center', clip_on=False)
-    ax.set_xlabel('Epoch')
-    ax.set_ylabel('Accuracy')
-    ax.set_title(f'{title} - Accuracy')
-    ax.legend(loc='best', fontsize=8)
-    ax.grid(True, alpha=0.3)
-    ax.set_ylim(-0.05, 1.05)
+        ax.plot(epochs, d['train_acc'], label='Train Acc', linewidth=1.5)
+        ax.plot(epochs, d['test_acc'], label='Test Acc', linewidth=1.5)
+        ax.plot(epochs, d['best_acc'], label='Best Test Acc',
+                linewidth=1.5, linestyle='--')
+        ax.set_xlabel('Epoch')
+        ax.set_ylabel('Accuracy')
+        ax.set_title(f'{title} - Accuracy')
+        ax.legend(loc='best', fontsize=8)
+        ax.grid(True, alpha=0.3)
+        ax.set_ylim(-0.05, 1.05)
 
-    ax = axes[1]
-    for idx, (label, d) in enumerate(items):
-        epochs = d['epochs']
-        if not epochs:
-            continue
-        if single_mode:
-            ax.plot(epochs, d['train_loss'], label='Train Loss',
-                    linewidth=1.5, color='tab:red')
-        else:
-            color = colors[idx % len(colors)]
-            line, = ax.plot(epochs, d['train_loss'], label=f'seed {label}',
-                            linewidth=1.5, color=color, alpha=0.85)
-            ax.annotate(label, xy=(epochs[-1], d['train_loss'][-1]),
-                        fontsize=7, color=color,
-                        textcoords='offset points', xytext=(5, 0),
-                        va='center', clip_on=False)
-    ax.set_xlabel('Epoch')
-    ax.set_ylabel('Loss')
-    ax.set_title(f'{title} - Loss')
-    ax.legend(loc='best', fontsize=8)
-    ax.grid(True, alpha=0.3)
+        ax = axes[1]
+        ax.plot(epochs, d['train_loss'], label='Train Loss',
+                linewidth=1.5, color='tab:red')
+        ax.set_xlabel('Epoch')
+        ax.set_ylabel('Loss')
+        ax.set_title(f'{title} - Loss')
+        ax.legend(loc='best', fontsize=8)
+        ax.grid(True, alpha=0.3)
 
-    fig.tight_layout()
+        fig.tight_layout()
+    else:
+        n = len(items)
+        ncols = 4
+        nrows = (n + ncols - 1) // ncols
+        fig, axes = plt.subplots(nrows, ncols, figsize=(3.2*ncols, 2.5*nrows),
+                                 squeeze=False, constrained_layout=True)
+        axes = axes.flatten()
+
+        for idx, (label, d) in enumerate(items):
+            ax = axes[idx]
+            ax_loss = ax.twinx()
+            epochs = d['epochs']
+            if not epochs:
+                continue
+
+            # Left y-axis: accuracy
+            l1, = ax.plot(epochs, d['train_acc'], label='train acc',
+                          color='tab:blue', linewidth=1.2)
+            l2, = ax.plot(epochs, d['test_acc'], label='test acc',
+                          color='tab:orange', linewidth=1.2)
+            l3, = ax.plot(epochs, d['best_acc'], label='best',
+                          color='tab:green', linewidth=1.0, linestyle='--')
+            ax.set_ylabel('Accuracy', color='tab:blue')
+            ax.tick_params(axis='y', labelcolor='tab:blue')
+            ax.set_ylim(-0.05, 1.05)
+
+            # Right y-axis: loss
+            l4, = ax_loss.plot(epochs, d['train_loss'], label='loss',
+                               color='tab:red', linewidth=1.0, alpha=0.7)
+            ax_loss.set_ylabel('Loss', color='tab:red')
+            ax_loss.tick_params(axis='y', labelcolor='tab:red')
+            # Keep the loss axis focused on the main trend (ignore first-epoch spikes).
+            sorted_loss = sorted(d['train_loss'])
+            p95_idx = int(0.95 * len(sorted_loss))
+            loss_ylim = max(sorted_loss[p95_idx] * 1.2, 0.5)
+            ax_loss.set_ylim(0, loss_ylim)
+
+            ax.set_title(f'seed {label}', fontsize=9)
+            ax.set_xlabel('Epoch', fontsize=8)
+            ax.tick_params(axis='both', which='major', labelsize=7)
+            ax_loss.tick_params(axis='y', which='major', labelsize=6)
+            ax.grid(True, alpha=0.3)
+
+            # Combined legend
+            lines = [l1, l2, l3, l4]
+            labels = [l.get_label() for l in lines]
+            ax.legend(lines, labels, loc='best', fontsize=6)
+
+        for idx in range(n, len(axes)):
+            axes[idx].axis('off')
+
+        fig.suptitle(f'{title} - Learning Curve', fontsize=12)
+
     out = save_path or ('learning_curve.png' if single_mode else f'{title}_curve.png')
     fig.savefig(out, dpi=150)
     print(f"Saved learning curve to {out}")
