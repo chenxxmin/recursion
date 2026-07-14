@@ -359,8 +359,17 @@ def plot_per_rule(data, title, save_path=None):
             ax = axes[idx]
             for r in range(n_rules):
                 accs = [rd[r] for rd in rule_data]
-                ax.plot(epochs, accs, label=f'rule {r}',
-                        linewidth=1.5, color=colors[r % len(colors)])
+                line, = ax.plot(epochs, accs, label=f'rule {r}',
+                                linewidth=1.5, color=colors[r % len(colors)])
+                # Annotate the highest accuracy on this curve.
+                max_acc = max(accs)
+                max_idx = accs.index(max_acc)
+                max_epoch = epochs[max_idx]
+                ax.annotate(f'{max_acc:.2f}',
+                            xy=(max_epoch, max_acc),
+                            fontsize=6, color=line.get_color(),
+                            textcoords='offset points', xytext=(0, 5),
+                            ha='center', va='bottom')
             ax.set_title(f'seed {label}', fontsize=9)
             ax.set_xlabel('Epoch', fontsize=8)
             ax.set_ylabel('Accuracy', fontsize=8)
