@@ -467,11 +467,14 @@ def main():
     else:
         log_dir = log_dir or 'logs'
         out_dir = out_dir or 'plots'
+        if not names:
+            # Default: visualize all logs found in log_dir.
+            names = [Path(p).stem for p in glob.glob(os.path.join(log_dir, '*.log'))]
 
     os.makedirs(out_dir, exist_ok=True)
 
     if not names:
-        print("No experiment names provided. Usage: python visualize.py <exp_name> [--all]")
+        print(f"No experiment names or log files found in {log_dir}.")
         sys.exit(1)
 
     groups = collect_log_groups(names, log_dir)
