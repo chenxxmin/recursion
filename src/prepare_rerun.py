@@ -13,7 +13,7 @@ import json
 import os
 import re
 
-DEFAULT_BASE_DIR = '/data/cxm'
+DEFAULT_BASE_DIR = '/data/cxm/recursion'
 
 
 def load_json(path):
