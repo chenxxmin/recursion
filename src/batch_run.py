@@ -13,6 +13,9 @@ from datetime import datetime
 
 BASE_CONFIG_PATH = 'config.json'
 DEFAULT_EXPERIMENTS_PATH = 'experiments.json'
+DEFAULT_BASE_DIR = '/data'
+
+# These are updated in main() based on the experiments config filename.
 LOG_DIR = 'logs'
 MODEL_DIR = 'models'
 PLOT_DIR = 'plots'
@@ -237,8 +240,22 @@ def main():
         default=DEFAULT_EXPERIMENTS_PATH,
         help=f'Path to experiments config JSON (default: {DEFAULT_EXPERIMENTS_PATH})'
     )
+    parser.add_argument(
+        '--base-dir',
+        default=DEFAULT_BASE_DIR,
+        help=f'Base output directory (default: {DEFAULT_BASE_DIR})'
+    )
     args = parser.parse_args()
     experiments_path = args.experiments_path
+
+    # Place outputs under /data/<experiments filename>/logs|plots|models
+    exp_name = os.path.splitext(os.path.basename(experiments_path))[0]
+    work_dir = os.path.join(args.base_dir, exp_name)
+
+    global LOG_DIR, MODEL_DIR, PLOT_DIR
+    LOG_DIR = os.path.join(work_dir, 'logs')
+    MODEL_DIR = os.path.join(work_dir, 'models')
+    PLOT_DIR = os.path.join(work_dir, 'plots')
 
     os.makedirs(LOG_DIR, exist_ok=True)
     os.makedirs(MODEL_DIR, exist_ok=True)
