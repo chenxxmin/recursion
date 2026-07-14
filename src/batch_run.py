@@ -13,7 +13,7 @@ from datetime import datetime
 
 BASE_CONFIG_PATH = 'config.json'
 DEFAULT_EXPERIMENTS_PATH = 'experiments.json'
-DEFAULT_BASE_DIR = '/data'
+DEFAULT_BASE_DIR = '/data/cxm'
 
 # These are updated in main() based on the experiments config filename.
 LOG_DIR = 'logs'
