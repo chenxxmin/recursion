@@ -1096,8 +1096,10 @@ def run_experiment(config_path=None):
         TRAIN_LEN = cfg.get('TRAIN_LEN', 16)
         OOD_LEN = cfg.get('OOD_LEN', 32)
 
-        BLOCK_SIZE = max(TRAIN_LEN, OOD_LEN)
-        BLOCK_SIZE = 2 ** (BLOCK_SIZE - 1).bit_length()
+        # In dynamic_mixed, each generated token is preceded by a flag token,
+        # so the actual sequence length is 2*length - 2.
+        max_seq_len = 2 * max(TRAIN_LEN, OOD_LEN) - 2
+        BLOCK_SIZE = 2 ** (max_seq_len - 1).bit_length()
 
         train_dataset = DynamicMixedDataset(
             p=P, ab_pairs=AB_PAIRS, num_samples=NUM_TRAIN_SAMPLES,
