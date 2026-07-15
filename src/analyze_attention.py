@@ -201,100 +201,128 @@ def extract_qk_raw_scores(model, input_ids, ab_label=None):
     return layer_outputs
 
 
-def summarize_attention_for_sequence(model, seq, p=None):
+def summarize_attention_for_sequence(model, seq, p=None, query_mask=None):
     """
     Compute attention summary for a single sequence.
-    
+
     seq: list[int] or torch.LongTensor, length T
+    query_mask: optional list/tensor of length T-1 indicating which target/query
+                positions should be included in the summary (1 = include).
+                If None, all query positions are included.
     Returns: dict containing attention concentration analysis per layer.
     """
     if isinstance(seq, list):
         seq = torch.tensor([seq], dtype=torch.long)
     seq = seq.to(next(model.parameters()).device)
-    
+
     attn_maps = get_attention_weights(model, seq)
     T = seq.size(1)
+
+    if query_mask is None:
+        query_positions = list(range(T))
+    else:
+        if isinstance(query_mask, (list, tuple)):
+            query_mask = torch.tensor(query_mask, dtype=torch.bool)
+        query_positions = query_mask.nonzero(as_tuple=True)[0].tolist()
+        # Pad/truncate to T in case query_mask was shorter than T
+        query_positions = [i for i in query_positions if 0 <= i < T]
+
     results = []
-    
+
     for layer_idx, att in enumerate(attn_maps):
         n_head, _, _ = att.shape
         layer_info = {
             'layer': layer_idx,
             'heads': []
         }
-        
+
         for h in range(n_head):
             attn_matrix = att[h]  # (T, T), attn_matrix[i, j] is attention from position i to j
-            
-            # For each query position i, find top K positions it attends to most
-            topk_vals, topk_idx = torch.topk(attn_matrix, k=min(3, T), dim=-1)
-            
-            # Compute attention entropy (lower = more concentrated)
-            entropy = -(attn_matrix * (attn_matrix + 1e-12).log()).sum(dim=-1)
-            mean_entropy = entropy.mean().item()
-            
-            # Compute diagonal/sub-diagonal attention ratio (in causal attention, recent positions are usually more important)
-            # For recurrence tasks, we care if position i attends to i-1 and i-2
+
+            # Filter to valid query positions for statistics
+            valid_attn = attn_matrix[query_positions] if query_positions else attn_matrix[:0]
+
+            # For each valid query position i, find top K positions it attends to most
+            topk_vals, topk_idx = torch.topk(valid_attn, k=min(3, T), dim=-1) if query_positions else (torch.empty(0, min(3, T)), torch.empty(0, min(3, T), dtype=torch.long))
+
+            # Compute attention entropy (lower = more concentrated) over valid query positions
+            if query_positions:
+                entropy = -(valid_attn * (valid_attn + 1e-12).log()).sum(dim=-1)
+                mean_entropy = entropy.mean().item()
+            else:
+                mean_entropy = 0.0
+
+            # Compute diagonal/sub-diagonal attention ratio over valid query positions
             focus_prev1 = 0.0
             focus_prev2 = 0.0
-            if T >= 3:
-                for i in range(2, T):
-                    focus_prev1 += attn_matrix[i, i-1].item()
-                    focus_prev2 += attn_matrix[i, i-2].item()
-                focus_prev1 /= (T - 2)
-                focus_prev2 /= (T - 2)
-            
-            # Compute average attention for distances 0..63, d=0 is self-attention
+            if query_positions and T >= 3:
+                for i in query_positions:
+                    if i >= 1:
+                        focus_prev1 += attn_matrix[i, i-1].item()
+                    if i >= 2:
+                        focus_prev2 += attn_matrix[i, i-2].item()
+                focus_prev1 /= len(query_positions)
+                focus_prev2 /= len(query_positions)
+
+            # Compute average attention for distances 0..63 over valid query positions
             focus_by_distance = {}
             max_d = min(63, T - 1)
             for d in range(0, max_d + 1):
                 total = 0.0
                 count = 0
-                for i in range(d, T):
-                    total += attn_matrix[i, i - d].item()
-                    count += 1
+                for i in query_positions:
+                    if i - d >= 0:
+                        total += attn_matrix[i, i - d].item()
+                        count += 1
                 if count > 0:
                     focus_by_distance[d] = total / count
-            
+
             layer_info['heads'].append({
                 'head': h,
                 'mean_entropy': mean_entropy,
                 'focus_prev1': focus_prev1,      # Average attention to previous token
                 'focus_prev2': focus_prev2,      # Average attention to token before previous
                 'focus_by_distance': focus_by_distance,
-                'topk_positions': topk_idx.cpu().tolist(),
+                'topk_positions': topk_vals.cpu().tolist(),
                 'topk_values': topk_vals.cpu().tolist(),
                 'attention_matrix': attn_matrix.cpu().tolist(),
+                'query_positions': query_positions,
             })
-        
+
         results.append(layer_info)
-    
+
     return results
 
 
-def verify_qk_properties(model, test_sequences, init_len, device='cpu'):
+def verify_qk_properties(model, test_sequences, init_len, query_masks=None, device='cpu'):
     """
     Verify two QK properties:
     P1: raw_score ≈ 0 when |i-j| > init_len (orthogonality)
     P2: raw_score constant across positions i for fixed distance d (time-homogeneous)
-    
+
     test_sequences: list[list[int]], test sequences
+    query_masks: optional list of masks, each of length T-1, indicating which
+                 query positions should be included.
     """
     print(f"\n{'='*70}")
     print("QK Property Verification (Raw Scores, before Softmax)")
     print(f"{'='*70}")
     print(f"Recurrence order init_len={init_len}, num test sequences={len(test_sequences)}")
     print()
-    
+
     # Collect QK data for all sequences
     all_seq_data = []
-    for seq in test_sequences:
+    for seq_idx, seq in enumerate(test_sequences):
         input_ids = torch.tensor([seq], dtype=torch.long).to(device)
         qk_data = extract_qk_raw_scores(model, input_ids)
+        mask = query_masks[seq_idx] if query_masks is not None else None
+        if mask is not None and isinstance(mask, (list, tuple)):
+            mask = torch.tensor(mask, dtype=torch.bool)
         all_seq_data.append({
             'seq': seq,
             'qk': qk_data,
-            'T': len(seq)
+            'T': len(seq),
+            'query_mask': mask,
         })
     
     n_layers = len(all_seq_data[0]['qk'])
@@ -312,7 +340,10 @@ def verify_qk_properties(model, test_sequences, init_len, device='cpu'):
             for seq_data in all_seq_data:
                 T = seq_data['T']
                 raw = seq_data['qk'][layer_idx]['raw_scores'][h]  # (T, T)
+                mask = seq_data.get('query_mask')
                 for i in range(T):
+                    if mask is not None and not mask[i]:
+                        continue
                     for j in range(i+1):
                         d = i - j
                         if d not in scores_by_d:
@@ -351,7 +382,10 @@ def verify_qk_properties(model, test_sequences, init_len, device='cpu'):
                 for seq_data in all_seq_data:
                     T = seq_data['T']
                     raw = seq_data['qk'][layer_idx]['raw_scores'][h]
+                    mask = seq_data.get('query_mask')
                     for i in range(d, T):
+                        if mask is not None and not mask[i]:
+                            continue
                         vals.append(raw[i, i - d].item())
                 
                 if vals:
@@ -389,10 +423,12 @@ def print_attention_summary(summary, seq=None):
             
             attn_mat = head['attention_matrix']
             T = len(attn_mat)
+            query_positions = head.get('query_positions', list(range(T)))
             print(f"    Attention coefficients from each query position to previous positions:")
-            for i in range(T):
-                parts = [f"j={j}:{attn_mat[i][j]:.3f}" for j in range(i+1)]
-                print(f"      i={i:2d} -> " + ", ".join(parts))
+            for i in query_positions:
+                if i < T:
+                    parts = [f"j={j}:{attn_mat[i][j]:.3f}" for j in range(i+1)]
+                    print(f"      i={i:2d} -> " + ", ".join(parts))
             
             # Average attention per distance (no filtering, print all for debugging)
             if head.get('focus_by_distance'):
@@ -455,6 +491,7 @@ def analyze_model_attention(pth_path, device='cpu'):
     # Randomly generate test sequences: 1 for attention visualization, 5 for QK property verification
     max_len = config.get('block_size', 20)
     test_sequences = []
+    query_masks = None
 
     if is_dynamic_mixed:
         def make_dynamic_seq(seed):
@@ -470,8 +507,18 @@ def analyze_model_attention(pth_path, device='cpu'):
                 seq.append(x_next)
             return seq
 
+        def make_dynamic_query_mask(length):
+            # Target length is 2*length - 3; valid targets are x3, x4, ..., x_L
+            # at target indices 2, 4, ..., 2*(length-1).
+            mask = [0] * (2 * length - 3)
+            for k in range(2, length):
+                target_idx = 2 * (k - 1)
+                mask[target_idx] = 1
+            return mask
+
         for seed in range(5):
             test_sequences.append(make_dynamic_seq(seed))
+        query_masks = [make_dynamic_query_mask(dynamic_seq_len) for _ in range(5)]
     else:
         init = [random.randint(0, p - 1) for _ in range(init_len)]
         seq = init[:]
@@ -481,11 +528,13 @@ def analyze_model_attention(pth_path, device='cpu'):
 
     # Attention visualization: show only the first
     print(f"\nRandom test sequence 1/{len(test_sequences)} (length {len(test_sequences[0])}): {test_sequences[0][:20]}{'...' if len(test_sequences[0]) > 20 else ''}")
-    summary = summarize_attention_for_sequence(model, test_sequences[0], p=p)
+    summary = summarize_attention_for_sequence(
+        model, test_sequences[0], p=p,
+        query_mask=query_masks[0] if query_masks is not None else None)
     print_attention_summary(summary, test_sequences[0])
 
     # QK property verification
-    verify_qk_properties(model, test_sequences, init_len, device=device)
+    verify_qk_properties(model, test_sequences, init_len, query_masks=query_masks, device=device)
 
 
 if __name__ == "__main__":
