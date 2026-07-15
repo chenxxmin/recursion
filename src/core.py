@@ -431,8 +431,9 @@ def train_epoch(model, dataloader, optimizer, device, num_mask=1, extra_kwargs_f
     for batch in dataloader:
         if isinstance(batch, (list, tuple)):
             x = batch[0].to(device)  # (B, L)
-            # If the dataset supplies a float loss_mask, use it directly.
-            if len(batch) > 1 and batch[1].dtype == torch.float:
+            # If the dataset supplies a 2D loss_mask, use it directly.
+            # mixed_ab passes 1D ab_indices here, so ndim distinguishes them.
+            if len(batch) > 1 and batch[1].ndim == 2:
                 loss_mask = batch[1].to(device)
                 kwargs = {}
             else:
@@ -503,8 +504,8 @@ def evaluate(model, dataloader, device, num_mask=1, extra_kwargs_fn=None):
             ab_labels = None
             if isinstance(batch, (list, tuple)):
                 x = batch[0].to(device)  # (B, L)
-                # Dataset-supplied loss_mask takes priority.
-                if len(batch) > 1 and batch[1].dtype == torch.float:
+                # Dataset-supplied 2D loss_mask takes priority over 1D ab_indices.
+                if len(batch) > 1 and batch[1].ndim == 2:
                     loss_mask = batch[1].to(device)
                     kwargs = {}
                 else:
