@@ -42,6 +42,14 @@
   },
   "multiplicative": {
   },
+  "dynamic_mixed": {
+    "P": 53,
+    "AB_PAIRS": [[1, 1], [1, 2]],
+    "NUM_TRAIN_SAMPLES": 10000,
+    "NUM_TEST_SAMPLES": 1000,
+    "TRAIN_LEN": 16,
+    "OOD_LEN": 32
+  },
   "mixed_ab": {
     "USE_AB_TAG": false,
     "USE_CONDITIONAL_WTE": false,

@@ -431,22 +431,30 @@ def train_epoch(model, dataloader, optimizer, device, num_mask=1, extra_kwargs_f
     for batch in dataloader:
         if isinstance(batch, (list, tuple)):
             x = batch[0].to(device)  # (B, L)
-            extra = batch[1:]
-            kwargs = extra_kwargs_fn(*extra) if extra_kwargs_fn is not None else {}
+            # If the dataset supplies a float loss_mask, use it directly.
+            if len(batch) > 1 and batch[1].dtype == torch.float:
+                loss_mask = batch[1].to(device)
+                kwargs = {}
+            else:
+                extra = batch[1:]
+                kwargs = extra_kwargs_fn(*extra) if extra_kwargs_fn is not None else {}
+                loss_mask = None
         else:
             x = batch.to(device)
             kwargs = {}
+            loss_mask = None
         B = x.size(0)
         
         # Construct targets (no padding, no PAD token)
         # Input [a,b,c,d,e], targets [b,c,d,e], aligned to L-1
         targets = x[:, 1:]  # (B, L-1)
-        loss_len = targets.size(1)
-        loss_mask = torch.zeros(B, loss_len, dtype=torch.float, device=device)
-        if loss_len > num_mask:
-            loss_mask[:, num_mask:] = 1.0
-            if first_task_weight != 1.0:
-                loss_mask[:, num_mask] = first_task_weight
+        if loss_mask is None:
+            loss_len = targets.size(1)
+            loss_mask = torch.zeros(B, loss_len, dtype=torch.float, device=device)
+            if loss_len > num_mask:
+                loss_mask[:, num_mask:] = 1.0
+                if first_task_weight != 1.0:
+                    loss_mask[:, num_mask] = first_task_weight
         
         optimizer.zero_grad()
         logits, loss, *_ = model(x, targets, loss_mask, **kwargs)
@@ -492,23 +500,30 @@ def evaluate(model, dataloader, device, num_mask=1, extra_kwargs_fn=None):
     debug_printed = False
     with torch.no_grad():
         for batch in dataloader:
+            ab_labels = None
             if isinstance(batch, (list, tuple)):
                 x = batch[0].to(device)  # (B, L)
-                extra = batch[1:]
-                kwargs = extra_kwargs_fn(*extra) if extra_kwargs_fn is not None else {}
-                ab_labels = batch[1].to(device) if len(batch) > 1 else None
+                # Dataset-supplied loss_mask takes priority.
+                if len(batch) > 1 and batch[1].dtype == torch.float:
+                    loss_mask = batch[1].to(device)
+                    kwargs = {}
+                else:
+                    extra = batch[1:]
+                    kwargs = extra_kwargs_fn(*extra) if extra_kwargs_fn is not None else {}
+                    ab_labels = batch[1].to(device)
             else:
                 x = batch.to(device)
                 kwargs = {}
-                ab_labels = None
+                loss_mask = None
             
             B = x.size(0)
             
             targets = x[:, 1:]  # (B, L-1)
-            loss_len = targets.size(1)
-            loss_mask = torch.zeros(B, loss_len, dtype=torch.float, device=device)
-            if loss_len > num_mask:
-                loss_mask[:, num_mask:] = 1.0  # Start calculating from predicting item (num_mask+2)
+            if loss_mask is None:
+                loss_len = targets.size(1)
+                loss_mask = torch.zeros(B, loss_len, dtype=torch.float, device=device)
+                if loss_len > num_mask:
+                    loss_mask[:, num_mask:] = 1.0  # Start calculating from predicting item (num_mask+2)
             
             logits, loss, *_ = model(x, targets, loss_mask, **kwargs)
             
@@ -753,6 +768,66 @@ def mixed_ab_collate_fn(batch):
     sequences = [item[0] for item in batch]
     ab_indices = torch.tensor([item[1] for item in batch], dtype=torch.long)
     return torch.stack(sequences, dim=0), ab_indices
+
+
+class DynamicMixedDataset(Dataset):
+    """Dataset where the recurrence rule can change at every step.
+
+    Input format: [x1, x2, flag_3, x3, flag_4, x4, ..., flag_L, x_L]
+    where flag_k indicates which rule is used to generate x_k.
+    Loss is computed only on x3..x_L; x1, x2 and all flags are masked.
+    """
+
+    def __init__(self, p, ab_pairs, num_samples, length, seed=0):
+        super().__init__()
+        self.p = p
+        self.ab_pairs = [tuple(pair) for pair in ab_pairs]
+        self.num_ab_pairs = len(self.ab_pairs)
+        self.num_samples = num_samples
+        self.length = length
+        self.pad_token_id = p
+        self.flag_start_id = p + 1
+        self.rng = random.Random(seed)
+        self.samples = [self._generate_sample() for _ in range(num_samples)]
+
+    def _generate_sample(self):
+        """Generate one sequence with per-step random rules."""
+        x1 = self.rng.randrange(self.p)
+        x2 = self.rng.randrange(self.p)
+        seq = [x1, x2]
+        # loss_mask aligned to targets = seq[1:]
+        loss_mask = [0.0, 0.0]  # skip x2 prediction and first flag
+        for _ in range(2, self.length):
+            rule_idx = self.rng.randrange(self.num_ab_pairs)
+            a, b = self.ab_pairs[rule_idx]
+            x_next = (a * seq[-2] + b * seq[-1]) % self.p
+            flag_id = self.flag_start_id + rule_idx
+            seq.append(flag_id)
+            seq.append(x_next)
+            # flag position -> mask, value position -> keep
+            loss_mask.extend([0.0, 1.0])
+        # The last flag has no following value in targets, so drop its mask entry
+        # Actually seq length is 2 + 2*(length-2), target length is seq_len - 1.
+        # loss_mask length should equal target length = len(seq) - 1.
+        # Last element of seq is x_L; its target position is the second-to-last mask.
+        # The flag before x_L contributes a target (flag), masked.
+        # So loss_mask should already be len(seq)-1.
+        assert len(loss_mask) == len(seq) - 1
+        seq_tensor = torch.tensor(seq, dtype=torch.long)
+        mask_tensor = torch.tensor(loss_mask, dtype=torch.float)
+        return seq_tensor, mask_tensor
+
+    def __len__(self):
+        return len(self.samples)
+
+    def __getitem__(self, idx):
+        return self.samples[idx]
+
+
+def dynamic_mixed_collate_fn(batch):
+    sequences = [item[0] for item in batch]
+    loss_masks = [item[1] for item in batch]
+    return torch.stack(sequences, dim=0), torch.stack(loss_masks, dim=0)
 
 
 class MixedABTransformer(FibonacciTransformer):
@@ -1005,6 +1080,81 @@ def run_experiment(config_path=None):
             'pad_token_id': P + len(AB_PAIRS) if cfg.get('USE_AB_TAG', True) else P,
         }
         post_train_mode = 'mixed_ab'
+
+    elif TASK == 'dynamic_mixed':
+        if not config.get('_BATCH_RUN_MERGED'):
+            print("[Error] Config not merged. Please run via batch_run.py or merge config manually.")
+            return
+
+        cfg = dict(cfg_main)
+        cfg.update(config.get('dynamic_mixed', {}))
+
+        P = cfg['P']
+        AB_PAIRS = [tuple(pair) for pair in cfg.get('AB_PAIRS', [[1, 1], [1, 2]])]
+        NUM_TRAIN_SAMPLES = cfg.get('NUM_TRAIN_SAMPLES', 10000)
+        NUM_TEST_SAMPLES = cfg.get('NUM_TEST_SAMPLES', 1000)
+        TRAIN_LEN = cfg.get('TRAIN_LEN', 16)
+        OOD_LEN = cfg.get('OOD_LEN', 32)
+
+        BLOCK_SIZE = max(TRAIN_LEN, OOD_LEN)
+        BLOCK_SIZE = 2 ** (BLOCK_SIZE - 1).bit_length()
+
+        train_dataset = DynamicMixedDataset(
+            p=P, ab_pairs=AB_PAIRS, num_samples=NUM_TRAIN_SAMPLES,
+            length=TRAIN_LEN, seed=cfg.get('RANDOM_SEED', 42)
+        )
+        test_dataset = DynamicMixedDataset(
+            p=P, ab_pairs=AB_PAIRS, num_samples=NUM_TEST_SAMPLES,
+            length=OOD_LEN, seed=cfg.get('RANDOM_SEED', 42) + 1
+        )
+
+        print(f"[Model config] block_size: {BLOCK_SIZE}, train length: {TRAIN_LEN}")
+        print(f"[Number theory] Dynamic mixed rules: {AB_PAIRS}")
+        print()
+
+        train_sampler = BucketBatchSampler(train_dataset, batch_size=BATCH_SIZE, shuffle=True)
+        test_sampler = BucketBatchSampler(test_dataset, batch_size=BATCH_SIZE, shuffle=False)
+        train_loader = DataLoader(train_dataset, batch_sampler=train_sampler, collate_fn=dynamic_mixed_collate_fn)
+        test_loader = DataLoader(test_dataset, batch_sampler=test_sampler, collate_fn=dynamic_mixed_collate_fn)
+
+        model = FibonacciTransformer(
+            p=P, d_model=D_MODEL, n_head=N_HEAD, n_layer=N_LAYER,
+            block_size=BLOCK_SIZE, dropout=DROPOUT,
+            entropy_penalty_weight=ENTROPY_PENALTY_WEIGHT,
+            use_learnable_pe=USE_LEARNABLE_PE,
+            mlp_ratio=cfg.get('MLP_RATIO', 4)
+        )
+        # vocab_size needs to include flag tokens
+        model.vocab_size = P + 1 + len(AB_PAIRS)
+        model.pad_token_id = P
+        # Expand lm_head and transformer.wte to accommodate flags
+        if model.lm_head.weight.size(0) < model.vocab_size:
+            with torch.no_grad():
+                old_head = model.lm_head
+                old_wte = model.transformer.wte
+                new_head = nn.Linear(old_head.in_features, model.vocab_size, bias=False)
+                new_head.weight.data[:old_head.weight.size(0)] = old_head.weight.data
+                model.lm_head = new_head
+                new_wte = nn.Embedding(model.vocab_size, old_wte.embedding_dim)
+                new_wte.weight.data[:old_wte.weight.size(0)] = old_wte.weight.data
+                model.transformer.wte = new_wte
+
+        num_mask = 0  # unused; loss_mask comes from the dataset
+        extra_kwargs_fn = None
+        save_config = {
+            'p': P,
+            'ab_pairs': AB_PAIRS,
+            'd_model': D_MODEL,
+            'n_head': N_HEAD,
+            'n_layer': N_LAYER,
+            'block_size': BLOCK_SIZE,
+            'use_learnable_pe': USE_LEARNABLE_PE,
+            'mlp_ratio': cfg.get('MLP_RATIO', 4),
+            'vocab_size': model.vocab_size,
+            'pad_token_id': model.pad_token_id,
+            'recurrence': 'dynamic_mixed',
+        }
+        post_train_mode = 'dynamic_mixed'
         
     elif TASK == 'addition':
         config_key = 'main'
@@ -1025,7 +1175,7 @@ def run_experiment(config_path=None):
     # ========================================================================
     # Single recurrence task data preparation (mixed_ab handled above)
     # ========================================================================
-    if TASK != 'mixed_ab':
+    if TASK not in ('mixed_ab', 'dynamic_mixed'):
         if not config.get('_BATCH_RUN_MERGED'):
             print("[Error] Config not merged. Please run via batch_run.py or merge config manually.")
             return
