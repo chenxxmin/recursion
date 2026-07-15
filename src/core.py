@@ -795,8 +795,6 @@ class DynamicMixedDataset(Dataset):
         x1 = self.rng.randrange(self.p)
         x2 = self.rng.randrange(self.p)
         seq = [x1, x2]
-        # loss_mask aligned to targets = seq[1:]
-        loss_mask = [0.0, 0.0]  # skip x2 prediction and first flag
         for _ in range(2, self.length):
             rule_idx = self.rng.randrange(self.num_ab_pairs)
             a, b = self.ab_pairs[rule_idx]
@@ -804,18 +802,20 @@ class DynamicMixedDataset(Dataset):
             flag_id = self.flag_start_id + rule_idx
             seq.append(flag_id)
             seq.append(x_next)
-            # flag position -> mask, value position -> keep
-            loss_mask.extend([0.0, 1.0])
-        # The last flag has no following value in targets, so drop its mask entry
-        # Actually seq length is 2 + 2*(length-2), target length is seq_len - 1.
-        # loss_mask length should equal target length = len(seq) - 1.
-        # Last element of seq is x_L; its target position is the second-to-last mask.
-        # The flag before x_L contributes a target (flag), masked.
-        # So loss_mask should already be len(seq)-1.
-        assert len(loss_mask) == len(seq) - 1
+
+        # Build loss mask aligned to targets = seq[1:]
+        # Input: [x1, x2, f3, x3, f4, x4, ..., f_L, x_L]
+        # Target: [x2, f3, x3, f4, x4, ..., f_L, x_L]
+        # Only x3, x4, ..., x_L should contribute to loss; x2 and all flags are masked.
+        # Loop index k=2 generates x_3 (target index 2), k=3 generates x_4 (target index 4),
+        # so x_{k+1} is at target index 2*(k-1).
+        loss_mask = torch.zeros(len(seq) - 1, dtype=torch.float)
+        for k in range(2, self.length):
+            target_idx = 2 * (k - 1)
+            loss_mask[target_idx] = 1.0
+
         seq_tensor = torch.tensor(seq, dtype=torch.long)
-        mask_tensor = torch.tensor(loss_mask, dtype=torch.float)
-        return seq_tensor, mask_tensor
+        return seq_tensor, loss_mask
 
     def __len__(self):
         return len(self.samples)
