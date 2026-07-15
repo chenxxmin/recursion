@@ -511,6 +511,7 @@ def evaluate(model, dataloader, device, num_mask=1, extra_kwargs_fn=None):
                     extra = batch[1:]
                     kwargs = extra_kwargs_fn(*extra) if extra_kwargs_fn is not None else {}
                     ab_labels = batch[1].to(device)
+                    loss_mask = None
             else:
                 x = batch.to(device)
                 kwargs = {}
