@@ -416,6 +416,7 @@ def analyze_model_attention(pth_path, device='cpu'):
     config = checkpoint['config']
     p = config['p']
     recurrence = config.get('recurrence', 'addition')
+    is_dynamic_mixed = False
 
     if 'c' in config:
         a, b, c = config['a'], config['b'], config['c']
@@ -428,6 +429,13 @@ def analyze_model_attention(pth_path, device='cpu'):
         init_len = 2
         def next_val(seq):
             return (seq[-1] * seq[-2]) % p
+    elif recurrence == 'dynamic_mixed':
+        print(f"Model config: dynamic_mixed, ab_pairs={config['ab_pairs']}, p={p}")
+        init_len = 2
+        is_dynamic_mixed = True
+        ab_pairs = config['ab_pairs']
+        flag_start_id = p + 1
+        dynamic_seq_len = config.get('ood_len', 32)
     elif 'a' in config and 'b' in config:
         a, b = config['a'], config['b']
         print(f"Model config: addition, a={a}, b={b}, p={p}")
@@ -444,21 +452,39 @@ def analyze_model_attention(pth_path, device='cpu'):
     print(f"Best test accuracy: {checkpoint.get('best_accuracy', 'N/A')}")
     print(f"Training epochs: {checkpoint.get('final_epoch', 'N/A')}")
     
-    # Randomly generate 5 test sequences: 1 for attention visualization, 5 for QK property verification
+    # Randomly generate test sequences: 1 for attention visualization, 5 for QK property verification
     max_len = config.get('block_size', 20)
     test_sequences = []
-    init = [random.randint(0, p - 1) for _ in range(init_len)]
-    seq = init[:]
-    for i in range(init_len, max_len):
-        seq.append(next_val(seq))
-    test_sequences.append(seq)
-    
+
+    if is_dynamic_mixed:
+        def make_dynamic_seq(seed):
+            rng = random.Random(seed)
+            x1 = rng.randint(0, p - 1)
+            x2 = rng.randint(0, p - 1)
+            seq = [x1, x2]
+            for _ in range(2, dynamic_seq_len):
+                rule_idx = rng.randrange(len(ab_pairs))
+                a, b = ab_pairs[rule_idx]
+                x_next = (a * seq[-2] + b * seq[-1]) % p
+                seq.append(flag_start_id + rule_idx)
+                seq.append(x_next)
+            return seq
+
+        for seed in range(5):
+            test_sequences.append(make_dynamic_seq(seed))
+    else:
+        init = [random.randint(0, p - 1) for _ in range(init_len)]
+        seq = init[:]
+        for i in range(init_len, max_len):
+            seq.append(next_val(seq))
+        test_sequences.append(seq)
+
     # Attention visualization: show only the first
-    print(f"\nRandom test sequence 1/5 (length {len(test_sequences[0])}): {test_sequences[0][:20]}{'...' if len(test_sequences[0]) > 20 else ''}")
+    print(f"\nRandom test sequence 1/{len(test_sequences)} (length {len(test_sequences[0])}): {test_sequences[0][:20]}{'...' if len(test_sequences[0]) > 20 else ''}")
     summary = summarize_attention_for_sequence(model, test_sequences[0], p=p)
     print_attention_summary(summary, test_sequences[0])
-    
-    # QK property verification (5 samples)
+
+    # QK property verification
     verify_qk_properties(model, test_sequences, init_len, device=device)
 
 

@@ -1155,6 +1155,8 @@ def run_experiment(config_path=None):
             'vocab_size': model.vocab_size,
             'pad_token_id': model.pad_token_id,
             'recurrence': 'dynamic_mixed',
+            'train_len': TRAIN_LEN,
+            'ood_len': OOD_LEN,
         }
         post_train_mode = 'dynamic_mixed'
         
