@@ -26,6 +26,174 @@
       }
     },
     {
+      "name": "dynamic_mixed_d64l1r4_N2_seed1",
+      "task": "dynamic_mixed",
+      "config": {
+        "D_MODEL": 64,
+        "N_LAYER": 1,
+        "MLP_RATIO": 4,
+        "NUM_TRAIN_SAMPLES": 10000,
+        "NUM_TEST_SAMPLES": 2000,
+        "TRAIN_LEN": 16,
+        "OOD_LEN": 32,
+        "RANDOM_SEED": 1,
+        "AB_PAIRS": [
+          [
+            1,
+            1
+          ],
+          [
+            1,
+            2
+          ]
+        ]
+      }
+    },
+    {
+      "name": "dynamic_mixed_d64l1r4_N2_seed2",
+      "task": "dynamic_mixed",
+      "config": {
+        "D_MODEL": 64,
+        "N_LAYER": 1,
+        "MLP_RATIO": 4,
+        "NUM_TRAIN_SAMPLES": 10000,
+        "NUM_TEST_SAMPLES": 2000,
+        "TRAIN_LEN": 16,
+        "OOD_LEN": 32,
+        "RANDOM_SEED": 2,
+        "AB_PAIRS": [
+          [
+            1,
+            1
+          ],
+          [
+            1,
+            2
+          ]
+        ]
+      }
+    },
+    {
+      "name": "dynamic_mixed_d64l1r4_N2_seed3",
+      "task": "dynamic_mixed",
+      "config": {
+        "D_MODEL": 64,
+        "N_LAYER": 1,
+        "MLP_RATIO": 4,
+        "NUM_TRAIN_SAMPLES": 10000,
+        "NUM_TEST_SAMPLES": 2000,
+        "TRAIN_LEN": 16,
+        "OOD_LEN": 32,
+        "RANDOM_SEED": 3,
+        "AB_PAIRS": [
+          [
+            1,
+            1
+          ],
+          [
+            1,
+            2
+          ]
+        ]
+      }
+    },
+    {
+      "name": "dynamic_mixed_d64l1r4_N2_seed4",
+      "task": "dynamic_mixed",
+      "config": {
+        "D_MODEL": 64,
+        "N_LAYER": 1,
+        "MLP_RATIO": 4,
+        "NUM_TRAIN_SAMPLES": 10000,
+        "NUM_TEST_SAMPLES": 2000,
+        "TRAIN_LEN": 16,
+        "OOD_LEN": 32,
+        "RANDOM_SEED": 4,
+        "AB_PAIRS": [
+          [
+            1,
+            1
+          ],
+          [
+            1,
+            2
+          ]
+        ]
+      }
+    },
+    {
+      "name": "dynamic_mixed_d64l1r4_N2_seed5",
+      "task": "dynamic_mixed",
+      "config": {
+        "D_MODEL": 64,
+        "N_LAYER": 1,
+        "MLP_RATIO": 4,
+        "NUM_TRAIN_SAMPLES": 10000,
+        "NUM_TEST_SAMPLES": 2000,
+        "TRAIN_LEN": 16,
+        "OOD_LEN": 32,
+        "RANDOM_SEED": 5,
+        "AB_PAIRS": [
+          [
+            1,
+            1
+          ],
+          [
+            1,
+            2
+          ]
+        ]
+      }
+    },
+    {
+      "name": "dynamic_mixed_d64l1r4_N2_seed6",
+      "task": "dynamic_mixed",
+      "config": {
+        "D_MODEL": 64,
+        "N_LAYER": 1,
+        "MLP_RATIO": 4,
+        "NUM_TRAIN_SAMPLES": 10000,
+        "NUM_TEST_SAMPLES": 2000,
+        "TRAIN_LEN": 16,
+        "OOD_LEN": 32,
+        "RANDOM_SEED": 6,
+        "AB_PAIRS": [
+          [
+            1,
+            1
+          ],
+          [
+            1,
+            2
+          ]
+        ]
+      }
+    },
+    {
+      "name": "dynamic_mixed_d64l1r4_N2_seed7",
+      "task": "dynamic_mixed",
+      "config": {
+        "D_MODEL": 64,
+        "N_LAYER": 1,
+        "MLP_RATIO": 4,
+        "NUM_TRAIN_SAMPLES": 10000,
+        "NUM_TEST_SAMPLES": 2000,
+        "TRAIN_LEN": 16,
+        "OOD_LEN": 32,
+        "RANDOM_SEED": 7,
+        "AB_PAIRS": [
+          [
+            1,
+            1
+          ],
+          [
+            1,
+            2
+          ]
+        ]
+      }
+    },
+    {
       "name": "dynamic_mixed_d64l1r4_N3_seed0",
       "task": "dynamic_mixed",
       "config": {
@@ -54,6 +222,202 @@
       }
     },
     {
+      "name": "dynamic_mixed_d64l1r4_N3_seed1",
+      "task": "dynamic_mixed",
+      "config": {
+        "D_MODEL": 64,
+        "N_LAYER": 1,
+        "MLP_RATIO": 4,
+        "NUM_TRAIN_SAMPLES": 10000,
+        "NUM_TEST_SAMPLES": 2000,
+        "TRAIN_LEN": 16,
+        "OOD_LEN": 32,
+        "RANDOM_SEED": 1,
+        "AB_PAIRS": [
+          [
+            1,
+            1
+          ],
+          [
+            1,
+            2
+          ],
+          [
+            1,
+            3
+          ]
+        ]
+      }
+    },
+    {
+      "name": "dynamic_mixed_d64l1r4_N3_seed2",
+      "task": "dynamic_mixed",
+      "config": {
+        "D_MODEL": 64,
+        "N_LAYER": 1,
+        "MLP_RATIO": 4,
+        "NUM_TRAIN_SAMPLES": 10000,
+        "NUM_TEST_SAMPLES": 2000,
+        "TRAIN_LEN": 16,
+        "OOD_LEN": 32,
+        "RANDOM_SEED": 2,
+        "AB_PAIRS": [
+          [
+            1,
+            1
+          ],
+          [
+            1,
+            2
+          ],
+          [
+            1,
+            3
+          ]
+        ]
+      }
+    },
+    {
+      "name": "dynamic_mixed_d64l1r4_N3_seed3",
+      "task": "dynamic_mixed",
+      "config": {
+        "D_MODEL": 64,
+        "N_LAYER": 1,
+        "MLP_RATIO": 4,
+        "NUM_TRAIN_SAMPLES": 10000,
+        "NUM_TEST_SAMPLES": 2000,
+        "TRAIN_LEN": 16,
+        "OOD_LEN": 32,
+        "RANDOM_SEED": 3,
+        "AB_PAIRS": [
+          [
+            1,
+            1
+          ],
+          [
+            1,
+            2
+          ],
+          [
+            1,
+            3
+          ]
+        ]
+      }
+    },
+    {
+      "name": "dynamic_mixed_d64l1r4_N3_seed4",
+      "task": "dynamic_mixed",
+      "config": {
+        "D_MODEL": 64,
+        "N_LAYER": 1,
+        "MLP_RATIO": 4,
+        "NUM_TRAIN_SAMPLES": 10000,
+        "NUM_TEST_SAMPLES": 2000,
+        "TRAIN_LEN": 16,
+        "OOD_LEN": 32,
+        "RANDOM_SEED": 4,
+        "AB_PAIRS": [
+          [
+            1,
+            1
+          ],
+          [
+            1,
+            2
+          ],
+          [
+            1,
+            3
+          ]
+        ]
+      }
+    },
+    {
+      "name": "dynamic_mixed_d64l1r4_N3_seed5",
+      "task": "dynamic_mixed",
+      "config": {
+        "D_MODEL": 64,
+        "N_LAYER": 1,
+        "MLP_RATIO": 4,
+        "NUM_TRAIN_SAMPLES": 10000,
+        "NUM_TEST_SAMPLES": 2000,
+        "TRAIN_LEN": 16,
+        "OOD_LEN": 32,
+        "RANDOM_SEED": 5,
+        "AB_PAIRS": [
+          [
+            1,
+            1
+          ],
+          [
+            1,
+            2
+          ],
+          [
+            1,
+            3
+          ]
+        ]
+      }
+    },
+    {
+      "name": "dynamic_mixed_d64l1r4_N3_seed6",
+      "task": "dynamic_mixed",
+      "config": {
+        "D_MODEL": 64,
+        "N_LAYER": 1,
+        "MLP_RATIO": 4,
+        "NUM_TRAIN_SAMPLES": 10000,
+        "NUM_TEST_SAMPLES": 2000,
+        "TRAIN_LEN": 16,
+        "OOD_LEN": 32,
+        "RANDOM_SEED": 6,
+        "AB_PAIRS": [
+          [
+            1,
+            1
+          ],
+          [
+            1,
+            2
+          ],
+          [
+            1,
+            3
+          ]
+        ]
+      }
+    },
+    {
+      "name": "dynamic_mixed_d64l1r4_N3_seed7",
+      "task": "dynamic_mixed",
+      "config": {
+        "D_MODEL": 64,
+        "N_LAYER": 1,
+        "MLP_RATIO": 4,
+        "NUM_TRAIN_SAMPLES": 10000,
+        "NUM_TEST_SAMPLES": 2000,
+        "TRAIN_LEN": 16,
+        "OOD_LEN": 32,
+        "RANDOM_SEED": 7,
+        "AB_PAIRS": [
+          [
+            1,
+            1
+          ],
+          [
+            1,
+            2
+          ],
+          [
+            1,
+            3
+          ]
+        ]
+      }
+    },
+    {
       "name": "dynamic_mixed_d64l1r4_N4_seed0",
       "task": "dynamic_mixed",
       "config": {
@@ -65,6 +429,230 @@
         "TRAIN_LEN": 16,
         "OOD_LEN": 32,
         "RANDOM_SEED": 0,
+        "AB_PAIRS": [
+          [
+            1,
+            1
+          ],
+          [
+            1,
+            2
+          ],
+          [
+            1,
+            3
+          ],
+          [
+            1,
+            4
+          ]
+        ]
+      }
+    },
+    {
+      "name": "dynamic_mixed_d64l1r4_N4_seed1",
+      "task": "dynamic_mixed",
+      "config": {
+        "D_MODEL": 64,
+        "N_LAYER": 1,
+        "MLP_RATIO": 4,
+        "NUM_TRAIN_SAMPLES": 10000,
+        "NUM_TEST_SAMPLES": 2000,
+        "TRAIN_LEN": 16,
+        "OOD_LEN": 32,
+        "RANDOM_SEED": 1,
+        "AB_PAIRS": [
+          [
+            1,
+            1
+          ],
+          [
+            1,
+            2
+          ],
+          [
+            1,
+            3
+          ],
+          [
+            1,
+            4
+          ]
+        ]
+      }
+    },
+    {
+      "name": "dynamic_mixed_d64l1r4_N4_seed2",
+      "task": "dynamic_mixed",
+      "config": {
+        "D_MODEL": 64,
+        "N_LAYER": 1,
+        "MLP_RATIO": 4,
+        "NUM_TRAIN_SAMPLES": 10000,
+        "NUM_TEST_SAMPLES": 2000,
+        "TRAIN_LEN": 16,
+        "OOD_LEN": 32,
+        "RANDOM_SEED": 2,
+        "AB_PAIRS": [
+          [
+            1,
+            1
+          ],
+          [
+            1,
+            2
+          ],
+          [
+            1,
+            3
+          ],
+          [
+            1,
+            4
+          ]
+        ]
+      }
+    },
+    {
+      "name": "dynamic_mixed_d64l1r4_N4_seed3",
+      "task": "dynamic_mixed",
+      "config": {
+        "D_MODEL": 64,
+        "N_LAYER": 1,
+        "MLP_RATIO": 4,
+        "NUM_TRAIN_SAMPLES": 10000,
+        "NUM_TEST_SAMPLES": 2000,
+        "TRAIN_LEN": 16,
+        "OOD_LEN": 32,
+        "RANDOM_SEED": 3,
+        "AB_PAIRS": [
+          [
+            1,
+            1
+          ],
+          [
+            1,
+            2
+          ],
+          [
+            1,
+            3
+          ],
+          [
+            1,
+            4
+          ]
+        ]
+      }
+    },
+    {
+      "name": "dynamic_mixed_d64l1r4_N4_seed4",
+      "task": "dynamic_mixed",
+      "config": {
+        "D_MODEL": 64,
+        "N_LAYER": 1,
+        "MLP_RATIO": 4,
+        "NUM_TRAIN_SAMPLES": 10000,
+        "NUM_TEST_SAMPLES": 2000,
+        "TRAIN_LEN": 16,
+        "OOD_LEN": 32,
+        "RANDOM_SEED": 4,
+        "AB_PAIRS": [
+          [
+            1,
+            1
+          ],
+          [
+            1,
+            2
+          ],
+          [
+            1,
+            3
+          ],
+          [
+            1,
+            4
+          ]
+        ]
+      }
+    },
+    {
+      "name": "dynamic_mixed_d64l1r4_N4_seed5",
+      "task": "dynamic_mixed",
+      "config": {
+        "D_MODEL": 64,
+        "N_LAYER": 1,
+        "MLP_RATIO": 4,
+        "NUM_TRAIN_SAMPLES": 10000,
+        "NUM_TEST_SAMPLES": 2000,
+        "TRAIN_LEN": 16,
+        "OOD_LEN": 32,
+        "RANDOM_SEED": 5,
+        "AB_PAIRS": [
+          [
+            1,
+            1
+          ],
+          [
+            1,
+            2
+          ],
+          [
+            1,
+            3
+          ],
+          [
+            1,
+            4
+          ]
+        ]
+      }
+    },
+    {
+      "name": "dynamic_mixed_d64l1r4_N4_seed6",
+      "task": "dynamic_mixed",
+      "config": {
+        "D_MODEL": 64,
+        "N_LAYER": 1,
+        "MLP_RATIO": 4,
+        "NUM_TRAIN_SAMPLES": 10000,
+        "NUM_TEST_SAMPLES": 2000,
+        "TRAIN_LEN": 16,
+        "OOD_LEN": 32,
+        "RANDOM_SEED": 6,
+        "AB_PAIRS": [
+          [
+            1,
+            1
+          ],
+          [
+            1,
+            2
+          ],
+          [
+            1,
+            3
+          ],
+          [
+            1,
+            4
+          ]
+        ]
+      }
+    },
+    {
+      "name": "dynamic_mixed_d64l1r4_N4_seed7",
+      "task": "dynamic_mixed",
+      "config": {
+        "D_MODEL": 64,
+        "N_LAYER": 1,
+        "MLP_RATIO": 4,
+        "NUM_TRAIN_SAMPLES": 10000,
+        "NUM_TEST_SAMPLES": 2000,
+        "TRAIN_LEN": 16,
+        "OOD_LEN": 32,
+        "RANDOM_SEED": 7,
         "AB_PAIRS": [
           [
             1,
@@ -122,6 +710,258 @@
       }
     },
     {
+      "name": "dynamic_mixed_d64l1r4_N5_seed1",
+      "task": "dynamic_mixed",
+      "config": {
+        "D_MODEL": 64,
+        "N_LAYER": 1,
+        "MLP_RATIO": 4,
+        "NUM_TRAIN_SAMPLES": 10000,
+        "NUM_TEST_SAMPLES": 2000,
+        "TRAIN_LEN": 16,
+        "OOD_LEN": 32,
+        "RANDOM_SEED": 1,
+        "AB_PAIRS": [
+          [
+            1,
+            1
+          ],
+          [
+            1,
+            2
+          ],
+          [
+            1,
+            3
+          ],
+          [
+            1,
+            4
+          ],
+          [
+            1,
+            5
+          ]
+        ]
+      }
+    },
+    {
+      "name": "dynamic_mixed_d64l1r4_N5_seed2",
+      "task": "dynamic_mixed",
+      "config": {
+        "D_MODEL": 64,
+        "N_LAYER": 1,
+        "MLP_RATIO": 4,
+        "NUM_TRAIN_SAMPLES": 10000,
+        "NUM_TEST_SAMPLES": 2000,
+        "TRAIN_LEN": 16,
+        "OOD_LEN": 32,
+        "RANDOM_SEED": 2,
+        "AB_PAIRS": [
+          [
+            1,
+            1
+          ],
+          [
+            1,
+            2
+          ],
+          [
+            1,
+            3
+          ],
+          [
+            1,
+            4
+          ],
+          [
+            1,
+            5
+          ]
+        ]
+      }
+    },
+    {
+      "name": "dynamic_mixed_d64l1r4_N5_seed3",
+      "task": "dynamic_mixed",
+      "config": {
+        "D_MODEL": 64,
+        "N_LAYER": 1,
+        "MLP_RATIO": 4,
+        "NUM_TRAIN_SAMPLES": 10000,
+        "NUM_TEST_SAMPLES": 2000,
+        "TRAIN_LEN": 16,
+        "OOD_LEN": 32,
+        "RANDOM_SEED": 3,
+        "AB_PAIRS": [
+          [
+            1,
+            1
+          ],
+          [
+            1,
+            2
+          ],
+          [
+            1,
+            3
+          ],
+          [
+            1,
+            4
+          ],
+          [
+            1,
+            5
+          ]
+        ]
+      }
+    },
+    {
+      "name": "dynamic_mixed_d64l1r4_N5_seed4",
+      "task": "dynamic_mixed",
+      "config": {
+        "D_MODEL": 64,
+        "N_LAYER": 1,
+        "MLP_RATIO": 4,
+        "NUM_TRAIN_SAMPLES": 10000,
+        "NUM_TEST_SAMPLES": 2000,
+        "TRAIN_LEN": 16,
+        "OOD_LEN": 32,
+        "RANDOM_SEED": 4,
+        "AB_PAIRS": [
+          [
+            1,
+            1
+          ],
+          [
+            1,
+            2
+          ],
+          [
+            1,
+            3
+          ],
+          [
+            1,
+            4
+          ],
+          [
+            1,
+            5
+          ]
+        ]
+      }
+    },
+    {
+      "name": "dynamic_mixed_d64l1r4_N5_seed5",
+      "task": "dynamic_mixed",
+      "config": {
+        "D_MODEL": 64,
+        "N_LAYER": 1,
+        "MLP_RATIO": 4,
+        "NUM_TRAIN_SAMPLES": 10000,
+        "NUM_TEST_SAMPLES": 2000,
+        "TRAIN_LEN": 16,
+        "OOD_LEN": 32,
+        "RANDOM_SEED": 5,
+        "AB_PAIRS": [
+          [
+            1,
+            1
+          ],
+          [
+            1,
+            2
+          ],
+          [
+            1,
+            3
+          ],
+          [
+            1,
+            4
+          ],
+          [
+            1,
+            5
+          ]
+        ]
+      }
+    },
+    {
+      "name": "dynamic_mixed_d64l1r4_N5_seed6",
+      "task": "dynamic_mixed",
+      "config": {
+        "D_MODEL": 64,
+        "N_LAYER": 1,
+        "MLP_RATIO": 4,
+        "NUM_TRAIN_SAMPLES": 10000,
+        "NUM_TEST_SAMPLES": 2000,
+        "TRAIN_LEN": 16,
+        "OOD_LEN": 32,
+        "RANDOM_SEED": 6,
+        "AB_PAIRS": [
+          [
+            1,
+            1
+          ],
+          [
+            1,
+            2
+          ],
+          [
+            1,
+            3
+          ],
+          [
+            1,
+            4
+          ],
+          [
+            1,
+            5
+          ]
+        ]
+      }
+    },
+    {
+      "name": "dynamic_mixed_d64l1r4_N5_seed7",
+      "task": "dynamic_mixed",
+      "config": {
+        "D_MODEL": 64,
+        "N_LAYER": 1,
+        "MLP_RATIO": 4,
+        "NUM_TRAIN_SAMPLES": 10000,
+        "NUM_TEST_SAMPLES": 2000,
+        "TRAIN_LEN": 16,
+        "OOD_LEN": 32,
+        "RANDOM_SEED": 7,
+        "AB_PAIRS": [
+          [
+            1,
+            1
+          ],
+          [
+            1,
+            2
+          ],
+          [
+            1,
+            3
+          ],
+          [
+            1,
+            4
+          ],
+          [
+            1,
+            5
+          ]
+        ]
+      }
+    },
+    {
       "name": "dynamic_mixed_d64l1r4_N6_seed0",
       "task": "dynamic_mixed",
       "config": {
@@ -133,6 +973,286 @@
         "TRAIN_LEN": 16,
         "OOD_LEN": 32,
         "RANDOM_SEED": 0,
+        "AB_PAIRS": [
+          [
+            1,
+            1
+          ],
+          [
+            1,
+            2
+          ],
+          [
+            1,
+            3
+          ],
+          [
+            1,
+            4
+          ],
+          [
+            1,
+            5
+          ],
+          [
+            1,
+            6
+          ]
+        ]
+      }
+    },
+    {
+      "name": "dynamic_mixed_d64l1r4_N6_seed1",
+      "task": "dynamic_mixed",
+      "config": {
+        "D_MODEL": 64,
+        "N_LAYER": 1,
+        "MLP_RATIO": 4,
+        "NUM_TRAIN_SAMPLES": 10000,
+        "NUM_TEST_SAMPLES": 2000,
+        "TRAIN_LEN": 16,
+        "OOD_LEN": 32,
+        "RANDOM_SEED": 1,
+        "AB_PAIRS": [
+          [
+            1,
+            1
+          ],
+          [
+            1,
+            2
+          ],
+          [
+            1,
+            3
+          ],
+          [
+            1,
+            4
+          ],
+          [
+            1,
+            5
+          ],
+          [
+            1,
+            6
+          ]
+        ]
+      }
+    },
+    {
+      "name": "dynamic_mixed_d64l1r4_N6_seed2",
+      "task": "dynamic_mixed",
+      "config": {
+        "D_MODEL": 64,
+        "N_LAYER": 1,
+        "MLP_RATIO": 4,
+        "NUM_TRAIN_SAMPLES": 10000,
+        "NUM_TEST_SAMPLES": 2000,
+        "TRAIN_LEN": 16,
+        "OOD_LEN": 32,
+        "RANDOM_SEED": 2,
+        "AB_PAIRS": [
+          [
+            1,
+            1
+          ],
+          [
+            1,
+            2
+          ],
+          [
+            1,
+            3
+          ],
+          [
+            1,
+            4
+          ],
+          [
+            1,
+            5
+          ],
+          [
+            1,
+            6
+          ]
+        ]
+      }
+    },
+    {
+      "name": "dynamic_mixed_d64l1r4_N6_seed3",
+      "task": "dynamic_mixed",
+      "config": {
+        "D_MODEL": 64,
+        "N_LAYER": 1,
+        "MLP_RATIO": 4,
+        "NUM_TRAIN_SAMPLES": 10000,
+        "NUM_TEST_SAMPLES": 2000,
+        "TRAIN_LEN": 16,
+        "OOD_LEN": 32,
+        "RANDOM_SEED": 3,
+        "AB_PAIRS": [
+          [
+            1,
+            1
+          ],
+          [
+            1,
+            2
+          ],
+          [
+            1,
+            3
+          ],
+          [
+            1,
+            4
+          ],
+          [
+            1,
+            5
+          ],
+          [
+            1,
+            6
+          ]
+        ]
+      }
+    },
+    {
+      "name": "dynamic_mixed_d64l1r4_N6_seed4",
+      "task": "dynamic_mixed",
+      "config": {
+        "D_MODEL": 64,
+        "N_LAYER": 1,
+        "MLP_RATIO": 4,
+        "NUM_TRAIN_SAMPLES": 10000,
+        "NUM_TEST_SAMPLES": 2000,
+        "TRAIN_LEN": 16,
+        "OOD_LEN": 32,
+        "RANDOM_SEED": 4,
+        "AB_PAIRS": [
+          [
+            1,
+            1
+          ],
+          [
+            1,
+            2
+          ],
+          [
+            1,
+            3
+          ],
+          [
+            1,
+            4
+          ],
+          [
+            1,
+            5
+          ],
+          [
+            1,
+            6
+          ]
+        ]
+      }
+    },
+    {
+      "name": "dynamic_mixed_d64l1r4_N6_seed5",
+      "task": "dynamic_mixed",
+      "config": {
+        "D_MODEL": 64,
+        "N_LAYER": 1,
+        "MLP_RATIO": 4,
+        "NUM_TRAIN_SAMPLES": 10000,
+        "NUM_TEST_SAMPLES": 2000,
+        "TRAIN_LEN": 16,
+        "OOD_LEN": 32,
+        "RANDOM_SEED": 5,
+        "AB_PAIRS": [
+          [
+            1,
+            1
+          ],
+          [
+            1,
+            2
+          ],
+          [
+            1,
+            3
+          ],
+          [
+            1,
+            4
+          ],
+          [
+            1,
+            5
+          ],
+          [
+            1,
+            6
+          ]
+        ]
+      }
+    },
+    {
+      "name": "dynamic_mixed_d64l1r4_N6_seed6",
+      "task": "dynamic_mixed",
+      "config": {
+        "D_MODEL": 64,
+        "N_LAYER": 1,
+        "MLP_RATIO": 4,
+        "NUM_TRAIN_SAMPLES": 10000,
+        "NUM_TEST_SAMPLES": 2000,
+        "TRAIN_LEN": 16,
+        "OOD_LEN": 32,
+        "RANDOM_SEED": 6,
+        "AB_PAIRS": [
+          [
+            1,
+            1
+          ],
+          [
+            1,
+            2
+          ],
+          [
+            1,
+            3
+          ],
+          [
+            1,
+            4
+          ],
+          [
+            1,
+            5
+          ],
+          [
+            1,
+            6
+          ]
+        ]
+      }
+    },
+    {
+      "name": "dynamic_mixed_d64l1r4_N6_seed7",
+      "task": "dynamic_mixed",
+      "config": {
+        "D_MODEL": 64,
+        "N_LAYER": 1,
+        "MLP_RATIO": 4,
+        "NUM_TRAIN_SAMPLES": 10000,
+        "NUM_TEST_SAMPLES": 2000,
+        "TRAIN_LEN": 16,
+        "OOD_LEN": 32,
+        "RANDOM_SEED": 7,
         "AB_PAIRS": [
           [
             1,
@@ -206,6 +1326,314 @@
       }
     },
     {
+      "name": "dynamic_mixed_d64l1r4_N7_seed1",
+      "task": "dynamic_mixed",
+      "config": {
+        "D_MODEL": 64,
+        "N_LAYER": 1,
+        "MLP_RATIO": 4,
+        "NUM_TRAIN_SAMPLES": 10000,
+        "NUM_TEST_SAMPLES": 2000,
+        "TRAIN_LEN": 16,
+        "OOD_LEN": 32,
+        "RANDOM_SEED": 1,
+        "AB_PAIRS": [
+          [
+            1,
+            1
+          ],
+          [
+            1,
+            2
+          ],
+          [
+            1,
+            3
+          ],
+          [
+            1,
+            4
+          ],
+          [
+            1,
+            5
+          ],
+          [
+            1,
+            6
+          ],
+          [
+            1,
+            7
+          ]
+        ]
+      }
+    },
+    {
+      "name": "dynamic_mixed_d64l1r4_N7_seed2",
+      "task": "dynamic_mixed",
+      "config": {
+        "D_MODEL": 64,
+        "N_LAYER": 1,
+        "MLP_RATIO": 4,
+        "NUM_TRAIN_SAMPLES": 10000,
+        "NUM_TEST_SAMPLES": 2000,
+        "TRAIN_LEN": 16,
+        "OOD_LEN": 32,
+        "RANDOM_SEED": 2,
+        "AB_PAIRS": [
+          [
+            1,
+            1
+          ],
+          [
+            1,
+            2
+          ],
+          [
+            1,
+            3
+          ],
+          [
+            1,
+            4
+          ],
+          [
+            1,
+            5
+          ],
+          [
+            1,
+            6
+          ],
+          [
+            1,
+            7
+          ]
+        ]
+      }
+    },
+    {
+      "name": "dynamic_mixed_d64l1r4_N7_seed3",
+      "task": "dynamic_mixed",
+      "config": {
+        "D_MODEL": 64,
+        "N_LAYER": 1,
+        "MLP_RATIO": 4,
+        "NUM_TRAIN_SAMPLES": 10000,
+        "NUM_TEST_SAMPLES": 2000,
+        "TRAIN_LEN": 16,
+        "OOD_LEN": 32,
+        "RANDOM_SEED": 3,
+        "AB_PAIRS": [
+          [
+            1,
+            1
+          ],
+          [
+            1,
+            2
+          ],
+          [
+            1,
+            3
+          ],
+          [
+            1,
+            4
+          ],
+          [
+            1,
+            5
+          ],
+          [
+            1,
+            6
+          ],
+          [
+            1,
+            7
+          ]
+        ]
+      }
+    },
+    {
+      "name": "dynamic_mixed_d64l1r4_N7_seed4",
+      "task": "dynamic_mixed",
+      "config": {
+        "D_MODEL": 64,
+        "N_LAYER": 1,
+        "MLP_RATIO": 4,
+        "NUM_TRAIN_SAMPLES": 10000,
+        "NUM_TEST_SAMPLES": 2000,
+        "TRAIN_LEN": 16,
+        "OOD_LEN": 32,
+        "RANDOM_SEED": 4,
+        "AB_PAIRS": [
+          [
+            1,
+            1
+          ],
+          [
+            1,
+            2
+          ],
+          [
+            1,
+            3
+          ],
+          [
+            1,
+            4
+          ],
+          [
+            1,
+            5
+          ],
+          [
+            1,
+            6
+          ],
+          [
+            1,
+            7
+          ]
+        ]
+      }
+    },
+    {
+      "name": "dynamic_mixed_d64l1r4_N7_seed5",
+      "task": "dynamic_mixed",
+      "config": {
+        "D_MODEL": 64,
+        "N_LAYER": 1,
+        "MLP_RATIO": 4,
+        "NUM_TRAIN_SAMPLES": 10000,
+        "NUM_TEST_SAMPLES": 2000,
+        "TRAIN_LEN": 16,
+        "OOD_LEN": 32,
+        "RANDOM_SEED": 5,
+        "AB_PAIRS": [
+          [
+            1,
+            1
+          ],
+          [
+            1,
+            2
+          ],
+          [
+            1,
+            3
+          ],
+          [
+            1,
+            4
+          ],
+          [
+            1,
+            5
+          ],
+          [
+            1,
+            6
+          ],
+          [
+            1,
+            7
+          ]
+        ]
+      }
+    },
+    {
+      "name": "dynamic_mixed_d64l1r4_N7_seed6",
+      "task": "dynamic_mixed",
+      "config": {
+        "D_MODEL": 64,
+        "N_LAYER": 1,
+        "MLP_RATIO": 4,
+        "NUM_TRAIN_SAMPLES": 10000,
+        "NUM_TEST_SAMPLES": 2000,
+        "TRAIN_LEN": 16,
+        "OOD_LEN": 32,
+        "RANDOM_SEED": 6,
+        "AB_PAIRS": [
+          [
+            1,
+            1
+          ],
+          [
+            1,
+            2
+          ],
+          [
+            1,
+            3
+          ],
+          [
+            1,
+            4
+          ],
+          [
+            1,
+            5
+          ],
+          [
+            1,
+            6
+          ],
+          [
+            1,
+            7
+          ]
+        ]
+      }
+    },
+    {
+      "name": "dynamic_mixed_d64l1r4_N7_seed7",
+      "task": "dynamic_mixed",
+      "config": {
+        "D_MODEL": 64,
+        "N_LAYER": 1,
+        "MLP_RATIO": 4,
+        "NUM_TRAIN_SAMPLES": 10000,
+        "NUM_TEST_SAMPLES": 2000,
+        "TRAIN_LEN": 16,
+        "OOD_LEN": 32,
+        "RANDOM_SEED": 7,
+        "AB_PAIRS": [
+          [
+            1,
+            1
+          ],
+          [
+            1,
+            2
+          ],
+          [
+            1,
+            3
+          ],
+          [
+            1,
+            4
+          ],
+          [
+            1,
+            5
+          ],
+          [
+            1,
+            6
+          ],
+          [
+            1,
+            7
+          ]
+        ]
+      }
+    },
+    {
       "name": "dynamic_mixed_d64l1r4_N8_seed0",
       "task": "dynamic_mixed",
       "config": {
@@ -217,6 +1645,342 @@
         "TRAIN_LEN": 16,
         "OOD_LEN": 32,
         "RANDOM_SEED": 0,
+        "AB_PAIRS": [
+          [
+            1,
+            1
+          ],
+          [
+            1,
+            2
+          ],
+          [
+            1,
+            3
+          ],
+          [
+            1,
+            4
+          ],
+          [
+            1,
+            5
+          ],
+          [
+            1,
+            6
+          ],
+          [
+            1,
+            7
+          ],
+          [
+            1,
+            8
+          ]
+        ]
+      }
+    },
+    {
+      "name": "dynamic_mixed_d64l1r4_N8_seed1",
+      "task": "dynamic_mixed",
+      "config": {
+        "D_MODEL": 64,
+        "N_LAYER": 1,
+        "MLP_RATIO": 4,
+        "NUM_TRAIN_SAMPLES": 10000,
+        "NUM_TEST_SAMPLES": 2000,
+        "TRAIN_LEN": 16,
+        "OOD_LEN": 32,
+        "RANDOM_SEED": 1,
+        "AB_PAIRS": [
+          [
+            1,
+            1
+          ],
+          [
+            1,
+            2
+          ],
+          [
+            1,
+            3
+          ],
+          [
+            1,
+            4
+          ],
+          [
+            1,
+            5
+          ],
+          [
+            1,
+            6
+          ],
+          [
+            1,
+            7
+          ],
+          [
+            1,
+            8
+          ]
+        ]
+      }
+    },
+    {
+      "name": "dynamic_mixed_d64l1r4_N8_seed2",
+      "task": "dynamic_mixed",
+      "config": {
+        "D_MODEL": 64,
+        "N_LAYER": 1,
+        "MLP_RATIO": 4,
+        "NUM_TRAIN_SAMPLES": 10000,
+        "NUM_TEST_SAMPLES": 2000,
+        "TRAIN_LEN": 16,
+        "OOD_LEN": 32,
+        "RANDOM_SEED": 2,
+        "AB_PAIRS": [
+          [
+            1,
+            1
+          ],
+          [
+            1,
+            2
+          ],
+          [
+            1,
+            3
+          ],
+          [
+            1,
+            4
+          ],
+          [
+            1,
+            5
+          ],
+          [
+            1,
+            6
+          ],
+          [
+            1,
+            7
+          ],
+          [
+            1,
+            8
+          ]
+        ]
+      }
+    },
+    {
+      "name": "dynamic_mixed_d64l1r4_N8_seed3",
+      "task": "dynamic_mixed",
+      "config": {
+        "D_MODEL": 64,
+        "N_LAYER": 1,
+        "MLP_RATIO": 4,
+        "NUM_TRAIN_SAMPLES": 10000,
+        "NUM_TEST_SAMPLES": 2000,
+        "TRAIN_LEN": 16,
+        "OOD_LEN": 32,
+        "RANDOM_SEED": 3,
+        "AB_PAIRS": [
+          [
+            1,
+            1
+          ],
+          [
+            1,
+            2
+          ],
+          [
+            1,
+            3
+          ],
+          [
+            1,
+            4
+          ],
+          [
+            1,
+            5
+          ],
+          [
+            1,
+            6
+          ],
+          [
+            1,
+            7
+          ],
+          [
+            1,
+            8
+          ]
+        ]
+      }
+    },
+    {
+      "name": "dynamic_mixed_d64l1r4_N8_seed4",
+      "task": "dynamic_mixed",
+      "config": {
+        "D_MODEL": 64,
+        "N_LAYER": 1,
+        "MLP_RATIO": 4,
+        "NUM_TRAIN_SAMPLES": 10000,
+        "NUM_TEST_SAMPLES": 2000,
+        "TRAIN_LEN": 16,
+        "OOD_LEN": 32,
+        "RANDOM_SEED": 4,
+        "AB_PAIRS": [
+          [
+            1,
+            1
+          ],
+          [
+            1,
+            2
+          ],
+          [
+            1,
+            3
+          ],
+          [
+            1,
+            4
+          ],
+          [
+            1,
+            5
+          ],
+          [
+            1,
+            6
+          ],
+          [
+            1,
+            7
+          ],
+          [
+            1,
+            8
+          ]
+        ]
+      }
+    },
+    {
+      "name": "dynamic_mixed_d64l1r4_N8_seed5",
+      "task": "dynamic_mixed",
+      "config": {
+        "D_MODEL": 64,
+        "N_LAYER": 1,
+        "MLP_RATIO": 4,
+        "NUM_TRAIN_SAMPLES": 10000,
+        "NUM_TEST_SAMPLES": 2000,
+        "TRAIN_LEN": 16,
+        "OOD_LEN": 32,
+        "RANDOM_SEED": 5,
+        "AB_PAIRS": [
+          [
+            1,
+            1
+          ],
+          [
+            1,
+            2
+          ],
+          [
+            1,
+            3
+          ],
+          [
+            1,
+            4
+          ],
+          [
+            1,
+            5
+          ],
+          [
+            1,
+            6
+          ],
+          [
+            1,
+            7
+          ],
+          [
+            1,
+            8
+          ]
+        ]
+      }
+    },
+    {
+      "name": "dynamic_mixed_d64l1r4_N8_seed6",
+      "task": "dynamic_mixed",
+      "config": {
+        "D_MODEL": 64,
+        "N_LAYER": 1,
+        "MLP_RATIO": 4,
+        "NUM_TRAIN_SAMPLES": 10000,
+        "NUM_TEST_SAMPLES": 2000,
+        "TRAIN_LEN": 16,
+        "OOD_LEN": 32,
+        "RANDOM_SEED": 6,
+        "AB_PAIRS": [
+          [
+            1,
+            1
+          ],
+          [
+            1,
+            2
+          ],
+          [
+            1,
+            3
+          ],
+          [
+            1,
+            4
+          ],
+          [
+            1,
+            5
+          ],
+          [
+            1,
+            6
+          ],
+          [
+            1,
+            7
+          ],
+          [
+            1,
+            8
+          ]
+        ]
+      }
+    },
+    {
+      "name": "dynamic_mixed_d64l1r4_N8_seed7",
+      "task": "dynamic_mixed",
+      "config": {
+        "D_MODEL": 64,
+        "N_LAYER": 1,
+        "MLP_RATIO": 4,
+        "NUM_TRAIN_SAMPLES": 10000,
+        "NUM_TEST_SAMPLES": 2000,
+        "TRAIN_LEN": 16,
+        "OOD_LEN": 32,
+        "RANDOM_SEED": 7,
         "AB_PAIRS": [
           [
             1,
@@ -306,6 +2070,370 @@
       }
     },
     {
+      "name": "dynamic_mixed_d64l1r4_N9_seed1",
+      "task": "dynamic_mixed",
+      "config": {
+        "D_MODEL": 64,
+        "N_LAYER": 1,
+        "MLP_RATIO": 4,
+        "NUM_TRAIN_SAMPLES": 10000,
+        "NUM_TEST_SAMPLES": 2000,
+        "TRAIN_LEN": 16,
+        "OOD_LEN": 32,
+        "RANDOM_SEED": 1,
+        "AB_PAIRS": [
+          [
+            1,
+            1
+          ],
+          [
+            1,
+            2
+          ],
+          [
+            1,
+            3
+          ],
+          [
+            1,
+            4
+          ],
+          [
+            1,
+            5
+          ],
+          [
+            1,
+            6
+          ],
+          [
+            1,
+            7
+          ],
+          [
+            1,
+            8
+          ],
+          [
+            1,
+            9
+          ]
+        ]
+      }
+    },
+    {
+      "name": "dynamic_mixed_d64l1r4_N9_seed2",
+      "task": "dynamic_mixed",
+      "config": {
+        "D_MODEL": 64,
+        "N_LAYER": 1,
+        "MLP_RATIO": 4,
+        "NUM_TRAIN_SAMPLES": 10000,
+        "NUM_TEST_SAMPLES": 2000,
+        "TRAIN_LEN": 16,
+        "OOD_LEN": 32,
+        "RANDOM_SEED": 2,
+        "AB_PAIRS": [
+          [
+            1,
+            1
+          ],
+          [
+            1,
+            2
+          ],
+          [
+            1,
+            3
+          ],
+          [
+            1,
+            4
+          ],
+          [
+            1,
+            5
+          ],
+          [
+            1,
+            6
+          ],
+          [
+            1,
+            7
+          ],
+          [
+            1,
+            8
+          ],
+          [
+            1,
+            9
+          ]
+        ]
+      }
+    },
+    {
+      "name": "dynamic_mixed_d64l1r4_N9_seed3",
+      "task": "dynamic_mixed",
+      "config": {
+        "D_MODEL": 64,
+        "N_LAYER": 1,
+        "MLP_RATIO": 4,
+        "NUM_TRAIN_SAMPLES": 10000,
+        "NUM_TEST_SAMPLES": 2000,
+        "TRAIN_LEN": 16,
+        "OOD_LEN": 32,
+        "RANDOM_SEED": 3,
+        "AB_PAIRS": [
+          [
+            1,
+            1
+          ],
+          [
+            1,
+            2
+          ],
+          [
+            1,
+            3
+          ],
+          [
+            1,
+            4
+          ],
+          [
+            1,
+            5
+          ],
+          [
+            1,
+            6
+          ],
+          [
+            1,
+            7
+          ],
+          [
+            1,
+            8
+          ],
+          [
+            1,
+            9
+          ]
+        ]
+      }
+    },
+    {
+      "name": "dynamic_mixed_d64l1r4_N9_seed4",
+      "task": "dynamic_mixed",
+      "config": {
+        "D_MODEL": 64,
+        "N_LAYER": 1,
+        "MLP_RATIO": 4,
+        "NUM_TRAIN_SAMPLES": 10000,
+        "NUM_TEST_SAMPLES": 2000,
+        "TRAIN_LEN": 16,
+        "OOD_LEN": 32,
+        "RANDOM_SEED": 4,
+        "AB_PAIRS": [
+          [
+            1,
+            1
+          ],
+          [
+            1,
+            2
+          ],
+          [
+            1,
+            3
+          ],
+          [
+            1,
+            4
+          ],
+          [
+            1,
+            5
+          ],
+          [
+            1,
+            6
+          ],
+          [
+            1,
+            7
+          ],
+          [
+            1,
+            8
+          ],
+          [
+            1,
+            9
+          ]
+        ]
+      }
+    },
+    {
+      "name": "dynamic_mixed_d64l1r4_N9_seed5",
+      "task": "dynamic_mixed",
+      "config": {
+        "D_MODEL": 64,
+        "N_LAYER": 1,
+        "MLP_RATIO": 4,
+        "NUM_TRAIN_SAMPLES": 10000,
+        "NUM_TEST_SAMPLES": 2000,
+        "TRAIN_LEN": 16,
+        "OOD_LEN": 32,
+        "RANDOM_SEED": 5,
+        "AB_PAIRS": [
+          [
+            1,
+            1
+          ],
+          [
+            1,
+            2
+          ],
+          [
+            1,
+            3
+          ],
+          [
+            1,
+            4
+          ],
+          [
+            1,
+            5
+          ],
+          [
+            1,
+            6
+          ],
+          [
+            1,
+            7
+          ],
+          [
+            1,
+            8
+          ],
+          [
+            1,
+            9
+          ]
+        ]
+      }
+    },
+    {
+      "name": "dynamic_mixed_d64l1r4_N9_seed6",
+      "task": "dynamic_mixed",
+      "config": {
+        "D_MODEL": 64,
+        "N_LAYER": 1,
+        "MLP_RATIO": 4,
+        "NUM_TRAIN_SAMPLES": 10000,
+        "NUM_TEST_SAMPLES": 2000,
+        "TRAIN_LEN": 16,
+        "OOD_LEN": 32,
+        "RANDOM_SEED": 6,
+        "AB_PAIRS": [
+          [
+            1,
+            1
+          ],
+          [
+            1,
+            2
+          ],
+          [
+            1,
+            3
+          ],
+          [
+            1,
+            4
+          ],
+          [
+            1,
+            5
+          ],
+          [
+            1,
+            6
+          ],
+          [
+            1,
+            7
+          ],
+          [
+            1,
+            8
+          ],
+          [
+            1,
+            9
+          ]
+        ]
+      }
+    },
+    {
+      "name": "dynamic_mixed_d64l1r4_N9_seed7",
+      "task": "dynamic_mixed",
+      "config": {
+        "D_MODEL": 64,
+        "N_LAYER": 1,
+        "MLP_RATIO": 4,
+        "NUM_TRAIN_SAMPLES": 10000,
+        "NUM_TEST_SAMPLES": 2000,
+        "TRAIN_LEN": 16,
+        "OOD_LEN": 32,
+        "RANDOM_SEED": 7,
+        "AB_PAIRS": [
+          [
+            1,
+            1
+          ],
+          [
+            1,
+            2
+          ],
+          [
+            1,
+            3
+          ],
+          [
+            1,
+            4
+          ],
+          [
+            1,
+            5
+          ],
+          [
+            1,
+            6
+          ],
+          [
+            1,
+            7
+          ],
+          [
+            1,
+            8
+          ],
+          [
+            1,
+            9
+          ]
+        ]
+      }
+    },
+    {
       "name": "dynamic_mixed_d64l1r4_N10_seed0",
       "task": "dynamic_mixed",
       "config": {
@@ -317,6 +2445,398 @@
         "TRAIN_LEN": 16,
         "OOD_LEN": 32,
         "RANDOM_SEED": 0,
+        "AB_PAIRS": [
+          [
+            1,
+            1
+          ],
+          [
+            1,
+            2
+          ],
+          [
+            1,
+            3
+          ],
+          [
+            1,
+            4
+          ],
+          [
+            1,
+            5
+          ],
+          [
+            1,
+            6
+          ],
+          [
+            1,
+            7
+          ],
+          [
+            1,
+            8
+          ],
+          [
+            1,
+            9
+          ],
+          [
+            1,
+            10
+          ]
+        ]
+      }
+    },
+    {
+      "name": "dynamic_mixed_d64l1r4_N10_seed1",
+      "task": "dynamic_mixed",
+      "config": {
+        "D_MODEL": 64,
+        "N_LAYER": 1,
+        "MLP_RATIO": 4,
+        "NUM_TRAIN_SAMPLES": 10000,
+        "NUM_TEST_SAMPLES": 2000,
+        "TRAIN_LEN": 16,
+        "OOD_LEN": 32,
+        "RANDOM_SEED": 1,
+        "AB_PAIRS": [
+          [
+            1,
+            1
+          ],
+          [
+            1,
+            2
+          ],
+          [
+            1,
+            3
+          ],
+          [
+            1,
+            4
+          ],
+          [
+            1,
+            5
+          ],
+          [
+            1,
+            6
+          ],
+          [
+            1,
+            7
+          ],
+          [
+            1,
+            8
+          ],
+          [
+            1,
+            9
+          ],
+          [
+            1,
+            10
+          ]
+        ]
+      }
+    },
+    {
+      "name": "dynamic_mixed_d64l1r4_N10_seed2",
+      "task": "dynamic_mixed",
+      "config": {
+        "D_MODEL": 64,
+        "N_LAYER": 1,
+        "MLP_RATIO": 4,
+        "NUM_TRAIN_SAMPLES": 10000,
+        "NUM_TEST_SAMPLES": 2000,
+        "TRAIN_LEN": 16,
+        "OOD_LEN": 32,
+        "RANDOM_SEED": 2,
+        "AB_PAIRS": [
+          [
+            1,
+            1
+          ],
+          [
+            1,
+            2
+          ],
+          [
+            1,
+            3
+          ],
+          [
+            1,
+            4
+          ],
+          [
+            1,
+            5
+          ],
+          [
+            1,
+            6
+          ],
+          [
+            1,
+            7
+          ],
+          [
+            1,
+            8
+          ],
+          [
+            1,
+            9
+          ],
+          [
+            1,
+            10
+          ]
+        ]
+      }
+    },
+    {
+      "name": "dynamic_mixed_d64l1r4_N10_seed3",
+      "task": "dynamic_mixed",
+      "config": {
+        "D_MODEL": 64,
+        "N_LAYER": 1,
+        "MLP_RATIO": 4,
+        "NUM_TRAIN_SAMPLES": 10000,
+        "NUM_TEST_SAMPLES": 2000,
+        "TRAIN_LEN": 16,
+        "OOD_LEN": 32,
+        "RANDOM_SEED": 3,
+        "AB_PAIRS": [
+          [
+            1,
+            1
+          ],
+          [
+            1,
+            2
+          ],
+          [
+            1,
+            3
+          ],
+          [
+            1,
+            4
+          ],
+          [
+            1,
+            5
+          ],
+          [
+            1,
+            6
+          ],
+          [
+            1,
+            7
+          ],
+          [
+            1,
+            8
+          ],
+          [
+            1,
+            9
+          ],
+          [
+            1,
+            10
+          ]
+        ]
+      }
+    },
+    {
+      "name": "dynamic_mixed_d64l1r4_N10_seed4",
+      "task": "dynamic_mixed",
+      "config": {
+        "D_MODEL": 64,
+        "N_LAYER": 1,
+        "MLP_RATIO": 4,
+        "NUM_TRAIN_SAMPLES": 10000,
+        "NUM_TEST_SAMPLES": 2000,
+        "TRAIN_LEN": 16,
+        "OOD_LEN": 32,
+        "RANDOM_SEED": 4,
+        "AB_PAIRS": [
+          [
+            1,
+            1
+          ],
+          [
+            1,
+            2
+          ],
+          [
+            1,
+            3
+          ],
+          [
+            1,
+            4
+          ],
+          [
+            1,
+            5
+          ],
+          [
+            1,
+            6
+          ],
+          [
+            1,
+            7
+          ],
+          [
+            1,
+            8
+          ],
+          [
+            1,
+            9
+          ],
+          [
+            1,
+            10
+          ]
+        ]
+      }
+    },
+    {
+      "name": "dynamic_mixed_d64l1r4_N10_seed5",
+      "task": "dynamic_mixed",
+      "config": {
+        "D_MODEL": 64,
+        "N_LAYER": 1,
+        "MLP_RATIO": 4,
+        "NUM_TRAIN_SAMPLES": 10000,
+        "NUM_TEST_SAMPLES": 2000,
+        "TRAIN_LEN": 16,
+        "OOD_LEN": 32,
+        "RANDOM_SEED": 5,
+        "AB_PAIRS": [
+          [
+            1,
+            1
+          ],
+          [
+            1,
+            2
+          ],
+          [
+            1,
+            3
+          ],
+          [
+            1,
+            4
+          ],
+          [
+            1,
+            5
+          ],
+          [
+            1,
+            6
+          ],
+          [
+            1,
+            7
+          ],
+          [
+            1,
+            8
+          ],
+          [
+            1,
+            9
+          ],
+          [
+            1,
+            10
+          ]
+        ]
+      }
+    },
+    {
+      "name": "dynamic_mixed_d64l1r4_N10_seed6",
+      "task": "dynamic_mixed",
+      "config": {
+        "D_MODEL": 64,
+        "N_LAYER": 1,
+        "MLP_RATIO": 4,
+        "NUM_TRAIN_SAMPLES": 10000,
+        "NUM_TEST_SAMPLES": 2000,
+        "TRAIN_LEN": 16,
+        "OOD_LEN": 32,
+        "RANDOM_SEED": 6,
+        "AB_PAIRS": [
+          [
+            1,
+            1
+          ],
+          [
+            1,
+            2
+          ],
+          [
+            1,
+            3
+          ],
+          [
+            1,
+            4
+          ],
+          [
+            1,
+            5
+          ],
+          [
+            1,
+            6
+          ],
+          [
+            1,
+            7
+          ],
+          [
+            1,
+            8
+          ],
+          [
+            1,
+            9
+          ],
+          [
+            1,
+            10
+          ]
+        ]
+      }
+    },
+    {
+      "name": "dynamic_mixed_d64l1r4_N10_seed7",
+      "task": "dynamic_mixed",
+      "config": {
+        "D_MODEL": 64,
+        "N_LAYER": 1,
+        "MLP_RATIO": 4,
+        "NUM_TRAIN_SAMPLES": 10000,
+        "NUM_TEST_SAMPLES": 2000,
+        "TRAIN_LEN": 16,
+        "OOD_LEN": 32,
+        "RANDOM_SEED": 7,
         "AB_PAIRS": [
           [
             1,
