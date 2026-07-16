@@ -1,6 +1,6 @@
 # Recursion 训练任务：模型结构与训练设置说明
 
-本文档汇总 `src/` 中 `addition`、`triponacci`（三阶线性递推）、`multiply`、`mixed` 四种递归训练任务的**模型结构**与**训练设置**。四种任务共享同一套 Transformer 主干，仅在递推规则、状态空间大小、输入格式以及多规则扩展上有所区别。
+本文档汇总 `src/` 中 `addition`、`tribonacci`、`multiplication`、`mixed_ab`、`dynamic_mixed` 五种递归训练任务的**模型结构**与**训练设置**。所有任务共享同一套 Transformer 主干，仅在递推规则、状态空间大小、输入格式以及多规则扩展上有所区别。
 
 ---
 
@@ -18,7 +18,7 @@ X(k) = a * X(k-1) + b * X(k-2)  (mod P)
 - 状态空间大小：`P^2 = 53^2 = 2809`
 - 模型：基础 `FibonacciTransformer`
 
-### 1.2 multiply
+### 1.2 multiplication
 二阶乘法递推：
 
 ```
@@ -29,6 +29,7 @@ X(k) = X(k-1) * X(k-2)  (mod P)
 - 初始状态长度：`init_len = 2`
 - 状态空间大小：`P^2`
 - 模型：基础 `FibonacciTransformer`
+- 注意：P 为质数时，非零初始状态不会陷入 `(0,0)` 不动点。
 
 ### 1.3 tribonacci
 三阶线性递推：
@@ -54,6 +55,26 @@ X(k) = a * X(k-1) + b * X(k-2)  (mod P)
 - 每组规则状态空间：`P^2 = 2809`
 - 模型：`MixedABTransformer`（在 `FibonacciTransformer` 基础上扩展多规则能力）
 
+### 1.5 dynamic_mixed
+每步规则可变的二阶线性递推。序列格式：
+
+```
+[x1, x2, flag_3, x3, flag_4, x4, ..., flag_L, x_L]
+```
+
+其中 `flag_k` 表示生成 `x_k` 所用的规则索引。每步从 `AB_PAIRS` 中随机选一条规则：
+
+```
+x_k = a * x_{k-2} + b * x_{k-1}  (mod P)
+```
+
+- 默认参数：`P = 53`，`AB_PAIRS = [[1,1], [1,2]]`
+- 训练/测试样本数：`NUM_TRAIN_SAMPLES = 10000`，`NUM_TEST_SAMPLES = 2000`
+- 序列长度：`TRAIN_LEN = 16`，`OOD_LEN = 32`
+- 实际输入序列长度：`2 * L - 2`
+- 模型：`FibonacciTransformer`（词表扩展以容纳 flag token）
+- loss 只计算 `x3, x4, ..., x_L`，flag token 与 `x2` 被 mask。
+
 ---
 
 ## 2. 公共训练设置
@@ -76,16 +97,16 @@ X(k) = a * X(k-1) + b * X(k-2)  (mod P)
 | `DROPOUT` | `0.0` | Dropout 概率 |
 | `USE_LEARNABLE_PE` | `false` | 是否使用可学习位置编码（false 使用 RoPE） |
 | `MLP_RATIO` | `4` | MLP 隐藏层相对 d_model 的倍数 |
-| `USE_GREEDY_GENERATE` | `true` | 生成时是否使用贪心解码 |
-| `MAX_UNIQUE_RATIO` | `0.5` | 暴露给训练的初始状态比例（单任务） |
+| `USE_GREEDY_GENERATE` | `true` | 生成时是否使用贪心解码（仅对 `MixedABTransformer` 生效） |
+| `MAX_UNIQUE_RATIO` | `0.5` | 暴露给训练的初始状态比例（单任务 / mixed_ab 默认 fallback） |
 | `ENTROPY_PENALTY_WEIGHT` | `0.0` | 注意力熵惩罚权重 |
 | `FIRST_TASK_WEIGHT` | `1.0` | 第一个预测位置的损失权重 |
 | `NUM_MASK` | `0` | 0 表示使用任务默认的 mask 起始位置 |
 | `EVAL_INTERVAL` | `20` | 每隔多少 epoch 评估一次 |
-| `EARLY_STOP_NO_IMPROVE` | `1000` | 测试准确率多久未提升则早停 |
+| `EARLY_STOP_NO_IMPROVE` | `3000` | 测试准确率多久未提升则早停 |
 | `EARLY_STOP_ACCURACY` | `0.99` | 测试准确率达到该值则早停 |
 | `RANDOM_SEED` | `42` | 随机种子 |
-| `SAVE_PATH` | `fibonacci_transformer.pth` | 模型保存路径 |
+| `SAVE_PATH` | `fibonacci_transformer.pth` | 模型保存路径；由 `batch_run.py` 自动覆盖为 `/data/cxm/models/{实验名}.pth` |
 
 ### 2.1 各任务对公共配置的覆盖
 
@@ -95,18 +116,21 @@ X(k) = a * X(k-1) + b * X(k-2)  (mod P)
 | `multiplication` | 无覆盖，使用 `main` 默认配置 |
 | `tribonacci` | `P: 23`，`A: 1`，`B: 2`，`C: 3` |
 | `mixed_ab` | `USE_AB_TAG: false`，`USE_CONDITIONAL_WTE: false`，`COND_WTE_SHARED_RATIO: 0.0`，`MIXED_AB_MAX_UNIQUE_RATIOS: [0.5, 0.5]` |
+| `dynamic_mixed` | `P: 53`，`AB_PAIRS: [[1,1],[1,2]]`，`NUM_TRAIN_SAMPLES: 10000`，`NUM_TEST_SAMPLES: 2000`，`TRAIN_LEN: 16`，`OOD_LEN: 32` |
 
 ### 2.2 训练流程通用设置
 
+- **运行入口**：`src/batch_run.py` 是唯一的运行入口，已删除 `src/main.py`。
 - **优化器**：`torch.optim.AdamW(model.parameters(), lr=LR, weight_decay=WEIGHT_DECAY)`
 - **学习率调度**：`CosineAnnealingLR(optimizer, T_max=EPOCHS)`
 - **梯度裁剪**：`clip_grad_norm_(model.parameters(), 1.0)`
 - **损失函数**：每个时间步的交叉熵，按 `loss_mask` 平均后加上可选的熵惩罚和 rule loss
 - **mask 策略**：
-  - `addition` / `multiply`：默认屏蔽前 `1` 个位置（从预测第 3 项开始）
+  - `addition` / `multiplication`：默认屏蔽前 `1` 个位置（从预测第 3 项开始）
   - `tribonacci`：默认屏蔽前 `2` 个位置（从预测第 4 项开始）
-  - `mixed_ab`：默认屏蔽前 `2` 个位置（从预测第 3 项开始）
-- **block_size 计算**：`max(TRAIN_LEN, OOD_LEN)` 向上取整到最近的 2 的幂，默认 `32`
+  - `mixed_ab`：默认屏蔽前 `2` 个位置（从预测第 3 项开始，受 rule token 影响）
+  - `dynamic_mixed`：由数据集生成 2D loss_mask，只计算 `x3, x4, ...`
+- **block_size 计算**：`max(TRAIN_LEN, OOD_LEN)` 向上取整到最近的 2 的幂；`dynamic_mixed` 按 `2*L - 2` 计算。
 
 ---
 
@@ -178,7 +202,7 @@ Input token ids (B, T)
 隐藏状态 ──▶ rule_head ──▶ 规则分类 logits ──▶ rule_loss (weight=0.5)
 ```
 
-### 3.2 FibonacciTransformer（单任务模型）
+### 3.2 FibonacciTransformer（单任务 / dynamic_mixed 模型）
 
 类：`src/core.py::FibonacciTransformer`
 
@@ -255,7 +279,6 @@ out = c_proj(out)
 
 | 组件 | 定义 | 说明 |
 |------|------|------|
-| `ab_emb` | `nn.Embedding(num_ab_pairs, d_model)` | 规则索引嵌入（当前主要保留作历史兼容） |
 | `rule_head` | `Linear(d_model, d_model // 2) → ReLU → Linear(d_model // 2, num_ab_pairs)` | 从隐藏状态预测当前序列属于哪条规则 |
 | `cond_wte` | `nn.Embedding(shared_size + num_ab_pairs * rule_size, d_model)` | 条件词嵌入，仅在 `cond_wte` 模式下使用 |
 
@@ -275,7 +298,18 @@ restricted_token_ids = range(P, P + num_ab_pairs)  # 生成时禁止输出 rule 
 - 规则专属 token：`idx >= shared_size`，按 `ab_labels` 选择对应规则段
 - 输出 logits 也按共享段 / 规则段分别计算，`cond_wte` 同时作为输入嵌入和输出分类权重
 
-### 3.4 参数初始化
+### 3.4 dynamic_mixed 的词表扩展
+
+`dynamic_mixed` 使用基础 `FibonacciTransformer`，但在 `run_experiment` 中扩展词表以容纳 flag token：
+
+```python
+vocab_size = P + 1 + len(AB_PAIRS)
+pad_token_id = P
+```
+
+扩展后的 `transformer.wte` 与 `lm_head` 保持权重共享。
+
+### 3.5 参数初始化
 
 - 所有 `nn.Linear` 和 `nn.Embedding`：均值 0、标准差 0.02 的正态分布
 - `nn.Linear` 的 bias：初始化为 0
@@ -302,6 +336,15 @@ restricted_token_ids = range(P, P + num_ab_pairs)  # 生成时禁止输出 rule 
 3. 合并所有规则样本后打乱训练顺序。
 4. 若启用 `USE_AB_TAG`，在序列开头拼接 rule token。
 
+### 4.3 动态混合数据集（DynamicMixedDataset）
+
+类：`src/core.py::DynamicMixedDataset`
+
+1. 使用独立的 `random.Random(seed)` 确定性生成样本。
+2. 每步随机选择一条规则，生成 `x_k` 并在前面插入 `flag_k`。
+3. 返回序列和 1D loss_mask，collate 后扩展为 2D。
+4. 训练/测试通过 `NUM_TRAIN_SAMPLES` / `NUM_TEST_SAMPLES` 控制，使用不同 seed 区分。
+
 ---
 
 ## 5. 损失函数与评估
@@ -318,8 +361,21 @@ if mixed_ab:
 - `targets = x[:, 1:]`，即输入序列右移一位
 - `loss_mask` 默认屏蔽前 `num_mask` 个位置，只计算后续生成位置的损失
 - `rule_loss` 是规则预测头的交叉熵，权重为 0.5
+- NaN 检测：`train_epoch` 中检测到 NaN loss 时，会将诊断信息打印到 stderr（进入 `.err` 日志），该 batch 不计入 epoch 平均 loss。
 
-### 5.2 评估指标
+### 5.2 batch 类型区分
+
+`train_epoch` 与 `evaluate` 使用显式的 `BatchTag` 区分不同 collate 模式：
+
+| Tag | 来源 | 额外张量 |
+|-----|------|----------|
+| `BatchTag['plain']` | `collate_fn` | 无 |
+| `BatchTag['mixed_ab']` | `mixed_ab_collate_fn` | `ab_indices` |
+| `BatchTag['dynamic_mixed']` | `dynamic_mixed_collate_fn` | `loss_mask` |
+
+不再通过张量 `ndim` 推断 batch 类型。
+
+### 5.3 评估指标
 
 训练过程中每个评估 epoch 输出：
 
@@ -327,6 +383,7 @@ if mixed_ab:
 - 测试 overall accuracy
 - 每个预测位置（per-position）的准确率
 - `mixed_ab` 任务额外输出每条规则的 per-rule accuracy
+- 保存模型前打印 `Training epochs: {epoch}`，供 `batch_run.py` 汇总表提取
 
 训练结束后执行 final generation test：
 
@@ -334,23 +391,25 @@ if mixed_ab:
 - 区分 **Exposed**（训练集中见过的初始状态）和 **Unexposed**
 - 区分 **In-distribution**（位置 `< TRAIN_LEN`）和 **OOD**（位置 `>= TRAIN_LEN`）
 - 输出四组准确率：Exposed-ID、Exposed-OOD、Unexposed-ID、Unexposed-OOD
+- `dynamic_mixed` 没有 final generation test。
 
 ---
 
 ## 6. 各任务模型与设置对比
 
-| 项目 | addition | multiply | tribonacci | mixed_ab |
-|------|----------|----------|------------|----------|
-| 递推公式 | `a*x1 + b*x0 mod P` | `x1 * x0 mod P` | `a*x2 + b*x1 + c*x0 mod P` | 多组 `(a,b)` 二阶线性递推 |
-| 默认 `P` | 53 | 53 | 23 | 53 |
-| `init_len` | 2 | 2 | 3 | 2 |
-| 状态空间 | `P^2` | `P^2` | `P^3` | 每组 `P^2` |
-| 默认参数 | `A=1, B=1` | 无 | `A=1, B=2, C=3` | `AB_PAIRS=[[1,1],[1,2]]` |
-| `num_mask` | 1 | 1 | 2 | 2 |
-| 模型 | `FibonacciTransformer` | `FibonacciTransformer` | `FibonacciTransformer` | `MixedABTransformer` |
-| 词表扩展 | 无 | 无 | 无 | 可能有 rule token / cond_wte |
-| 规则预测头 | 无 | 无 | 无 | 有 `rule_head` |
-| 条件冻结 | 支持 `COND_FIX` | 支持 | 支持 | 常用 `COND_FIX=WTE/LINEAR` |
+| 项目 | addition | multiplication | tribonacci | mixed_ab | dynamic_mixed |
+|------|----------|----------------|------------|----------|---------------|
+| 递推公式 | `a*x1 + b*x0 mod P` | `x1 * x0 mod P` | `a*x2 + b*x1 + c*x0 mod P` | 多组 `(a,b)` 二阶线性递推 | 每步随机 `(a,b)` 二阶线性递推 |
+| 默认 `P` | 53 | 53 | 23 | 53 | 53 |
+| `init_len` | 2 | 2 | 3 | 2 | 2 |
+| 状态空间 | `P^2` | `P^2` | `P^3` | 每组 `P^2` | 不枚举状态空间 |
+| 默认参数 | `A=1, B=1` | 无 | `A=1, B=2, C=3` | `AB_PAIRS=[[1,1],[1,2]]` | `AB_PAIRS=[[1,1],[1,2]]` |
+| `num_mask` | 1 | 1 | 2 | 2 | 来自数据集 |
+| 模型 | `FibonacciTransformer` | `FibonacciTransformer` | `FibonacciTransformer` | `MixedABTransformer` | `FibonacciTransformer` |
+| 词表扩展 | 无 | 无 | 无 | rule token / cond_wte | flag tokens |
+| 规则预测头 | 无 | 无 | 无 | 有 `rule_head` | 无 |
+| 条件冻结 | 支持 `COND_FIX` | 支持 | 支持 | 常用 `COND_FIX=WTE/LINEAR` | 支持 |
+| final generation test | 有 | 有 | 有 | 有 | 无 |
 
 ---
 
@@ -358,15 +417,16 @@ if mixed_ab:
 
 | 功能 | 文件与位置 |
 |------|------------|
-| 数据生成 | `src/core.py::RecurrenceDataset`，`src/core.py::MixedABDataset` |
+| 数据生成 | `src/core.py::RecurrenceDataset`，`src/core.py::MixedABDataset`，`src/core.py::DynamicMixedDataset` |
 | 模型定义 | `src/core.py::FibonacciTransformer`，`src/core.py::MixedABTransformer` |
 | 注意力层 | `src/core.py::CausalSelfAttention` |
 | RoPE 实现 | `src/core.py::RotaryEmbedding`，`src/core.py::apply_rotary_emb` |
 | 训练流程 | `src/core.py::run_training_engine`，`src/core.py::train_epoch`，`src/core.py::evaluate` |
 | 参数冻结 | `src/core.py::freeze_partial` |
-| 配置入口 | `src/core.py::run_experiment`，`src/main.py` |
+| 配置入口 | `src/core.py::run_experiment`（仅由 `src/batch_run.py` 调用） |
 | 批量运行 | `src/batch_run.py` |
-| 注意力分析 | `src/analyze_attention.py` |
+| 注意力可视化 | `src/analyze_attention.py` |
+| QK 性质验证 | `src/qk_verification.py`（独立脚本，不在默认流程中运行） |
 | 可视化 | `src/visualize.py` |
 
 ---
@@ -374,5 +434,9 @@ if mixed_ab:
 ## 8. 备注
 
 - 当前所有实验默认使用 **RoPE**（`USE_LEARNABLE_PE=false`），可切换为可学习位置编码。
-- `mixed_ab` 的详细子实验设置（basic / label / cond_wte / freeze / overlap 等）可参考已有的 `mixed_ab_experiments_summary.md`。
+- `USE_GREEDY_GENERATE` 配置项仅对 `MixedABTransformer` 生效；单任务 `FibonacciTransformer` 中该属性未参与初始化。
 - `experiments.json` 中定义的实验会覆盖 `config.json` 的对应字段，`batch_run.py` 负责配置合并与批量执行。
+- `src/main.py` 已删除，所有运行必须通过 `src/batch_run.py`。
+- `.gitignore` 已忽略训练产物：`*.log`、`*.err`、`*.pth`、`src/nohup.out`、`config_tmp_*.json` 等。
+- 模型默认保存路径：`/data/cxm/models/{实验名}.pth`（由 `batch_run.py` 自动设置，可在 `experiments.json` 中通过 `SAVE_PATH` 覆盖）。
+- 日志与绘图输出路径：`/data/cxm/recursion/{experiments文件名}/logs` 与 `/data/cxm/recursion/{experiments文件名}/plots`。

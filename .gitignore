@@ -1,3 +1,9 @@
 __pycache__/
 *.pyc
 *.pyo
+src/nohup.out
+*.log
+*.err
+*.pth
+config_tmp_*.json
+.DS_Store

@@ -283,7 +283,7 @@ def summarize_attention_for_sequence(model, seq, p=None, query_mask=None):
                 'focus_prev1': focus_prev1,      # Average attention to previous token
                 'focus_prev2': focus_prev2,      # Average attention to token before previous
                 'focus_by_distance': focus_by_distance,
-                'topk_positions': topk_vals.cpu().tolist(),
+                'topk_positions': topk_idx.cpu().tolist(),
                 'topk_values': topk_vals.cpu().tolist(),
                 'attention_matrix': attn_matrix.cpu().tolist(),
                 'query_positions': query_positions,
@@ -508,12 +508,16 @@ def analyze_model_attention(pth_path, device='cpu'):
             return seq
 
         def make_dynamic_query_mask(length):
-            # Target length is 2*length - 3; valid targets are x3, x4, ..., x_L
-            # at target indices 2, 4, ..., 2*(length-1).
-            mask = [0] * (2 * length - 3)
-            for k in range(2, length):
-                target_idx = 2 * (k - 1)
-                mask[target_idx] = 1
+            # Attention matrix is over the input sequence, which has length 2*length - 2.
+            # Valid prediction queries for x_k are the input positions of x_{k-1} and flag_k
+            # immediately preceding x_k. For x3 (k=3), x3 is at input index 3 (0-based),
+            # so we use input position 3 as the query for predicting x3.
+            # General: x_k is at input index 2*(k-1), so the query position is 2*(k-1).
+            total_len = 2 * length - 2
+            mask = [0] * total_len
+            for k in range(3, length + 1):
+                query_pos = 2 * (k - 1)
+                mask[query_pos] = 1
             return mask
 
         for seed in range(5):
@@ -532,9 +536,6 @@ def analyze_model_attention(pth_path, device='cpu'):
         model, test_sequences[0], p=p,
         query_mask=query_masks[0] if query_masks is not None else None)
     print_attention_summary(summary, test_sequences[0])
-
-    # QK property verification
-    verify_qk_properties(model, test_sequences, init_len, query_masks=query_masks, device=device)
 
 
 if __name__ == "__main__":

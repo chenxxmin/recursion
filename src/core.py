@@ -135,17 +135,45 @@ class BucketBatchSampler(Sampler):
         
         if self.shuffle:
             random.shuffle(self.batches)
-    
-    def __iter__(self):
-        for batch in self.batches:
-            yield batch
-    
-    def __len__(self):
-        return len(self.batches)
-
-# ==================== Collate fn (same length within batch, direct stack) ====================
 def collate_fn(batch):
     return torch.stack(batch, dim=0)
+
+
+def mixed_ab_collate_fn(batch):
+    sequences = [item[0] for item in batch]
+    ab_indices = torch.tensor([item[1] for item in batch], dtype=torch.long)
+    return torch.stack(sequences, dim=0), ab_indices
+
+
+def dynamic_mixed_collate_fn(batch):
+    sequences = [item[0] for item in batch]
+    loss_masks = [item[1] for item in batch]
+    return torch.stack(sequences, dim=0), torch.stack(loss_masks, dim=0)
+
+
+# A named tuple-like tag so callers can unambiguously identify what each tensor is.
+BatchTag = {
+    'mixed_ab': 0,
+    'dynamic_mixed': 1,
+    'plain': 2,
+}
+
+
+def collate_fn(batch):
+    return torch.stack(batch, dim=0), BatchTag['plain']
+
+
+def mixed_ab_collate_fn(batch):
+    sequences = [item[0] for item in batch]
+    ab_indices = torch.tensor([item[1] for item in batch], dtype=torch.long)
+    return torch.stack(sequences, dim=0), BatchTag['mixed_ab'], ab_indices
+
+
+def dynamic_mixed_collate_fn(batch):
+    sequences = [item[0] for item in batch]
+    loss_masks = [item[1] for item in batch]
+    return torch.stack(sequences, dim=0), BatchTag['dynamic_mixed'], torch.stack(loss_masks, dim=0)
+
 
 # ==================== RoPE Definition ====================
 class RotaryEmbedding(nn.Module):
@@ -394,7 +422,7 @@ class FibonacciTransformer(nn.Module):
 def freeze_partial(model, cond_fix):
     """
     Freeze part of the model for conditional_wte analysis.
-    cond_fix: 'WTE'    -> freeze embedding-related params (cond_wte, ab_emb, wte, wpe)
+    cond_fix: 'WTE'    -> freeze embedding-related params (cond_wte, wte, wpe)
               'LINEAR' -> freeze transformer backbone + rule head
     Returns a list of (param, saved_value) for restoring after optimizer steps.
     """
@@ -405,7 +433,7 @@ def freeze_partial(model, cond_fix):
     for name, param in model.named_parameters():
         freeze = False
         if cond_fix == "WTE":
-            if any(k in name for k in ('cond_wte', 'ab_emb', 'transformer.wte', 'transformer.wpe')):
+            if any(k in name for k in ('cond_wte', 'transformer.wte', 'transformer.wpe')):
                 freeze = True
         elif cond_fix == "LINEAR":
             if (name.startswith('transformer.h.') or 
@@ -431,15 +459,30 @@ def train_epoch(model, dataloader, optimizer, device, num_mask=1, extra_kwargs_f
     for batch in dataloader:
         if isinstance(batch, (list, tuple)):
             x = batch[0].to(device)  # (B, L)
-            # If the dataset supplies a 2D loss_mask, use it directly.
-            # mixed_ab passes 1D ab_indices here, so ndim distinguishes them.
-            if len(batch) > 1 and batch[1].ndim == 2:
-                loss_mask = batch[1].to(device)
-                kwargs = {}
+            # Use explicit batch tag to distinguish collate modes.
+            if len(batch) >= 2 and isinstance(batch[1], int):
+                tag = batch[1]
+                if tag == BatchTag['dynamic_mixed']:
+                    loss_mask = batch[2].to(device)
+                    kwargs = {}
+                elif tag == BatchTag['mixed_ab']:
+                    ab_indices = batch[2].to(device)
+                    kwargs = extra_kwargs_fn(ab_indices) if extra_kwargs_fn is not None else {}
+                    loss_mask = None
+                elif tag == BatchTag['plain']:
+                    kwargs = {}
+                    loss_mask = None
+                else:
+                    raise ValueError(f"Unknown batch tag: {tag}")
             else:
-                extra = batch[1:]
-                kwargs = extra_kwargs_fn(*extra) if extra_kwargs_fn is not None else {}
-                loss_mask = None
+                # Fallback for legacy callers that do not provide a tag.
+                if len(batch) > 1 and batch[1].ndim == 2:
+                    loss_mask = batch[1].to(device)
+                    kwargs = {}
+                else:
+                    extra = batch[1:]
+                    kwargs = extra_kwargs_fn(*extra) if extra_kwargs_fn is not None else {}
+                    loss_mask = None
         else:
             x = batch.to(device)
             kwargs = {}
@@ -459,6 +502,17 @@ def train_epoch(model, dataloader, optimizer, device, num_mask=1, extra_kwargs_f
         
         optimizer.zero_grad()
         logits, loss, *_ = model(x, targets, loss_mask, **kwargs)
+        
+        if loss is not None and torch.isnan(loss):
+            # NaN diagnostic: print to stderr so it shows up in .err logs
+            print("\n[NaN Alert] loss is NaN", file=sys.stderr, flush=True)
+            print(f"  batch shape: {x.shape}, device: {x.device}", file=sys.stderr, flush=True)
+            print(f"  input min/max: {x.min().item()} / {x.max().item()}", file=sys.stderr, flush=True)
+            print(f"  logits has NaN: {torch.isnan(logits).any().item()}", file=sys.stderr, flush=True)
+            print(f"  logits has Inf: {torch.isinf(logits).any().item()}", file=sys.stderr, flush=True)
+            print(f"  logits min/max: {logits.min().item()} / {logits.max().item()}", file=sys.stderr, flush=True)
+            print(f"  loss_mask sum: {loss_mask.sum().item()}", file=sys.stderr, flush=True)
+            print(f"  targets min/max: {targets.min().item()} / {targets.max().item()}", file=sys.stderr, flush=True)
         
         if loss is not None and not torch.isnan(loss):
             loss.backward()
@@ -482,7 +536,7 @@ def train_epoch(model, dataloader, optimizer, device, num_mask=1, extra_kwargs_f
             total_correct += match.sum().item()
             total_samples += valid_mask.float().sum().item()
         
-        total_loss += loss.item() if loss is not None else 0
+        total_loss += loss.item() if loss is not None and not torch.isnan(loss) else 0
     
     overall_acc = total_correct / total_samples if total_samples > 0 else 0
     per_pos_acc = {pos: pos_correct[pos] / pos_total[pos] for pos in sorted(pos_total.keys())}
@@ -504,15 +558,31 @@ def evaluate(model, dataloader, device, num_mask=1, extra_kwargs_fn=None):
             ab_labels = None
             if isinstance(batch, (list, tuple)):
                 x = batch[0].to(device)  # (B, L)
-                # Dataset-supplied 2D loss_mask takes priority over 1D ab_indices.
-                if len(batch) > 1 and batch[1].ndim == 2:
-                    loss_mask = batch[1].to(device)
-                    kwargs = {}
+                # Use explicit batch tag to distinguish collate modes.
+                if len(batch) >= 2 and isinstance(batch[1], int):
+                    tag = batch[1]
+                    if tag == BatchTag['dynamic_mixed']:
+                        loss_mask = batch[2].to(device)
+                        kwargs = {}
+                    elif tag == BatchTag['mixed_ab']:
+                        ab_labels = batch[2].to(device)
+                        kwargs = extra_kwargs_fn(ab_labels) if extra_kwargs_fn is not None else {}
+                        loss_mask = None
+                    elif tag == BatchTag['plain']:
+                        kwargs = {}
+                        loss_mask = None
+                    else:
+                        raise ValueError(f"Unknown batch tag: {tag}")
                 else:
-                    extra = batch[1:]
-                    kwargs = extra_kwargs_fn(*extra) if extra_kwargs_fn is not None else {}
-                    ab_labels = batch[1].to(device)
-                    loss_mask = None
+                    # Fallback for legacy callers that do not provide a tag.
+                    if len(batch) > 1 and batch[1].ndim == 2:
+                        loss_mask = batch[1].to(device)
+                        kwargs = {}
+                    else:
+                        extra = batch[1:]
+                        kwargs = extra_kwargs_fn(*extra) if extra_kwargs_fn is not None else {}
+                        ab_labels = batch[1].to(device)
+                        loss_mask = None
             else:
                 x = batch.to(device)
                 kwargs = {}
@@ -646,6 +716,7 @@ def run_training_engine(model, train_loader, test_loader, optimizer, scheduler, 
     
     print(f"\n{'='*50}")
     print("Saving model...")
+    print(f"Training epochs: {epoch}")
     save_dict = {
         'model_state_dict': model.state_dict(),
         'config': save_config,
@@ -859,13 +930,11 @@ class MixedABTransformer(FibonacciTransformer):
                 shared_size + num_ab_pairs * rule_size, self.d_model)
             torch.nn.init.normal_(self.cond_wte.weight, mean=0.0, std=0.02)
             
-        self.ab_emb = nn.Embedding(num_ab_pairs, self.d_model)
         self.rule_head = nn.Sequential(
             nn.Linear(self.d_model, self.d_model // 2),
             nn.ReLU(),
             nn.Linear(self.d_model // 2, num_ab_pairs)
         )
-        torch.nn.init.normal_(self.ab_emb.weight, mean=0.0, std=0.02)
         for module in self.rule_head.modules():
             if isinstance(module, nn.Linear):
                 torch.nn.init.normal_(module.weight, mean=0.0, std=0.02)
@@ -1131,17 +1200,17 @@ def run_experiment(config_path=None):
         # vocab_size needs to include flag tokens
         model.vocab_size = P + 1 + len(AB_PAIRS)
         model.pad_token_id = P
-        # Expand lm_head and transformer.wte to accommodate flags
+        # Expand lm_head and transformer.wte to accommodate flags while preserving weight tying
         if model.lm_head.weight.size(0) < model.vocab_size:
             with torch.no_grad():
                 old_head = model.lm_head
                 old_wte = model.transformer.wte
-                new_head = nn.Linear(old_head.in_features, model.vocab_size, bias=False)
-                new_head.weight.data[:old_head.weight.size(0)] = old_head.weight.data
-                model.lm_head = new_head
                 new_wte = nn.Embedding(model.vocab_size, old_wte.embedding_dim)
                 new_wte.weight.data[:old_wte.weight.size(0)] = old_wte.weight.data
                 model.transformer.wte = new_wte
+                # Tie lm_head to wte, matching FibonacciTransformer's original design
+                model.lm_head = nn.Linear(old_head.in_features, model.vocab_size, bias=False)
+                model.lm_head.weight = model.transformer.wte.weight
 
         num_mask = 0  # unused; loss_mask comes from the dataset
         extra_kwargs_fn = None

@@ -14,6 +14,7 @@ from datetime import datetime
 BASE_CONFIG_PATH = 'config.json'
 DEFAULT_EXPERIMENTS_PATH = 'experiments.json'
 DEFAULT_BASE_DIR = '/data/cxm/recursion'
+DEFAULT_MODEL_DIR = '/data/cxm/models'
 
 # These are updated in main() based on the experiments config filename.
 LOG_DIR = 'logs'
@@ -116,7 +117,7 @@ def run_single(exp, base_config, concurrency=1, gpu_id=None):
 
     # Auto-fill SAVE_PATH if not explicitly set
     if 'SAVE_PATH' not in override:
-        override = {**override, 'SAVE_PATH': os.path.join(MODEL_DIR, f"{name}.pth")}
+        override = {**override, 'SAVE_PATH': os.path.join(DEFAULT_MODEL_DIR, f"{name}.pth")}
 
     merged_main.update(override)
     merged['main'] = merged_main
@@ -138,9 +139,10 @@ def run_single(exp, base_config, concurrency=1, gpu_id=None):
     # Separate stdout and stderr:
     # - stdout: training log (clean model output)
     # - stderr: errors/warnings (PyTorch/CUDA low-level output, may contain null bytes)
-    script = 'main.py'
+    # NOTE: main.py was removed; batch_run.py is the only supported entry point.
     process = subprocess.Popen(
-        [sys.executable, script, tmp_config_path],
+        [sys.executable, '-c',
+         f"from core import run_experiment; run_experiment({tmp_config_path!r})"],
         stdout=subprocess.PIPE,
         stderr=subprocess.PIPE,
         env=env
@@ -248,17 +250,19 @@ def main():
     args = parser.parse_args()
     experiments_path = args.experiments_path
 
-    # Place outputs under /data/<experiments filename>/logs|plots|models
+    # Place logs/plots under /data/<experiments filename>/logs|plots.
+    # Models are saved to a separate flat directory /data/cxm/models.
     exp_name = os.path.splitext(os.path.basename(experiments_path))[0]
     work_dir = os.path.join(args.base_dir, exp_name)
 
     global LOG_DIR, MODEL_DIR, PLOT_DIR
     LOG_DIR = os.path.join(work_dir, 'logs')
-    MODEL_DIR = os.path.join(work_dir, 'models')
     PLOT_DIR = os.path.join(work_dir, 'plots')
+    MODEL_DIR = DEFAULT_MODEL_DIR
 
     os.makedirs(LOG_DIR, exist_ok=True)
     os.makedirs(MODEL_DIR, exist_ok=True)
+    os.makedirs(PLOT_DIR, exist_ok=True)
 
     if not os.path.exists(experiments_path):
         print(f"Error: experiments config file {experiments_path} not found")
