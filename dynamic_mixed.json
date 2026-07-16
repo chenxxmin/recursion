@@ -5,10 +5,14 @@
       "name": "dynamic_mixed_d64l1r4_N2_seed0",
       "task": "dynamic_mixed",
       "config": {
-        "RANDOM_SEED": 0,
         "D_MODEL": 64,
         "N_LAYER": 1,
         "MLP_RATIO": 4,
+        "NUM_TRAIN_SAMPLES": 10000,
+        "NUM_TEST_SAMPLES": 2000,
+        "TRAIN_LEN": 16,
+        "OOD_LEN": 32,
+        "RANDOM_SEED": 0,
         "AB_PAIRS": [
           [
             1,
@@ -18,11 +22,7 @@
             1,
             2
           ]
-        ],
-        "NUM_TRAIN_SAMPLES": 10000,
-        "NUM_TEST_SAMPLES": 2000,
-        "TRAIN_LEN": 16,
-        "OOD_LEN": 32
+        ]
       }
     },
     {
@@ -117,6 +117,246 @@
           [
             1,
             5
+          ]
+        ]
+      }
+    },
+    {
+      "name": "dynamic_mixed_d64l1r4_N6_seed0",
+      "task": "dynamic_mixed",
+      "config": {
+        "D_MODEL": 64,
+        "N_LAYER": 1,
+        "MLP_RATIO": 4,
+        "NUM_TRAIN_SAMPLES": 10000,
+        "NUM_TEST_SAMPLES": 2000,
+        "TRAIN_LEN": 16,
+        "OOD_LEN": 32,
+        "RANDOM_SEED": 0,
+        "AB_PAIRS": [
+          [
+            1,
+            1
+          ],
+          [
+            1,
+            2
+          ],
+          [
+            1,
+            3
+          ],
+          [
+            1,
+            4
+          ],
+          [
+            1,
+            5
+          ],
+          [
+            1,
+            6
+          ]
+        ]
+      }
+    },
+    {
+      "name": "dynamic_mixed_d64l1r4_N7_seed0",
+      "task": "dynamic_mixed",
+      "config": {
+        "D_MODEL": 64,
+        "N_LAYER": 1,
+        "MLP_RATIO": 4,
+        "NUM_TRAIN_SAMPLES": 10000,
+        "NUM_TEST_SAMPLES": 2000,
+        "TRAIN_LEN": 16,
+        "OOD_LEN": 32,
+        "RANDOM_SEED": 0,
+        "AB_PAIRS": [
+          [
+            1,
+            1
+          ],
+          [
+            1,
+            2
+          ],
+          [
+            1,
+            3
+          ],
+          [
+            1,
+            4
+          ],
+          [
+            1,
+            5
+          ],
+          [
+            1,
+            6
+          ],
+          [
+            1,
+            7
+          ]
+        ]
+      }
+    },
+    {
+      "name": "dynamic_mixed_d64l1r4_N8_seed0",
+      "task": "dynamic_mixed",
+      "config": {
+        "D_MODEL": 64,
+        "N_LAYER": 1,
+        "MLP_RATIO": 4,
+        "NUM_TRAIN_SAMPLES": 10000,
+        "NUM_TEST_SAMPLES": 2000,
+        "TRAIN_LEN": 16,
+        "OOD_LEN": 32,
+        "RANDOM_SEED": 0,
+        "AB_PAIRS": [
+          [
+            1,
+            1
+          ],
+          [
+            1,
+            2
+          ],
+          [
+            1,
+            3
+          ],
+          [
+            1,
+            4
+          ],
+          [
+            1,
+            5
+          ],
+          [
+            1,
+            6
+          ],
+          [
+            1,
+            7
+          ],
+          [
+            1,
+            8
+          ]
+        ]
+      }
+    },
+    {
+      "name": "dynamic_mixed_d64l1r4_N9_seed0",
+      "task": "dynamic_mixed",
+      "config": {
+        "D_MODEL": 64,
+        "N_LAYER": 1,
+        "MLP_RATIO": 4,
+        "NUM_TRAIN_SAMPLES": 10000,
+        "NUM_TEST_SAMPLES": 2000,
+        "TRAIN_LEN": 16,
+        "OOD_LEN": 32,
+        "RANDOM_SEED": 0,
+        "AB_PAIRS": [
+          [
+            1,
+            1
+          ],
+          [
+            1,
+            2
+          ],
+          [
+            1,
+            3
+          ],
+          [
+            1,
+            4
+          ],
+          [
+            1,
+            5
+          ],
+          [
+            1,
+            6
+          ],
+          [
+            1,
+            7
+          ],
+          [
+            1,
+            8
+          ],
+          [
+            1,
+            9
+          ]
+        ]
+      }
+    },
+    {
+      "name": "dynamic_mixed_d64l1r4_N10_seed0",
+      "task": "dynamic_mixed",
+      "config": {
+        "D_MODEL": 64,
+        "N_LAYER": 1,
+        "MLP_RATIO": 4,
+        "NUM_TRAIN_SAMPLES": 10000,
+        "NUM_TEST_SAMPLES": 2000,
+        "TRAIN_LEN": 16,
+        "OOD_LEN": 32,
+        "RANDOM_SEED": 0,
+        "AB_PAIRS": [
+          [
+            1,
+            1
+          ],
+          [
+            1,
+            2
+          ],
+          [
+            1,
+            3
+          ],
+          [
+            1,
+            4
+          ],
+          [
+            1,
+            5
+          ],
+          [
+            1,
+            6
+          ],
+          [
+            1,
+            7
+          ],
+          [
+            1,
+            8
+          ],
+          [
+            1,
+            9
+          ],
+          [
+            1,
+            10
           ]
         ]
       }
