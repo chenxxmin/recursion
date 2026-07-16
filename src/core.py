@@ -889,6 +889,15 @@ class DynamicMixedDataset(Dataset):
             target_idx = 2 * (k - 1)
             loss_mask[target_idx] = 1.0
 
+        # Sanity check: flag positions should be >= flag_start_id, value positions < p
+        for i, tok in enumerate(seq):
+            if i % 2 == 0 and i >= 2:
+                assert tok >= self.flag_start_id, \
+                    f"Position {i} should be a flag token (>= {self.flag_start_id}), got {tok}"
+            else:
+                assert tok < self.p, \
+                    f"Position {i} should be a value token (< {self.p}), got {tok}"
+
         seq_tensor = torch.tensor(seq, dtype=torch.long)
         return seq_tensor, loss_mask
 
@@ -1331,8 +1340,20 @@ def run_experiment(config_path=None):
     # ========================================================================
     # Stage 2: Common training
     # ========================================================================
+    # Print a random training sample for sanity check
+    try:
+        sample_idx = random.randint(0, len(train_dataset) - 1)
+        sample = train_dataset[sample_idx]
+        if isinstance(sample, (list, tuple)):
+            sample_seq = sample[0]
+        else:
+            sample_seq = sample
+        print(f"\nRandom sample (index {sample_idx}): {sample_seq.tolist()}")
+    except Exception:
+        pass
+
     model = model.to(device)
-    print(f"\nModel parameters: {sum(p.numel() for p in model.parameters())/1e6:.2f}M")
+    print(f"Model parameters: {sum(p.numel() for p in model.parameters())/1e6:.2f}M")
     optimizer = torch.optim.AdamW(model.parameters(), lr=LR, weight_decay=cfg['WEIGHT_DECAY'])
     scheduler = torch.optim.lr_scheduler.CosineAnnealingLR(optimizer, T_max=EPOCHS)
     best_acc, epoch = run_training_engine(

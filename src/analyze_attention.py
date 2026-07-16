@@ -507,6 +507,15 @@ def analyze_model_attention(pth_path, device='cpu'):
                 seq.append(flag_start_id + rule_idx)
                 seq.append(x_next)
                 values.append(x_next)
+
+            # Sanity check: flag positions should be >= flag_start_id, value positions < p
+            for i, tok in enumerate(seq):
+                if i % 2 == 0 and i >= 2:
+                    assert tok >= flag_start_id, \
+                        f"Position {i} should be a flag token (>= {flag_start_id}), got {tok}"
+                else:
+                    assert tok < p, \
+                        f"Position {i} should be a value token (< {p}), got {tok}"
             return seq
 
         def make_dynamic_query_mask(length):
