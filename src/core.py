@@ -868,13 +868,15 @@ class DynamicMixedDataset(Dataset):
         x1 = self.rng.randrange(self.p)
         x2 = self.rng.randrange(self.p)
         seq = [x1, x2]
+        values = [x1, x2]  # Only numeric values, used for recurrence
         for _ in range(2, self.length):
             rule_idx = self.rng.randrange(self.num_ab_pairs)
             a, b = self.ab_pairs[rule_idx]
-            x_next = (a * seq[-2] + b * seq[-1]) % self.p
+            x_next = (a * values[-2] + b * values[-1]) % self.p
             flag_id = self.flag_start_id + rule_idx
             seq.append(flag_id)
             seq.append(x_next)
+            values.append(x_next)
 
         # Build loss mask aligned to targets = seq[1:]
         # Input: [x1, x2, f3, x3, f4, x4, ..., f_L, x_L]

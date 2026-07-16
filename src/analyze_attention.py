@@ -499,12 +499,14 @@ def analyze_model_attention(pth_path, device='cpu'):
             x1 = rng.randint(0, p - 1)
             x2 = rng.randint(0, p - 1)
             seq = [x1, x2]
+            values = [x1, x2]  # Only numeric values, used for recurrence
             for _ in range(2, dynamic_seq_len):
                 rule_idx = rng.randrange(len(ab_pairs))
                 a, b = ab_pairs[rule_idx]
-                x_next = (a * seq[-2] + b * seq[-1]) % p
+                x_next = (a * values[-2] + b * values[-1]) % p
                 seq.append(flag_start_id + rule_idx)
                 seq.append(x_next)
+                values.append(x_next)
             return seq
 
         def make_dynamic_query_mask(length):
