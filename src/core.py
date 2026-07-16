@@ -135,6 +135,14 @@ class BucketBatchSampler(Sampler):
         
         if self.shuffle:
             random.shuffle(self.batches)
+
+    def __iter__(self):
+        for batch in self.batches:
+            yield batch
+
+    def __len__(self):
+        return len(self.batches)
+
 def collate_fn(batch):
     return torch.stack(batch, dim=0)
 
