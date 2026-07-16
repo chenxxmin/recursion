@@ -247,6 +247,11 @@ def main():
         default=DEFAULT_BASE_DIR,
         help=f'Base output directory (default: {DEFAULT_BASE_DIR})'
     )
+    parser.add_argument(
+        '--model-dir',
+        default=DEFAULT_MODEL_DIR,
+        help=f'Model output directory (default: {DEFAULT_MODEL_DIR})'
+    )
     args = parser.parse_args()
     experiments_path = args.experiments_path
 
@@ -258,7 +263,7 @@ def main():
     global LOG_DIR, MODEL_DIR, PLOT_DIR
     LOG_DIR = os.path.join(work_dir, 'logs')
     PLOT_DIR = os.path.join(work_dir, 'plots')
-    MODEL_DIR = DEFAULT_MODEL_DIR
+    MODEL_DIR = args.model_dir
 
     os.makedirs(LOG_DIR, exist_ok=True)
     os.makedirs(MODEL_DIR, exist_ok=True)
