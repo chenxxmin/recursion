@@ -29,102 +29,6 @@
       "name": "dynamic_mixed_d64l1r4_N3_seed0",
       "task": "dynamic_mixed",
       "config": {
-        "RANDOM_SEED": 0,
-        "D_MODEL": 64,
-        "N_LAYER": 1,
-        "MLP_RATIO": 4,
-        "AB_PAIRS": [
-          [
-            1,
-            1
-          ],
-          [
-            1,
-            2
-          ],
-          [
-            2,
-            1
-          ]
-        ],
-        "NUM_TRAIN_SAMPLES": 10000,
-        "NUM_TEST_SAMPLES": 2000,
-        "TRAIN_LEN": 16,
-        "OOD_LEN": 32
-      }
-    },
-    {
-      "name": "dynamic_mixed_d64l1r4_N4_seed0",
-      "task": "dynamic_mixed",
-      "config": {
-        "RANDOM_SEED": 0,
-        "D_MODEL": 64,
-        "N_LAYER": 1,
-        "MLP_RATIO": 4,
-        "AB_PAIRS": [
-          [
-            1,
-            1
-          ],
-          [
-            1,
-            2
-          ],
-          [
-            2,
-            1
-          ],
-          [
-            2,
-            2
-          ]
-        ],
-        "NUM_TRAIN_SAMPLES": 10000,
-        "NUM_TEST_SAMPLES": 2000,
-        "TRAIN_LEN": 16,
-        "OOD_LEN": 32
-      }
-    },
-    {
-      "name": "dynamic_mixed_d64l1r4_N5_seed0",
-      "task": "dynamic_mixed",
-      "config": {
-        "RANDOM_SEED": 0,
-        "D_MODEL": 64,
-        "N_LAYER": 1,
-        "MLP_RATIO": 4,
-        "AB_PAIRS": [
-          [
-            1,
-            1
-          ],
-          [
-            1,
-            2
-          ],
-          [
-            2,
-            1
-          ],
-          [
-            2,
-            2
-          ],
-          [
-            1,
-            0
-          ]
-        ],
-        "NUM_TRAIN_SAMPLES": 10000,
-        "NUM_TEST_SAMPLES": 2000,
-        "TRAIN_LEN": 16,
-        "OOD_LEN": 32
-      }
-    },
-    {
-      "name": "dynamic_mixed_d64l1r4_N3_add_seed0",
-      "task": "dynamic_mixed",
-      "config": {
         "D_MODEL": 64,
         "N_LAYER": 1,
         "MLP_RATIO": 4,
@@ -150,7 +54,7 @@
       }
     },
     {
-      "name": "dynamic_mixed_d64l1r4_N4_add_seed0",
+      "name": "dynamic_mixed_d64l1r4_N4_seed0",
       "task": "dynamic_mixed",
       "config": {
         "D_MODEL": 64,
@@ -182,7 +86,7 @@
       }
     },
     {
-      "name": "dynamic_mixed_d64l1r4_N5_add_seed0",
+      "name": "dynamic_mixed_d64l1r4_N5_seed0",
       "task": "dynamic_mixed",
       "config": {
         "D_MODEL": 64,
