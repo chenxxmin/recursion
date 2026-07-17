@@ -7,10 +7,5 @@ src/nohup.out
 *.pth
 config_tmp_*.json
 .DS_Store
-# Experiment outputs (relative to project root)
-experiments/logs/
-experiments/plots/
-experiments/models/
-logs/
-plots/
-models/
+# Experiment outputs under /data/cxm (not in repo)
+/data/
