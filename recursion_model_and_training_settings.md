@@ -438,5 +438,6 @@ if mixed_ab:
 - `experiments.json` 中定义的实验会覆盖 `config.json` 的对应字段，`batch_run.py` 负责配置合并与批量执行。
 - `src/main.py` 已删除，所有运行必须通过 `src/batch_run.py`。
 - `.gitignore` 已忽略训练产物：`*.log`、`*.err`、`*.pth`、`src/nohup.out`、`config_tmp_*.json` 等。
-- 模型默认保存路径：`/data/cxm/models/{实验名}.pth`（由 `batch_run.py` 自动设置，可在 `experiments.json` 中通过 `SAVE_PATH` 覆盖）。
-- 日志与绘图输出路径：`/data/cxm/recursion/{experiments文件名}/logs` 与 `/data/cxm/recursion/{experiments文件名}/plots`。
+- 模型默认保存路径：`./{experiments文件名}/models/{实验名}.pth`（由 `batch_run.py` 自动设置，可在 `experiments.json` 中通过 `SAVE_PATH` 覆盖）。
+- 日志与绘图输出路径：`./{experiments文件名}/logs` 与 `./{experiments文件名}/plots`。
+- 可通过 `--base-dir` 参数改变输出根目录，默认是当前目录 `.`。
