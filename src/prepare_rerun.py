@@ -55,8 +55,8 @@ def main():
     parser.add_argument(
         'experiments_path',
         nargs='?',
-        default='experiments.json',
-        help='Input experiments JSON (default: experiments.json)'
+        default='experiments/experiments.json',
+        help='Input experiments JSON (default: experiments/experiments.json)'
     )
     parser.add_argument(
         '--log-dir',

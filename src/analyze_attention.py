@@ -1,7 +1,14 @@
 import sys
+import os
 import torch
 import torch.nn.functional as F
 import math
+
+# Allow running from repo root as: python src/analyze_attention.py <pth>
+SCRIPT_DIR = os.path.dirname(os.path.abspath(__file__))
+if SCRIPT_DIR not in sys.path:
+    sys.path.insert(0, SCRIPT_DIR)
+
 import core as main
 
 
@@ -445,8 +452,10 @@ def print_attention_summary(summary, seq=None):
         print()
 
 
-def analyze_model_attention(pth_path, device='cpu'):
+def analyze_model_attention(pth_path, device=None):
     """Main entry: load model and randomly generate a test sequence for attention analysis."""
+    if device is None:
+        device = 'cuda' if torch.cuda.is_available() else 'cpu'
     import random
     model, checkpoint = load_model(pth_path, device=device)
     config = checkpoint['config']

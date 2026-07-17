@@ -1,7 +1,13 @@
 import sys
+import os
 import math
 import torch
 import torch.nn.functional as F
+
+# Allow running from repo root as: python src/qk_verification.py <pth> [init_len]
+SCRIPT_DIR = os.path.dirname(os.path.abspath(__file__))
+if SCRIPT_DIR not in sys.path:
+    sys.path.insert(0, SCRIPT_DIR)
 
 # Import shared helpers from analyze_attention.py.
 from analyze_attention import load_model, _build_input_embedding

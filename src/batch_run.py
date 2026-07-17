@@ -204,7 +204,8 @@ def run_single(exp, base_config, concurrency=1, gpu_id=None):
                 f.write(f"{'='*70}\n")
 
             analyze_process = subprocess.Popen(
-                [sys.executable, 'analyze_attention.py', pth_path],
+                [sys.executable, '-c',
+                 f"import sys; sys.path.insert(0, {SCRIPT_DIR!r}); from analyze_attention import analyze_model_attention; analyze_model_attention({pth_path!r})"],
                 stdout=subprocess.PIPE,
                 stderr=subprocess.STDOUT,
                 env=env

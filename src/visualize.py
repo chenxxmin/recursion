@@ -497,7 +497,7 @@ def main():
 
     names = args.names
     if args.all:
-        exp_path = 'experiments.json'
+        exp_path = 'experiments/experiments.json'
         if os.path.exists(exp_path):
             exp_name = os.path.splitext(os.path.basename(exp_path))[0]
             default_log = os.path.join(args.base_dir, exp_name, 'logs')
