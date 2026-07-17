@@ -16,7 +16,7 @@ SCRIPT_DIR = os.path.dirname(os.path.abspath(__file__))
 if SCRIPT_DIR not in sys.path:
     sys.path.insert(0, SCRIPT_DIR)
 
-BASE_CONFIG_PATH = 'config.json'
+BASE_CONFIG_PATH = 'src/config.json'
 DEFAULT_EXPERIMENTS_PATH = 'experiments/experiments.json'
 DEFAULT_BASE_DIR = '/data/cxm/recursion'
 DEFAULT_MODEL_BASE_DIR = '/data/cxm/models'
