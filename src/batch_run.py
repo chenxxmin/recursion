@@ -1,5 +1,4 @@
 import argparse
-
 import glob
 import json
 import os
@@ -11,8 +10,14 @@ import threading
 from concurrent.futures import ThreadPoolExecutor, as_completed
 from datetime import datetime
 
+# Ensure imports of src/ modules work when running from the repo root as:
+#   python src/batch_run.py experiments/some_task.json
+SCRIPT_DIR = os.path.dirname(os.path.abspath(__file__))
+if SCRIPT_DIR not in sys.path:
+    sys.path.insert(0, SCRIPT_DIR)
+
 BASE_CONFIG_PATH = 'config.json'
-DEFAULT_EXPERIMENTS_PATH = 'experiments.json'
+DEFAULT_EXPERIMENTS_PATH = 'experiments/experiments.json'
 DEFAULT_BASE_DIR = '/data/cxm/recursion'
 DEFAULT_MODEL_BASE_DIR = '/data/cxm/models'
 
@@ -142,7 +147,7 @@ def run_single(exp, base_config, concurrency=1, gpu_id=None):
     # NOTE: main.py was removed; batch_run.py is the only supported entry point.
     process = subprocess.Popen(
         [sys.executable, '-c',
-         f"from core import run_experiment; run_experiment({tmp_config_path!r})"],
+         f"import sys; sys.path.insert(0, {SCRIPT_DIR!r}); from core import run_experiment; run_experiment({tmp_config_path!r})"],
         stdout=subprocess.PIPE,
         stderr=subprocess.PIPE,
         env=env
