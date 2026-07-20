@@ -454,7 +454,9 @@ def analyze_model_attention(pth_path, device=None):
     print(f"Best test accuracy: {checkpoint.get('best_accuracy', 'N/A')}")
     print(f"Training epochs: {checkpoint.get('final_epoch', 'N/A')}")
     
-    # Randomly generate test sequences: 1 for attention visualization, 5 for QK property verification
+    # Randomly generate one test sequence for attention visualization.
+    # (QK property verification lives in qk_verification.py, which reuses
+    # verify_qk_properties from this module.)
     max_len = config.get('block_size', 20)
     test_sequences = []
     query_masks = None
@@ -497,9 +499,8 @@ def analyze_model_attention(pth_path, device=None):
                 mask[query_pos] = 1
             return mask
 
-        for seed in range(5):
-            test_sequences.append(make_dynamic_seq(seed))
-        query_masks = [make_dynamic_query_mask(dynamic_seq_len) for _ in range(5)]
+        test_sequences.append(make_dynamic_seq(seed=0))
+        query_masks = [make_dynamic_query_mask(dynamic_seq_len)]
     else:
         init = [random.randint(0, p - 1) for _ in range(init_len)]
         seq = init[:]
@@ -507,8 +508,8 @@ def analyze_model_attention(pth_path, device=None):
             seq.append(next_val(seq))
         test_sequences.append(seq)
 
-    # Attention visualization: show only the first
-    print(f"\nRandom test sequence 1/{len(test_sequences)} (length {len(test_sequences[0])}): {test_sequences[0][:20]}{'...' if len(test_sequences[0]) > 20 else ''}")
+    # Attention visualization uses this single sequence
+    print(f"\nRandom test sequence (length {len(test_sequences[0])}): {test_sequences[0][:20]}{'...' if len(test_sequences[0]) > 20 else ''}")
     summary = summarize_attention_for_sequence(
         model, test_sequences[0],
         query_mask=query_masks[0] if query_masks is not None else None)

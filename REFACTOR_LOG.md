@@ -77,3 +77,15 @@
 **原因**：冗余条件和不可达分支会让读者误以为存在需要兼容的历史情况。
 
 **验证**：py_compile 通过；逻辑等价性由条件包含关系直接得证。
+
+---
+
+## 4. analyze_attention.py 生成 5 条测试序列但只用第 0 条
+
+**问题**：`analyze_model_attention` 中 dynamic_mixed 分支生成 5 条测试序列和 5 个 query mask（原 `:500-502`），但函数体只使用 `test_sequences[0]`（QK 验证已移至 qk_verification.py）。其余 4 条是纯粹的计算浪费，且 `:457` 注释 "1 for attention visualization, 5 for QK property verification" 描述的是已不存在的行为，打印的 `1/{len}` 序号也暗示存在多条序列。
+
+**修改**：只生成 1 条序列和 1 个 mask；注释改为说明 QK 验证在 qk_verification.py；打印文案去掉 `1/N` 序号。
+
+**原因**：消除死计算和过时注释，避免读者去找"另外 4 条序列用在哪"。
+
+**验证**：py_compile 通过；唯一消费点 `test_sequences[0]` 的取值不变（seed=0 即原第 0 条）。
