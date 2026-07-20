@@ -308,8 +308,8 @@ def verify_qk_properties(model, test_sequences, init_len, query_masks=None, devi
     P2: raw_score constant across positions i for fixed distance d (time-homogeneous)
 
     test_sequences: list[list[int]], test sequences
-    query_masks: optional list of masks, each of length T-1, indicating which
-                 query positions should be included.
+    query_masks: optional list of masks, each of length T (input sequence
+                 length), indicating which query positions should be included.
     """
     print(f"\n{'='*70}")
     print("QK Property Verification (Raw Scores, before Softmax)")
