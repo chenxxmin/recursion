@@ -511,9 +511,10 @@ def main():
     if args.all:
         exp_path = 'experiments/experiments.json'
         if os.path.exists(exp_path):
-            exp_name = os.path.splitext(os.path.basename(exp_path))[0]
-            default_log = os.path.join(args.base_dir, exp_name, 'logs')
-            default_out = os.path.join(args.base_dir, exp_name, 'plots')
+            # The experiments file lives in experiments/, so its output dirs
+            # are fixed as <base>/experiments/{logs,plots}.
+            default_log = os.path.join(args.base_dir, 'experiments', 'logs')
+            default_out = os.path.join(args.base_dir, 'experiments', 'plots')
             log_dir = log_dir or default_log
             out_dir = out_dir or default_out
             with open(exp_path, 'r', encoding='utf-8') as f:

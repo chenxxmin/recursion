@@ -217,3 +217,15 @@
 **原因**：解析状态机的写入规则只保留一份。
 
 **验证**：构造含 per_pos/per_rule 及缺失项的假日志，断言解析结果逐项相等（含末尾 flush 的 None 填充）。
+
+---
+
+## 15. visualize.py exp_name 计算恒为常量，具有误导性
+
+**问题**：`--all` 分支中 `exp_path` 硬编码为 `'experiments/experiments.json'`，却用 `os.path.splitext(os.path.basename(exp_path))[0]` 计算 `exp_name`——结果恒为 `'experiments'`，两行计算给人"路径可变"的错觉。
+
+**修改**：直接写 `'experiments'`，并加注释说明输出目录与 experiments/ 目录的固定对应关系。
+
+**原因**：恒定的值就应该写成常量，计算过程是噪音。
+
+**验证**：py_compile 通过；替换前后 `default_log/default_out` 的取值字符串相等（恒等推导）。
