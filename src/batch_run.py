@@ -166,7 +166,6 @@ def run_single(exp, base_config, concurrency=1, gpu_id=None):
     save_json(tmp_config_path, merged)
 
     log_path = os.path.join(LOG_DIR, f"{name}.log")
-    prefix = f"[{name}] " if concurrency > 1 else ""
     start_time = datetime.now()
     gpu_label = f"cuda:{gpu_id}" if gpu_id is not None else "cpu"
     print(f"[{start_time.strftime('%H:%M:%S')}] Start experiment: {name} on {gpu_label}")
