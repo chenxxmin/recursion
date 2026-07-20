@@ -462,6 +462,18 @@ def _unpack_batch(batch, device, extra_kwargs_fn):
     raise ValueError(f"Unknown batch tag: {tag}")
 
 
+def _print_nan_diagnostics(x, logits, loss_mask, targets):
+    """Dump batch statistics to stderr when the training loss goes NaN."""
+    print("\n[NaN Alert] loss is NaN", file=sys.stderr, flush=True)
+    print(f"  batch shape: {x.shape}, device: {x.device}", file=sys.stderr, flush=True)
+    print(f"  input min/max: {x.min().item()} / {x.max().item()}", file=sys.stderr, flush=True)
+    print(f"  logits has NaN: {torch.isnan(logits).any().item()}", file=sys.stderr, flush=True)
+    print(f"  logits has Inf: {torch.isinf(logits).any().item()}", file=sys.stderr, flush=True)
+    print(f"  logits min/max: {logits.min().item()} / {logits.max().item()}", file=sys.stderr, flush=True)
+    print(f"  loss_mask sum: {loss_mask.sum().item()}", file=sys.stderr, flush=True)
+    print(f"  targets min/max: {targets.min().item()} / {targets.max().item()}", file=sys.stderr, flush=True)
+
+
 def train_epoch(model, dataloader, optimizer, device, num_mask=1, extra_kwargs_fn=None, first_task_weight=1.0, frozen_param_states=None):
     model.train()
     total_loss = 0
@@ -490,14 +502,7 @@ def train_epoch(model, dataloader, optimizer, device, num_mask=1, extra_kwargs_f
         
         if loss is not None and torch.isnan(loss):
             # NaN diagnostic: print to stderr so it shows up in .err logs
-            print("\n[NaN Alert] loss is NaN", file=sys.stderr, flush=True)
-            print(f"  batch shape: {x.shape}, device: {x.device}", file=sys.stderr, flush=True)
-            print(f"  input min/max: {x.min().item()} / {x.max().item()}", file=sys.stderr, flush=True)
-            print(f"  logits has NaN: {torch.isnan(logits).any().item()}", file=sys.stderr, flush=True)
-            print(f"  logits has Inf: {torch.isinf(logits).any().item()}", file=sys.stderr, flush=True)
-            print(f"  logits min/max: {logits.min().item()} / {logits.max().item()}", file=sys.stderr, flush=True)
-            print(f"  loss_mask sum: {loss_mask.sum().item()}", file=sys.stderr, flush=True)
-            print(f"  targets min/max: {targets.min().item()} / {targets.max().item()}", file=sys.stderr, flush=True)
+            _print_nan_diagnostics(x, logits, loss_mask, targets)
         
         if loss is not None and not torch.isnan(loss):
             loss.backward()
