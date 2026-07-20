@@ -377,3 +377,17 @@
 **原因**：7 行重复缩为 1 个辅助函数 + 3 行列表；列的增删只需改列表。
 
 **验证**：构造可解析/不可解析两份假日志实跑 `summarize_experiments`，表格列宽与 N/A 填充正确。
+
+---
+
+## 27. batch_run.py 模块级可变全局目录改显式传参
+
+**问题**：`LOG_DIR / MODEL_DIR / PLOT_DIR` 是模块级可变全局，`main()` 用 `global` 改写，读者需要跨 `main`/`run_single`/`build_merged_config`/`generate_grouped_plots`/`summarize_experiments` 五个函数追踪隐式状态；且原注释 "updated per experiment" 不准确（是每个**批次**更新一次）。
+
+**修改**：删除三个全局；`main()` 计算 `dirs = {'log', 'plot', 'model'}` 字典并显式下传——`run_single(exp, base_config, dirs, ...)`、`build_merged_config(..., model_dir)`、`summarize_experiments(log_dir)`、`generate_grouped_plots(log_dir, plot_dir)`。
+
+**原因**：数据流显式化；函数签名即依赖声明，可独立测试（如本次验证直接以临时目录调用 summarize/plots）。
+
+**验证**：断言模块级全局已不存在；临时目录实跑 summarize_experiments 与 generate_grouped_plots 正常。
+
+**签名变更说明**：以上四个函数均为 batch_run.py 内部函数（无其他模块调用），签名调整不影响外部。

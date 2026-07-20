@@ -39,11 +39,6 @@ NAME_COL = 45       # summary table: experiment name column width
 EPOCH_COL = 6       # summary table: epoch column width
 NUM_COL = 8         # summary table: numeric column width
 
-# These are updated per experiment in main().
-LOG_DIR = 'logs'
-MODEL_DIR = 'models'
-PLOT_DIR = 'plots'
-
 import visualize
 
 
@@ -140,7 +135,7 @@ def _spawn_python(statement, env, stderr=subprocess.PIPE):
                             stdout=subprocess.PIPE, stderr=stderr, env=env)
 
 
-def build_merged_config(exp, base_config):
+def build_merged_config(exp, base_config, model_dir):
     """Merge base config with per-experiment overrides.
 
     Merge order: main -> task defaults -> experiment override.
@@ -165,7 +160,7 @@ def build_merged_config(exp, base_config):
 
     # Auto-fill SAVE_PATH if not explicitly set
     if 'SAVE_PATH' not in override:
-        override = {**override, 'SAVE_PATH': os.path.join(MODEL_DIR, f"{name}.pth")}
+        override = {**override, 'SAVE_PATH': os.path.join(model_dir, f"{name}.pth")}
 
     merged_main.update(override)
     merged['main'] = merged_main
@@ -195,14 +190,14 @@ def run_attention_analysis(name, pth_path, log_path, env):
     print(f"[{datetime.now().strftime('%H:%M:%S')}] Attention analysis completed: {name}")
 
 
-def run_single(exp, base_config, concurrency=1, gpu_id=None):
-    name, task, merged_main, merged = build_merged_config(exp, base_config)
+def run_single(exp, base_config, dirs, concurrency=1, gpu_id=None):
+    name, task, merged_main, merged = build_merged_config(exp, base_config, dirs['model'])
 
     # Use independent temp config per experiment (avoid concurrency conflicts)
     tmp_config_path = f"config_tmp_{name}.json"
     save_json(tmp_config_path, merged)
 
-    log_path = os.path.join(LOG_DIR, f"{name}.log")
+    log_path = os.path.join(dirs['log'], f"{name}.log")
     start_time = datetime.now()
     gpu_label = f"cuda:{gpu_id}" if gpu_id is not None else "cpu"
     print(f"[{start_time.strftime('%H:%M:%S')}] Start experiment: {name} on {gpu_label}")
@@ -219,7 +214,7 @@ def run_single(exp, base_config, concurrency=1, gpu_id=None):
         f"from core import run_experiment; run_experiment({tmp_config_path!r})",
         env, stderr=subprocess.PIPE)
 
-    err_log_path = os.path.join(LOG_DIR, f"{name}.err")
+    err_log_path = os.path.join(dirs['log'], f"{name}.err")
 
     def read_stdout():
         with open(log_path, 'w', encoding='utf-8') as f:
@@ -310,14 +305,17 @@ def main():
     exp_name = os.path.splitext(os.path.basename(experiments_path))[0]
     work_dir = os.path.join(args.base_dir, exp_name)
 
-    global LOG_DIR, MODEL_DIR, PLOT_DIR
-    LOG_DIR = os.path.join(work_dir, 'logs')
-    PLOT_DIR = os.path.join(work_dir, 'plots')
-    MODEL_DIR = os.path.join(args.model_base_dir, exp_name)
-
-    os.makedirs(LOG_DIR, exist_ok=True)
-    os.makedirs(MODEL_DIR, exist_ok=True)
-    os.makedirs(PLOT_DIR, exist_ok=True)
+    # Per-experiment-batch output directories, passed explicitly to consumers:
+    # log:   <base-dir>/<experiment-name>/logs/
+    # plot:  <base-dir>/<experiment-name>/plots/
+    # model: <model-base-dir>/<experiment-name>/
+    dirs = {
+        'log': os.path.join(work_dir, 'logs'),
+        'plot': os.path.join(work_dir, 'plots'),
+        'model': os.path.join(args.model_base_dir, exp_name),
+    }
+    for d in dirs.values():
+        os.makedirs(d, exist_ok=True)
 
     if not os.path.exists(experiments_path):
         print(f"Error: experiments config file {experiments_path} not found")
@@ -388,11 +386,11 @@ def main():
         if gpu_queue is not None:
             gpu_id = gpu_queue.get()
             try:
-                return run_single(exp, base_config, effective_workers, gpu_id)
+                return run_single(exp, base_config, dirs, effective_workers, gpu_id)
             finally:
                 gpu_queue.put(gpu_id)
         else:
-            return run_single(exp, base_config, effective_workers, None)
+            return run_single(exp, base_config, dirs, effective_workers, None)
 
     resource_stop = False
 
@@ -445,19 +443,19 @@ def main():
         print("\n[Error] Batch stopped early because at least one experiment hit a resource limit (CUDA OOM or CPU memory limit).")
 
     # Run detailed summary
-    summarize_experiments()
+    summarize_experiments(dirs['log'])
 
     # Generate grouped plots (one figure per setting, all seeds overlaid)
-    generate_grouped_plots()
+    generate_grouped_plots(dirs['log'], dirs['plot'])
 
     if resource_stop:
         sys.exit(1)
 
 
-def generate_grouped_plots():
+def generate_grouped_plots(log_dir, plot_dir):
     """Group logs by experiment setting and plot all seeds together."""
-    os.makedirs(PLOT_DIR, exist_ok=True)
-    log_files = sorted(glob.glob(os.path.join(LOG_DIR, '*.log')))
+    os.makedirs(plot_dir, exist_ok=True)
+    log_files = sorted(glob.glob(os.path.join(log_dir, '*.log')))
 
     groups = {}
     for log_path in log_files:
@@ -475,13 +473,13 @@ def generate_grouped_plots():
         if not data_items:
             continue
         try:
-            visualize.plot_setting_group(setting, data_items, PLOT_DIR)
+            visualize.plot_setting_group(setting, data_items, plot_dir)
             print(f"[{datetime.now().strftime('%H:%M:%S')}] Grouped plots saved: {setting}")
         except Exception as e:
             print(f"[{datetime.now().strftime('%H:%M:%S')}] Warning: failed to generate grouped plots for {setting}: {e}")
 
 
-def summarize_experiments():
+def summarize_experiments(log_dir):
     """Parse all log files and print a detailed summary table."""
 
     def parse_log(log_path):
@@ -521,7 +519,7 @@ def summarize_experiments():
 
         return result
 
-    log_files = sorted(glob.glob(os.path.join(LOG_DIR, '*.log')))
+    log_files = sorted(glob.glob(os.path.join(log_dir, '*.log')))
 
     if not log_files:
         print('No log files found for summary.')
