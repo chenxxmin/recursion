@@ -495,18 +495,13 @@ def plot_setting_group(setting, seed_data_items, out_dir,
         plot_per_rule(data_items, setting, save_path=f'{base}_per_rule.png')
 
 
-def main():
-    parser = argparse.ArgumentParser(description='Visualize learning curves from training logs.')
-    parser.add_argument('names', nargs='*', help='Experiment name(s) or setting prefix(es).')
-    parser.add_argument('--all', action='store_true', help='Visualize all experiments in experiments.json.')
-    parser.add_argument('--base-dir', default='/data/cxm/recursion', help='Base output directory (default: /data/cxm/recursion).')
-    parser.add_argument('--log-dir', default=None, help='Directory containing .log files.')
-    parser.add_argument('--out-dir', default=None, help='Directory to save plots.')
-    parser.add_argument('--no-per-pos', action='store_true', help='Skip per-position plot.')
-    parser.add_argument('--no-per-rule', action='store_true', help='Skip per-rule plot.')
-    parser.add_argument('--no-group', action='store_true', help='Plot each log separately (do not group seeds).')
-    args = parser.parse_args()
+def _resolve_inputs(args):
+    """Resolve (names, log_dir, out_dir) from CLI args.
 
+    names comes from --all (experiments.json), positional args, or as a
+    fallback every .log in log_dir. log_dir/out_dir default to
+    <base_dir>/experiments/{logs,plots} for --all, else ./logs and ./plots.
+    """
     log_dir = args.log_dir
     out_dir = args.out_dir
 
@@ -533,6 +528,23 @@ def main():
         if not names:
             # Default: visualize all logs found in log_dir.
             names = [Path(p).stem for p in glob.glob(os.path.join(log_dir, '*.log'))]
+
+    return names, log_dir, out_dir
+
+
+def main():
+    parser = argparse.ArgumentParser(description='Visualize learning curves from training logs.')
+    parser.add_argument('names', nargs='*', help='Experiment name(s) or setting prefix(es).')
+    parser.add_argument('--all', action='store_true', help='Visualize all experiments in experiments.json.')
+    parser.add_argument('--base-dir', default='/data/cxm/recursion', help='Base output directory (default: /data/cxm/recursion).')
+    parser.add_argument('--log-dir', default=None, help='Directory containing .log files.')
+    parser.add_argument('--out-dir', default=None, help='Directory to save plots.')
+    parser.add_argument('--no-per-pos', action='store_true', help='Skip per-position plot.')
+    parser.add_argument('--no-per-rule', action='store_true', help='Skip per-rule plot.')
+    parser.add_argument('--no-group', action='store_true', help='Plot each log separately (do not group seeds).')
+    args = parser.parse_args()
+
+    names, log_dir, out_dir = _resolve_inputs(args)
 
     os.makedirs(out_dir, exist_ok=True)
 
