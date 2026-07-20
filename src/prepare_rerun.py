@@ -15,6 +15,11 @@ import re
 
 DEFAULT_BASE_DIR = '/data/cxm/recursion'
 
+# Log verdict returned by log_status().
+STATUS_MISSING = 'missing'    # no .log file
+STATUS_SUCCESS = 'success'    # last return code is 0
+STATUS_FAILED = 'failed'      # log exists but no success marker
+
 
 def load_json(path):
     with open(path, 'r', encoding='utf-8') as f:
@@ -27,9 +32,9 @@ def save_json(path, data):
 
 
 def log_status(log_path):
-    """Return 'missing', 'success', or 'failed' for a log file."""
+    """Return STATUS_MISSING, STATUS_SUCCESS, or STATUS_FAILED for a log file."""
     if not os.path.exists(log_path):
-        return 'missing'
+        return STATUS_MISSING
 
     with open(log_path, 'r', encoding='utf-8', errors='replace') as f:
         text = f.read()
@@ -37,9 +42,9 @@ def log_status(log_path):
     # Look for the last return-code line.
     matches = re.findall(r'--- Return code:\s*(\d+)\s*---', text)
     if not matches:
-        return 'failed'
+        return STATUS_FAILED
 
-    return 'success' if int(matches[-1]) == 0 else 'failed'
+    return STATUS_SUCCESS if int(matches[-1]) == 0 else STATUS_FAILED
 
 
 def default_log_dir(experiments_path):
@@ -91,9 +96,9 @@ def main():
         err_path = os.path.join(log_dir, f'{name}.err')
 
         status = log_status(log_path)
-        if status == 'missing':
+        if status == STATUS_MISSING:
             missing.append(exp)
-        elif status == 'failed':
+        elif status == STATUS_FAILED:
             failed.append(exp)
         else:
             success += 1

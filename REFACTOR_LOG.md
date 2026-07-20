@@ -417,3 +417,15 @@
 **原因**：文档与代码必须同源。
 
 **验证**：py_compile 通过。
+
+---
+
+## 30. prepare_rerun.py 状态字符串字面量散落
+
+**问题**：`'missing'/'success'/'failed'` 在 `log_status` 的返回值和 `main` 的判断处重复出现，拼写漂移不会产生报错。
+
+**修改**：定义 `STATUS_MISSING / STATUS_SUCCESS / STATUS_FAILED` 常量（各带注释），全部引用处替换。
+
+**原因**：协议性字符串应有单一来源。
+
+**验证**：四种情况（缺文件/返回码 0/非 0/无标记）断言正确。
