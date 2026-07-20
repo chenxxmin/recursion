@@ -195,6 +195,8 @@ def run_single(exp, base_config, concurrency=1, gpu_id=None):
             f.write(f"=== Experiment: {name} ===\n")
             f.write(f"Time: {datetime.now().isoformat()}\n")
             f.write(f"Task type: {task}\n")
+            gpu_label = f"cuda:{gpu_id}" if gpu_id is not None else "cpu"
+            f.write(f"GPU: {gpu_label}\n")
             f.write("\n=== Merged Config ===\n")
             f.write(format_config_table(merged_main))
             f.write("\n--- output ---\n")
@@ -353,16 +355,20 @@ def main():
         gpu_ids = []
         detection_msg = "No GPUs detected"
 
+    print("=" * 50)
     if gpu_ids:
         effective_workers = min(concurrency, len(gpu_ids))
         gpu_queue = queue.Queue()
         for gpu_id in gpu_ids:
             gpu_queue.put(gpu_id)
-        print(f"Detected {detection_msg}, effective concurrency: {effective_workers} (one experiment per GPU)")
+        print(f"GPU detection: {detection_msg}")
+        print(f"Effective concurrency: {effective_workers} (one experiment per GPU)")
     else:
         effective_workers = concurrency
         gpu_queue = None
-        print(f"{detection_msg}, running on CPU")
+        print(f"GPU detection: {detection_msg}")
+        print("Running on CPU")
+    print("=" * 50)
 
     results = []
 
