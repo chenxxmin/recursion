@@ -9,26 +9,17 @@ All missing or failed experiments are written to a new JSON that can be
 fed directly to batch_run.py.
 """
 import argparse
-import json
 import os
 import re
 
-DEFAULT_BASE_DIR = '/data/cxm/recursion'
+# Shared with batch_run.py (same repo, no import side effects beyond matplotlib
+# pulled in by visualize). batch_run is the canonical home of these helpers.
+from batch_run import load_json, save_json, DEFAULT_BASE_DIR
 
 # Log verdict returned by log_status().
 STATUS_MISSING = 'missing'    # no .log file
 STATUS_SUCCESS = 'success'    # last return code is 0
 STATUS_FAILED = 'failed'      # log exists but no success marker
-
-
-def load_json(path):
-    with open(path, 'r', encoding='utf-8') as f:
-        return json.load(f)
-
-
-def save_json(path, data):
-    with open(path, 'w', encoding='utf-8') as f:
-        json.dump(data, f, indent=2, ensure_ascii=False)
 
 
 def log_status(log_path):

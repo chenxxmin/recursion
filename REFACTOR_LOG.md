@@ -429,3 +429,15 @@
 **原因**：协议性字符串应有单一来源。
 
 **验证**：四种情况（缺文件/返回码 0/非 0/无标记）断言正确。
+
+---
+
+## 31. prepare_rerun.py 与 batch_run.py 的重复定义
+
+**问题**：`load_json`/`save_json` 与 batch_run.py 逐字重复；`DEFAULT_BASE_DIR = '/data/cxm/recursion'` 两处硬编码，改一处忘另一处会导致日志路径错位。
+
+**修改**：prepare_rerun.py 删除本地副本，改为 `from batch_run import load_json, save_json, DEFAULT_BASE_DIR`（batch_run 的 `main()` 有 `__main__` 保护，导入无副作用；唯一代价是会连带导入 visualize→matplotlib，已在注释中说明）。
+
+**原因**：路径常量与 IO 辅助必须单一来源。
+
+**验证**：端到端——构造假 experiments（成功/失败/缺失各一）跑 `main()`，rerun JSON 内容正确、metadata 保留、成功实验的 .err 被清理。
