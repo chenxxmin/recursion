@@ -186,6 +186,11 @@ def apply_rotary_emb(x, cos, sin):
     return (x * cos) + (rotate_half(x) * sin)
 
 # ==================== Model Definition ====================
+# Finite large-negative value for attention masking. Using -inf would produce
+# NaN in softmax for fully-masked rows (e.g. padded queries).
+ATTN_MASK_NEG = -1e9
+
+
 class CausalSelfAttention(nn.Module):
     def __init__(self, n_embd, n_head, block_size, dropout=0.0, rope=None, entropy_penalty_weight=0.0):
         super().__init__()
@@ -221,7 +226,7 @@ class CausalSelfAttention(nn.Module):
             k = apply_rotary_emb(k, cos, sin)
         
         att = (q @ k.transpose(-2, -1)) * (1.0 / math.sqrt(self.head_size))
-        att = att.masked_fill(self.causal_mask[:, :, :T, :T] == 0, -1e9)
+        att = att.masked_fill(self.causal_mask[:, :, :T, :T] == 0, ATTN_MASK_NEG)
         att = F.softmax(att, dim=-1)
         
         penalty = torch.tensor(0.0, device=x.device)
@@ -867,6 +872,10 @@ def dynamic_mixed_collate_fn(batch):
     return torch.stack(sequences, dim=0), BatchTag.DYNAMIC_MIXED, torch.stack(loss_masks, dim=0)
 
 
+# Weight of the rule-classification auxiliary loss relative to the LM loss.
+RULE_LOSS_WEIGHT = 0.5
+
+
 class MixedABTransformer(FibonacciTransformer):
     def __init__(self, num_ab_pairs=1, use_greedy_generate=True, use_ab_tag=True,
                  use_conditional_wte=False, cond_wte_shared_ratio=0.0, **kwargs):
@@ -962,7 +971,9 @@ class MixedABTransformer(FibonacciTransformer):
             logits = self.lm_head(x)
         
         rule_logits = None
-        # With leading rule token, shift rule-head window by one position.
+        # Rule head reads positions from x3 onward (the first transition that
+        # reveals the recurrence rule); with a leading rule token, shift the
+        # window by one position.
         rule_start_offset = 4 if self.use_ab_tag else 3
         if ab_labels is not None and t > rule_start_offset:
             rule_features = x[:, rule_start_offset:, :]
@@ -995,7 +1006,7 @@ class MixedABTransformer(FibonacciTransformer):
                 rule_logits_flat = rule_logits.reshape(-1, self.num_ab_pairs)
                 ab_labels_expanded = ab_labels.unsqueeze(1).expand(B, num_pos).reshape(-1)
                 rule_loss = F.cross_entropy(rule_logits_flat, ab_labels_expanded)
-                loss = loss + 0.5 * rule_loss
+                loss = loss + RULE_LOSS_WEIGHT * rule_loss
         return logits, loss, rule_logits
 
 # ==================== Memory Safety ====================
@@ -1133,6 +1144,11 @@ class MemoryMonitor(threading.Thread):
 
     def stop(self):
         self._stop_event.set()
+
+
+# Batch size for teacher-forced evaluation over the full initial-state space
+# in the final generation tests (large for throughput; no gradients taken).
+EVAL_BATCH_SIZE = 1024
 
 
 # ==================== Unified Experiment Entry ====================
@@ -1516,7 +1532,7 @@ def run_experiment(config_path=None):
                 x0, x1 = seq[0].item(), seq[1].item()
             train_seen_inits[ab_idx].add((x0, x1))
 
-        batch_size = 1024
+        batch_size = EVAL_BATCH_SIZE
 
         for ab_idx, (a, b) in enumerate(AB_PAIRS):
             print(f"\n--- AB pair {ab_idx+1}: ({a}, {b}) ---")
@@ -1633,7 +1649,7 @@ def run_experiment(config_path=None):
         full_sequences = torch.tensor(full_sequences, dtype=torch.long, device=device)
 
         # Teacher-forced forward in batches
-        batch_size = 1024
+        batch_size = EVAL_BATCH_SIZE
         all_preds = []
         with torch.no_grad():
             for start in range(0, total_states, batch_size):

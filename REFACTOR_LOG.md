@@ -525,3 +525,15 @@
 **原因**：诊断细节折叠为有名字的函数，主循环保持清爽。
 
 **验证**：py_compile 通过（打印语句逐字移动）。
+
+---
+
+## 39. core.py 魔法数字常量化与关键注释
+
+**问题**：注意力 mask 的 `-1e9`（为什么不是 -inf，值得说明）；`rule_start_offset = 4 if use_ab_tag else 3` 的来源只有半句注释；`0.5 * rule_loss` 的权重无语义；最终测试的 `batch_size = 1024` 重复两处。
+
+**修改**：提取常量 `ATTN_MASK_NEG`（注释说明用有限值是为避免全 mask 行 softmax 出 NaN）、`RULE_LOSS_WEIGHT`、`EVAL_BATCH_SIZE`；`rule_start_offset` 注释补全（rule head 从 x3 读起，因为 x3 是第一个能体现规则的转移；有 rule token 时窗口 +1）。
+
+**原因**：这些数字承载模型设计决策，必须显式化。
+
+**验证**：py_compile 通过。
