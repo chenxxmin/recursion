@@ -177,7 +177,6 @@ def run_single(exp, base_config, concurrency=1, gpu_id=None):
             f.write(f"=== Experiment: {name} ===\n")
             f.write(f"Time: {datetime.now().isoformat()}\n")
             f.write(f"Task type: {task}\n")
-            gpu_label = f"cuda:{gpu_id}" if gpu_id is not None else "cpu"
             f.write(f"GPU: {gpu_label}\n")
             f.write("\n=== Merged Config ===\n")
             f.write(format_config_table(merged_main))
