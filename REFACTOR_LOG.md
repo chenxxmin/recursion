@@ -277,3 +277,15 @@
 **原因**：死代码。（连带影响：`concurrency` 参数现仅作为签名保留，由调用处传入；不改变任何输出。）
 
 **验证**：py_compile 通过。
+
+---
+
+## 19. batch_run.py 死赋值 returncode = None
+
+**问题**：`returncode = None`（原 `:190`）之后没有任何读取，唯一赋值来源是后面的 `returncode = process.wait()`（`:225`），死赋值。
+
+**修改**：删除该行。
+
+**原因**：死代码；保留会让读者怀疑存在"wait 之前的 returncode 语义"。
+
+**验证**：py_compile 通过。

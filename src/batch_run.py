@@ -186,7 +186,6 @@ def run_single(exp, base_config, concurrency=1, gpu_id=None):
         env=env
     )
 
-    returncode = None
     err_log_path = os.path.join(LOG_DIR, f"{name}.err")
 
     def _decode(raw):
