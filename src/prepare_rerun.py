@@ -45,7 +45,7 @@ def log_status(log_path):
 def default_log_dir(experiments_path):
     """Derive the default log dir matching batch_run.py conventions."""
     exp_name = os.path.splitext(os.path.basename(experiments_path))[0]
-    return os.path.join(DEFAULT_BASE_DIR, exp_name, 'logs')
+    return os.path.join(DEFAULT_BASE_DIR, exp_name)
 
 
 def main():
@@ -61,7 +61,7 @@ def main():
     parser.add_argument(
         '--log-dir',
         default=None,
-        help='Directory containing .log files (default: /data/cxm/<exp_name>/logs)'
+        help='Directory containing .log files (default: /data/cxm/<exp_name>/)'
     )
     parser.add_argument(
         '--out',
