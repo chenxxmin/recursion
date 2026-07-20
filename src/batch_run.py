@@ -459,7 +459,7 @@ def generate_grouped_plots():
 
     groups = {}
     for log_path in log_files:
-        name = os.path.basename(log_path)[:-4]  # remove .log
+        name = os.path.splitext(os.path.basename(log_path))[0]  # remove .log
         setting, seed = visualize.extract_setting_and_seed(name)
         groups.setdefault(setting, []).append((seed or '', log_path))
 
@@ -534,7 +534,7 @@ def summarize_experiments():
     print('-' * SUMMARY_WIDTH)
 
     for log_path in log_files:
-        name = os.path.basename(log_path)[:-4]  # Remove .log
+        name = os.path.splitext(os.path.basename(log_path))[0]  # Remove .log
         r = parse_log(log_path)
 
         epoch_str = f"{r['final_epoch']}" if r.get('final_epoch') is not None else 'N/A'

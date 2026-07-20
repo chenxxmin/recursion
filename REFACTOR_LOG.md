@@ -341,3 +341,15 @@
 **原因**：跨模块协议（标记键名）必须有名字；表格宽度单一来源。
 
 **验证**：两文件编译通过；断言两模块标记常量相等；format_config_table 输出分隔线宽度不变。
+
+---
+
+## 24. batch_run.py [:-4] 手写去扩展名
+
+**问题**：`generate_grouped_plots` 和 `summarize_experiments` 用 `os.path.basename(log_path)[:-4]` 去掉 `.log`，与 prepare_rerun.py 已在用的 `os.path.splitext` 风格不一致；手写数字 4 依赖"扩展名恰好 4 字符"的隐含假设。
+
+**修改**：两处改为 `os.path.splitext(os.path.basename(log_path))[0]`。
+
+**原因**：语义化 API，与项目内其他文件一致。
+
+**验证**：py_compile 通过。
