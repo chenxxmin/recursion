@@ -2,7 +2,7 @@
   "concurrency": 8,
   "experiments": [
     {
-      "name": "tribonacci_wt30_d64l1r4_a1b1c1_seed0",
+      "name": "tribonacci_d256l1r4_a1b1c1_seed0",
       "task": "tribonacci",
       "config": {
         "RANDOM_SEED": 0,
@@ -10,11 +10,13 @@
         "B": 1,
         "C": 1,
         "NUM_MASK": 2,
-        "FIRST_TASK_WEIGHT": 30
+        "D_MODEL": 256,
+        "N_LAYER": 1,
+        "MLP_RATIO": 4
       }
     },
     {
-      "name": "tribonacci_wt30_d64l1r4_a1b1c1_seed1",
+      "name": "tribonacci_d256l1r4_a1b1c1_seed1",
       "task": "tribonacci",
       "config": {
         "RANDOM_SEED": 1,
@@ -22,11 +24,13 @@
         "B": 1,
         "C": 1,
         "NUM_MASK": 2,
-        "FIRST_TASK_WEIGHT": 30
+        "D_MODEL": 256,
+        "N_LAYER": 1,
+        "MLP_RATIO": 4
       }
     },
     {
-      "name": "tribonacci_wt30_d64l1r4_a1b1c1_seed2",
+      "name": "tribonacci_d256l1r4_a1b1c1_seed2",
       "task": "tribonacci",
       "config": {
         "RANDOM_SEED": 2,
@@ -34,11 +38,13 @@
         "B": 1,
         "C": 1,
         "NUM_MASK": 2,
-        "FIRST_TASK_WEIGHT": 30
+        "D_MODEL": 256,
+        "N_LAYER": 1,
+        "MLP_RATIO": 4
       }
     },
     {
-      "name": "tribonacci_wt30_d64l1r4_a1b1c1_seed3",
+      "name": "tribonacci_d256l1r4_a1b1c1_seed3",
       "task": "tribonacci",
       "config": {
         "RANDOM_SEED": 3,
@@ -46,11 +52,13 @@
         "B": 1,
         "C": 1,
         "NUM_MASK": 2,
-        "FIRST_TASK_WEIGHT": 30
+        "D_MODEL": 256,
+        "N_LAYER": 1,
+        "MLP_RATIO": 4
       }
     },
     {
-      "name": "tribonacci_wt30_d64l1r4_a1b1c1_seed4",
+      "name": "tribonacci_d256l1r4_a1b1c1_seed4",
       "task": "tribonacci",
       "config": {
         "RANDOM_SEED": 4,
@@ -58,11 +66,13 @@
         "B": 1,
         "C": 1,
         "NUM_MASK": 2,
-        "FIRST_TASK_WEIGHT": 30
+        "D_MODEL": 256,
+        "N_LAYER": 1,
+        "MLP_RATIO": 4
       }
     },
     {
-      "name": "tribonacci_wt30_d64l1r4_a1b1c1_seed5",
+      "name": "tribonacci_d256l1r4_a1b1c1_seed5",
       "task": "tribonacci",
       "config": {
         "RANDOM_SEED": 5,
@@ -70,11 +80,13 @@
         "B": 1,
         "C": 1,
         "NUM_MASK": 2,
-        "FIRST_TASK_WEIGHT": 30
+        "D_MODEL": 256,
+        "N_LAYER": 1,
+        "MLP_RATIO": 4
       }
     },
     {
-      "name": "tribonacci_wt30_d64l1r4_a1b1c1_seed6",
+      "name": "tribonacci_d256l1r4_a1b1c1_seed6",
       "task": "tribonacci",
       "config": {
         "RANDOM_SEED": 6,
@@ -82,11 +94,13 @@
         "B": 1,
         "C": 1,
         "NUM_MASK": 2,
-        "FIRST_TASK_WEIGHT": 30
+        "D_MODEL": 256,
+        "N_LAYER": 1,
+        "MLP_RATIO": 4
       }
     },
     {
-      "name": "tribonacci_wt30_d64l1r4_a1b1c1_seed7",
+      "name": "tribonacci_d256l1r4_a1b1c1_seed7",
       "task": "tribonacci",
       "config": {
         "RANDOM_SEED": 7,
@@ -94,11 +108,13 @@
         "B": 1,
         "C": 1,
         "NUM_MASK": 2,
-        "FIRST_TASK_WEIGHT": 30
+        "D_MODEL": 256,
+        "N_LAYER": 1,
+        "MLP_RATIO": 4
       }
     },
     {
-      "name": "tribonacci_wt30_d64l1r4_a1b2c4_seed0",
+      "name": "tribonacci_d256l1r4_a1b2c4_seed0",
       "task": "tribonacci",
       "config": {
         "RANDOM_SEED": 0,
@@ -106,11 +122,13 @@
         "B": 2,
         "C": 4,
         "NUM_MASK": 2,
-        "FIRST_TASK_WEIGHT": 30
+        "D_MODEL": 256,
+        "N_LAYER": 1,
+        "MLP_RATIO": 4
       }
     },
     {
-      "name": "tribonacci_wt30_d64l1r4_a1b2c4_seed1",
+      "name": "tribonacci_d256l1r4_a1b2c4_seed1",
       "task": "tribonacci",
       "config": {
         "RANDOM_SEED": 1,
@@ -118,11 +136,13 @@
         "B": 2,
         "C": 4,
         "NUM_MASK": 2,
-        "FIRST_TASK_WEIGHT": 30
+        "D_MODEL": 256,
+        "N_LAYER": 1,
+        "MLP_RATIO": 4
       }
     },
     {
-      "name": "tribonacci_wt30_d64l1r4_a1b2c4_seed2",
+      "name": "tribonacci_d256l1r4_a1b2c4_seed2",
       "task": "tribonacci",
       "config": {
         "RANDOM_SEED": 2,
@@ -130,11 +150,13 @@
         "B": 2,
         "C": 4,
         "NUM_MASK": 2,
-        "FIRST_TASK_WEIGHT": 30
+        "D_MODEL": 256,
+        "N_LAYER": 1,
+        "MLP_RATIO": 4
       }
     },
     {
-      "name": "tribonacci_wt30_d64l1r4_a1b2c4_seed3",
+      "name": "tribonacci_d256l1r4_a1b2c4_seed3",
       "task": "tribonacci",
       "config": {
         "RANDOM_SEED": 3,
@@ -142,11 +164,13 @@
         "B": 2,
         "C": 4,
         "NUM_MASK": 2,
-        "FIRST_TASK_WEIGHT": 30
+        "D_MODEL": 256,
+        "N_LAYER": 1,
+        "MLP_RATIO": 4
       }
     },
     {
-      "name": "tribonacci_wt30_d64l1r4_a1b2c4_seed4",
+      "name": "tribonacci_d256l1r4_a1b2c4_seed4",
       "task": "tribonacci",
       "config": {
         "RANDOM_SEED": 4,
@@ -154,11 +178,13 @@
         "B": 2,
         "C": 4,
         "NUM_MASK": 2,
-        "FIRST_TASK_WEIGHT": 30
+        "D_MODEL": 256,
+        "N_LAYER": 1,
+        "MLP_RATIO": 4
       }
     },
     {
-      "name": "tribonacci_wt30_d64l1r4_a1b2c4_seed5",
+      "name": "tribonacci_d256l1r4_a1b2c4_seed5",
       "task": "tribonacci",
       "config": {
         "RANDOM_SEED": 5,
@@ -166,11 +192,13 @@
         "B": 2,
         "C": 4,
         "NUM_MASK": 2,
-        "FIRST_TASK_WEIGHT": 30
+        "D_MODEL": 256,
+        "N_LAYER": 1,
+        "MLP_RATIO": 4
       }
     },
     {
-      "name": "tribonacci_wt30_d64l1r4_a1b2c4_seed6",
+      "name": "tribonacci_d256l1r4_a1b2c4_seed6",
       "task": "tribonacci",
       "config": {
         "RANDOM_SEED": 6,
@@ -178,11 +206,13 @@
         "B": 2,
         "C": 4,
         "NUM_MASK": 2,
-        "FIRST_TASK_WEIGHT": 30
+        "D_MODEL": 256,
+        "N_LAYER": 1,
+        "MLP_RATIO": 4
       }
     },
     {
-      "name": "tribonacci_wt30_d64l1r4_a1b2c4_seed7",
+      "name": "tribonacci_d256l1r4_a1b2c4_seed7",
       "task": "tribonacci",
       "config": {
         "RANDOM_SEED": 7,
@@ -190,11 +220,13 @@
         "B": 2,
         "C": 4,
         "NUM_MASK": 2,
-        "FIRST_TASK_WEIGHT": 30
+        "D_MODEL": 256,
+        "N_LAYER": 1,
+        "MLP_RATIO": 4
       }
     },
     {
-      "name": "tribonacci_wt30_d64l1r4_a1b2c3_seed0",
+      "name": "tribonacci_d256l1r4_a1b2c3_seed0",
       "task": "tribonacci",
       "config": {
         "RANDOM_SEED": 0,
@@ -202,11 +234,13 @@
         "B": 2,
         "C": 3,
         "NUM_MASK": 2,
-        "FIRST_TASK_WEIGHT": 30
+        "D_MODEL": 256,
+        "N_LAYER": 1,
+        "MLP_RATIO": 4
       }
     },
     {
-      "name": "tribonacci_wt30_d64l1r4_a1b2c3_seed1",
+      "name": "tribonacci_d256l1r4_a1b2c3_seed1",
       "task": "tribonacci",
       "config": {
         "RANDOM_SEED": 1,
@@ -214,11 +248,13 @@
         "B": 2,
         "C": 3,
         "NUM_MASK": 2,
-        "FIRST_TASK_WEIGHT": 30
+        "D_MODEL": 256,
+        "N_LAYER": 1,
+        "MLP_RATIO": 4
       }
     },
     {
-      "name": "tribonacci_wt30_d64l1r4_a1b2c3_seed2",
+      "name": "tribonacci_d256l1r4_a1b2c3_seed2",
       "task": "tribonacci",
       "config": {
         "RANDOM_SEED": 2,
@@ -226,11 +262,13 @@
         "B": 2,
         "C": 3,
         "NUM_MASK": 2,
-        "FIRST_TASK_WEIGHT": 30
+        "D_MODEL": 256,
+        "N_LAYER": 1,
+        "MLP_RATIO": 4
       }
     },
     {
-      "name": "tribonacci_wt30_d64l1r4_a1b2c3_seed3",
+      "name": "tribonacci_d256l1r4_a1b2c3_seed3",
       "task": "tribonacci",
       "config": {
         "RANDOM_SEED": 3,
@@ -238,11 +276,13 @@
         "B": 2,
         "C": 3,
         "NUM_MASK": 2,
-        "FIRST_TASK_WEIGHT": 30
+        "D_MODEL": 256,
+        "N_LAYER": 1,
+        "MLP_RATIO": 4
       }
     },
     {
-      "name": "tribonacci_wt30_d64l1r4_a1b2c3_seed4",
+      "name": "tribonacci_d256l1r4_a1b2c3_seed4",
       "task": "tribonacci",
       "config": {
         "RANDOM_SEED": 4,
@@ -250,11 +290,13 @@
         "B": 2,
         "C": 3,
         "NUM_MASK": 2,
-        "FIRST_TASK_WEIGHT": 30
+        "D_MODEL": 256,
+        "N_LAYER": 1,
+        "MLP_RATIO": 4
       }
     },
     {
-      "name": "tribonacci_wt30_d64l1r4_a1b2c3_seed5",
+      "name": "tribonacci_d256l1r4_a1b2c3_seed5",
       "task": "tribonacci",
       "config": {
         "RANDOM_SEED": 5,
@@ -262,11 +304,13 @@
         "B": 2,
         "C": 3,
         "NUM_MASK": 2,
-        "FIRST_TASK_WEIGHT": 30
+        "D_MODEL": 256,
+        "N_LAYER": 1,
+        "MLP_RATIO": 4
       }
     },
     {
-      "name": "tribonacci_wt30_d64l1r4_a1b2c3_seed6",
+      "name": "tribonacci_d256l1r4_a1b2c3_seed6",
       "task": "tribonacci",
       "config": {
         "RANDOM_SEED": 6,
@@ -274,11 +318,13 @@
         "B": 2,
         "C": 3,
         "NUM_MASK": 2,
-        "FIRST_TASK_WEIGHT": 30
+        "D_MODEL": 256,
+        "N_LAYER": 1,
+        "MLP_RATIO": 4
       }
     },
     {
-      "name": "tribonacci_wt30_d64l1r4_a1b2c3_seed7",
+      "name": "tribonacci_d256l1r4_a1b2c3_seed7",
       "task": "tribonacci",
       "config": {
         "RANDOM_SEED": 7,
@@ -286,11 +332,13 @@
         "B": 2,
         "C": 3,
         "NUM_MASK": 2,
-        "FIRST_TASK_WEIGHT": 30
+        "D_MODEL": 256,
+        "N_LAYER": 1,
+        "MLP_RATIO": 4
       }
     },
     {
-      "name": "tribonacci_wt30_d64l1r4_a1b0c2_seed0",
+      "name": "tribonacci_d256l1r4_a1b0c2_seed0",
       "task": "tribonacci",
       "config": {
         "RANDOM_SEED": 0,
@@ -298,11 +346,13 @@
         "B": 0,
         "C": 2,
         "NUM_MASK": 2,
-        "FIRST_TASK_WEIGHT": 30
+        "D_MODEL": 256,
+        "N_LAYER": 1,
+        "MLP_RATIO": 4
       }
     },
     {
-      "name": "tribonacci_wt30_d64l1r4_a1b0c2_seed1",
+      "name": "tribonacci_d256l1r4_a1b0c2_seed1",
       "task": "tribonacci",
       "config": {
         "RANDOM_SEED": 1,
@@ -310,11 +360,13 @@
         "B": 0,
         "C": 2,
         "NUM_MASK": 2,
-        "FIRST_TASK_WEIGHT": 30
+        "D_MODEL": 256,
+        "N_LAYER": 1,
+        "MLP_RATIO": 4
       }
     },
     {
-      "name": "tribonacci_wt30_d64l1r4_a1b0c2_seed2",
+      "name": "tribonacci_d256l1r4_a1b0c2_seed2",
       "task": "tribonacci",
       "config": {
         "RANDOM_SEED": 2,
@@ -322,11 +374,13 @@
         "B": 0,
         "C": 2,
         "NUM_MASK": 2,
-        "FIRST_TASK_WEIGHT": 30
+        "D_MODEL": 256,
+        "N_LAYER": 1,
+        "MLP_RATIO": 4
       }
     },
     {
-      "name": "tribonacci_wt30_d64l1r4_a1b0c2_seed3",
+      "name": "tribonacci_d256l1r4_a1b0c2_seed3",
       "task": "tribonacci",
       "config": {
         "RANDOM_SEED": 3,
@@ -334,11 +388,13 @@
         "B": 0,
         "C": 2,
         "NUM_MASK": 2,
-        "FIRST_TASK_WEIGHT": 30
+        "D_MODEL": 256,
+        "N_LAYER": 1,
+        "MLP_RATIO": 4
       }
     },
     {
-      "name": "tribonacci_wt30_d64l1r4_a1b0c2_seed4",
+      "name": "tribonacci_d256l1r4_a1b0c2_seed4",
       "task": "tribonacci",
       "config": {
         "RANDOM_SEED": 4,
@@ -346,11 +402,13 @@
         "B": 0,
         "C": 2,
         "NUM_MASK": 2,
-        "FIRST_TASK_WEIGHT": 30
+        "D_MODEL": 256,
+        "N_LAYER": 1,
+        "MLP_RATIO": 4
       }
     },
     {
-      "name": "tribonacci_wt30_d64l1r4_a1b0c2_seed5",
+      "name": "tribonacci_d256l1r4_a1b0c2_seed5",
       "task": "tribonacci",
       "config": {
         "RANDOM_SEED": 5,
@@ -358,11 +416,13 @@
         "B": 0,
         "C": 2,
         "NUM_MASK": 2,
-        "FIRST_TASK_WEIGHT": 30
+        "D_MODEL": 256,
+        "N_LAYER": 1,
+        "MLP_RATIO": 4
       }
     },
     {
-      "name": "tribonacci_wt30_d64l1r4_a1b0c2_seed6",
+      "name": "tribonacci_d256l1r4_a1b0c2_seed6",
       "task": "tribonacci",
       "config": {
         "RANDOM_SEED": 6,
@@ -370,11 +430,13 @@
         "B": 0,
         "C": 2,
         "NUM_MASK": 2,
-        "FIRST_TASK_WEIGHT": 30
+        "D_MODEL": 256,
+        "N_LAYER": 1,
+        "MLP_RATIO": 4
       }
     },
     {
-      "name": "tribonacci_wt30_d64l1r4_a1b0c2_seed7",
+      "name": "tribonacci_d256l1r4_a1b0c2_seed7",
       "task": "tribonacci",
       "config": {
         "RANDOM_SEED": 7,
@@ -382,7 +444,9 @@
         "B": 0,
         "C": 2,
         "NUM_MASK": 2,
-        "FIRST_TASK_WEIGHT": 30
+        "D_MODEL": 256,
+        "N_LAYER": 1,
+        "MLP_RATIO": 4
       }
     }
   ]
