@@ -1297,12 +1297,10 @@ def _prepare_mixed_ab(config, device):
                                use_conditional_wte=cfg.get('USE_CONDITIONAL_WTE', False),
                                cond_wte_shared_ratio=cfg.get('COND_WTE_SHARED_RATIO', 0.0),
                                )
-    NUM_MASK = cfg.get('NUM_MASK', 0)
-    if NUM_MASK == 0:
-        # x0 and x1 are initial values; start evaluating from x2 (the first generated token)
-        num_mask = 2
-    else:
-        num_mask = NUM_MASK
+    # NUM_MASK unset (None) means: x0 and x1 are initial values, so start
+    # evaluating from x2 (the first generated token).
+    num_mask_cfg = cfg.get('NUM_MASK')
+    num_mask = 2 if num_mask_cfg is None else num_mask_cfg
     extra_kwargs_fn = lambda ab_indices: {'ab_labels': ab_indices.to(device)}
     save_config = {
         'p': P,
@@ -1476,11 +1474,9 @@ def _prepare_single_recurrence(config, task):
 
     state_space_size = P ** init_len
     NUM_TRAIN_SAMPLES = max(1, int(state_space_size * MAX_UNIQUE_RATIO))
-    NUM_MASK = cfg.get('NUM_MASK', 0)
-    if NUM_MASK == 0:
-        num_mask = default_num_mask
-    else:
-        num_mask = NUM_MASK
+    # NUM_MASK unset (None) falls back to the task's default mask count.
+    num_mask_cfg = cfg.get('NUM_MASK')
+    num_mask = default_num_mask if num_mask_cfg is None else num_mask_cfg
 
     ds = RecurrenceDataset(
         p=P, recurrence_fn=recurrence_fn, recurrence_name=recurrence_name,

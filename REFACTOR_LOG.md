@@ -626,3 +626,17 @@
 **验证**：**黄金标准等价测试**——同一批小 config（addition/tribonacci/mixed_ab/dynamic_mixed 四任务），分别用重构前（git HEAD 旧代码）与重构后的 `run_experiment` 在独立子进程中完整跑通（数据集 → 2 epoch 训练 → 最终生成测试），stdout 逐行 diff：**四个任务全部 IDENTICAL**（剔除含内存数值的 [Memory] 行）。
 
 **附带发现（既有问题，未修）**：测试中发现 multiplication 任务的 `generate_cycle` 对暂态状态（如含 0 的 (1,0)）会死循环——循环只检查"回到起始状态"，不检查"进入已见状态"。旧代码同样存在，与本重构无关。
+
+---
+
+## 46. core.py NUM_MASK 哨兵值 0 → None
+
+**问题**：`NUM_MASK == 0` 被当作"未配置"的哨兵（走任务默认值），导致 0 永远无法作为合法值使用（含义本应是"从位置 0 开始评估"），语义扭曲。
+
+**修改**：哨兵改为 `None`——`cfg.get('NUM_MASK')` 不带默认值，为 None 时走任务默认；`src/config.json` 的 `"NUM_MASK": 0` 同步改为 `null`（保持原语义）。已 grep 确认 `experiments/*.json` 全部使用 1/2，无配置依赖 0 的旧哨兵语义。
+
+**原因**：哨兵应该是不可能与合法值冲突的值。
+
+**行为差异（仅理论边缘）**：显式配置 `"NUM_MASK": 0` 现在表示字面 0（旧语义为"默认"）；仓库内无此配置。
+
+**验证**：缺失/null/2/3 四种取值下单一递推 num_mask 正确；tribonacci 默认 2；mixed_ab 缺失 → 2、显式 4 → 4。

@@ -2,7 +2,7 @@
   "main": {
     "P": 53,
     "TASK": "addition",
-    "NUM_MASK": 0,
+    "NUM_MASK": null,
     "A": 1,
     "B": 1,
     "AB_PAIRS": [[1, 1], [1, 2]],
