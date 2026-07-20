@@ -552,15 +552,9 @@ def main():
                     print(f"No epoch data found in {log_path}, skipping.")
                     continue
                 data_items.append((seed, data))
-            if not data_items:
-                continue
-
-            base = os.path.join(out_dir, setting)
-            plot_learning_curve(data_items, setting, save_path=f'{base}_curve.png')
-            if not args.no_per_pos:
-                plot_per_position(data_items, setting, save_path=f'{base}_per_pos.png')
-            if not args.no_per_rule:
-                plot_per_rule(data_items, setting, save_path=f'{base}_per_rule.png')
+            plot_setting_group(setting, data_items, out_dir,
+                               no_per_pos=args.no_per_pos,
+                               no_per_rule=args.no_per_rule)
 
 
 if __name__ == '__main__':

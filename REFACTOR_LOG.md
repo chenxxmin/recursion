@@ -155,3 +155,17 @@
 **原因**：推断逻辑的有效性依赖模型实现细节，必须把这条隐式知识写显式。
 
 **验证**：仅注释变更，py_compile 通过。
+
+---
+
+## 10. visualize.py plot_setting_group 是死代码，main 内联重复了同样逻辑
+
+**问题**：`plot_setting_group`（`:454-480`）已实现了"过滤空数据 → 拼 base 路径 → 调三个 plot"的完整分组绘图流程，但 `main()` 的分组分支没有调用它，而是内联重写了同样的逻辑。两份实现会漂移。
+
+**修改**：`main()` 分组分支保留逐日志解析（保留每条空日志的提示信息），尾部改为调用 `plot_setting_group`，删除内联的 base 拼接和三个 plot 调用。
+
+**原因**：单一实现；`plot_setting_group` 本就是为此设计的。
+
+**行为差异（仅日志输出）**：某 setting 所有日志都无 epoch 数据时，现在会额外打印一行 "No epoch data for setting X, skipping."（来自 plot_setting_group 自身的检查），信息更明确。
+
+**验证**：构造两个假日志跑 `visualize.py`，分组输出的曲线图/热力图正常生成。
