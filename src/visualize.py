@@ -43,13 +43,18 @@ def parse_log(log_path):
         text = f.read()
 
     current = {}
+
+    def flush_current(cur):
+        """Append the pending per-epoch per_pos/per_rule of cur (if any) to data."""
+        if cur:
+            data['per_pos'].append(cur.get('per_pos'))
+            data['per_rule'].append(cur.get('per_rule'))
+
     for line in text.splitlines():
         m = epoch_re.search(line)
         if m:
-            if current:
-                data['per_pos'].append(current.get('per_pos'))
-                data['per_rule'].append(current.get('per_rule'))
-                current = {}
+            flush_current(current)
+            current = {}
             epoch = int(m.group(1))
             data['epochs'].append(epoch)
             data['train_loss'].append(float(m.group(2)))
@@ -73,9 +78,7 @@ def parse_log(log_path):
             continue
 
     # flush last
-    if current:
-        data['per_pos'].append(current.get('per_pos'))
-        data['per_rule'].append(current.get('per_rule'))
+    flush_current(current)
 
     return data
 
