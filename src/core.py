@@ -6,6 +6,7 @@ import random
 import os
 import sys
 import time
+import json
 import threading
 import itertools
 from enum import IntEnum
@@ -762,11 +763,10 @@ class MixedABDataset(Dataset):
                 for seq, l in zip(all_test, all_labels_test)
             ]
 
-        self.train_pairs = list(zip(all_train, all_labels_train))
-        self.test_pairs = list(zip(all_test, all_labels_test))
-        random.shuffle(self.train_pairs)
-        self.train_samples = [s for s, _ in self.train_pairs]
-        self.ab_labels_train = [l for _, l in self.train_pairs]
+        train_pairs = list(zip(all_train, all_labels_train))
+        random.shuffle(train_pairs)
+        self.train_samples = [s for s, _ in train_pairs]
+        self.ab_labels_train = [l for _, l in train_pairs]
         self.test_samples = all_test
         self.ab_labels_test = all_labels_test
 
@@ -1158,7 +1158,6 @@ BATCH_RUN_MERGED_FLAG = '_BATCH_RUN_MERGED'
 
 
 def run_experiment(config_path=None):
-    import json
     if config_path is None:
         script_dir = os.path.dirname(os.path.abspath(__file__))
         config_path = os.path.join(script_dir, 'config.json')
@@ -1410,7 +1409,8 @@ def run_experiment(config_path=None):
         NUM_MASK = cfg.get('NUM_MASK', 0)
         if NUM_MASK == 0:
             num_mask = default_num_mask
-        else:            num_mask = NUM_MASK
+        else:
+            num_mask = NUM_MASK
 
         ds = RecurrenceDataset(
             p=P, recurrence_fn=recurrence_fn, recurrence_name=recurrence_name,

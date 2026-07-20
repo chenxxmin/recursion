@@ -549,3 +549,18 @@
 **原因**：注释语言统一，避免编码环境和读者群体的双重负担。
 
 **验证**：grep 确认 src/*.py 无 CJK 字符残留；py_compile 通过。
+
+---
+
+## 41. core.py 三处小清理
+
+**问题**：
+1. `import json` 写在 `run_experiment` 函数体内；
+2. `self.test_pairs`（原 combined2）赋值后从未使用，是纯死状态；`self.train_pairs` 也只在 shuffle 后立即拆包，无需挂在实例上；
+3. `else:            num_mask = NUM_MASK` 同行多条空格，格式异常。
+
+**修改**：`import json` 上移到文件顶部；删除 `test_pairs`，`train_pairs` 降为局部变量；else 分支恢复正常缩进换行。
+
+**原因**：死状态会让读者搜索"它在哪里被读"；其余两项是惯例。
+
+**验证**：py_compile 通过；MixedABDataset 实例无 test_pairs 属性，train 数据正常。
