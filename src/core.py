@@ -1118,6 +1118,38 @@ def check_gpu_memory(model, device, batch_size, seq_len):
         sys.exit(EXIT_CUDA_OUT_OF_MEMORY)
 
 
+def get_cpu_rss_mb():
+    """Return this process's resident set size in MB (Linux only)."""
+    try:
+        with open('/proc/self/status', 'r', encoding='utf-8') as f:
+            for line in f:
+                if line.startswith('VmRSS:'):
+                    kb = int(line.split()[1])
+                    return kb / 1024.0
+    except Exception:
+        return None
+
+
+def log_memory(label, device='cpu'):
+    """Print current CPU RSS and GPU memory usage."""
+    parts = [f"device={device}"]
+
+    cpu_mb = get_cpu_rss_mb()
+    if cpu_mb is not None:
+        parts.append(f"CPU RSS={cpu_mb:.1f}MB")
+
+    if torch.cuda.is_available() and device.startswith('cuda'):
+        try:
+            idx = torch.cuda.current_device() if device == 'cuda' else int(device.split(':')[-1])
+            alloc = torch.cuda.memory_allocated(idx) / 1024 ** 2
+            reserved = torch.cuda.memory_reserved(idx) / 1024 ** 2
+            parts.append(f"GPU alloc={alloc:.1f}MB reserved={reserved:.1f}MB")
+        except Exception:
+            pass
+
+    print(f"[Memory] {label}: " + " | ".join(parts))
+
+
 # ==================== Unified Experiment Entry ====================
 def run_experiment(config_path=None):
     import json
@@ -1156,7 +1188,8 @@ def run_experiment(config_path=None):
         torch.backends.cudnn.benchmark = False
     device = 'cuda' if torch.cuda.is_available() else 'cpu'
     print(f"Using device: {device}\n")
-    
+    log_memory("start", device)
+
     # ========================================================================
     # Stage 1: Task branch -- prepare dataset, model, loader, training params
     # ========================================================================
@@ -1410,6 +1443,8 @@ def run_experiment(config_path=None):
             save_config.update(save_extra_config)
         post_train_mode = 'single_recurrence'
 
+    log_memory("after dataset", device)
+
     # ========================================================================
     # Stage 2: Common training
     # ========================================================================
@@ -1431,6 +1466,7 @@ def run_experiment(config_path=None):
     # Pre-flight memory check: fail fast if the model cannot fit, rather than
     # letting CUDA OOM hang or kill the server.
     check_gpu_memory(model, device, BATCH_SIZE, max(TRAIN_LEN, OOD_LEN))
+    log_memory("after model init", device)
 
     optimizer = torch.optim.AdamW(model.parameters(), lr=LR, weight_decay=cfg['WEIGHT_DECAY'])
     scheduler = torch.optim.lr_scheduler.CosineAnnealingLR(optimizer, T_max=EPOCHS)
@@ -1456,6 +1492,8 @@ def run_experiment(config_path=None):
                 torch.cuda.empty_cache()
             sys.exit(EXIT_CUDA_OUT_OF_MEMORY)
         raise
+
+    log_memory("after training", device)
 
     # ========================================================================
     # Stage 3: Post-processing (mixed_ab final generation test with exposure split)
@@ -1569,6 +1607,8 @@ def run_experiment(config_path=None):
                 if parts:
                     print(f"  Position {i:3d}: " + " | ".join(parts))
 
+        log_memory("after final test", device)
+
     elif post_train_mode == 'single_recurrence':
         print(f"\n{'='*50}")
         print(f"Final generation test (batched teacher forcing, validate from position {num_mask+1})")
@@ -1675,3 +1715,5 @@ def run_experiment(config_path=None):
                     parts.append(f"{label}: {cnt}/{tot} ({_safe_div(cnt, tot)*100:5.1f}%)")
             if parts:
                 print(f"  Position {i:3d}: " + " | ".join(parts))
+
+        log_memory("after final test", device)
