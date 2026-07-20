@@ -169,3 +169,15 @@
 **行为差异（仅日志输出）**：某 setting 所有日志都无 epoch 数据时，现在会额外打印一行 "No epoch data for setting X, skipping."（来自 plot_setting_group 自身的检查），信息更明确。
 
 **验证**：构造两个假日志跑 `visualize.py`，分组输出的曲线图/热力图正常生成。
+
+---
+
+## 11. visualize.py 子图网格样板代码重复三次
+
+**问题**：三个绘图函数的多 seed 分支各自写了一遍相同的网格样板：`ncols=4` / nrows 计算 / `figsize=(3.2*ncols, 2.5*nrows)` / flatten / 结尾"关闭多余子图"循环。
+
+**修改**：提取 `_make_subplot_grid(n, ncols=4)`（创建网格并隐藏多余子图），三处改为调用，删除三处收尾的 `axis('off')` 循环。
+
+**原因**：网格布局规则只保留一份；各绘图函数只关心自己的内容。
+
+**验证**：5 个 seed 的假日志出图正常（2 行网格、3 个空位正确隐藏），三种图均生成。

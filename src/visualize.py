@@ -105,6 +105,17 @@ def _seed_sort_key(item):
     return int(seed) if seed.isdigit() else -1
 
 
+def _make_subplot_grid(n, ncols=4):
+    """Create an ncols-wide subplot grid for n panels; unused panels are hidden."""
+    nrows = (n + ncols - 1) // ncols
+    fig, axes = plt.subplots(nrows, ncols, figsize=(3.2*ncols, 2.5*nrows),
+                             squeeze=False, constrained_layout=True)
+    axes = axes.flatten()
+    for ax in axes[n:]:
+        ax.axis('off')
+    return fig, axes
+
+
 def plot_learning_curve(data, title, save_path=None):
     """Plot train/test accuracy and train loss over epochs.
 
@@ -147,11 +158,7 @@ def plot_learning_curve(data, title, save_path=None):
         fig.tight_layout()
     else:
         n = len(items)
-        ncols = 4
-        nrows = (n + ncols - 1) // ncols
-        fig, axes = plt.subplots(nrows, ncols, figsize=(3.2*ncols, 2.5*nrows),
-                                 squeeze=False, constrained_layout=True)
-        axes = axes.flatten()
+        fig, axes = _make_subplot_grid(n)
 
         for idx, (label, d) in enumerate(items):
             ax = axes[idx]
@@ -192,9 +199,6 @@ def plot_learning_curve(data, title, save_path=None):
             lines = [l1, l2, l3, l4]
             labels = [l.get_label() for l in lines]
             ax.legend(lines, labels, loc='best', fontsize=6)
-
-        for idx in range(n, len(axes)):
-            axes[idx].axis('off')
 
         fig.suptitle(f'{title} - Learning Curve', fontsize=12)
 
@@ -285,11 +289,7 @@ def plot_per_position(data, title, save_path=None):
             return
 
         n = len(valid_items)
-        ncols = 4
-        nrows = (n + ncols - 1) // ncols
-        fig, axes = plt.subplots(nrows, ncols, figsize=(3.2*ncols, 2.5*nrows),
-                                 squeeze=False, constrained_layout=True)
-        axes = axes.flatten()
+        fig, axes = _make_subplot_grid(n)
         for idx, (label, epochs, matrix) in enumerate(valid_items):
             ax = axes[idx]
             im = ax.imshow(matrix, aspect='auto', cmap='RdYlGn', vmin=0, vmax=1)
@@ -300,8 +300,6 @@ def plot_per_position(data, title, save_path=None):
             step = max(1, len(epochs)//5)
             ax.set_yticks(range(0, len(epochs), step))
             ax.set_yticklabels([epochs[i] for i in range(0, len(epochs), step)], fontsize=6)
-        for idx in range(n, len(axes)):
-            axes[idx].axis('off')
         fig.suptitle(f'{title} - Per-position Accuracy', fontsize=12)
         fig.colorbar(im, ax=axes.ravel().tolist(), label='Accuracy')
 
@@ -374,11 +372,7 @@ def plot_per_rule(data, title, save_path=None):
             return
 
         n = len(parsed)
-        ncols = 4
-        nrows = (n + ncols - 1) // ncols
-        fig, axes = plt.subplots(nrows, ncols, figsize=(3.2*ncols, 2.5*nrows),
-                                 squeeze=False, constrained_layout=True)
-        axes = axes.flatten()
+        fig, axes = _make_subplot_grid(n)
         colors = plt.cm.tab10.colors
 
         for idx, (label, epochs, rule_data) in enumerate(parsed):
@@ -403,9 +397,6 @@ def plot_per_rule(data, title, save_path=None):
             ax.legend(fontsize=7)
             ax.grid(True, alpha=0.3)
             ax.set_ylim(-0.05, 1.05)
-
-        for idx in range(n, len(axes)):
-            axes[idx].axis('off')
 
         fig.suptitle(f'{title} - Per-rule Accuracy', fontsize=12)
 
