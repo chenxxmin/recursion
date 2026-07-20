@@ -501,3 +501,15 @@
 **原因**：名字即文档。
 
 **验证**：grep 确认无残留；两种数据集的 train/test split 访问与 `__getitem__` 正常。
+
+---
+
+## 37. core.py run() 的 where=1/2 魔法值
+
+**问题**：`where = 1 if ... else 2` 用整数 1/2 编码 train/test 去向，读者要对照两个 append 分支才能破译；且两个分支的循环体完全相同。
+
+**修改**：改为布尔 `is_train`；两个相同的 append 循环合并为一个（`target = train_samples if is_train else test_samples`）。
+
+**原因**：布尔比魔法整数直白；重复循环体一并消除。
+
+**验证**：数据集生成结果与前一致（train/test 数量和样本长度正确）。

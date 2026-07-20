@@ -73,7 +73,7 @@ class RecurrenceDataset(Dataset):
 
             # MAX_UNIQUE_RATIO is the proportion of initial states exposed to training.
             # The first num_samples states (in shuffled order) go to train, the rest to test.
-            where = 1 if len(self.seen_indices) < self.num_samples else 2
+            is_train = len(self.seen_indices) < self.num_samples
 
             # Traverse the entire cycle
             self.seen_indices.add(start_idx)
@@ -86,12 +86,9 @@ class RecurrenceDataset(Dataset):
                 seq = seq + seq
 
             # Append to train/test set
-            if where == 1:
-                for i in range(num_inits):
-                    self.train_samples.append(torch.tensor(seq[i:i + self.length], dtype=torch.long))
-            else:
-                for i in range(num_inits):
-                    self.test_samples.append(torch.tensor(seq[i:i + self.length], dtype=torch.long))
+            target = self.train_samples if is_train else self.test_samples
+            for i in range(num_inits):
+                target.append(torch.tensor(seq[i:i + self.length], dtype=torch.long))
 
         # Shuffle sample order
         random.shuffle(self.train_samples)
