@@ -346,7 +346,7 @@ class FibonacciTransformer(nn.Module):
             targets_flat = targets.reshape(-1)
             
             loss_all = F.cross_entropy(logits_flat, targets_flat, reduction='none')
-            loss_all = loss_all.view(b, t_targets)
+            loss_all = loss_all.view(b, t_min)
             
             if loss_mask is not None:
                 masked_loss = (loss_all * loss_mask.float()).sum()
@@ -989,7 +989,7 @@ class MixedABTransformer(FibonacciTransformer):
             logits_flat = logits_for_loss.reshape(-1, self.vocab_size)
             targets_flat = targets.reshape(-1)
             loss_all = F.cross_entropy(logits_flat, targets_flat, reduction='none')
-            loss_all = loss_all.view(b, t_targets)
+            loss_all = loss_all.view(b, t_min)
             if loss_mask is not None:
                 masked_loss = (loss_all * loss_mask.float()).sum()
                 num_loss_positions = loss_mask.float().sum()

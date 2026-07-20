@@ -564,3 +564,15 @@
 **原因**：死状态会让读者搜索"它在哪里被读"；其余两项是惯例。
 
 **验证**：py_compile 通过；MixedABDataset 实例无 test_pairs 属性，train 数据正常。
+
+---
+
+## 42. core.py loss_all.view(b, t_targets) 误导性变量名（潜在崩溃点）
+
+**问题**：两个 forward 中 `logits` 和 `targets` 都已截断到 `t_min = min(t_logits, t_targets)`，但 reshape 却写成 `loss_all.view(b, t_targets)`。目前 `t_targets == t_min` 恒成立所以不报错，但若将来出现 targets 长于 logits 的调用方式，`view` 会直接 RuntimeError；且读者需要自行推理为什么 t_targets 恰好安全。
+
+**修改**：两处改为 `view(b, t_min)`，与实际元素个数严格一致。
+
+**原因**：reshape 的维度应该由数据本身决定，而不是靠"恰好相等"的外部条件。
+
+**验证**：两种模型的 forward+loss 路径实跑正常。
