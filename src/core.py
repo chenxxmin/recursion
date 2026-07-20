@@ -1074,14 +1074,19 @@ def estimate_training_memory_bytes(model, batch_size, seq_len):
     grad_bytes = param_bytes
 
     d_model = getattr(model, 'd_model', 64)
-    n_layer = len(getattr(model, 'transformer', {}).get('h', []))
-    if n_layer == 0:
-        n_layer = 1
+    transformer = getattr(model, 'transformer', None)
+    layers = getattr(transformer, 'h', []) if transformer is not None else []
+    n_layer = len(layers) if layers else 1
 
     # Conservative activation estimate per layer:
     # qkv projection, attention scores, MLP up/down, residuals.
     # Multiply by a safety factor to cover framework overhead.
-    mlp_hidden = model.transformer.h[0].mlp[0].out_features
+    mlp_hidden = d_model * 4  # default fallback for mlp_ratio=4
+    if layers:
+        try:
+            mlp_hidden = layers[0].mlp[0].out_features
+        except Exception:
+            pass
     activations_per_layer = batch_size * seq_len * (
         6 * d_model + mlp_hidden
     ) * 4
