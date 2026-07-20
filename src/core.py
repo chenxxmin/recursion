@@ -8,6 +8,7 @@ import sys
 import time
 import threading
 import itertools
+from enum import IntEnum
 from torch.utils.data import Dataset, DataLoader, Sampler
 
 # ==================== Data Generation ====================
@@ -146,44 +147,16 @@ class BucketBatchSampler(Sampler):
     def __len__(self):
         return len(self.batches)
 
-def collate_fn(batch):
-    return torch.stack(batch, dim=0)
-
-
-def mixed_ab_collate_fn(batch):
-    sequences = [item[0] for item in batch]
-    ab_indices = torch.tensor([item[1] for item in batch], dtype=torch.long)
-    return torch.stack(sequences, dim=0), ab_indices
-
-
-def dynamic_mixed_collate_fn(batch):
-    sequences = [item[0] for item in batch]
-    loss_masks = [item[1] for item in batch]
-    return torch.stack(sequences, dim=0), torch.stack(loss_masks, dim=0)
-
-
-# A named tuple-like tag so callers can unambiguously identify what each tensor is.
-BatchTag = {
-    'mixed_ab': 0,
-    'dynamic_mixed': 1,
-    'plain': 2,
-}
+# Every collate_fn returns (x, tag, *payload); the tag tells consumers how to
+# interpret the payload. See _unpack_batch for the layout of each tag.
+class BatchTag(IntEnum):
+    MIXED_AB = 0       # payload: (ab_indices,)  -- per-sample rule index
+    DYNAMIC_MIXED = 1  # payload: (loss_mask,)   -- per-position loss mask
+    PLAIN = 2          # payload: ()             -- sequences only
 
 
 def collate_fn(batch):
-    return torch.stack(batch, dim=0), BatchTag['plain']
-
-
-def mixed_ab_collate_fn(batch):
-    sequences = [item[0] for item in batch]
-    ab_indices = torch.tensor([item[1] for item in batch], dtype=torch.long)
-    return torch.stack(sequences, dim=0), BatchTag['mixed_ab'], ab_indices
-
-
-def dynamic_mixed_collate_fn(batch):
-    sequences = [item[0] for item in batch]
-    loss_masks = [item[1] for item in batch]
-    return torch.stack(sequences, dim=0), BatchTag['dynamic_mixed'], torch.stack(loss_masks, dim=0)
+    return torch.stack(batch, dim=0), BatchTag.PLAIN
 
 
 # ==================== RoPE Definition ====================
@@ -459,6 +432,39 @@ def freeze_partial(model, cond_fix):
     return frozen
 
 
+def _unpack_batch(batch, device, extra_kwargs_fn):
+    """Unpack a dataloader batch of the form (x, tag, *payload).
+
+    Returns (x, loss_mask, kwargs, ab_labels). The tag (see BatchTag) selects
+    the payload layout:
+      PLAIN         -> no payload
+      MIXED_AB      -> (ab_indices,); passed through extra_kwargs_fn and also
+                       returned as ab_labels for per-rule evaluation stats
+      DYNAMIC_MIXED -> (loss_mask,)
+
+    Malformed batches raise immediately instead of being guessed by shape.
+    """
+    if not isinstance(batch, (list, tuple)) or len(batch) < 2 or not isinstance(batch[1], int):
+        raise ValueError(f"Batch must be (x, tag, *payload) with a BatchTag, got: {type(batch)}")
+    x = batch[0].to(device)
+    tag = batch[1]
+    if tag == BatchTag.PLAIN:
+        if len(batch) != 2:
+            raise ValueError(f"PLAIN batch must have no payload, got {len(batch) - 2} extra item(s)")
+        return x, None, {}, None
+    if tag == BatchTag.MIXED_AB:
+        if len(batch) != 3:
+            raise ValueError(f"MIXED_AB batch must carry exactly (ab_indices,), got {len(batch) - 2} payload item(s)")
+        ab_labels = batch[2].to(device)
+        kwargs = extra_kwargs_fn(ab_labels) if extra_kwargs_fn is not None else {}
+        return x, None, kwargs, ab_labels
+    if tag == BatchTag.DYNAMIC_MIXED:
+        if len(batch) != 3:
+            raise ValueError(f"DYNAMIC_MIXED batch must carry exactly (loss_mask,), got {len(batch) - 2} payload item(s)")
+        return x, batch[2].to(device), {}, None
+    raise ValueError(f"Unknown batch tag: {tag}")
+
+
 def train_epoch(model, dataloader, optimizer, device, num_mask=1, extra_kwargs_fn=None, first_task_weight=1.0, frozen_param_states=None):
     model.train()
     total_loss = 0
@@ -468,36 +474,7 @@ def train_epoch(model, dataloader, optimizer, device, num_mask=1, extra_kwargs_f
     pos_total = {}
     
     for batch in dataloader:
-        if isinstance(batch, (list, tuple)):
-            x = batch[0].to(device)  # (B, L)
-            # Use explicit batch tag to distinguish collate modes.
-            if len(batch) >= 2 and isinstance(batch[1], int):
-                tag = batch[1]
-                if tag == BatchTag['dynamic_mixed']:
-                    loss_mask = batch[2].to(device)
-                    kwargs = {}
-                elif tag == BatchTag['mixed_ab']:
-                    ab_indices = batch[2].to(device)
-                    kwargs = extra_kwargs_fn(ab_indices) if extra_kwargs_fn is not None else {}
-                    loss_mask = None
-                elif tag == BatchTag['plain']:
-                    kwargs = {}
-                    loss_mask = None
-                else:
-                    raise ValueError(f"Unknown batch tag: {tag}")
-            else:
-                # Fallback for legacy callers that do not provide a tag.
-                if len(batch) > 1 and batch[1].ndim == 2:
-                    loss_mask = batch[1].to(device)
-                    kwargs = {}
-                else:
-                    extra = batch[1:]
-                    kwargs = extra_kwargs_fn(*extra) if extra_kwargs_fn is not None else {}
-                    loss_mask = None
-        else:
-            x = batch.to(device)
-            kwargs = {}
-            loss_mask = None
+        x, loss_mask, kwargs, _ = _unpack_batch(batch, device, extra_kwargs_fn)
         B = x.size(0)
         
         # Construct targets (no padding, no PAD token)
@@ -566,39 +543,8 @@ def evaluate(model, dataloader, device, num_mask=1, extra_kwargs_fn=None):
     debug_printed = False
     with torch.no_grad():
         for batch in dataloader:
-            ab_labels = None
-            if isinstance(batch, (list, tuple)):
-                x = batch[0].to(device)  # (B, L)
-                # Use explicit batch tag to distinguish collate modes.
-                if len(batch) >= 2 and isinstance(batch[1], int):
-                    tag = batch[1]
-                    if tag == BatchTag['dynamic_mixed']:
-                        loss_mask = batch[2].to(device)
-                        kwargs = {}
-                    elif tag == BatchTag['mixed_ab']:
-                        ab_labels = batch[2].to(device)
-                        kwargs = extra_kwargs_fn(ab_labels) if extra_kwargs_fn is not None else {}
-                        loss_mask = None
-                    elif tag == BatchTag['plain']:
-                        kwargs = {}
-                        loss_mask = None
-                    else:
-                        raise ValueError(f"Unknown batch tag: {tag}")
-                else:
-                    # Fallback for legacy callers that do not provide a tag.
-                    if len(batch) > 1 and batch[1].ndim == 2:
-                        loss_mask = batch[1].to(device)
-                        kwargs = {}
-                    else:
-                        extra = batch[1:]
-                        kwargs = extra_kwargs_fn(*extra) if extra_kwargs_fn is not None else {}
-                        ab_labels = batch[1].to(device)
-                        loss_mask = None
-            else:
-                x = batch.to(device)
-                kwargs = {}
-                loss_mask = None
-            
+            x, loss_mask, kwargs, ab_labels = _unpack_batch(batch, device, extra_kwargs_fn)
+
             B = x.size(0)
             
             targets = x[:, 1:]  # (B, L-1)
@@ -851,7 +797,7 @@ class MixedABDataset(Dataset):
 def mixed_ab_collate_fn(batch):
     sequences = [item[0] for item in batch]
     ab_indices = torch.tensor([item[1] for item in batch], dtype=torch.long)
-    return torch.stack(sequences, dim=0), ab_indices
+    return torch.stack(sequences, dim=0), BatchTag.MIXED_AB, ab_indices
 
 
 class DynamicMixedDataset(Dataset):
@@ -922,7 +868,7 @@ class DynamicMixedDataset(Dataset):
 def dynamic_mixed_collate_fn(batch):
     sequences = [item[0] for item in batch]
     loss_masks = [item[1] for item in batch]
-    return torch.stack(sequences, dim=0), torch.stack(loss_masks, dim=0)
+    return torch.stack(sequences, dim=0), BatchTag.DYNAMIC_MIXED, torch.stack(loss_masks, dim=0)
 
 
 class MixedABTransformer(FibonacciTransformer):
