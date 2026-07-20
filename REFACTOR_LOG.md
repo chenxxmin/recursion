@@ -576,3 +576,15 @@
 **原因**：reshape 的维度应该由数据本身决定，而不是靠"恰好相等"的外部条件。
 
 **验证**：两种模型的 forward+loss 路径实跑正常。
+
+---
+
+## 43. core.py train_epoch/evaluate 的准确率统计重复
+
+**问题**：argmax → 对齐长度 → valid_mask → 逐位置累加 → 总量累加，这段统计逻辑在 `train_epoch` 和 `evaluate` 中逐字重复（约 10 行 ×2）。
+
+**修改**：提取 `_accumulate_accuracy(logits, targets, loss_mask, pos_correct, pos_total)`，就地更新逐位置计数并返回 `(match, batch_correct, batch_samples)`；`match` 保留给 evaluate 的分组统计使用。两处各缩为一行调用 + 两行累加。
+
+**原因**：统计口径（哪些位置计入、如何对齐）必须单一来源——train 和 eval 口径漂移是隐蔽的评估错误。
+
+**验证**：三种任务 train/evaluate 各跑一步，逐位置与分组准确率均正常产出。

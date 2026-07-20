@@ -480,6 +480,24 @@ def _print_nan_diagnostics(x, logits, loss_mask, targets):
     print(f"  targets min/max: {targets.min().item()} / {targets.max().item()}", file=sys.stderr, flush=True)
 
 
+def _accumulate_accuracy(logits, targets, loss_mask, pos_correct, pos_total):
+    """Accumulate per-position and overall accuracy counts for one batch.
+
+    Updates pos_correct/pos_total in place. Returns (match, batch_correct,
+    batch_samples); `match` is the per-position correctness matrix, also used
+    by evaluate() for per-group stats.
+    """
+    preds = logits.argmax(dim=-1)
+    preds = preds[:, :targets.size(1)]  # Align length with targets
+    valid_mask = loss_mask > 0
+    match = ((preds == targets) & valid_mask).float()
+    for pos in range(valid_mask.size(1)):
+        if valid_mask[:, pos].any():
+            pos_correct[pos] = pos_correct.get(pos, 0) + match[:, pos].sum().item()
+            pos_total[pos] = pos_total.get(pos, 0) + valid_mask[:, pos].sum().item()
+    return match, match.sum().item(), valid_mask.float().sum().item()
+
+
 def train_epoch(model, dataloader, optimizer, device, num_mask=1, extra_kwargs_fn=None, first_task_weight=1.0, frozen_param_states=None):
     model.train()
     total_loss = 0
@@ -521,17 +539,11 @@ def train_epoch(model, dataloader, optimizer, device, num_mask=1, extra_kwargs_f
                         param.copy_(saved_value)
         
         with torch.no_grad():
-            preds = logits.argmax(dim=-1)
-            preds = preds[:, :targets.size(1)]  # Align length with targets
-            valid_mask = loss_mask > 0
-            match = ((preds == targets) & valid_mask).float()
-            for pos in range(valid_mask.size(1)):
-                if valid_mask[:, pos].any():
-                    pos_correct[pos] = pos_correct.get(pos, 0) + match[:, pos].sum().item()
-                    pos_total[pos] = pos_total.get(pos, 0) + valid_mask[:, pos].sum().item()
-            total_correct += match.sum().item()
-            total_samples += valid_mask.float().sum().item()
-        
+            _, batch_correct, batch_samples = _accumulate_accuracy(
+                logits, targets, loss_mask, pos_correct, pos_total)
+            total_correct += batch_correct
+            total_samples += batch_samples
+
         total_loss += loss.item() if loss is not None and not torch.isnan(loss) else 0
     
     overall_acc = total_correct / total_samples if total_samples > 0 else 0
@@ -563,17 +575,11 @@ def evaluate(model, dataloader, device, num_mask=1, extra_kwargs_fn=None):
                     loss_mask[:, num_mask:] = 1.0  # Start calculating from predicting item (num_mask+2)
             
             logits, loss, *_ = model(x, targets, loss_mask, **kwargs)
-            
-            preds = logits.argmax(dim=-1)
-            preds = preds[:, :targets.size(1)]  # Align length with targets
-            valid_mask = loss_mask > 0
-            match = ((preds == targets) & valid_mask).float()
-            for pos in range(loss_mask.size(1)):
-                if valid_mask[:, pos].any():
-                    pos_correct[pos] = pos_correct.get(pos, 0) + match[:, pos].sum().item()
-                    pos_total[pos] = pos_total.get(pos, 0) + valid_mask[:, pos].sum().item()
-            total_correct += match.sum().item()
-            total_samples += valid_mask.float().sum().item()
+
+            match, batch_correct, batch_samples = _accumulate_accuracy(
+                logits, targets, loss_mask, pos_correct, pos_total)
+            total_correct += batch_correct
+            total_samples += batch_samples
             total_loss += loss.item()
             
             # Per-rule/group accuracy for mixed_ab
