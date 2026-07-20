@@ -604,3 +604,25 @@
 **验证**：合成张量验证 `_split_exposure_stats` 四组计数与打印格式正确。
 
 **保留的差异（非本项范围）**：mixed_ab 最终测试的 loss mask 与逐位置范围硬编码 2（`loss_mask[:, 2:]`），与可配置的 NUM_MASK 不联动——既有不一致，未动。
+
+---
+
+## 45. core.py run_experiment 拆分（约 570 行 → 4 个函数）
+
+**问题**：`run_experiment` 约 570 行，混合三个阶段：任务分支准备（mixed_ab / dynamic_mixed / 单一递推三套 dataset+model+loader 构造）、公共训练流程、两套最终生成测试。preamble 里 15 个大写局部变量穿透全部三个分支，读者无法判断每个变量在哪个分支真正被用。
+
+**修改**：
+- 三个任务分支提取为 `_prepare_mixed_ab(config, device)` / `_prepare_dynamic_mixed(config)` / `_prepare_single_recurrence(config, task)`，各返回一个 ctx dict（model/dataset/loader/num_mask/extra_kwargs_fn/save_config/cfg/p/train_len/ood_len + 任务特有字段）；
+- 重复构造提取：`_round_up_pow2`（block_size 计算 ×3）、`_make_loaders`（sampler+DataLoader ×3）、`_print_task_banner`（配置打印 ×3）；
+- `_BATCH_RUN_MERGED` 检查从三个分支内提升到分派前（原本每个分支重复一遍）；
+- preamble 只保留 stage 2 真正使用的变量（BATCH_SIZE/EPOCHS/LR/SAVE_PATH/MEMORY_LIMIT_GB + seed/device）；
+- 删除死变量 `config_key`（elif 链中赋值后从未使用）；
+- stage 3 两个分支开头从 ctx 取任务特有值（AB_PAIRS / recurrence_fn 等）。
+
+**原因**：每个 `_prepare_*` 是自包含的任务说明书；`run_experiment` 剩下约 40 行的三阶段骨架。
+
+**行为差异（仅错误路径）**：未合并 config 且 TASK 未知时，原本打印 "Unknown task"，现在先打印 "Config not merged"（均为报错返回）。
+
+**验证**：**黄金标准等价测试**——同一批小 config（addition/tribonacci/mixed_ab/dynamic_mixed 四任务），分别用重构前（git HEAD 旧代码）与重构后的 `run_experiment` 在独立子进程中完整跑通（数据集 → 2 epoch 训练 → 最终生成测试），stdout 逐行 diff：**四个任务全部 IDENTICAL**（剔除含内存数值的 [Memory] 行）。
+
+**附带发现（既有问题，未修）**：测试中发现 multiplication 任务的 `generate_cycle` 对暂态状态（如含 0 的 (1,0)）会死循环——循环只检查"回到起始状态"，不检查"进入已见状态"。旧代码同样存在，与本重构无关。

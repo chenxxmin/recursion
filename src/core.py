@@ -1224,6 +1224,314 @@ def _print_per_position_exposure(correct, loss_mask, exposed, positions, train_l
 BATCH_RUN_MERGED_FLAG = '_BATCH_RUN_MERGED'
 
 
+def _round_up_pow2(n):
+    """Smallest power of two >= n (used for block_size)."""
+    return 2 ** (n - 1).bit_length()
+
+
+def _make_loaders(train_dataset, test_dataset, batch_size, collate_fn):
+    """Build train/test DataLoaders with length-grouped batch sampling."""
+    train_sampler = BucketBatchSampler(train_dataset, batch_size=batch_size, shuffle=True)
+    test_sampler = BucketBatchSampler(test_dataset, batch_size=batch_size, shuffle=False)
+    train_loader = DataLoader(train_dataset, batch_sampler=train_sampler, collate_fn=collate_fn)
+    test_loader = DataLoader(test_dataset, batch_sampler=test_sampler, collate_fn=collate_fn)
+    return train_loader, test_loader
+
+
+def _print_task_banner(block_size, train_len, number_theory_msg):
+    print(f"[Model config] block_size: {block_size}, train length: {train_len}")
+    print(f"[Number theory] {number_theory_msg}")
+    print()
+
+
+def _prepare_mixed_ab(config, device):
+    """Prepare dataset, model, loaders and training params for the mixed_ab task."""
+    cfg = dict(config.get('main', {}))
+    P = cfg['P']
+    D_MODEL = cfg['D_MODEL']
+    N_HEAD = cfg['N_HEAD']
+    N_LAYER = cfg['N_LAYER']
+    BATCH_SIZE = cfg['BATCH_SIZE']
+    TRAIN_LEN = cfg['TRAIN_LEN']
+    OOD_LEN = cfg['OOD_LEN']
+    DROPOUT = cfg['DROPOUT']
+    MAX_UNIQUE_RATIO = cfg.get('MAX_UNIQUE_RATIO', 0.5)
+    ab_pairs_raw = cfg.get('AB_PAIRS', [(3, 5), [7, 11]])
+    AB_PAIRS = [tuple(pair) for pair in ab_pairs_raw] if ab_pairs_raw else [(3, 5), (7, 11)]
+    state_space_size = P ** 2
+
+    # block_size must accommodate max sequence length plus an optional leading rule token
+    max_seq_len = max(TRAIN_LEN, OOD_LEN)
+    if cfg.get('USE_AB_TAG', True):
+        max_seq_len += 1
+    BLOCK_SIZE = _round_up_pow2(max_seq_len)
+
+    # Per-rule exposure ratio for mixed_ab. MAX_UNIQUE_RATIO means exposed (train) proportion.
+    if 'MIXED_AB_MAX_UNIQUE_RATIOS' in cfg:
+        ratios = cfg['MIXED_AB_MAX_UNIQUE_RATIOS']
+    else:
+        ratios = [MAX_UNIQUE_RATIO] * len(AB_PAIRS)
+    if isinstance(ratios, (int, float)):
+        ratios = [ratios] * len(AB_PAIRS)
+    assert len(ratios) == len(AB_PAIRS), \
+        f"MIXED_AB_MAX_UNIQUE_RATIOS length ({len(ratios)}) must equal AB_PAIRS length ({len(AB_PAIRS)})"
+    NUM_TRAIN_SAMPLES = [max(1, int(state_space_size * r)) for r in ratios]
+
+    ds = MixedABDataset(p=P, ab_pairs=AB_PAIRS, num_samples=NUM_TRAIN_SAMPLES, length=TRAIN_LEN,
+                        verbose=True, use_ab_tag=cfg.get('USE_AB_TAG', True))
+    train_dataset = ds.train_data
+    test_dataset = ds.test_data
+
+    _print_task_banner(BLOCK_SIZE, TRAIN_LEN, f"AB parameter pairs: {AB_PAIRS}")
+
+    train_loader, test_loader = _make_loaders(train_dataset, test_dataset, BATCH_SIZE, mixed_ab_collate_fn)
+
+    model = MixedABTransformer(p=P, d_model=D_MODEL, n_head=N_HEAD, n_layer=N_LAYER, block_size=BLOCK_SIZE,
+                               dropout=DROPOUT,
+                               entropy_penalty_weight=cfg['ENTROPY_PENALTY_WEIGHT'],
+                               num_ab_pairs=len(AB_PAIRS),
+                               use_greedy_generate=cfg.get('USE_GREEDY_GENERATE', True),
+                               use_learnable_pe=cfg.get('USE_LEARNABLE_PE', False),
+                               mlp_ratio=cfg.get('MLP_RATIO', 4),
+                               use_ab_tag=cfg.get('USE_AB_TAG', True),
+                               use_conditional_wte=cfg.get('USE_CONDITIONAL_WTE', False),
+                               cond_wte_shared_ratio=cfg.get('COND_WTE_SHARED_RATIO', 0.0),
+                               )
+    NUM_MASK = cfg.get('NUM_MASK', 0)
+    if NUM_MASK == 0:
+        # x0 and x1 are initial values; start evaluating from x2 (the first generated token)
+        num_mask = 2
+    else:
+        num_mask = NUM_MASK
+    extra_kwargs_fn = lambda ab_indices: {'ab_labels': ab_indices.to(device)}
+    save_config = {
+        'p': P,
+        'ab_pairs': AB_PAIRS,
+        'mixed_ab_max_unique_ratios': ratios,
+        'd_model': D_MODEL,
+        'n_head': N_HEAD,
+        'n_layer': N_LAYER,
+        'block_size': BLOCK_SIZE,
+        'use_learnable_pe': cfg.get('USE_LEARNABLE_PE', False),
+        'mlp_ratio': cfg.get('MLP_RATIO', 4),
+        'use_ab_tag': cfg.get('USE_AB_TAG', True),
+        'use_conditional_wte': cfg.get('USE_CONDITIONAL_WTE', False),
+        'cond_wte_shared_ratio': cfg.get('COND_WTE_SHARED_RATIO', 0.0),
+        'vocab_size': P + 1 + len(AB_PAIRS) if cfg.get('USE_AB_TAG', True) else P + 1,
+        'pad_token_id': P + len(AB_PAIRS) if cfg.get('USE_AB_TAG', True) else P,
+    }
+    return {
+        'post_train_mode': 'mixed_ab',
+        'model': model,
+        'train_dataset': train_dataset,
+        'test_dataset': test_dataset,
+        'train_loader': train_loader,
+        'test_loader': test_loader,
+        'num_mask': num_mask,
+        'extra_kwargs_fn': extra_kwargs_fn,
+        'save_config': save_config,
+        'cfg': cfg,
+        'p': P,
+        'train_len': TRAIN_LEN,
+        'ood_len': OOD_LEN,
+        'ab_pairs': AB_PAIRS,
+    }
+
+
+def _prepare_dynamic_mixed(config):
+    """Prepare dataset, model, loaders and training params for the dynamic_mixed task."""
+    cfg_main = config.get('main', {})
+    cfg = dict(cfg_main)
+    cfg.update(config.get('dynamic_mixed', {}))
+
+    P = cfg['P']
+    D_MODEL = cfg_main['D_MODEL']
+    N_HEAD = cfg_main['N_HEAD']
+    N_LAYER = cfg_main['N_LAYER']
+    BATCH_SIZE = cfg_main['BATCH_SIZE']
+    DROPOUT = cfg_main['DROPOUT']
+    ENTROPY_PENALTY_WEIGHT = cfg_main.get('ENTROPY_PENALTY_WEIGHT', 0.0)
+    USE_LEARNABLE_PE = cfg_main.get('USE_LEARNABLE_PE', False)
+    AB_PAIRS = [tuple(pair) for pair in cfg.get('AB_PAIRS', [[1, 1], [1, 2]])]
+    NUM_TRAIN_SAMPLES = cfg.get('NUM_TRAIN_SAMPLES', 10000)
+    NUM_TEST_SAMPLES = cfg.get('NUM_TEST_SAMPLES', 1000)
+    TRAIN_LEN = cfg.get('TRAIN_LEN', 16)
+    OOD_LEN = cfg.get('OOD_LEN', 32)
+
+    # In dynamic_mixed, each generated token is preceded by a flag token,
+    # so the actual sequence length is 2*length - 2.
+    max_seq_len = 2 * max(TRAIN_LEN, OOD_LEN) - 2
+    BLOCK_SIZE = _round_up_pow2(max_seq_len)
+
+    train_dataset = DynamicMixedDataset(
+        p=P, ab_pairs=AB_PAIRS, num_samples=NUM_TRAIN_SAMPLES,
+        length=TRAIN_LEN, seed=cfg.get('RANDOM_SEED', 42)
+    )
+    test_dataset = DynamicMixedDataset(
+        p=P, ab_pairs=AB_PAIRS, num_samples=NUM_TEST_SAMPLES,
+        length=OOD_LEN, seed=cfg.get('RANDOM_SEED', 42) + 1
+    )
+
+    _print_task_banner(BLOCK_SIZE, TRAIN_LEN, f"Dynamic mixed rules: {AB_PAIRS}")
+
+    train_loader, test_loader = _make_loaders(train_dataset, test_dataset, BATCH_SIZE, dynamic_mixed_collate_fn)
+
+    model = FibonacciTransformer(
+        p=P, d_model=D_MODEL, n_head=N_HEAD, n_layer=N_LAYER,
+        block_size=BLOCK_SIZE, dropout=DROPOUT,
+        entropy_penalty_weight=ENTROPY_PENALTY_WEIGHT,
+        use_learnable_pe=USE_LEARNABLE_PE,
+        mlp_ratio=cfg.get('MLP_RATIO', 4)
+    )
+    # vocab_size needs to include flag tokens
+    model.vocab_size = P + 1 + len(AB_PAIRS)
+    model.pad_token_id = P
+    # Expand lm_head and transformer.wte to accommodate flags while preserving weight tying
+    if model.lm_head.weight.size(0) < model.vocab_size:
+        with torch.no_grad():
+            old_head = model.lm_head
+            old_wte = model.transformer.wte
+            new_wte = nn.Embedding(model.vocab_size, old_wte.embedding_dim)
+            new_wte.weight.data[:old_wte.weight.size(0)] = old_wte.weight.data
+            model.transformer.wte = new_wte
+            # Tie lm_head to wte, matching FibonacciTransformer's original design
+            model.lm_head = nn.Linear(old_head.in_features, model.vocab_size, bias=False)
+            model.lm_head.weight = model.transformer.wte.weight
+
+    save_config = {
+        'p': P,
+        'ab_pairs': AB_PAIRS,
+        'd_model': D_MODEL,
+        'n_head': N_HEAD,
+        'n_layer': N_LAYER,
+        'block_size': BLOCK_SIZE,
+        'use_learnable_pe': USE_LEARNABLE_PE,
+        'mlp_ratio': cfg.get('MLP_RATIO', 4),
+        'vocab_size': model.vocab_size,
+        'pad_token_id': model.pad_token_id,
+        'recurrence': 'dynamic_mixed',
+        'train_len': TRAIN_LEN,
+        'ood_len': OOD_LEN,
+    }
+    return {
+        'post_train_mode': 'dynamic_mixed',
+        'model': model,
+        'train_dataset': train_dataset,
+        'test_dataset': test_dataset,
+        'train_loader': train_loader,
+        'test_loader': test_loader,
+        'num_mask': 0,  # unused; loss_mask comes from the dataset
+        'extra_kwargs_fn': None,
+        'save_config': save_config,
+        'cfg': cfg,
+        'p': P,
+        'train_len': TRAIN_LEN,
+        'ood_len': OOD_LEN,
+    }
+
+
+def _prepare_single_recurrence(config, task):
+    """Prepare dataset, model, loaders and training params for addition/multiplication/tribonacci."""
+    cfg = dict(config.get('main', {}))
+    P = cfg['P']
+    D_MODEL = cfg['D_MODEL']
+    N_HEAD = cfg['N_HEAD']
+    N_LAYER = cfg['N_LAYER']
+    BATCH_SIZE = cfg['BATCH_SIZE']
+    TRAIN_LEN = cfg['TRAIN_LEN']
+    OOD_LEN = cfg['OOD_LEN']
+    DROPOUT = cfg['DROPOUT']
+    ENTROPY_PENALTY_WEIGHT = cfg.get('ENTROPY_PENALTY_WEIGHT', 0.0)
+    MAX_UNIQUE_RATIO = cfg.get('MAX_UNIQUE_RATIO', 0.5)
+    USE_LEARNABLE_PE = cfg.get('USE_LEARNABLE_PE', False)
+
+    BLOCK_SIZE = _round_up_pow2(max(TRAIN_LEN, OOD_LEN))
+
+    if task == 'addition':
+        default_num_mask = 1
+        init_len = 2
+        a = cfg['A']
+        b = cfg['B']
+        def recurrence_fn(seq, p):
+            return (a * seq[-1] + b * seq[-2]) % p
+        recurrence_name = f"X(k)=({a}*X(k-1)+{b}*X(k-2)) mod {P}"
+        save_extra_config = {'a': a, 'b': b, 'recurrence': 'addition'}
+    elif task == 'multiplication':
+        default_num_mask = 1
+        init_len = 2
+        def recurrence_fn(seq, p):
+            return (seq[-1] * seq[-2]) % p
+        recurrence_name = f"X(k)=(X(k-1)*X(k-2)) mod {P}"
+        save_extra_config = {'recurrence': 'multiplicative'}
+    elif task == 'tribonacci':
+        default_num_mask = 2
+        init_len = 3
+        a = cfg.get('A', 1)
+        b = cfg.get('B', 1)
+        c = cfg.get('C', 1)
+        def recurrence_fn(seq, p):
+            return (a * seq[-1] + b * seq[-2] + c * seq[-3]) % p
+        recurrence_name = f"X(k)=({a}*X(k-1)+{b}*X(k-2)+{c}*X(k-3)) mod {P}"
+        save_extra_config = {'a': a, 'b': b, 'c': c, 'recurrence': 'tribonacci'}
+
+    state_space_size = P ** init_len
+    NUM_TRAIN_SAMPLES = max(1, int(state_space_size * MAX_UNIQUE_RATIO))
+    NUM_MASK = cfg.get('NUM_MASK', 0)
+    if NUM_MASK == 0:
+        num_mask = default_num_mask
+    else:
+        num_mask = NUM_MASK
+
+    ds = RecurrenceDataset(
+        p=P, recurrence_fn=recurrence_fn, recurrence_name=recurrence_name,
+        init_len=init_len, num_samples=NUM_TRAIN_SAMPLES,
+        length=TRAIN_LEN
+    )
+    ds.run()
+    train_dataset = ds.train_samples
+    test_dataset = ds.test_samples
+
+    _print_task_banner(BLOCK_SIZE, TRAIN_LEN, recurrence_name)
+
+    train_loader, test_loader = _make_loaders(train_dataset, test_dataset, BATCH_SIZE, collate_fn)
+
+    model = FibonacciTransformer(
+        p=P, d_model=D_MODEL, n_head=N_HEAD, n_layer=N_LAYER,
+        block_size=BLOCK_SIZE, dropout=DROPOUT,
+        entropy_penalty_weight=ENTROPY_PENALTY_WEIGHT,
+        use_learnable_pe=USE_LEARNABLE_PE,
+        mlp_ratio=cfg.get('MLP_RATIO', 4)
+    )
+    save_config = {
+        'p': P,
+        'd_model': D_MODEL,
+        'n_head': N_HEAD,
+        'n_layer': N_LAYER,
+        'block_size': BLOCK_SIZE,
+        'use_learnable_pe': USE_LEARNABLE_PE,
+        'mlp_ratio': cfg.get('MLP_RATIO', 4),
+    }
+    save_config.update(save_extra_config)
+    return {
+        'post_train_mode': 'single_recurrence',
+        'model': model,
+        'train_dataset': train_dataset,
+        'test_dataset': test_dataset,
+        'train_loader': train_loader,
+        'test_loader': test_loader,
+        'num_mask': num_mask,
+        'extra_kwargs_fn': None,
+        'save_config': save_config,
+        'cfg': cfg,
+        'p': P,
+        'train_len': TRAIN_LEN,
+        'ood_len': OOD_LEN,
+        'recurrence_fn': recurrence_fn,
+        'init_len': init_len,
+        'recurrence_name': recurrence_name,
+    }
+
+
 def run_experiment(config_path=None):
     if config_path is None:
         script_dir = os.path.dirname(os.path.abspath(__file__))
@@ -1233,25 +1541,12 @@ def run_experiment(config_path=None):
     
     cfg_main = config.get('main', {})
     TASK = cfg_main.get('TASK', 'addition')
-    P = cfg_main['P']
-    D_MODEL = cfg_main['D_MODEL']
-    N_HEAD = cfg_main['N_HEAD']
-    N_LAYER = cfg_main['N_LAYER']
     BATCH_SIZE = cfg_main['BATCH_SIZE']
     EPOCHS = cfg_main['EPOCHS']
     LR = cfg_main['LR']
     SAVE_PATH = cfg_main['SAVE_PATH']
-    TRAIN_LEN = cfg_main['TRAIN_LEN']
-    OOD_LEN = cfg_main['OOD_LEN']
-    DROPOUT = cfg_main['DROPOUT']
-    ENTROPY_PENALTY_WEIGHT = cfg_main.get('ENTROPY_PENALTY_WEIGHT', 0.0)
-    MAX_UNIQUE_RATIO = cfg_main.get('MAX_UNIQUE_RATIO', 0.5)
     MEMORY_LIMIT_GB = cfg_main.get('MEMORY_LIMIT_GB', 50.0)
 
-    # Determine if we need extra room for rule token in mixed_ab label mode.
-    # We cannot compute final BLOCK_SIZE until we know the task and use_ab_tag,
-    # so defer block_size calculation to the task branches below.
-    USE_LEARNABLE_PE = cfg_main.get('USE_LEARNABLE_PE', False)
     seed = cfg_main['RANDOM_SEED']
     random.seed(seed)
     torch.manual_seed(seed)
@@ -1263,259 +1558,35 @@ def run_experiment(config_path=None):
     print(f"Using device: {device}\n")
     log_memory("start", device)
 
+    if not config.get(BATCH_RUN_MERGED_FLAG):
+        print("[Error] Config not merged. Please run via batch_run.py or merge config manually.")
+        return
+
     # ========================================================================
     # Stage 1: Task branch -- prepare dataset, model, loader, training params
     # ========================================================================
     if TASK == 'mixed_ab':
-        if not config.get(BATCH_RUN_MERGED_FLAG):
-            print("[Error] Config not merged. Please run via batch_run.py or merge config manually.")
-            return
-        cfg = dict(cfg_main)
-        ab_pairs_raw = cfg.get('AB_PAIRS', [(3, 5), [7, 11]])
-        AB_PAIRS = [tuple(pair) for pair in ab_pairs_raw] if ab_pairs_raw else [(3, 5), (7, 11)]
-        state_space_size = P ** 2
-
-        # block_size must accommodate max sequence length plus an optional leading rule token
-        max_seq_len = max(TRAIN_LEN, OOD_LEN)
-        if cfg.get('USE_AB_TAG', True):
-            max_seq_len += 1
-        BLOCK_SIZE = 2 ** (max_seq_len - 1).bit_length()
-
-        # Per-rule exposure ratio for mixed_ab. MAX_UNIQUE_RATIO means exposed (train) proportion.
-        if 'MIXED_AB_MAX_UNIQUE_RATIOS' in cfg:
-            ratios = cfg['MIXED_AB_MAX_UNIQUE_RATIOS']
-        else:
-            ratios = [MAX_UNIQUE_RATIO] * len(AB_PAIRS)
-        if isinstance(ratios, (int, float)):
-            ratios = [ratios] * len(AB_PAIRS)
-        assert len(ratios) == len(AB_PAIRS), \
-            f"MIXED_AB_MAX_UNIQUE_RATIOS length ({len(ratios)}) must equal AB_PAIRS length ({len(AB_PAIRS)})"
-        NUM_TRAIN_SAMPLES = [max(1, int(state_space_size * r)) for r in ratios]
-
-        ds = MixedABDataset(p=P, ab_pairs=AB_PAIRS, num_samples=NUM_TRAIN_SAMPLES, length=TRAIN_LEN,
-                            verbose=True, use_ab_tag=cfg.get('USE_AB_TAG', True))
-        train_dataset = ds.train_data
-        test_dataset = ds.test_data
-        
-        print(f"[Model config] block_size: {BLOCK_SIZE}, train length: {TRAIN_LEN}")
-        print(f"[Number theory] AB parameter pairs: {AB_PAIRS}")
-        print()
-        
-        train_sampler = BucketBatchSampler(train_dataset, batch_size=BATCH_SIZE, shuffle=True)
-        train_loader = DataLoader(train_dataset, batch_sampler=train_sampler, collate_fn=mixed_ab_collate_fn)
-        test_sampler = BucketBatchSampler(test_dataset, batch_size=BATCH_SIZE, shuffle=False)
-        test_loader = DataLoader(test_dataset, batch_sampler=test_sampler, collate_fn=mixed_ab_collate_fn)
-        
-        model = MixedABTransformer(p=P, d_model=D_MODEL, n_head=N_HEAD, n_layer=N_LAYER, block_size=BLOCK_SIZE,
-                                   dropout=DROPOUT, 
-                                   entropy_penalty_weight=cfg['ENTROPY_PENALTY_WEIGHT'],
-                                   num_ab_pairs=len(AB_PAIRS),
-                                   use_greedy_generate=cfg.get('USE_GREEDY_GENERATE', True),
-                                   use_learnable_pe=cfg.get('USE_LEARNABLE_PE', False),
-                                   mlp_ratio=cfg.get('MLP_RATIO', 4),
-                                   use_ab_tag=cfg.get('USE_AB_TAG', True),
-                                   use_conditional_wte=cfg.get('USE_CONDITIONAL_WTE', False),
-                                   cond_wte_shared_ratio=cfg.get('COND_WTE_SHARED_RATIO', 0.0),
-)
-        NUM_MASK = cfg.get('NUM_MASK', 0)
-        if NUM_MASK == 0:
-            # x0 and x1 are initial values; start evaluating from x2 (the first generated token)
-            num_mask = 2
-        else:
-            num_mask = NUM_MASK
-        extra_kwargs_fn = lambda ab_indices: {'ab_labels': ab_indices.to(device)}
-        save_config = {
-            'p': P,
-            'ab_pairs': AB_PAIRS,
-            'mixed_ab_max_unique_ratios': ratios,
-            'd_model': D_MODEL,
-            'n_head': N_HEAD,
-            'n_layer': N_LAYER,
-            'block_size': BLOCK_SIZE,
-            'use_learnable_pe': cfg.get('USE_LEARNABLE_PE', False),
-            'mlp_ratio': cfg.get('MLP_RATIO', 4),
-            'use_ab_tag': cfg.get('USE_AB_TAG', True),
-            'use_conditional_wte': cfg.get('USE_CONDITIONAL_WTE', False),
-            'cond_wte_shared_ratio': cfg.get('COND_WTE_SHARED_RATIO', 0.0),
-            'vocab_size': P + 1 + len(AB_PAIRS) if cfg.get('USE_AB_TAG', True) else P + 1,
-            'pad_token_id': P + len(AB_PAIRS) if cfg.get('USE_AB_TAG', True) else P,
-        }
-        post_train_mode = 'mixed_ab'
-
+        ctx = _prepare_mixed_ab(config, device)
     elif TASK == 'dynamic_mixed':
-        if not config.get(BATCH_RUN_MERGED_FLAG):
-            print("[Error] Config not merged. Please run via batch_run.py or merge config manually.")
-            return
-
-        cfg = dict(cfg_main)
-        cfg.update(config.get('dynamic_mixed', {}))
-
-        P = cfg['P']
-        AB_PAIRS = [tuple(pair) for pair in cfg.get('AB_PAIRS', [[1, 1], [1, 2]])]
-        NUM_TRAIN_SAMPLES = cfg.get('NUM_TRAIN_SAMPLES', 10000)
-        NUM_TEST_SAMPLES = cfg.get('NUM_TEST_SAMPLES', 1000)
-        TRAIN_LEN = cfg.get('TRAIN_LEN', 16)
-        OOD_LEN = cfg.get('OOD_LEN', 32)
-
-        # In dynamic_mixed, each generated token is preceded by a flag token,
-        # so the actual sequence length is 2*length - 2.
-        max_seq_len = 2 * max(TRAIN_LEN, OOD_LEN) - 2
-        BLOCK_SIZE = 2 ** (max_seq_len - 1).bit_length()
-
-        train_dataset = DynamicMixedDataset(
-            p=P, ab_pairs=AB_PAIRS, num_samples=NUM_TRAIN_SAMPLES,
-            length=TRAIN_LEN, seed=cfg.get('RANDOM_SEED', 42)
-        )
-        test_dataset = DynamicMixedDataset(
-            p=P, ab_pairs=AB_PAIRS, num_samples=NUM_TEST_SAMPLES,
-            length=OOD_LEN, seed=cfg.get('RANDOM_SEED', 42) + 1
-        )
-
-        print(f"[Model config] block_size: {BLOCK_SIZE}, train length: {TRAIN_LEN}")
-        print(f"[Number theory] Dynamic mixed rules: {AB_PAIRS}")
-        print()
-
-        train_sampler = BucketBatchSampler(train_dataset, batch_size=BATCH_SIZE, shuffle=True)
-        test_sampler = BucketBatchSampler(test_dataset, batch_size=BATCH_SIZE, shuffle=False)
-        train_loader = DataLoader(train_dataset, batch_sampler=train_sampler, collate_fn=dynamic_mixed_collate_fn)
-        test_loader = DataLoader(test_dataset, batch_sampler=test_sampler, collate_fn=dynamic_mixed_collate_fn)
-
-        model = FibonacciTransformer(
-            p=P, d_model=D_MODEL, n_head=N_HEAD, n_layer=N_LAYER,
-            block_size=BLOCK_SIZE, dropout=DROPOUT,
-            entropy_penalty_weight=ENTROPY_PENALTY_WEIGHT,
-            use_learnable_pe=USE_LEARNABLE_PE,
-            mlp_ratio=cfg.get('MLP_RATIO', 4)
-        )
-        # vocab_size needs to include flag tokens
-        model.vocab_size = P + 1 + len(AB_PAIRS)
-        model.pad_token_id = P
-        # Expand lm_head and transformer.wte to accommodate flags while preserving weight tying
-        if model.lm_head.weight.size(0) < model.vocab_size:
-            with torch.no_grad():
-                old_head = model.lm_head
-                old_wte = model.transformer.wte
-                new_wte = nn.Embedding(model.vocab_size, old_wte.embedding_dim)
-                new_wte.weight.data[:old_wte.weight.size(0)] = old_wte.weight.data
-                model.transformer.wte = new_wte
-                # Tie lm_head to wte, matching FibonacciTransformer's original design
-                model.lm_head = nn.Linear(old_head.in_features, model.vocab_size, bias=False)
-                model.lm_head.weight = model.transformer.wte.weight
-
-        num_mask = 0  # unused; loss_mask comes from the dataset
-        extra_kwargs_fn = None
-        save_config = {
-            'p': P,
-            'ab_pairs': AB_PAIRS,
-            'd_model': D_MODEL,
-            'n_head': N_HEAD,
-            'n_layer': N_LAYER,
-            'block_size': BLOCK_SIZE,
-            'use_learnable_pe': USE_LEARNABLE_PE,
-            'mlp_ratio': cfg.get('MLP_RATIO', 4),
-            'vocab_size': model.vocab_size,
-            'pad_token_id': model.pad_token_id,
-            'recurrence': 'dynamic_mixed',
-            'train_len': TRAIN_LEN,
-            'ood_len': OOD_LEN,
-        }
-        post_train_mode = 'dynamic_mixed'
-        
-    elif TASK == 'addition':
-        config_key = 'main'
-        default_num_mask = 1
-        init_len = 2
-    elif TASK == 'multiplication':
-        config_key = 'multiplicative'
-        default_num_mask = 1
-        init_len = 2
-    elif TASK == 'tribonacci':
-        config_key = 'tribonacci'
-        default_num_mask = 2
-        init_len = 3
+        ctx = _prepare_dynamic_mixed(config)
+    elif TASK in ('addition', 'multiplication', 'tribonacci'):
+        ctx = _prepare_single_recurrence(config, TASK)
     else:
         print(f"Unknown task: {TASK}")
         return
 
-    # ========================================================================
-    # Single recurrence task data preparation (mixed_ab handled above)
-    # ========================================================================
-    if TASK not in ('mixed_ab', 'dynamic_mixed'):
-        if not config.get(BATCH_RUN_MERGED_FLAG):
-            print("[Error] Config not merged. Please run via batch_run.py or merge config manually.")
-            return
-
-        BLOCK_SIZE = max(TRAIN_LEN, OOD_LEN)
-        BLOCK_SIZE = 2 ** (BLOCK_SIZE - 1).bit_length()
-        
-        cfg = dict(cfg_main)
-
-        if TASK == 'addition':
-            a = cfg['A']
-            b = cfg['B']
-            def recurrence_fn(seq, p):
-                return (a * seq[-1] + b * seq[-2]) % p
-            recurrence_name = f"X(k)=({a}*X(k-1)+{b}*X(k-2)) mod {P}"
-            save_extra_config = {'a': a, 'b': b, 'recurrence': 'addition'}
-        elif TASK == 'multiplication':
-            def recurrence_fn(seq, p):
-                return (seq[-1] * seq[-2]) % p
-            recurrence_name = f"X(k)=(X(k-1)*X(k-2)) mod {P}"
-            save_extra_config = {'recurrence': 'multiplicative'}
-        elif TASK == 'tribonacci':
-            a = cfg.get('A', 1)
-            b = cfg.get('B', 1)
-            c = cfg.get('C', 1)
-            def recurrence_fn(seq, p):
-                return (a * seq[-1] + b * seq[-2] + c * seq[-3]) % p
-            recurrence_name = f"X(k)=({a}*X(k-1)+{b}*X(k-2)+{c}*X(k-3)) mod {P}"
-            save_extra_config = {'a': a, 'b': b, 'c': c, 'recurrence': 'tribonacci'}
-
-        state_space_size = P ** init_len
-        NUM_TRAIN_SAMPLES = max(1, int(state_space_size * MAX_UNIQUE_RATIO))
-        NUM_MASK = cfg.get('NUM_MASK', 0)
-        if NUM_MASK == 0:
-            num_mask = default_num_mask
-        else:
-            num_mask = NUM_MASK
-
-        ds = RecurrenceDataset(
-            p=P, recurrence_fn=recurrence_fn, recurrence_name=recurrence_name,
-            init_len=init_len, num_samples=NUM_TRAIN_SAMPLES,
-            length=TRAIN_LEN
-        )
-        ds.run()
-        train_dataset = ds.train_samples
-        test_dataset = ds.test_samples
-        print(f"[Model config] block_size: {BLOCK_SIZE}, train length: {TRAIN_LEN}")
-        print(f"[Number theory] {recurrence_name}")
-        print()
-
-        train_sampler = BucketBatchSampler(train_dataset, batch_size=BATCH_SIZE, shuffle=True)
-        test_sampler = BucketBatchSampler(test_dataset, batch_size=BATCH_SIZE, shuffle=False)
-        train_loader = DataLoader(train_dataset, batch_sampler=train_sampler, collate_fn=collate_fn)
-        test_loader = DataLoader(test_dataset, batch_sampler=test_sampler, collate_fn=collate_fn)
-
-        model = FibonacciTransformer(
-            p=P, d_model=D_MODEL, n_head=N_HEAD, n_layer=N_LAYER,
-            block_size=BLOCK_SIZE, dropout=DROPOUT,
-            entropy_penalty_weight=ENTROPY_PENALTY_WEIGHT,
-            use_learnable_pe=USE_LEARNABLE_PE,
-            mlp_ratio=cfg.get('MLP_RATIO', 4)
-        )
-        extra_kwargs_fn = None
-        save_config = {
-            'p': P,
-            'd_model': D_MODEL,
-            'n_head': N_HEAD,
-            'n_layer': N_LAYER,
-            'block_size': BLOCK_SIZE,
-            'use_learnable_pe': USE_LEARNABLE_PE,
-            'mlp_ratio': cfg.get('MLP_RATIO', 4),
-        }
-        if save_extra_config:
-            save_config.update(save_extra_config)
-        post_train_mode = 'single_recurrence'
+    model = ctx['model']
+    train_dataset = ctx['train_dataset']
+    train_loader = ctx['train_loader']
+    test_loader = ctx['test_loader']
+    num_mask = ctx['num_mask']
+    extra_kwargs_fn = ctx['extra_kwargs_fn']
+    save_config = ctx['save_config']
+    cfg = ctx['cfg']
+    P = ctx['p']
+    TRAIN_LEN = ctx['train_len']
+    OOD_LEN = ctx['ood_len']
+    post_train_mode = ctx['post_train_mode']
 
     log_memory("after dataset", device)
 
@@ -1583,6 +1654,7 @@ def run_experiment(config_path=None):
     if cfg.get('SKIP_FINAL_GENERATION_TEST', False):
         print("\n[Config] SKIP_FINAL_GENERATION_TEST=true, skipping final generation test.")
     elif post_train_mode == 'mixed_ab':
+        AB_PAIRS = ctx['ab_pairs']
         print(f"\n{'='*50}")
         print("Final generation test (batched teacher forcing, validate from position 3)")
         print(f"{'='*50}")
@@ -1659,6 +1731,9 @@ def run_experiment(config_path=None):
         log_memory("after final test", device)
 
     elif post_train_mode == 'single_recurrence':
+        recurrence_fn = ctx['recurrence_fn']
+        init_len = ctx['init_len']
+        recurrence_name = ctx['recurrence_name']
         print(f"\n{'='*50}")
         print(f"Final generation test (batched teacher forcing, validate from position {num_mask+1})")
         print(f"{'='*50}")
