@@ -329,3 +329,15 @@
 **原因**：每个函数一个职责；`run_single` 剩下约 90 行的线性流程，一眼可读。
 
 **验证**：`build_merged_config` 合并顺序/自动填充断言；`_spawn_python` 实际启动子进程跑通。
+
+---
+
+## 23. batch_run.py 魔法值常量化（含 core.py 的合并标记）
+
+**问题**：`'_BATCH_RUN_MERGED'` 字面量横跨 batch_run.py（写入）和 core.py（3 处消费），拼写漂移不会报错只会静默拒绝运行；`'fibonacci_transformer.pth'` 兜底默认值与 config.json 重复；分隔线宽度 `50`、汇总表宽 `140` 和列宽 `45/6/8` 散布多处，表头与数据行的格式串各自手写数字，改一处忘另一处表格就错位。
+
+**修改**：batch_run.py 定义 `BATCH_RUN_MERGED_FLAG / DEFAULT_SAVE_PATH / SEP_WIDTH / SUMMARY_WIDTH / NAME_COL / EPOCH_COL / NUM_COL`；core.py 定义同名 `BATCH_RUN_MERGED_FLAG`（两模块互为生产者-消费者，各自定义并注释来源，避免训练核心依赖批跑器）。表头与数据行格式串共用列宽常量。
+
+**原因**：跨模块协议（标记键名）必须有名字；表格宽度单一来源。
+
+**验证**：两文件编译通过；断言两模块标记常量相等；format_config_table 输出分隔线宽度不变。

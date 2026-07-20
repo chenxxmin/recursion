@@ -27,6 +27,18 @@ EXIT_CUDA_OUT_OF_MEMORY = 77
 # Exit code used by core.py when CPU RSS exceeds MEMORY_LIMIT_GB.
 EXIT_MEMORY_LIMIT_EXCEEDED = 78
 
+# Marker written into merged configs; core.run_experiment refuses to run without it.
+BATCH_RUN_MERGED_FLAG = '_BATCH_RUN_MERGED'
+# Fallback when the merged config has no SAVE_PATH (should not happen since
+# build_merged_config auto-fills it; kept for defensive .get()).
+DEFAULT_SAVE_PATH = 'fibonacci_transformer.pth'
+
+SEP_WIDTH = 50      # width of console section separators
+SUMMARY_WIDTH = 140  # width of the detailed summary table
+NAME_COL = 45       # summary table: experiment name column width
+EPOCH_COL = 6       # summary table: epoch column width
+NUM_COL = 8         # summary table: numeric column width
+
 # These are updated per experiment in main().
 LOG_DIR = 'logs'
 MODEL_DIR = 'models'
@@ -62,9 +74,9 @@ TRAIN_KEYS = [
 
 
 def _append_config_section(lines, title, keys, config):
-    lines.append("-" * 50)
+    lines.append("-" * SEP_WIDTH)
     lines.append(title)
-    lines.append("-" * 50)
+    lines.append("-" * SEP_WIDTH)
     for key in keys:
         if key in config:
             lines.append(f"{key:<25} {config[key]}")
@@ -76,15 +88,15 @@ def format_config_table(config):
     _append_config_section(lines, "Network Config", NET_KEYS, config)
     _append_config_section(lines, "Dataset Config", DATA_KEYS, config)
 
-    lines.append("-" * 50)
+    lines.append("-" * SEP_WIDTH)
     lines.append("Training Config")
-    lines.append("-" * 50)
+    lines.append("-" * SEP_WIDTH)
     lines.append(f"{'OPTIMIZER':<25} AdamW")
     lines.append(f"{'SCHEDULER':<25} CosineAnnealingLR(T_max=EPOCHS)")
     for key in TRAIN_KEYS:
         if key in config:
             lines.append(f"{key:<25} {config[key]}")
-    lines.append("-" * 50)
+    lines.append("-" * SEP_WIDTH)
     lines.append("")
 
     return "\n".join(lines)
@@ -157,7 +169,7 @@ def build_merged_config(exp, base_config):
 
     merged_main.update(override)
     merged['main'] = merged_main
-    merged['_BATCH_RUN_MERGED'] = True
+    merged[BATCH_RUN_MERGED_FLAG] = True
     return name, task, merged_main, merged
 
 
@@ -246,7 +258,7 @@ def run_single(exp, base_config, concurrency=1, gpu_id=None):
 
     # After experiment succeeds, run attention analysis and append to the same log
     if returncode == 0:
-        pth_path = merged_main.get('SAVE_PATH', 'fibonacci_transformer.pth')
+        pth_path = merged_main.get('SAVE_PATH', DEFAULT_SAVE_PATH)
         if os.path.exists(pth_path):
             run_attention_analysis(name, pth_path, log_path, env)
         else:
@@ -331,7 +343,7 @@ def main():
 
     print(f"Using experiments config: {experiments_path}")
     print(f"Total experiments: {len(experiments)}, concurrency: {concurrency}")
-    print("-" * 50)
+    print("-" * SEP_WIDTH)
 
     # Detect GPUs. Prefer idle GPUs reported by nvidia-smi; fall back to the
     # total GPU count from torch if nvidia-smi is unavailable. Then cap
@@ -354,7 +366,7 @@ def main():
         gpu_ids = []
         detection_msg = "No GPUs detected"
 
-    print("=" * 50)
+    print("=" * SEP_WIDTH)
     if gpu_ids:
         effective_workers = min(concurrency, len(gpu_ids))
         gpu_queue = queue.Queue()
@@ -367,7 +379,7 @@ def main():
         gpu_queue = None
         print(f"GPU detection: {detection_msg}")
         print("Running on CPU")
-    print("=" * 50)
+    print("=" * SEP_WIDTH)
 
     results = []
 
@@ -421,9 +433,9 @@ def main():
                 name, ok, returncode = future.result()
                 handle_result(name, ok, returncode)
 
-    print("\n" + "=" * 50)
+    print("\n" + "=" * SEP_WIDTH)
     print("Experiment Summary")
-    print("=" * 50)
+    print("=" * SEP_WIDTH)
     for name, ok in results:
         status = "[OK] Success" if ok else "[NG] Failed"
         print(f"{status}: {name}")
@@ -514,11 +526,12 @@ def summarize_experiments():
         return
 
     print()
-    print('=' * 140)
+    print('=' * SUMMARY_WIDTH)
     print('Detailed Experiment Summary')
-    print('=' * 140)
-    print(f'{"Experiment":<45} {"Epoch":>6} {"BestTest":>8} {"1stTask":>8} {"Exp-ID":>8} {"Exp-OOD":>8} {"Unexp-ID":>8} {"Unexp-OOD":>8}')
-    print('-' * 140)
+    print('=' * SUMMARY_WIDTH)
+    print(f'{"Experiment":<{NAME_COL}} {"Epoch":>{EPOCH_COL}} {"BestTest":>{NUM_COL}} {"1stTask":>{NUM_COL}} '
+          f'{"Exp-ID":>{NUM_COL}} {"Exp-OOD":>{NUM_COL}} {"Unexp-ID":>{NUM_COL}} {"Unexp-OOD":>{NUM_COL}}')
+    print('-' * SUMMARY_WIDTH)
 
     for log_path in log_files:
         name = os.path.basename(log_path)[:-4]  # Remove .log
@@ -532,9 +545,10 @@ def summarize_experiments():
         uid_str = f"{r['unexposed_in_dist']:.1f}" if r.get('unexposed_in_dist') is not None else 'N/A'
         uood_str = f"{r['unexposed_ood']:.1f}" if r.get('unexposed_ood') is not None else 'N/A'
 
-        print(f'{name:<45} {epoch_str:>6} {best_str:>8} {first_str:>8} {eid_str:>8} {eood_str:>8} {uid_str:>8} {uood_str:>8}')
+        print(f'{name:<{NAME_COL}} {epoch_str:>{EPOCH_COL}} {best_str:>{NUM_COL}} {first_str:>{NUM_COL}} '
+              f'{eid_str:>{NUM_COL}} {eood_str:>{NUM_COL}} {uid_str:>{NUM_COL}} {uood_str:>{NUM_COL}}')
 
-    print('=' * 140)
+    print('=' * SUMMARY_WIDTH)
 
 
 if __name__ == '__main__':

@@ -1140,6 +1140,11 @@ class MemoryMonitor(threading.Thread):
 
 
 # ==================== Unified Experiment Entry ====================
+# Marker that batch_run.py writes into merged configs; run_experiment refuses
+# to run on an unmerged config (raw config.json lacks per-experiment fields).
+BATCH_RUN_MERGED_FLAG = '_BATCH_RUN_MERGED'
+
+
 def run_experiment(config_path=None):
     import json
     if config_path is None:
@@ -1184,7 +1189,7 @@ def run_experiment(config_path=None):
     # Stage 1: Task branch -- prepare dataset, model, loader, training params
     # ========================================================================
     if TASK == 'mixed_ab':
-        if not config.get('_BATCH_RUN_MERGED'):
+        if not config.get(BATCH_RUN_MERGED_FLAG):
             print("[Error] Config not merged. Please run via batch_run.py or merge config manually.")
             return
         cfg = dict(cfg_main)
@@ -1260,7 +1265,7 @@ def run_experiment(config_path=None):
         post_train_mode = 'mixed_ab'
 
     elif TASK == 'dynamic_mixed':
-        if not config.get('_BATCH_RUN_MERGED'):
+        if not config.get(BATCH_RUN_MERGED_FLAG):
             print("[Error] Config not merged. Please run via batch_run.py or merge config manually.")
             return
 
@@ -1358,7 +1363,7 @@ def run_experiment(config_path=None):
     # Single recurrence task data preparation (mixed_ab handled above)
     # ========================================================================
     if TASK not in ('mixed_ab', 'dynamic_mixed'):
-        if not config.get('_BATCH_RUN_MERGED'):
+        if not config.get(BATCH_RUN_MERGED_FLAG):
             print("[Error] Config not merged. Please run via batch_run.py or merge config manually.")
             return
 
