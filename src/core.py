@@ -373,10 +373,10 @@ class FibonacciTransformer(nn.Module):
         batch_size = idx.size(0)
         
         for _ in range(max_new_tokens):
-            # 上下文截断
+            # Crop context to block_size
             idx_cond = idx if idx.size(1) <= self.block_size else idx[:, -self.block_size:]
-            
-            # 安全地提取 logits
+
+            # Extract logits robustly
             output = self(idx_cond, **kwargs)
             if isinstance(output, (tuple, list)):
                 logits = output[0]
@@ -384,13 +384,13 @@ class FibonacciTransformer(nn.Module):
                 logits = output.logits
             else:
                 logits = output
-            
-            # 取最后一个时间步
+
+            # Take the last time step
             logits = logits[:, -1, :]  # (B, V)
-            
-            # 屏蔽 PAD
+
+            # Mask out PAD
             logits[:, pad_id] = float('-inf')
-            # 屏蔽其他受限 token（如 rule tokens）
+            # Mask out other restricted tokens (e.g. rule tokens)
             restricted = getattr(self, 'restricted_token_ids', None)
             if restricted is not None:
                 for tid in restricted:
@@ -770,7 +770,7 @@ class MixedABDataset(Dataset):
         self.test_samples = all_test
         self.ab_labels_test = all_labels_test
 
-        # 构建可直接喂给 DataLoader / BucketBatchSampler 的扁平列表
+        # Flat lists that can be fed directly to DataLoader / BucketBatchSampler
         self.train_data = list(zip(self.train_samples, [self.ab_pairs.index(l) for l in self.ab_labels_train]))
         self.test_data  = list(zip(self.test_samples, [self.ab_pairs.index(l) for l in self.ab_labels_test]))
 
