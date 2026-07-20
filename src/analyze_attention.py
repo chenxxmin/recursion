@@ -168,7 +168,7 @@ def extract_qk_raw_scores(model, input_ids, ab_label=None):
     return layer_outputs
 
 
-def summarize_attention_for_sequence(model, seq, p=None, query_mask=None):
+def summarize_attention_for_sequence(model, seq, query_mask=None):
     """
     Compute attention summary for a single sequence.
 
@@ -513,7 +513,7 @@ def analyze_model_attention(pth_path, device=None):
     # Attention visualization: show only the first
     print(f"\nRandom test sequence 1/{len(test_sequences)} (length {len(test_sequences[0])}): {test_sequences[0][:20]}{'...' if len(test_sequences[0]) > 20 else ''}")
     summary = summarize_attention_for_sequence(
-        model, test_sequences[0], p=p,
+        model, test_sequences[0],
         query_mask=query_masks[0] if query_masks is not None else None)
     print_attention_summary(summary, test_sequences[0])
 

@@ -51,3 +51,15 @@
 **原因**：前向逻辑只保留一份，所有分析函数共享同一实现，消除副本漂移风险。
 
 **验证**：小模型上断言两函数输出的 attention weights 逐元素相等（`torch.equal`）。
+
+---
+
+## 2. analyze_attention.py 死参数 p（summarize_attention_for_sequence）
+
+**问题**：`summarize_attention_for_sequence(model, seq, p=None, query_mask=None)` 的参数 `p` 在函数体内从未被引用，但调用处（`analyze_model_attention`）还在传 `p=p`，给人"模数会参与汇总计算"的错觉。
+
+**修改**：从签名和唯一调用处删除该参数。
+
+**原因**：死参数误导读者去理解一个不存在的数据流。
+
+**验证**：grep 确认函数体内无 `p` 引用；py_compile 通过。
