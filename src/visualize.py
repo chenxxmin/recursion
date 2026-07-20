@@ -93,10 +93,19 @@ def extract_setting_and_seed(name):
 
 
 def _data_items(data):
-    """Normalize input to a list of (label, data_dict)."""
+    """Normalize input to a list of (label, data_dict).
+
+    A plain dict (single experiment) becomes a one-item list with an EMPTY-LABEL
+    marker (''); _is_single relies on this convention to detect single mode.
+    """
     if isinstance(data, dict):
         return [('', data)]
     return data
+
+
+def _is_single(items):
+    """True when items hold a single, unlabeled experiment (see _data_items)."""
+    return len(items) == 1 and items[0][0] == ''
 
 
 def _seed_sort_key(item):
@@ -127,7 +136,7 @@ def plot_learning_curve(data, title, save_path=None):
         (e.g. the seed number).
     """
     items = _data_items(data)
-    single_mode = len(items) == 1 and items[0][0] == ''
+    single_mode = _is_single(items)
 
     if single_mode:
         fig, axes = plt.subplots(1, 2, figsize=(12, 4))
@@ -250,7 +259,7 @@ def plot_per_position(data, title, save_path=None):
         return out_epochs, matrix
 
     items = _data_items(data)
-    single_mode = len(items) == 1 and items[0][0] == ''
+    single_mode = _is_single(items)
 
     if single_mode:
         d = items[0][1]
@@ -318,7 +327,7 @@ def plot_per_rule(data, title, save_path=None):
         Single experiment or a list of runs.
     """
     items = _data_items(data)
-    single_mode = len(items) == 1 and items[0][0] == ''
+    single_mode = _is_single(items)
 
     if single_mode:
         d = items[0][1]
