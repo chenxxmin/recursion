@@ -477,3 +477,15 @@
 **原因**：死配置让读者误以为存在 test 任务分支。（附带说明：`main` 中的 `SAVE_PATH` 默认值与单字母键名（P/A/B/C）的含义问题超出等价修改范围，未动；`"NUM_MASK": 0` 的哨兵语义见 CORE 系列最后一条。）
 
 **验证**：JSON 解析通过；core.py 按 task 读取对应段，test 段无引用。
+
+---
+
+## 35. core.py 参数名 len 遮蔽内置函数
+
+**问题**：`RecurrenceDataset.__init__` 和 `MixedABDataset.__init__`/`_build_with_ab`/`_build_mixed` 的参数名 `len` 遮蔽内置 `len()`，迫使 `_build_with_ab`/`_build_mixed` 写 `import builtins; _len = builtins.len` 这种 hack 才能调用 len()，且每个函数开头还要 `length = len` 转一手。
+
+**修改**：参数统一改名 `length`；删除两处 builtins hack 和所有 `_len()` 调用（直接恢复内置 `len()`）；`run_experiment` 两处调用点同步改为 `length=TRAIN_LEN`。
+
+**原因**：遮蔽内置函数是纯粹的陷阱，hack 代码全部消失。
+
+**验证**：两种数据集（含 fixed_ab_idx 分支）构造正常，样本长度正确。

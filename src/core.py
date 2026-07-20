@@ -13,9 +13,9 @@ from torch.utils.data import Dataset, DataLoader, Sampler
 
 # ==================== Data Generation ====================
 class RecurrenceDataset(Dataset):
-    def __init__(self, p=127, recurrence_fn=None, recurrence_name="X(k)=?", init_len=2, num_samples=1000, len=10,
+    def __init__(self, p=127, recurrence_fn=None, recurrence_name="X(k)=?", init_len=2, num_samples=1000, length=10,
                  verbose=True):
-        self.length = len
+        self.length = length
         self.p = p
         self.recurrence_fn = recurrence_fn
         self.recurrence_name = recurrence_name
@@ -692,7 +692,7 @@ def run_training_engine(model, train_loader, test_loader, optimizer, scheduler, 
 # ==================== Mixed AB Experiment (mixed training with multiple recurrence params) ====================
 
 class MixedABDataset(Dataset):
-    def __init__(self, p=127, ab_pairs=None, fixed_ab_idx=None, num_samples=1000, len=10,
+    def __init__(self, p=127, ab_pairs=None, fixed_ab_idx=None, num_samples=1000, length=10,
                  verbose=True, use_ab_tag=False):
         self.p = p
         self.use_ab_tag = use_ab_tag
@@ -706,37 +706,31 @@ class MixedABDataset(Dataset):
         if fixed_ab_idx is not None:
             a, b = self.ab_pairs[fixed_ab_idx]
             ns = num_samples[fixed_ab_idx] if isinstance(num_samples, (list, tuple)) else num_samples
-            self._build_with_ab(a, b, ns, len, verbose)
+            self._build_with_ab(a, b, ns, length, verbose)
         else:
-            self._build_mixed(num_samples, len, verbose)
+            self._build_mixed(num_samples, length, verbose)
 
-    def _build_with_ab(self, a, b, num_samples, len, verbose):
-        import builtins
-        _len = builtins.len
-        length = len
+    def _build_with_ab(self, a, b, num_samples, length, verbose):
         def recurrence_fn(seq, p):
             return (a * seq[-1] + b * seq[-2]) % p
 
         ds = RecurrenceDataset(
             p=self.p, recurrence_fn=recurrence_fn,
             recurrence_name=f"X(k)={a}*X(k-1)+{b}*X(k-2)",
-            init_len=2, num_samples=num_samples, len=length,
+            init_len=2, num_samples=num_samples, length=length,
             verbose=verbose
         )
         ds.run()
         self.part1 = ds.part1
         self.part2 = ds.part2
-        self.ab_labels_part1 = [(a, b)] * _len(ds.part1)
-        self.ab_labels_part2 = [(a, b)] * _len(ds.part2)
+        self.ab_labels_part1 = [(a, b)] * len(ds.part1)
+        self.ab_labels_part2 = [(a, b)] * len(ds.part2)
 
-    def _build_mixed(self, num_samples, len, verbose):
-        import builtins
-        _len = builtins.len
-        length = len
+    def _build_mixed(self, num_samples, length, verbose):
         if isinstance(num_samples, (list, tuple)):
             num_samples_list = list(num_samples)
         else:
-            num_samples_list = [num_samples] * _len(self.ab_pairs)
+            num_samples_list = [num_samples] * len(self.ab_pairs)
         all_part1 = []
         all_part2 = []
         all_labels_part1 = []
@@ -748,7 +742,7 @@ class MixedABDataset(Dataset):
             all_part2.extend(self.part2)
             all_labels_part1.extend(self.ab_labels_part1)
             all_labels_part2.extend(self.ab_labels_part2)
-            per_rule_stats.append((a, b, _len(self.part1), _len(self.part2)))
+            per_rule_stats.append((a, b, len(self.part1), len(self.part2)))
 
         # Prepend rule token if use_ab_tag (DataLoader indexes the flat list, not __getitem__)
         if self.use_ab_tag:
@@ -775,7 +769,7 @@ class MixedABDataset(Dataset):
 
         if verbose:
             total_states = self.p * self.p
-            print(f"[Dataset] Mixed mode: generated {_len(self.part1)} + {_len(self.part2)} samples, length {length}")
+            print(f"[Dataset] Mixed mode: generated {len(self.part1)} + {len(self.part2)} samples, length {length}")
             print(f"AB parameter pairs: {self.ab_pairs}")
             for a, b, n_train, n_test in per_rule_stats:
                 print(f"  - AB=({a},{b}): train {n_train} | test {n_test} | exposed ~{n_train/total_states*100:.1f}%")
@@ -1214,7 +1208,7 @@ def run_experiment(config_path=None):
             f"MIXED_AB_MAX_UNIQUE_RATIOS length ({len(ratios)}) must equal AB_PAIRS length ({len(AB_PAIRS)})"
         NUM_TRAIN_SAMPLES = [max(1, int(state_space_size * r)) for r in ratios]
 
-        ds = MixedABDataset(p=P, ab_pairs=AB_PAIRS, num_samples=NUM_TRAIN_SAMPLES, len=TRAIN_LEN,
+        ds = MixedABDataset(p=P, ab_pairs=AB_PAIRS, num_samples=NUM_TRAIN_SAMPLES, length=TRAIN_LEN,
                             verbose=True, use_ab_tag=cfg.get('USE_AB_TAG', True))
         train_dataset = ds.train_data
         test_dataset = ds.test_data
@@ -1403,7 +1397,7 @@ def run_experiment(config_path=None):
         ds = RecurrenceDataset(
             p=P, recurrence_fn=recurrence_fn, recurrence_name=recurrence_name,
             init_len=init_len, num_samples=NUM_TRAIN_SAMPLES,
-            len=TRAIN_LEN
+            length=TRAIN_LEN
         )
         ds.run()
         train_dataset = ds.part1
