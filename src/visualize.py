@@ -120,8 +120,12 @@ def _is_single(items):
     return len(items) == 1 and items[0][0] == ''
 
 
-def _seed_sort_key(item):
-    """Sort key for (seed_label, ...) items."""
+def seed_sort_key(item):
+    """Sort key for (seed_label, ...) items.
+
+    Numeric seed labels sort numerically; the empty label (standalone
+    experiment without a seed suffix) gets -1 so it sorts first.
+    """
     seed = item[0]
     return int(seed) if seed.isdigit() else -1
 
@@ -557,7 +561,7 @@ def main():
     if args.no_group:
         # Legacy behaviour: one figure per log file.
         for setting, items in groups.items():
-            for seed, log_path in sorted(items, key=_seed_sort_key):
+            for seed, log_path in sorted(items, key=seed_sort_key):
                 name = f'{setting}_seed{seed}' if seed else setting
                 data = parse_log(log_path)
                 if not data['epochs']:
@@ -574,7 +578,7 @@ def main():
         for setting in sorted(groups.keys()):
             items = groups[setting]
             data_items = []
-            for seed, log_path in sorted(items, key=_seed_sort_key):
+            for seed, log_path in sorted(items, key=seed_sort_key):
                 data = parse_log(log_path)
                 if not data['epochs']:
                     print(f"No epoch data found in {log_path}, skipping.")

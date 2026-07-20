@@ -460,7 +460,7 @@ def generate_grouped_plots():
     for setting in sorted(groups.keys()):
         items = groups[setting]
         data_items = []
-        for seed, log_path in sorted(items, key=visualize._seed_sort_key):
+        for seed, log_path in sorted(items, key=visualize.seed_sort_key):
             data = visualize.parse_log(log_path)
             if data['epochs']:
                 data_items.append((seed, data))
