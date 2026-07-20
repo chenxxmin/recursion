@@ -296,13 +296,15 @@ def main():
     experiments_path = args.experiments_path
 
     # Per-experiment output directories:
-    # logs/plots: <base-dir>/<experiment-name>/
-    # models:     <model-base-dir>/<experiment-name>/
+    # logs:   <base-dir>/<experiment-name>/logs/
+    # plots:  <base-dir>/<experiment-name>/plots/
+    # models: <model-base-dir>/<experiment-name>/
     exp_name = os.path.splitext(os.path.basename(experiments_path))[0]
+    work_dir = os.path.join(args.base_dir, exp_name)
 
     global LOG_DIR, MODEL_DIR, PLOT_DIR
-    LOG_DIR = os.path.join(args.base_dir, exp_name)
-    PLOT_DIR = os.path.join(args.base_dir, exp_name)
+    LOG_DIR = os.path.join(work_dir, 'logs')
+    PLOT_DIR = os.path.join(work_dir, 'plots')
     MODEL_DIR = os.path.join(args.model_base_dir, exp_name)
 
     os.makedirs(LOG_DIR, exist_ok=True)
