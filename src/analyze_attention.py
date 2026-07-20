@@ -432,6 +432,83 @@ def print_attention_summary(summary, seq=None):
         print()
 
 
+def _resolve_recurrence(config):
+    """Inspect the saved config and describe the recurrence the model was trained on.
+
+    Returns a dict with:
+      init_len:         number of initial values the recurrence needs
+      next_val:         callable seq -> next value (None for dynamic_mixed)
+      is_dynamic_mixed: whether the rule can change at every step
+      ab_pairs, flag_start_id, dynamic_seq_len: only for dynamic_mixed
+    """
+    p = config['p']
+    recurrence = config.get('recurrence', 'addition')
+
+    if 'c' in config:
+        a, b, c = config['a'], config['b'], config['c']
+        print(f"Model config: tribonacci, a={a}, b={b}, c={c}, p={p}")
+        return {'init_len': 3, 'is_dynamic_mixed': False,
+                'next_val': lambda seq: (a * seq[-1] + b * seq[-2] + c * seq[-3]) % p}
+    if recurrence == 'multiplicative':
+        print(f"Model config: multiplication, p={p}")
+        return {'init_len': 2, 'is_dynamic_mixed': False,
+                'next_val': lambda seq: (seq[-1] * seq[-2]) % p}
+    if recurrence == 'dynamic_mixed':
+        print(f"Model config: dynamic_mixed, ab_pairs={config['ab_pairs']}, p={p}")
+        return {'init_len': 2, 'is_dynamic_mixed': True, 'next_val': None,
+                'ab_pairs': config['ab_pairs'], 'flag_start_id': p + 1,
+                'dynamic_seq_len': config.get('ood_len', 32)}
+    if 'a' in config and 'b' in config:
+        a, b = config['a'], config['b']
+        print(f"Model config: addition, a={a}, b={b}, p={p}")
+        return {'init_len': 2, 'is_dynamic_mixed': False,
+                'next_val': lambda seq: (a * seq[-1] + b * seq[-2]) % p}
+    # Fallback: old checkpoint or minimal config defaults to addition
+    print(f"Model config: addition (default), p={p}")
+    return {'init_len': 2, 'is_dynamic_mixed': False,
+            'next_val': lambda seq: (seq[-1] + seq[-2]) % p}
+
+
+def _make_dynamic_seq(p, ab_pairs, flag_start_id, length, seed):
+    """Generate one dynamic_mixed sequence: [x1, x2, flag_3, x3, ..., flag_L, x_L]."""
+    rng = random.Random(seed)
+    x1 = rng.randint(0, p - 1)
+    x2 = rng.randint(0, p - 1)
+    seq = [x1, x2]
+    values = [x1, x2]  # Only numeric values, used for recurrence
+    for _ in range(2, length):
+        rule_idx = rng.randrange(len(ab_pairs))
+        a, b = ab_pairs[rule_idx]
+        x_next = (a * values[-2] + b * values[-1]) % p
+        seq.append(flag_start_id + rule_idx)
+        seq.append(x_next)
+        values.append(x_next)
+
+    # Sanity check: flag positions should be >= flag_start_id, value positions < p
+    for i, tok in enumerate(seq):
+        if i % 2 == 0 and i >= 2:
+            assert tok >= flag_start_id, \
+                f"Position {i} should be a flag token (>= {flag_start_id}), got {tok}"
+        else:
+            assert tok < p, \
+                f"Position {i} should be a value token (< {p}), got {tok}"
+    return seq
+
+
+def _make_dynamic_query_mask(length):
+    # Attention matrix is over the input sequence, which has length 2*length - 2.
+    # Valid prediction queries for x_k are the input positions of x_{k-1} and flag_k
+    # immediately preceding x_k. For x3 (k=3), x3 is at input index 3 (0-based),
+    # so we use input position 3 as the query for predicting x3.
+    # General: x_k is at input index 2*(k-1), so the query position is 2*(k-1).
+    total_len = 2 * length - 2
+    mask = [0] * total_len
+    for k in range(3, length + 1):
+        query_pos = 2 * (k - 1)
+        mask[query_pos] = 1
+    return mask
+
+
 def analyze_model_attention(pth_path, device=None):
     """Main entry: load model and randomly generate a test sequence for attention analysis."""
     if device is None:
@@ -439,103 +516,29 @@ def analyze_model_attention(pth_path, device=None):
     model, checkpoint = load_model(pth_path, device=device)
     config = checkpoint['config']
     p = config['p']
-    recurrence = config.get('recurrence', 'addition')
-    is_dynamic_mixed = False
+    rec = _resolve_recurrence(config)
 
-    if 'c' in config:
-        a, b, c = config['a'], config['b'], config['c']
-        print(f"Model config: tribonacci, a={a}, b={b}, c={c}, p={p}")
-        init_len = 3
-        def next_val(seq):
-            return (a * seq[-1] + b * seq[-2] + c * seq[-3]) % p
-    elif recurrence == 'multiplicative':
-        print(f"Model config: multiplication, p={p}")
-        init_len = 2
-        def next_val(seq):
-            return (seq[-1] * seq[-2]) % p
-    elif recurrence == 'dynamic_mixed':
-        print(f"Model config: dynamic_mixed, ab_pairs={config['ab_pairs']}, p={p}")
-        init_len = 2
-        is_dynamic_mixed = True
-        ab_pairs = config['ab_pairs']
-        flag_start_id = p + 1
-        dynamic_seq_len = config.get('ood_len', 32)
-    elif 'a' in config and 'b' in config:
-        a, b = config['a'], config['b']
-        print(f"Model config: addition, a={a}, b={b}, p={p}")
-        init_len = 2
-        def next_val(seq):
-            return (a * seq[-1] + b * seq[-2]) % p
-    else:
-        # Fallback: old checkpoint or minimal config defaults to addition
-        print(f"Model config: addition (default), p={p}")
-        init_len = 2
-        def next_val(seq):
-            return (seq[-1] + seq[-2]) % p
-    
     print(f"Best test accuracy: {checkpoint.get('best_accuracy', 'N/A')}")
     print(f"Training epochs: {checkpoint.get('final_epoch', 'N/A')}")
-    
+
     # Randomly generate one test sequence for attention visualization.
     # (QK property verification lives in qk_verification.py, which reuses
     # verify_qk_properties from this module.)
-    max_len = config.get('block_size', 20)
-    test_sequences = []
-    query_masks = None
-
-    if is_dynamic_mixed:
-        def make_dynamic_seq(seed):
-            rng = random.Random(seed)
-            x1 = rng.randint(0, p - 1)
-            x2 = rng.randint(0, p - 1)
-            seq = [x1, x2]
-            values = [x1, x2]  # Only numeric values, used for recurrence
-            for _ in range(2, dynamic_seq_len):
-                rule_idx = rng.randrange(len(ab_pairs))
-                a, b = ab_pairs[rule_idx]
-                x_next = (a * values[-2] + b * values[-1]) % p
-                seq.append(flag_start_id + rule_idx)
-                seq.append(x_next)
-                values.append(x_next)
-
-            # Sanity check: flag positions should be >= flag_start_id, value positions < p
-            for i, tok in enumerate(seq):
-                if i % 2 == 0 and i >= 2:
-                    assert tok >= flag_start_id, \
-                        f"Position {i} should be a flag token (>= {flag_start_id}), got {tok}"
-                else:
-                    assert tok < p, \
-                        f"Position {i} should be a value token (< {p}), got {tok}"
-            return seq
-
-        def make_dynamic_query_mask(length):
-            # Attention matrix is over the input sequence, which has length 2*length - 2.
-            # Valid prediction queries for x_k are the input positions of x_{k-1} and flag_k
-            # immediately preceding x_k. For x3 (k=3), x3 is at input index 3 (0-based),
-            # so we use input position 3 as the query for predicting x3.
-            # General: x_k is at input index 2*(k-1), so the query position is 2*(k-1).
-            total_len = 2 * length - 2
-            mask = [0] * total_len
-            for k in range(3, length + 1):
-                query_pos = 2 * (k - 1)
-                mask[query_pos] = 1
-            return mask
-
-        test_sequences.append(make_dynamic_seq(seed=0))
-        query_masks = [make_dynamic_query_mask(dynamic_seq_len)]
+    if rec['is_dynamic_mixed']:
+        test_seq = _make_dynamic_seq(p, rec['ab_pairs'], rec['flag_start_id'],
+                                     rec['dynamic_seq_len'], seed=0)
+        query_mask = _make_dynamic_query_mask(rec['dynamic_seq_len'])
     else:
-        init = [random.randint(0, p - 1) for _ in range(init_len)]
-        seq = init[:]
-        for _ in range(init_len, max_len):
-            seq.append(next_val(seq))
-        test_sequences.append(seq)
+        max_len = config.get('block_size', 20)
+        test_seq = [random.randint(0, p - 1) for _ in range(rec['init_len'])]
+        for _ in range(rec['init_len'], max_len):
+            test_seq.append(rec['next_val'](test_seq))
+        query_mask = None
 
     # Attention visualization uses this single sequence
-    print(f"\nRandom test sequence (length {len(test_sequences[0])}): {test_sequences[0][:20]}{'...' if len(test_sequences[0]) > 20 else ''}")
-    summary = summarize_attention_for_sequence(
-        model, test_sequences[0],
-        query_mask=query_masks[0] if query_masks is not None else None)
-    print_attention_summary(summary, test_sequences[0])
+    print(f"\nRandom test sequence (length {len(test_seq)}): {test_seq[:20]}{'...' if len(test_seq) > 20 else ''}")
+    summary = summarize_attention_for_sequence(model, test_seq, query_mask=query_mask)
+    print_attention_summary(summary, test_seq)
 
 
 if __name__ == "__main__":

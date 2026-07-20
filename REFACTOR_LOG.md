@@ -129,3 +129,17 @@
 **原因**：符合 Python 惯例，消除"main 是什么"的认知负担。
 
 **验证**：py_compile + 小模型实跑 summarize 流程正常；qk_verification 同步编译通过。
+
+---
+
+## 8. analyze_attention.py analyze_model_attention 拆分
+
+**问题**：`analyze_model_attention` 约 100 行，混杂三类职责：从 config 推断递推规则（5 个分支）、dynamic_mixed 测试序列与 query mask 生成（2 个嵌套函数）、汇总调用。嵌套函数依赖闭包变量，阅读时需要在 100 行内追踪多个隐式状态。
+
+**修改**：提取三个模块级函数——`_resolve_recurrence(config)`（返回描述递推规则的 dict）、`_make_dynamic_seq(p, ab_pairs, flag_start_id, length, seed)`、`_make_dynamic_query_mask(length)`；主函数只保留"加载模型 → 生成序列 → 汇总打印"的流程骨架，原来的列表包装（`test_sequences[0]`）简化为标量。
+
+**原因**：每个函数一个职责，参数显式传递取代闭包隐式依赖。
+
+**验证**：`_resolve_recurrence` 五个分支单测；小 checkpoint 端到端跑通 addition 路径。
+
+**⚠️ 发现的既有 bug（未修，保持等价）**：`_make_dynamic_query_mask` 中 `query_pos = 2*(k-1)` 与其注释矛盾——注释说"x3 在输入下标 3"，但公式给出 4。按输入布局 `[x1,x2,f3,x3,...]`，x_k 的下标应为 `2*(k-1)-1`。该 bug 在重构前即存在（见 commit d6b0ed1 第 539 行），且最后一个 k 必然越界——dynamic_mixed 的注意力分析路径实际上从未成功运行过。是否修复待确认（修复属于行为变更，超出等价重构范围）。
