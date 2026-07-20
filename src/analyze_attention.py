@@ -258,6 +258,13 @@ def summarize_attention_for_sequence(model, seq, query_mask=None):
     return results
 
 
+def _mean_std(vals):
+    """Return (mean, population std) of a non-empty list of numbers."""
+    mean = sum(vals) / len(vals)
+    std = math.sqrt(sum((v - mean) ** 2 for v in vals) / len(vals))
+    return mean, std
+
+
 def verify_qk_properties(model, test_sequences, init_len, query_masks=None, device='cpu'):
     """
     Verify two QK properties:
@@ -319,15 +326,15 @@ def verify_qk_properties(model, test_sequences, init_len, query_masks=None, devi
             for d in range(1, init_len + 1):
                 vals = scores_by_d.get(d, [])
                 if vals:
-                    print(f"    d={d:2d} (effective): mean={sum(vals)/len(vals):7.3f}, std={math.sqrt(sum((v-sum(vals)/len(vals))**2 for v in vals)/len(vals)):6.3f}, n={len(vals)}")
+                    mean, std = _mean_std(vals)
+                    print(f"    d={d:2d} (effective): mean={mean:7.3f}, std={std:6.3f}, n={len(vals)}")
             # long-distance
             far_vals = []
             for d, vals in scores_by_d.items():
                 if d > init_len:
                     far_vals.extend(vals)
             if far_vals:
-                mean_far = sum(far_vals) / len(far_vals)
-                std_far = math.sqrt(sum((v - mean_far)**2 for v in far_vals) / len(far_vals))
+                mean_far, std_far = _mean_std(far_vals)
                 print(f"    d>{init_len} (long-distance): mean={mean_far:7.3f}, std={std_far:6.3f}, n={len(far_vals)}")
             print()
     
@@ -353,8 +360,7 @@ def verify_qk_properties(model, test_sequences, init_len, query_masks=None, devi
                         vals.append(raw[i, i - d].item())
                 
                 if vals:
-                    mean_v = sum(vals) / len(vals)
-                    std_v = math.sqrt(sum((v - mean_v)**2 for v in vals) / len(vals))
+                    mean_v, std_v = _mean_std(vals)
                     cv = std_v / abs(mean_v) if abs(mean_v) > 1e-6 else float('inf')
                     print(f"    d={d:2d}: mean={mean_v:7.3f}, std={std_v:6.3f}, CV={cv:5.3f}, n={len(vals)}")
             print()
