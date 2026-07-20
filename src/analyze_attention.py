@@ -32,7 +32,7 @@ def load_model(pth_path, device='cpu'):
     # backward compat: old checkpoints without mlp_ratio, infer from first MLP weight shape
     if 'mlp_ratio' not in filtered_config:
         for k in state_keys:
-            if 'transformer.h.0.mlp.0.weight' in k or k.endswith('.mlp.0.weight'):
+            if k.endswith('.mlp.0.weight'):
                 out_dim, in_dim = checkpoint['model_state_dict'][k].shape
                 if in_dim > 0:
                     filtered_config['mlp_ratio'] = out_dim // in_dim
@@ -41,9 +41,6 @@ def load_model(pth_path, device='cpu'):
     # Detect MixedABTransformer checkpoint and instantiate accordingly
     if any('ab_emb' in k or 'rule_head' in k or 'cond_wte' in k for k in state_keys):
         num_ab_pairs = len(config.get('ab_pairs', [])) if config.get('ab_pairs') else 1
-        if num_ab_pairs == 0:
-            # Fallback: infer from ab_emb.weight shape
-            num_ab_pairs = checkpoint['model_state_dict']['ab_emb.weight'].shape[0]
         mixedab_config = dict(filtered_config)
         mixedab_config['use_ab_tag'] = config.get('use_ab_tag', True)
         mixedab_config['use_conditional_wte'] = config.get('use_conditional_wte', any('cond_wte' in k for k in state_keys))

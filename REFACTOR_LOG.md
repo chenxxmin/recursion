@@ -63,3 +63,17 @@
 **原因**：死参数误导读者去理解一个不存在的数据流。
 
 **验证**：grep 确认函数体内无 `p` 引用；py_compile 通过。
+
+---
+
+## 3. analyze_attention.py load_model 的两处逻辑噪音
+
+**问题**：
+1. `:35` 条件 `'transformer.h.0.mlp.0.weight' in k or k.endswith('.mlp.0.weight')` 中，前半句恒被后半句覆盖（该字符串本身就以 `.mlp.0.weight` 结尾），是无效冗余。
+2. `:43-46` `num_ab_pairs = len(...) if config.get('ab_pairs') else 1` 的结果最小为 1，紧随的 `if num_ab_pairs == 0` 分支不可达；且该分支引用的 `ab_emb.weight` 在当前模型结构中并不存在，若真走到反而会 KeyError。
+
+**修改**：1 的条件只保留 `endswith`；2 删除不可达分支。
+
+**原因**：冗余条件和不可达分支会让读者误以为存在需要兼容的历史情况。
+
+**验证**：py_compile 通过；逻辑等价性由条件包含关系直接得证。
