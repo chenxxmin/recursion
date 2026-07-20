@@ -34,15 +34,13 @@
     "EARLY_STOP_ACCURACY": 0.99,
     "MEMORY_LIMIT_GB": 50.0
   },
-  "test": {},
   "tribonacci": {
     "P": 23,
     "A": 1,
     "B": 2,
     "C": 3
   },
-  "multiplicative": {
-  },
+  "multiplicative": {},
   "dynamic_mixed": {
     "P": 53,
     "AB_PAIRS": [[1, 1], [1, 2]],
