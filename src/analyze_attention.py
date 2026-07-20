@@ -38,7 +38,10 @@ def load_model(pth_path, device='cpu'):
     # backward compat: old checkpoints saved 'recurrence' or 'a','b' in config
     filtered_config = {k: v for k, v in config.items() if k in valid_keys}
     
-    # backward compat: old checkpoints without use_learnable_pe, infer from state_dict keys
+    # backward compat: old checkpoints without use_learnable_pe, infer from state_dict keys.
+    # The two position-encoding schemes leave different fingerprints in the checkpoint:
+    # learnable PE (or its alibi variant) stores per-position parameters ('alibi_slopes'),
+    # while RoPE registers its frequency table as a buffer ('rope.inv_freq').
     state_keys = set(checkpoint['model_state_dict'].keys())
     if 'use_learnable_pe' not in filtered_config:
         if any('alibi_slopes' in k for k in state_keys):

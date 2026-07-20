@@ -143,3 +143,15 @@
 **验证**：`_resolve_recurrence` 五个分支单测；小 checkpoint 端到端跑通 addition 路径。
 
 **⚠️ 发现的既有 bug（未修，保持等价）**：`_make_dynamic_query_mask` 中 `query_pos = 2*(k-1)` 与其注释矛盾——注释说"x3 在输入下标 3"，但公式给出 4。按输入布局 `[x1,x2,f3,x3,...]`，x_k 的下标应为 `2*(k-1)-1`。该 bug 在重构前即存在（见 commit d6b0ed1 第 539 行），且最后一个 k 必然越界——dynamic_mixed 的注意力分析路径实际上从未成功运行过。是否修复待确认（修复属于行为变更，超出等价重构范围）。
+
+---
+
+## 9. analyze_attention.py 补充 PE 方案推断注释
+
+**问题**：`load_model` 通过 state_dict 键名反推 `use_learnable_pe`（看到 `alibi_slopes` 判 True、看到 `rope.inv_freq` 判 False），这条因果链不显然，读者需要知道两种位置编码在 checkpoint 里留下的"指纹"才能理解。
+
+**修改**：补充注释说明两种位置编码各自在 checkpoint 中留下什么键。
+
+**原因**：推断逻辑的有效性依赖模型实现细节，必须把这条隐式知识写显式。
+
+**验证**：仅注释变更，py_compile 通过。
