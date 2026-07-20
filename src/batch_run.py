@@ -45,64 +45,45 @@ def save_json(path, data):
         json.dump(data, f, indent=2, ensure_ascii=False)
 
 
+NET_KEYS = [
+    'D_MODEL', 'N_HEAD', 'N_LAYER', 'MLP_RATIO', 'DROPOUT',
+    'USE_LEARNABLE_PE'
+]
+DATA_KEYS = [
+    'P', 'TASK', 'TRAIN_LEN', 'OOD_LEN', 'MAX_UNIQUE_RATIO',
+    'MIXED_AB_MAX_UNIQUE_RATIOS', 'AB_PAIRS', 'A', 'B', 'C',
+    'NUM_MASK'
+]
+TRAIN_KEYS = [
+    'BATCH_SIZE', 'LR', 'WEIGHT_DECAY', 'EPOCHS', 'RANDOM_SEED',
+    'FIRST_TASK_WEIGHT', 'ENTROPY_PENALTY_WEIGHT', 'EVAL_INTERVAL',
+    'EARLY_STOP_ACCURACY', 'EARLY_STOP_NO_IMPROVE', 'USE_GREEDY_GENERATE'
+]
+
+
+def _append_config_section(lines, title, keys, config):
+    lines.append("-" * 50)
+    lines.append(title)
+    lines.append("-" * 50)
+    for key in keys:
+        if key in config:
+            lines.append(f"{key:<25} {config[key]}")
+
+
 def format_config_table(config):
     """Format merged config into a readable three-section table."""
-    net_keys = [
-        'D_MODEL', 'N_HEAD', 'N_LAYER', 'MLP_RATIO', 'DROPOUT',
-        'USE_LEARNABLE_PE'
-    ]
-    data_keys = [
-        'P', 'TASK', 'TRAIN_LEN', 'OOD_LEN', 'MAX_UNIQUE_RATIO',
-        'MIXED_AB_MAX_UNIQUE_RATIOS', 'AB_PAIRS', 'A', 'B', 'C',
-        'NUM_MASK'
-    ]
-    train_keys = [
-        'BATCH_SIZE', 'LR', 'WEIGHT_DECAY', 'EPOCHS', 'RANDOM_SEED',
-        'FIRST_TASK_WEIGHT', 'ENTROPY_PENALTY_WEIGHT', 'EVAL_INTERVAL',
-        'EARLY_STOP_ACCURACY', 'EARLY_STOP_NO_IMPROVE', 'USE_GREEDY_GENERATE'
-    ]
-
     lines = []
-    lines.append("-" * 50)
-    lines.append("Network Config")
-    lines.append("-" * 50)
-    for key in net_keys:
-        if key in config:
-            value = config[key]
-            if isinstance(value, float):
-                lines.append(f"{key:<25} {value}")
-            elif isinstance(value, bool):
-                lines.append(f"{key:<25} {value}")
-            else:
-                lines.append(f"{key:<25} {value}")
-
-    lines.append("-" * 50)
-    lines.append("Dataset Config")
-    lines.append("-" * 50)
-    for key in data_keys:
-        if key in config:
-            value = config[key]
-            if isinstance(value, (list, tuple)):
-                lines.append(f"{key:<25} {value}")
-            elif isinstance(value, float):
-                lines.append(f"{key:<25} {value}")
-            else:
-                lines.append(f"{key:<25} {value}")
+    _append_config_section(lines, "Network Config", NET_KEYS, config)
+    _append_config_section(lines, "Dataset Config", DATA_KEYS, config)
 
     lines.append("-" * 50)
     lines.append("Training Config")
     lines.append("-" * 50)
     lines.append(f"{'OPTIMIZER':<25} AdamW")
     lines.append(f"{'SCHEDULER':<25} CosineAnnealingLR(T_max=EPOCHS)")
-    for key in train_keys:
+    for key in TRAIN_KEYS:
         if key in config:
-            value = config[key]
-            if isinstance(value, float):
-                lines.append(f"{key:<25} {value}")
-            elif isinstance(value, bool):
-                lines.append(f"{key:<25} {value}")
-            else:
-                lines.append(f"{key:<25} {value}")
+            lines.append(f"{key:<25} {config[key]}")
     lines.append("-" * 50)
     lines.append("")
 

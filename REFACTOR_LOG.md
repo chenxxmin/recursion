@@ -289,3 +289,15 @@
 **原因**：死代码；保留会让读者怀疑存在"wait 之前的 returncode 语义"。
 
 **验证**：py_compile 通过。
+
+---
+
+## 20. batch_run.py format_config_table 三段重复与无效分支
+
+**问题**：三个配置段的循环结构完全重复；更离谱的是每段内部 `isinstance(float) / isinstance(bool) / else` 三个分支的函数体一模一样（`f"{key:<25} {value}"`）——类型判断完全不产生差异，是纯噪音。
+
+**修改**：键列表提升为模块常量 `NET_KEYS / DATA_KEYS / TRAIN_KEYS`；段输出提取为 `_append_config_section()`；删除所有无效 isinstance 分支，统一一行格式化。Training 段因多 OPTIMIZER/SCHEDULER 两行保留内联。
+
+**原因**：60 行缩到 35 行；无效分支会让读者停下来找"不同类型到底有什么区别"。
+
+**验证**：构造含各类型值的 config，断言输出段落、分隔线数量与键均正确。
