@@ -22,8 +22,8 @@ class RecurrenceDataset(Dataset):
         self.init_len = init_len
         self.num_samples = num_samples
         self.verbose = verbose
-        self.part1 = []
-        self.part2 = []
+        self.train_samples = []
+        self.test_samples = []
         self.seen_indices = set()
         self.split = 'train'
         
@@ -88,28 +88,28 @@ class RecurrenceDataset(Dataset):
             # Append to train/test set
             if where == 1:
                 for i in range(num_inits):
-                    self.part1.append(torch.tensor(seq[i:i + self.length], dtype=torch.long))
+                    self.train_samples.append(torch.tensor(seq[i:i + self.length], dtype=torch.long))
             else:
                 for i in range(num_inits):
-                    self.part2.append(torch.tensor(seq[i:i + self.length], dtype=torch.long))
+                    self.test_samples.append(torch.tensor(seq[i:i + self.length], dtype=torch.long))
 
         # Shuffle sample order
-        random.shuffle(self.part1)
+        random.shuffle(self.train_samples)
 
         if self.verbose:
-            cov = len(self.part1) / state_space
-            print(f"[Dataset] Cycle traverse + sliding window: {len(self.part1)} + {len(self.part2)} samples, length {self.length}, mod {self.p}")
-            print(f"  - Initial state coverage: {len(self.part1)}/{state_space} ({cov*100:.1f}%)")
+            cov = len(self.train_samples) / state_space
+            print(f"[Dataset] Cycle traverse + sliding window: {len(self.train_samples)} + {len(self.test_samples)} samples, length {self.length}, mod {self.p}")
+            print(f"  - Initial state coverage: {len(self.train_samples)}/{state_space} ({cov*100:.1f}%)")
             print(f"Recurrence: {self.recurrence_name}")
             print("-" * 50)
             print("-" * 50)
 
     def __len__(self):
-        data = self.part1 if self.split == 'train' else self.part2
+        data = self.train_samples if self.split == 'train' else self.test_samples
         return len(data)
 
     def __getitem__(self, idx):
-        data = self.part1 if self.split == 'train' else self.part2
+        data = self.train_samples if self.split == 'train' else self.test_samples
         return data[idx]
 
 # ==================== BucketBatchSampler (group by same length) ====================
@@ -697,10 +697,10 @@ class MixedABDataset(Dataset):
         self.p = p
         self.use_ab_tag = use_ab_tag
         self.ab_pairs = ab_pairs if ab_pairs is not None else [(3, 5), (7, 11)]
-        self.part1 = []
-        self.part2 = []
-        self.ab_labels_part1 = []
-        self.ab_labels_part2 = []
+        self.train_samples = []
+        self.test_samples = []
+        self.ab_labels_train = []
+        self.ab_labels_test = []
         self.split = 'train'
 
         if fixed_ab_idx is not None:
@@ -721,67 +721,67 @@ class MixedABDataset(Dataset):
             verbose=verbose
         )
         ds.run()
-        self.part1 = ds.part1
-        self.part2 = ds.part2
-        self.ab_labels_part1 = [(a, b)] * len(ds.part1)
-        self.ab_labels_part2 = [(a, b)] * len(ds.part2)
+        self.train_samples = ds.train_samples
+        self.test_samples = ds.test_samples
+        self.ab_labels_train = [(a, b)] * len(ds.train_samples)
+        self.ab_labels_test = [(a, b)] * len(ds.test_samples)
 
     def _build_mixed(self, num_samples, length, verbose):
         if isinstance(num_samples, (list, tuple)):
             num_samples_list = list(num_samples)
         else:
             num_samples_list = [num_samples] * len(self.ab_pairs)
-        all_part1 = []
-        all_part2 = []
-        all_labels_part1 = []
-        all_labels_part2 = []
+        all_train = []
+        all_test = []
+        all_labels_train = []
+        all_labels_test = []
         per_rule_stats = []
         for idx, (a, b) in enumerate(self.ab_pairs):
             self._build_with_ab(a, b, num_samples_list[idx], length, False)
-            all_part1.extend(self.part1)
-            all_part2.extend(self.part2)
-            all_labels_part1.extend(self.ab_labels_part1)
-            all_labels_part2.extend(self.ab_labels_part2)
-            per_rule_stats.append((a, b, len(self.part1), len(self.part2)))
+            all_train.extend(self.train_samples)
+            all_test.extend(self.test_samples)
+            all_labels_train.extend(self.ab_labels_train)
+            all_labels_test.extend(self.ab_labels_test)
+            per_rule_stats.append((a, b, len(self.train_samples), len(self.test_samples)))
 
         # Prepend rule token if use_ab_tag (DataLoader indexes the flat list, not __getitem__)
         if self.use_ab_tag:
-            all_part1 = [
+            all_train = [
                 torch.cat([torch.tensor([self.p + self.ab_pairs.index(l)], dtype=torch.long), seq], dim=0)
-                for seq, l in zip(all_part1, all_labels_part1)
+                for seq, l in zip(all_train, all_labels_train)
             ]
-            all_part2 = [
+            all_test = [
                 torch.cat([torch.tensor([self.p + self.ab_pairs.index(l)], dtype=torch.long), seq], dim=0)
-                for seq, l in zip(all_part2, all_labels_part2)
+                for seq, l in zip(all_test, all_labels_test)
             ]
 
-        self.combined1 = list(zip(all_part1, all_labels_part1))
-        self.combined2 = list(zip(all_part2, all_labels_part2))
-        random.shuffle(self.combined1)
-        self.part1 = [s for s, _ in self.combined1]
-        self.ab_labels_part1 = [l for _, l in self.combined1]
-        self.part2 = all_part2
-        self.ab_labels_part2 = all_labels_part2
+        self.train_pairs = list(zip(all_train, all_labels_train))
+        self.test_pairs = list(zip(all_test, all_labels_test))
+        random.shuffle(self.train_pairs)
+        self.train_samples = [s for s, _ in self.train_pairs]
+        self.ab_labels_train = [l for _, l in self.train_pairs]
+        self.test_samples = all_test
+        self.ab_labels_test = all_labels_test
 
         # 构建可直接喂给 DataLoader / BucketBatchSampler 的扁平列表
-        self.train_data = list(zip(self.part1, [self.ab_pairs.index(l) for l in self.ab_labels_part1]))
-        self.test_data  = list(zip(self.part2, [self.ab_pairs.index(l) for l in self.ab_labels_part2]))
+        self.train_data = list(zip(self.train_samples, [self.ab_pairs.index(l) for l in self.ab_labels_train]))
+        self.test_data  = list(zip(self.test_samples, [self.ab_pairs.index(l) for l in self.ab_labels_test]))
 
         if verbose:
             total_states = self.p * self.p
-            print(f"[Dataset] Mixed mode: generated {len(self.part1)} + {len(self.part2)} samples, length {length}")
+            print(f"[Dataset] Mixed mode: generated {len(self.train_samples)} + {len(self.test_samples)} samples, length {length}")
             print(f"AB parameter pairs: {self.ab_pairs}")
             for a, b, n_train, n_test in per_rule_stats:
                 print(f"  - AB=({a},{b}): train {n_train} | test {n_test} | exposed ~{n_train/total_states*100:.1f}%")
             print("-" * 50)
 
     def __len__(self):
-        seqs = self.part1 if self.split == 'train' else self.part2
+        seqs = self.train_samples if self.split == 'train' else self.test_samples
         return len(seqs)
 
     def __getitem__(self, idx):
-        seqs = self.part1 if self.split == 'train' else self.part2
-        labels = self.ab_labels_part1 if self.split == 'train' else self.ab_labels_part2
+        seqs = self.train_samples if self.split == 'train' else self.test_samples
+        labels = self.ab_labels_train if self.split == 'train' else self.ab_labels_test
         ab_pair = labels[idx]
         ab_idx = self.ab_pairs.index(ab_pair)
         seq = seqs[idx]
@@ -1400,8 +1400,8 @@ def run_experiment(config_path=None):
             length=TRAIN_LEN
         )
         ds.run()
-        train_dataset = ds.part1
-        test_dataset = ds.part2
+        train_dataset = ds.train_samples
+        test_dataset = ds.test_samples
         print(f"[Model config] block_size: {BLOCK_SIZE}, train length: {TRAIN_LEN}")
         print(f"[Number theory] {recurrence_name}")
         print()

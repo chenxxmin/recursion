@@ -489,3 +489,15 @@
 **原因**：遮蔽内置函数是纯粹的陷阱，hack 代码全部消失。
 
 **验证**：两种数据集（含 fixed_ab_idx 分支）构造正常，样本长度正确。
+
+---
+
+## 36. core.py part1/part2 命名不直观
+
+**问题**：`part1`/`part2`（及其变体 `ab_labels_part1/2`、`all_part1/2`、`combined1/2`）实为 train/test 划分，名字不携带任何语义，读者必须回溯 `run()` 里的写入逻辑才能理解 1=train、2=test。
+
+**修改**：统一改名——`part1→train_samples`、`part2→test_samples`、`ab_labels_part1/2→ab_labels_train/test`、`all_part1/2→all_train/test`、`combined1/2→train_pairs/test_pairs`；`run_experiment` 中 `ds.part1/part2` 同步。
+
+**原因**：名字即文档。
+
+**验证**：grep 确认无残留；两种数据集的 train/test split 访问与 `__getitem__` 正常。
