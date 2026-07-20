@@ -11,6 +11,22 @@ if SCRIPT_DIR not in sys.path:
 
 import core as main
 
+# Display/analysis constants
+HEADER_WIDTH = 70       # width of printed section separators
+TOP_K = 3               # how many strongest-attended positions to report per query
+MAX_DISTANCE = 63       # max lag for per-distance attention statistics
+ENTROPY_EPS = 1e-12     # numerical epsilon inside log() for attention entropy
+CV_MEAN_EPS = 1e-6      # guard against division by a ~0 mean in the CV
+MIN_PRINT_VAL = 0.01    # per-distance values below this are omitted from printout
+ITEMS_PER_LINE = 8      # per-distance entries printed per line
+
+
+def _print_header(title):
+    sep = '=' * HEADER_WIDTH
+    print(f"\n{sep}")
+    print(title)
+    print(sep)
+
 
 def load_model(pth_path, device='cpu'):
     """Load saved model and config."""
@@ -207,11 +223,15 @@ def summarize_attention_for_sequence(model, seq, query_mask=None):
             valid_attn = attn_matrix[query_positions] if query_positions else attn_matrix[:0]
 
             # For each valid query position i, find top K positions it attends to most
-            topk_vals, topk_idx = torch.topk(valid_attn, k=min(3, T), dim=-1) if query_positions else (torch.empty(0, min(3, T)), torch.empty(0, min(3, T), dtype=torch.long))
+            if query_positions:
+                topk_vals, topk_idx = torch.topk(valid_attn, k=min(TOP_K, T), dim=-1)
+            else:
+                topk_vals = torch.empty(0, min(TOP_K, T))
+                topk_idx = torch.empty(0, min(TOP_K, T), dtype=torch.long)
 
             # Compute attention entropy (lower = more concentrated) over valid query positions
             if query_positions:
-                entropy = -(valid_attn * (valid_attn + 1e-12).log()).sum(dim=-1)
+                entropy = -(valid_attn * (valid_attn + ENTROPY_EPS).log()).sum(dim=-1)
                 mean_entropy = entropy.mean().item()
             else:
                 mean_entropy = 0.0
@@ -228,9 +248,9 @@ def summarize_attention_for_sequence(model, seq, query_mask=None):
                 focus_prev1 /= len(query_positions)
                 focus_prev2 /= len(query_positions)
 
-            # Compute average attention for distances 0..63 over valid query positions
+            # Compute average attention for distances 0..MAX_DISTANCE over valid query positions
             focus_by_distance = {}
-            max_d = min(63, T - 1)
+            max_d = min(MAX_DISTANCE, T - 1)
             for d in range(0, max_d + 1):
                 total = 0.0
                 count = 0
@@ -275,9 +295,7 @@ def verify_qk_properties(model, test_sequences, init_len, query_masks=None, devi
     query_masks: optional list of masks, each of length T (input sequence
                  length), indicating which query positions should be included.
     """
-    print(f"\n{'='*70}")
-    print("QK Property Verification (Raw Scores, before Softmax)")
-    print(f"{'='*70}")
+    _print_header("QK Property Verification (Raw Scores, before Softmax)")
     print(f"Recurrence order init_len={init_len}, num test sequences={len(test_sequences)}")
     print()
 
@@ -361,14 +379,14 @@ def verify_qk_properties(model, test_sequences, init_len, query_masks=None, devi
                 
                 if vals:
                     mean_v, std_v = _mean_std(vals)
-                    cv = std_v / abs(mean_v) if abs(mean_v) > 1e-6 else float('inf')
+                    cv = std_v / abs(mean_v) if abs(mean_v) > CV_MEAN_EPS else float('inf')
                     print(f"    d={d:2d}: mean={mean_v:7.3f}, std={std_v:6.3f}, CV={cv:5.3f}, n={len(vals)}")
             print()
     
     
-    print("="*70)
+    print("=" * HEADER_WIDTH)
     print("QK Property Verification Completed")
-    print("="*70)
+    print("=" * HEADER_WIDTH)
 
 
 def print_attention_summary(summary, seq=None):
@@ -376,9 +394,7 @@ def print_attention_summary(summary, seq=None):
     if seq is not None and isinstance(seq, torch.Tensor):
         seq = seq[0].tolist()
     
-    print(f"\n{'='*70}")
-    print("Attention Layer Training Result Summary")
-    print(f"{'='*70}")
+    _print_header("Attention Layer Training Result Summary")
     if seq is not None:
         print(f"Input sequence: {seq}")
     print()
@@ -407,9 +423,9 @@ def print_attention_summary(summary, seq=None):
                 line_parts = []
                 for d in range(0, max_d+1):
                     val = head['focus_by_distance'].get(d, 0.0)
-                    if val >= 0.01:
+                    if val >= MIN_PRINT_VAL:
                         line_parts.append(f"d={d}:{val:.3f}")
-                    if len(line_parts) == 8 or d == max_d:
+                    if len(line_parts) == ITEMS_PER_LINE or d == max_d:
                         print("      " + ", ".join(line_parts))
                         line_parts = []
         print()

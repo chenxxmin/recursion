@@ -101,3 +101,15 @@
 **原因**：命名即文档；f-string 行长度恢复正常。
 
 **验证**：`_mean_std` 输出与原手算结果数值断言一致。
+
+---
+
+## 6. analyze_attention.py 魔法数字常量化
+
+**问题**：分析脚本中散布多个无语义字面量——top-k 的 `3`（还在一条 130+ 字符的三元表达式里重复 3 次）、距离上限 `63`、熵 epsilon `1e-12`、CV 保护阈值 `1e-6`、打印阈值 `0.01`、每行 `8` 项、分隔线 `'='*70` 重复 7 处。
+
+**修改**：模块顶部定义常量 `TOP_K / MAX_DISTANCE / ENTROPY_EPS / CV_MEAN_EPS / MIN_PRINT_VAL / ITEMS_PER_LINE / HEADER_WIDTH`（各带注释）；两处标题打印提取为 `_print_header()`；过长的 topk 三元表达式拆为 if/else。
+
+**原因**：字面量有了名字就有了含义；调整参数时改一处即可。
+
+**验证**：py_compile + 小模型实跑 `summarize_attention_for_sequence` / `print_attention_summary` / `verify_qk_properties`，输出格式与之前一致。
