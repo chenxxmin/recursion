@@ -313,3 +313,19 @@
 **原因**：单一计算源；遮蔽同名变量是经典的维护陷阱。
 
 **验证**：py_compile 通过；表达式逐字相同，等价性显然。
+
+---
+
+## 22. batch_run.py run_single 拆分
+
+**问题**：`run_single` 约 140 行，混杂五个职责：配置合并、临时文件管理、子进程输出泵（两个线程）、注意力分析子进程、清理与汇报。两处 `subprocess.Popen` 的 `python -c` 命令行构造也重复。
+
+**修改**：纯提取式拆分，行为不变——
+- `build_merged_config(exp, base_config)`：配置合并 + SAVE_PATH 自动填充，返回 `(name, task, merged_main, merged)`；
+- `run_attention_analysis(name, pth_path, log_path, env)`：注意力分析子进程；
+- `_spawn_python(statement, env, stderr=...)`：统一的 `python -c` 启动器（两处 Popen 调用点共用）；
+- `_decode` 从 run_single 内层提升为模块级（read_stdout/read_stderr/分析三处共用）。
+
+**原因**：每个函数一个职责；`run_single` 剩下约 90 行的线性流程，一眼可读。
+
+**验证**：`build_merged_config` 合并顺序/自动填充断言；`_spawn_python` 实际启动子进程跑通。

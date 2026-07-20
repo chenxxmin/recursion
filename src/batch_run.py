@@ -117,7 +117,24 @@ def get_idle_gpus(memory_threshold_mb=100):
         return None
 
 
-def run_single(exp, base_config, concurrency=1, gpu_id=None):
+def _decode(raw):
+    return raw.decode('utf-8', errors='replace').replace('\x00', '')
+
+
+def _spawn_python(statement, env, stderr=subprocess.PIPE):
+    """Launch `python -c` with src/ on sys.path, running the given statement."""
+    snippet = f"import sys; sys.path.insert(0, {SCRIPT_DIR!r}); {statement}"
+    return subprocess.Popen([sys.executable, '-c', snippet],
+                            stdout=subprocess.PIPE, stderr=stderr, env=env)
+
+
+def build_merged_config(exp, base_config):
+    """Merge base config with per-experiment overrides.
+
+    Merge order: main -> task defaults -> experiment override.
+    Returns (name, task, merged_main, merged): merged_main is the effective
+    'main' section; merged is the full config to write to the temp file.
+    """
     name = exp['name']
     override = exp.get('config', {})
 
@@ -141,8 +158,35 @@ def run_single(exp, base_config, concurrency=1, gpu_id=None):
     merged_main.update(override)
     merged['main'] = merged_main
     merged['_BATCH_RUN_MERGED'] = True
+    return name, task, merged_main, merged
 
-    # 3. Use independent temp config per experiment (avoid concurrency conflicts)
+
+def run_attention_analysis(name, pth_path, log_path, env):
+    """Run attention analysis on a trained checkpoint and append it to the log."""
+    print(f"[{datetime.now().strftime('%H:%M:%S')}] Start attention analysis: {name}")
+    with open(log_path, 'a', encoding='utf-8') as f:
+        f.write(f"\n{'='*70}\n")
+        f.write("Attention Analysis\n")
+        f.write(f"{'='*70}\n")
+
+    analyze_process = _spawn_python(
+        f"from analyze_attention import analyze_model_attention; analyze_model_attention({pth_path!r})",
+        env, stderr=subprocess.STDOUT)
+
+    with open(log_path, 'a', encoding='utf-8') as f:
+        for raw in analyze_process.stdout:
+            line = _decode(raw)
+            f.write(line)
+            f.flush()
+
+    analyze_process.wait()
+    print(f"[{datetime.now().strftime('%H:%M:%S')}] Attention analysis completed: {name}")
+
+
+def run_single(exp, base_config, concurrency=1, gpu_id=None):
+    name, task, merged_main, merged = build_merged_config(exp, base_config)
+
+    # Use independent temp config per experiment (avoid concurrency conflicts)
     tmp_config_path = f"config_tmp_{name}.json"
     save_json(tmp_config_path, merged)
 
@@ -159,18 +203,11 @@ def run_single(exp, base_config, concurrency=1, gpu_id=None):
     # - stdout: training log (clean model output)
     # - stderr: errors/warnings (PyTorch/CUDA low-level output, may contain null bytes)
     # NOTE: main.py was removed; batch_run.py is the only supported entry point.
-    process = subprocess.Popen(
-        [sys.executable, '-c',
-         f"import sys; sys.path.insert(0, {SCRIPT_DIR!r}); from core import run_experiment; run_experiment({tmp_config_path!r})"],
-        stdout=subprocess.PIPE,
-        stderr=subprocess.PIPE,
-        env=env
-    )
+    process = _spawn_python(
+        f"from core import run_experiment; run_experiment({tmp_config_path!r})",
+        env, stderr=subprocess.PIPE)
 
     err_log_path = os.path.join(LOG_DIR, f"{name}.err")
-
-    def _decode(raw):
-        return raw.decode('utf-8', errors='replace').replace('\x00', '')
 
     def read_stdout():
         with open(log_path, 'w', encoding='utf-8') as f:
@@ -211,28 +248,7 @@ def run_single(exp, base_config, concurrency=1, gpu_id=None):
     if returncode == 0:
         pth_path = merged_main.get('SAVE_PATH', 'fibonacci_transformer.pth')
         if os.path.exists(pth_path):
-            print(f"[{datetime.now().strftime('%H:%M:%S')}] Start attention analysis: {name}")
-            with open(log_path, 'a', encoding='utf-8') as f:
-                f.write(f"\n{'='*70}\n")
-                f.write("Attention Analysis\n")
-                f.write(f"{'='*70}\n")
-
-            analyze_process = subprocess.Popen(
-                [sys.executable, '-c',
-                 f"import sys; sys.path.insert(0, {SCRIPT_DIR!r}); from analyze_attention import analyze_model_attention; analyze_model_attention({pth_path!r})"],
-                stdout=subprocess.PIPE,
-                stderr=subprocess.STDOUT,
-                env=env
-            )
-
-            with open(log_path, 'a', encoding='utf-8') as f:
-                for raw in analyze_process.stdout:
-                    line = _decode(raw)
-                    f.write(line)
-                    f.flush()
-
-            analyze_process.wait()
-            print(f"[{datetime.now().strftime('%H:%M:%S')}] Attention analysis completed: {name}")
+            run_attention_analysis(name, pth_path, log_path, env)
         else:
             print(f"[{datetime.now().strftime('%H:%M:%S')}] Warning: model file {pth_path} not found, skip attention analysis")
 
