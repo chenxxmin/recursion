@@ -3,13 +3,14 @@ import os
 import torch
 import torch.nn.functional as F
 import math
+import random
 
 # Allow running from repo root as: python src/analyze_attention.py <pth>
 SCRIPT_DIR = os.path.dirname(os.path.abspath(__file__))
 if SCRIPT_DIR not in sys.path:
     sys.path.insert(0, SCRIPT_DIR)
 
-import core as main
+import core
 
 # Display/analysis constants
 HEADER_WIDTH = 70       # width of printed section separators
@@ -61,9 +62,9 @@ def load_model(pth_path, device='cpu'):
         mixedab_config['use_ab_tag'] = config.get('use_ab_tag', True)
         mixedab_config['use_conditional_wte'] = config.get('use_conditional_wte', any('cond_wte' in k for k in state_keys))
         mixedab_config['cond_wte_shared_ratio'] = config.get('cond_wte_shared_ratio', 0.0)
-        model = main.MixedABTransformer(num_ab_pairs=num_ab_pairs, **mixedab_config)
+        model = core.MixedABTransformer(num_ab_pairs=num_ab_pairs, **mixedab_config)
     else:
-        model = main.FibonacciTransformer(**filtered_config)
+        model = core.FibonacciTransformer(**filtered_config)
     model.load_state_dict(checkpoint['model_state_dict'])
     model = model.to(device)
     model.eval()
@@ -152,8 +153,8 @@ def extract_qk_raw_scores(model, input_ids, ab_label=None):
         # RoPE
         if attn_module.rope is not None:
             cos, sin = attn_module.rope(q, seq_len=T)
-            q = main.apply_rotary_emb(q, cos, sin)
-            k = main.apply_rotary_emb(k, cos, sin)
+            q = core.apply_rotary_emb(q, cos, sin)
+            k = core.apply_rotary_emb(k, cos, sin)
         
         # Raw QK scores (before softmax)
         raw_scores = (q @ k.transpose(-2, -1)) * (1.0 / math.sqrt(attn_module.head_size))
@@ -210,7 +211,7 @@ def summarize_attention_for_sequence(model, seq, query_mask=None):
     results = []
 
     for layer_idx, att in enumerate(attn_maps):
-        n_head, _, _ = att.shape
+        n_head = att.shape[0]
         layer_info = {
             'layer': layer_idx,
             'heads': []
@@ -435,7 +436,6 @@ def analyze_model_attention(pth_path, device=None):
     """Main entry: load model and randomly generate a test sequence for attention analysis."""
     if device is None:
         device = 'cuda' if torch.cuda.is_available() else 'cpu'
-    import random
     model, checkpoint = load_model(pth_path, device=device)
     config = checkpoint['config']
     p = config['p']
@@ -526,7 +526,7 @@ def analyze_model_attention(pth_path, device=None):
     else:
         init = [random.randint(0, p - 1) for _ in range(init_len)]
         seq = init[:]
-        for i in range(init_len, max_len):
+        for _ in range(init_len, max_len):
             seq.append(next_val(seq))
         test_sequences.append(seq)
 

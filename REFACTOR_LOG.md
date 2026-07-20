@@ -113,3 +113,19 @@
 **原因**：字面量有了名字就有了含义；调整参数时改一处即可。
 
 **验证**：py_compile + 小模型实跑 `summarize_attention_for_sequence` / `print_attention_summary` / `verify_qk_properties`，输出格式与之前一致。
+
+---
+
+## 7. analyze_attention.py 命名与 import 风格清理
+
+**问题**：
+1. `import core as main`——别名 `main` 通常指程序入口函数，这里却是模块，易误读；
+2. `import random` 写在 `analyze_model_attention` 函数体内；
+3. `n_head, _, _ = att.shape` 解包两个弃值，不如直接 `att.shape[0]`；
+4. `for i in range(init_len, max_len)` 的循环变量 `i` 未使用。
+
+**修改**：别名改回 `import core`（4 处 `main.` 引用同步改为 `core.`）；`import random` 上移到文件顶部；`n_head = att.shape[0]`；循环变量改 `_`。
+
+**原因**：符合 Python 惯例，消除"main 是什么"的认知负担。
+
+**验证**：py_compile + 小模型实跑 summarize 流程正常；qk_verification 同步编译通过。
