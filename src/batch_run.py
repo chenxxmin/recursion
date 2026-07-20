@@ -410,12 +410,15 @@ def main():
 
     skip_reason = "due to earlier resource failure (CUDA OOM or memory limit)"
 
+    def skip_exp(exp):
+        print(f"Skipping {exp['name']} {skip_reason}")
+        results.append((exp['name'], False))
+
     if effective_workers == 1:
         # Avoid thread overhead for purely serial execution.
         for exp in experiments:
             if resource_stop:
-                print(f"Skipping {exp['name']} {skip_reason}")
-                results.append((exp['name'], False))
+                skip_exp(exp)
                 continue
             name, ok, returncode = run_with_gpu(exp)
             handle_result(name, ok, returncode)
@@ -424,8 +427,7 @@ def main():
         with ThreadPoolExecutor(max_workers=effective_workers) as executor:
             for exp in experiments:
                 if resource_stop:
-                    print(f"Skipping {exp['name']} {skip_reason}")
-                    results.append((exp['name'], False))
+                    skip_exp(exp)
                     continue
                 submitted_futures.append(executor.submit(run_with_gpu, exp))
 
