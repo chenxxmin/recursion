@@ -1053,6 +1053,71 @@ class MixedABTransformer(FibonacciTransformer):
                 loss = loss + 0.5 * rule_loss
         return logits, loss, rule_logits
 
+# ==================== Memory Safety ====================
+EXIT_CUDA_OUT_OF_MEMORY = 77
+
+
+def estimate_training_memory_bytes(model, batch_size, seq_len):
+    """Rough upper-bound estimate of peak GPU memory for training.
+
+    Accounts for fp32 parameters, AdamW optimizer state, gradients, and a
+    conservative activation estimate. The result is intentionally pessimistic
+    so that we fail early rather than OOM mid-training.
+    """
+    total_params = sum(p.numel() for p in model.parameters())
+    param_bytes = total_params * 4            # fp32
+    optimizer_bytes = 2 * param_bytes         # AdamW moments
+    grad_bytes = param_bytes
+
+    d_model = getattr(model, 'd_model', 64)
+    n_layer = len(getattr(model, 'transformer', {}).get('h', []))
+    if n_layer == 0:
+        n_layer = 1
+
+    # Conservative activation estimate per layer:
+    # qkv projection, attention scores, MLP up/down, residuals.
+    # Multiply by a safety factor to cover framework overhead.
+    mlp_hidden = model.transformer.h[0].mlp[0].out_features
+    activations_per_layer = batch_size * seq_len * (
+        6 * d_model + mlp_hidden
+    ) * 4
+    activation_bytes = n_layer * activations_per_layer
+
+    # ~1 GB of CUDA context / fragmentation overhead
+    overhead_bytes = 1 * 1024 ** 3
+
+    return param_bytes + optimizer_bytes + grad_bytes + activation_bytes + overhead_bytes
+
+
+def check_gpu_memory(model, device, batch_size, seq_len):
+    """Check whether the model is likely to fit in GPU memory.
+
+    If not, print an error and exit with EXIT_CUDA_OUT_OF_MEMORY so the
+    parent batch runner can stop the whole batch instead of continuing.
+    """
+    if not torch.cuda.is_available() or not device.startswith('cuda'):
+        return
+
+    required_bytes = estimate_training_memory_bytes(model, batch_size, seq_len)
+    total_bytes = torch.cuda.get_device_properties(device).total_memory
+    reserved_bytes = torch.cuda.memory_reserved(device)
+    available_bytes = total_bytes - reserved_bytes
+
+    required_gb = required_bytes / 1024 ** 3
+    available_gb = available_bytes / 1024 ** 3
+    total_gb = total_bytes / 1024 ** 3
+
+    print(f"[Memory check] Estimated required: {required_gb:.1f} GB, "
+          f"available: {available_gb:.1f} GB / total: {total_gb:.1f} GB")
+
+    if required_bytes > available_bytes:
+        print(f"[Error] Insufficient GPU memory on {device}. "
+              f"Estimated need ~{required_gb:.1f} GB, but only "
+              f"{available_gb:.1f} GB is available.",
+              file=sys.stderr)
+        sys.exit(EXIT_CUDA_OUT_OF_MEMORY)
+
+
 # ==================== Unified Experiment Entry ====================
 def run_experiment(config_path=None):
     import json
@@ -1362,21 +1427,35 @@ def run_experiment(config_path=None):
 
     model = model.to(device)
     print(f"Model parameters: {sum(p.numel() for p in model.parameters())/1e6:.2f}M")
+
+    # Pre-flight memory check: fail fast if the model cannot fit, rather than
+    # letting CUDA OOM hang or kill the server.
+    check_gpu_memory(model, device, BATCH_SIZE, max(TRAIN_LEN, OOD_LEN))
+
     optimizer = torch.optim.AdamW(model.parameters(), lr=LR, weight_decay=cfg['WEIGHT_DECAY'])
     scheduler = torch.optim.lr_scheduler.CosineAnnealingLR(optimizer, T_max=EPOCHS)
-    best_acc, epoch = run_training_engine(
-        model, train_loader, test_loader, optimizer, scheduler, device,
-        epochs=EPOCHS, eval_interval=cfg['EVAL_INTERVAL'],
-        early_stop_accuracy=cfg.get('EARLY_STOP_ACCURACY', 0.99),
-        early_stop_no_improve=cfg.get('EARLY_STOP_NO_IMPROVE', 100),
-        save_path=SAVE_PATH, save_config=save_config,
-        num_mask=num_mask, extra_kwargs_fn=extra_kwargs_fn,
-        first_task_weight=cfg.get('FIRST_TASK_WEIGHT', 1.0),
-        cond_fix=cfg.get('COND_FIX', None),
-        cond_fix_start=cfg.get('COND_FIX_START', None),
-        cond_fix_start_a1=cfg.get('COND_FIX_START_A1', None),
-        cond_fix_start_a2=cfg.get('COND_FIX_START_A2', None)
-    )
+
+    try:
+        best_acc, epoch = run_training_engine(
+            model, train_loader, test_loader, optimizer, scheduler, device,
+            epochs=EPOCHS, eval_interval=cfg['EVAL_INTERVAL'],
+            early_stop_accuracy=cfg.get('EARLY_STOP_ACCURACY', 0.99),
+            early_stop_no_improve=cfg.get('EARLY_STOP_NO_IMPROVE', 100),
+            save_path=SAVE_PATH, save_config=save_config,
+            num_mask=num_mask, extra_kwargs_fn=extra_kwargs_fn,
+            first_task_weight=cfg.get('FIRST_TASK_WEIGHT', 1.0),
+            cond_fix=cfg.get('COND_FIX', None),
+            cond_fix_start=cfg.get('COND_FIX_START', None),
+            cond_fix_start_a1=cfg.get('COND_FIX_START_A1', None),
+            cond_fix_start_a2=cfg.get('COND_FIX_START_A2', None)
+        )
+    except RuntimeError as e:
+        if 'out of memory' in str(e).lower():
+            print(f"[Error] CUDA out of memory during training: {e}", file=sys.stderr)
+            if torch.cuda.is_available():
+                torch.cuda.empty_cache()
+            sys.exit(EXIT_CUDA_OUT_OF_MEMORY)
+        raise
 
     # ========================================================================
     # Stage 3: Post-processing (mixed_ab final generation test with exposure split)

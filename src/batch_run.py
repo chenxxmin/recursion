@@ -6,6 +6,7 @@ import re
 import shutil
 import subprocess
 import sys
+import queue
 import threading
 from concurrent.futures import ThreadPoolExecutor, as_completed
 from datetime import datetime
@@ -20,6 +21,9 @@ BASE_CONFIG_PATH = 'src/config.json'
 DEFAULT_EXPERIMENTS_PATH = 'experiments/experiments.json'
 DEFAULT_BASE_DIR = '/data/cxm/recursion'
 DEFAULT_MODEL_BASE_DIR = '/data/cxm/models'
+
+# Exit code used by core.py when the model does not fit in GPU memory.
+EXIT_CUDA_OUT_OF_MEMORY = 77
 
 # These are updated per experiment in main().
 LOG_DIR = 'logs'
@@ -101,6 +105,33 @@ def format_config_table(config):
     lines.append("")
 
     return "\n".join(lines)
+
+
+def get_idle_gpus(memory_threshold_mb=100):
+    """Return GPU indices that appear to be idle (low memory usage).
+
+    Uses nvidia-smi to query per-GPU memory usage. GPUs with used memory
+    below ``memory_threshold_mb`` are considered idle and safe to use.
+
+    Returns ``None`` if nvidia-smi is unavailable, so callers can fall back
+    to torch.cuda.device_count().
+    """
+    try:
+        result = subprocess.run(
+            ['nvidia-smi', '--query-gpu=index,memory.used',
+             '--format=csv,noheader,nounits'],
+            capture_output=True, text=True, check=True
+        )
+        idle_gpus = []
+        for line in result.stdout.strip().splitlines():
+            parts = line.split(',')
+            idx = int(parts[0].strip())
+            used_mb = float(parts[1].strip())
+            if used_mb < memory_threshold_mb:
+                idle_gpus.append(idx)
+        return idle_gpus
+    except Exception:
+        return None
 
 
 def run_single(exp, base_config, concurrency=1, gpu_id=None):
@@ -237,7 +268,7 @@ def run_single(exp, base_config, concurrency=1, gpu_id=None):
     else:
         print(f"[{end_time.strftime('%H:%M:%S')}] Experiment failed: {name} ({duration:.0f}s), return code: {returncode}, log: {log_path}")
 
-    return name, returncode == 0
+    return name, returncode == 0, returncode
 
 
 def main():
@@ -301,35 +332,82 @@ def main():
     print(f"Total experiments: {len(experiments)}, concurrency: {concurrency}")
     print("-" * 50)
 
-    # Detect available GPUs and assign each experiment to one
+    # Detect GPUs. Prefer idle GPUs reported by nvidia-smi; fall back to the
+    # total GPU count from torch if nvidia-smi is unavailable. Then cap
+    # concurrency so each GPU runs at most one experiment at a time.
     try:
         import torch
-        num_gpus = torch.cuda.device_count()
+        num_gpus_total = torch.cuda.device_count()
     except Exception:
-        num_gpus = 0
-    if num_gpus > 1 and concurrency > 1:
-        print(f"Detected {num_gpus} GPUs, distributing experiments round-robin")
-    gpu_assignments = [i % num_gpus if num_gpus > 0 else None for i in range(len(experiments))]
+        num_gpus_total = 0
+
+    idle_gpus = get_idle_gpus() if num_gpus_total > 0 else None
+
+    if idle_gpus is not None:
+        gpu_ids = idle_gpus
+        detection_msg = f"{len(gpu_ids)} idle of {num_gpus_total} GPUs: {gpu_ids}"
+    elif num_gpus_total > 0:
+        gpu_ids = list(range(num_gpus_total))
+        detection_msg = f"{num_gpus_total} GPUs (could not check idle status)"
+    else:
+        gpu_ids = []
+        detection_msg = "No GPUs detected"
+
+    if gpu_ids:
+        effective_workers = min(concurrency, len(gpu_ids))
+        gpu_queue = queue.Queue()
+        for gpu_id in gpu_ids:
+            gpu_queue.put(gpu_id)
+        print(f"Detected {detection_msg}, effective concurrency: {effective_workers} (one experiment per GPU)")
+    else:
+        effective_workers = concurrency
+        gpu_queue = None
+        print(f"{detection_msg}, running on CPU")
 
     results = []
 
-    if concurrency == 1:
-        # Serial execution
-        for i, exp in enumerate(experiments):
-            gpu_id = gpu_assignments[i]
-            name, ok = run_single(exp, base_config, concurrency=1, gpu_id=gpu_id)
-            results.append((name, ok))
+    def run_with_gpu(exp):
+        """Pick a free GPU, run one experiment, then return the GPU."""
+        if gpu_queue is not None:
+            gpu_id = gpu_queue.get()
+            try:
+                return run_single(exp, base_config, effective_workers, gpu_id)
+            finally:
+                gpu_queue.put(gpu_id)
+        else:
+            return run_single(exp, base_config, effective_workers, None)
+
+    oom_stop = False
+
+    def handle_result(name, ok, returncode):
+        nonlocal oom_stop
+        results.append((name, ok))
+        if returncode == EXIT_CUDA_OUT_OF_MEMORY and not oom_stop:
+            print(f"[{datetime.now().strftime('%H:%M:%S')}] Stopping batch: experiment {name} failed with CUDA out of memory")
+            oom_stop = True
+
+    if effective_workers == 1:
+        # Avoid thread overhead for purely serial execution.
+        for exp in experiments:
+            if oom_stop:
+                print(f"Skipping {exp['name']} due to earlier CUDA OOM")
+                results.append((exp['name'], False))
+                continue
+            name, ok, returncode = run_with_gpu(exp)
+            handle_result(name, ok, returncode)
     else:
-        # Concurrent execution
-        with ThreadPoolExecutor(max_workers=concurrency) as executor:
-            futures = {}
-            for i, exp in enumerate(experiments):
-                gpu_id = gpu_assignments[i]
-                future = executor.submit(run_single, exp, base_config, concurrency, gpu_id)
-                futures[future] = exp
-            for future in as_completed(futures):
-                name, ok = future.result()
-                results.append((name, ok))
+        submitted_futures = []
+        with ThreadPoolExecutor(max_workers=effective_workers) as executor:
+            for exp in experiments:
+                if oom_stop:
+                    print(f"Skipping {exp['name']} due to earlier CUDA OOM")
+                    results.append((exp['name'], False))
+                    continue
+                submitted_futures.append(executor.submit(run_with_gpu, exp))
+
+            for future in as_completed(submitted_futures):
+                name, ok, returncode = future.result()
+                handle_result(name, ok, returncode)
 
     print("\n" + "=" * 50)
     print("Experiment Summary")
@@ -337,12 +415,17 @@ def main():
     for name, ok in results:
         status = "[OK] Success" if ok else "[NG] Failed"
         print(f"{status}: {name}")
+    if oom_stop:
+        print("\n[Error] Batch stopped early because at least one experiment ran out of GPU memory.")
 
     # Run detailed summary
     summarize_experiments()
 
     # Generate grouped plots (one figure per setting, all seeds overlaid)
     generate_grouped_plots()
+
+    if oom_stop:
+        sys.exit(1)
 
 
 def generate_grouped_plots():
