@@ -61,7 +61,7 @@ def main():
     parser.add_argument(
         '--log-dir',
         default=None,
-        help='Directory containing .log files (default: /data/cxm/<exp_name>/logs)'
+        help=f'Directory containing .log files (default: {DEFAULT_BASE_DIR}/<exp_name>/logs)'
     )
     parser.add_argument(
         '--out',

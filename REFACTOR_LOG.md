@@ -405,3 +405,15 @@
 **原因**：注释应描述现状，不应承担变更日志职能。
 
 **验证**：py_compile 通过。
+
+---
+
+## 29. prepare_rerun.py help 文本与实际默认值不符
+
+**问题**：`--log-dir` 的 help 写 "default: /data/cxm/<exp_name>/logs"，但实际默认由 `DEFAULT_BASE_DIR = '/data/cxm/recursion'` 推出，是 `/data/cxm/recursion/<exp_name>/logs`。按 help 拼路径会找到错误的目录。
+
+**修改**：help 改为 f-string 引用 `DEFAULT_BASE_DIR` 常量，消除两处来源。
+
+**原因**：文档与代码必须同源。
+
+**验证**：py_compile 通过。
