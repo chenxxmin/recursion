@@ -588,3 +588,19 @@
 **原因**：统计口径（哪些位置计入、如何对齐）必须单一来源——train 和 eval 口径漂移是隐蔽的评估错误。
 
 **验证**：三种任务 train/evaluate 各跑一步，逐位置与分组准确率均正常产出。
+
+---
+
+## 44. core.py 两套 final generation test 的统计代码合并
+
+**问题**：mixed_ab 和 single_recurrence 两套最终生成测试中，曝光/未曝光 × 分布内/OOD 的 8 变量累加（16 行）逐字重复；`_safe_div` 定义了两遍；汇总打印两行格式完全相同；逐位置打印循环做的是同一件事，但一个内联、一个先攒 4 个 dict 再打印。
+
+**修改**：提取三个模块级辅助——`_split_exposure_stats`（返回 4 组 (correct, total)）、`_print_exposure_stats`（汇总两行 + 标题）、`_print_per_position_exposure`（逐位置打印，统一为内联计算）；`_safe_div` 提升为模块级，删除两处局部定义。净删约 90 行。
+
+**原因**：曝光统计是论文级指标，两套实现的任何漂移都直接影响实验结论。
+
+**行为差异（仅日志文本）**：mixed_ab 逐位置打印的 correct 数原为浮点格式（如 `98.0`），统一后与 single_recurrence 一致打印为整数（`98`）；数值不变。
+
+**验证**：合成张量验证 `_split_exposure_stats` 四组计数与打印格式正确。
+
+**保留的差异（非本项范围）**：mixed_ab 最终测试的 loss mask 与逐位置范围硬编码 2（`loss_mask[:, 2:]`），与可配置的 NUM_MASK 不联动——既有不一致，未动。
