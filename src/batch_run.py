@@ -209,7 +209,6 @@ def run_single(exp, base_config, dirs, concurrency=1, gpu_id=None):
     # Separate stdout and stderr:
     # - stdout: training log (clean model output)
     # - stderr: errors/warnings (PyTorch/CUDA low-level output, may contain null bytes)
-    # NOTE: main.py was removed; batch_run.py is the only supported entry point.
     process = _spawn_python(
         f"from core import run_experiment; run_experiment({tmp_config_path!r})",
         env, stderr=subprocess.PIPE)

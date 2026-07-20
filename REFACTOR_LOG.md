@@ -391,3 +391,17 @@
 **验证**：断言模块级全局已不存在；临时目录实跑 summarize_experiments 与 generate_grouped_plots 正常。
 
 **签名变更说明**：以上四个函数均为 batch_run.py 内部函数（无其他模块调用），签名调整不影响外部。
+
+---
+
+## 28. batch_run.py 失效/历史注释清理
+
+**问题**：
+1. 原 `:30` 注释 "These are updated per experiment in main()" 不准确（实为每个批次更新一次）——已随第 27 条全局变量的删除一并移除；
+2. 原 `:181` "NOTE: main.py was removed; batch_run.py is the only supported entry point." 是历史变更记录，对理解当前代码无帮助（git 历史已保留该信息）。
+
+**修改**：删除第 2 条注释。
+
+**原因**：注释应描述现状，不应承担变更日志职能。
+
+**验证**：py_compile 通过。
