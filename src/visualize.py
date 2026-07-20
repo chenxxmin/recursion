@@ -322,6 +322,9 @@ def plot_per_position(data, title, save_path=None):
             ax.set_yticks(range(0, len(epochs), step))
             ax.set_yticklabels([epochs[i] for i in range(0, len(epochs), step)], fontsize=6)
         fig.suptitle(f'{title} - Per-position Accuracy', fontsize=12)
+        # im is the AxesImage of the last panel; valid_items is non-empty
+        # (checked above), so the loop always assigns it. All panels share
+        # the same vmin/vmax, so one colorbar serves the whole figure.
         fig.colorbar(im, ax=axes.ravel().tolist(), label='Accuracy')
 
     out = save_path or ('per_position.png' if single_mode else f'{title}_per_pos.png')
