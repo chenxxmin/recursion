@@ -101,53 +101,13 @@ def _build_input_embedding(model, input_ids, ab_label=None):
 def get_attention_weights(model, input_ids, ab_label=None):
     """
     Manually compute attention map for each layer and head given input.
-    
+
     Returns: list of (n_head, T, T) tensors, one per layer.
     """
-    x = _build_input_embedding(model, input_ids, ab_label=ab_label)
-    
-    attention_maps = []
-    
-    for block in model.transformer.h:
-        # LayerNorm + Attention
-        ln_x = block.ln_1(x)
-        attn_module = block.attn
-        B, T, C = ln_x.size()
-        
-        # QKV projection
-        qkv = attn_module.c_attn(ln_x)
-        q, k, v = qkv.split(attn_module.n_embd, dim=2)
-        
-        q = q.view(B, T, attn_module.n_head, attn_module.head_size).transpose(1, 2)
-        k = k.view(B, T, attn_module.n_head, attn_module.head_size).transpose(1, 2)
-        v = v.view(B, T, attn_module.n_head, attn_module.head_size).transpose(1, 2)
-        
-        # RoPE
-        if attn_module.rope is not None:
-            cos, sin = attn_module.rope(q, seq_len=T)
-            q = main.apply_rotary_emb(q, cos, sin)
-            k = main.apply_rotary_emb(k, cos, sin)
-        
-        # Attention scores
-        att = (q @ k.transpose(-2, -1)) * (1.0 / math.sqrt(attn_module.head_size))
-        att = att.masked_fill(attn_module.causal_mask[:, :, :T, :T] == 0, float('-inf'))
-        row_all_inf = torch.isinf(att).all(dim=-1, keepdim=True)
-        att = att.masked_fill(row_all_inf, 0.0)
-        att = F.softmax(att, dim=-1)
-        
-        # Save attention map (remove batch dim)
-        attention_maps.append(att[0].detach().cpu())  # (n_head, T, T)
-        
-        # Continue forward pass to get next layer input
-        y = att @ v
-        y = y.transpose(1, 2).contiguous().view(B, T, C)
-        y = attn_module.c_proj(y)
-        x = x + y
-        
-        # MLP
-        x = x + block.mlp(block.ln_2(x))
-    
-    return attention_maps
+    # extract_qk_raw_scores runs the same manual forward pass and its
+    # 'attn_weights' field is exactly this function's output.
+    layer_outputs = extract_qk_raw_scores(model, input_ids, ab_label=ab_label)
+    return [layer['attn_weights'] for layer in layer_outputs]
 
 
 def extract_qk_raw_scores(model, input_ids, ab_label=None):
