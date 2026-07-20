@@ -11,19 +11,19 @@ def remove_broken_per_rule_lines(folder):
     """
     Remove lines starting with BROKEN_LINE_PREFIX from all .log files in folder.
     """
-    folder = os.path.abspath(folder)
-    if not os.path.isdir(folder):
-        print(f"[Error] Not a directory: {folder}")
+    folder_abs = os.path.abspath(folder)
+    if not os.path.isdir(folder_abs):
+        print(f"[Error] Not a directory: {folder_abs}")
         return
 
-    log_files = [f for f in os.listdir(folder) if f.endswith('.log')]
+    log_files = [f for f in os.listdir(folder_abs) if f.endswith('.log')]
     log_files.sort()
 
-    total_files = 0
+    fixed_files = 0
     total_removed = 0
 
     for filename in log_files:
-        path = os.path.join(folder, filename)
+        path = os.path.join(folder_abs, filename)
         try:
             with open(path, 'r', encoding='utf-8', errors='replace') as f:
                 lines = f.readlines()
@@ -43,14 +43,14 @@ def remove_broken_per_rule_lines(folder):
             try:
                 with open(path, 'w', encoding='utf-8') as f:
                     f.writelines(cleaned)
-                total_files += 1
+                fixed_files += 1
                 total_removed += removed
                 print(f"[Fixed] {filename}: removed {removed} broken line(s)")
             except Exception as e:
                 print(f"[Error] Cannot write {filename}: {e}")
 
     print(f"\nDone. Processed {len(log_files)} log file(s), "
-          f"fixed {total_files} file(s), removed {total_removed} broken line(s) total.")
+          f"fixed {fixed_files} file(s), removed {total_removed} broken line(s) total.")
 
 
 def main():
