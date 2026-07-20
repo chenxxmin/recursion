@@ -535,20 +535,20 @@ def summarize_experiments():
           f'{"Exp-ID":>{NUM_COL}} {"Exp-OOD":>{NUM_COL}} {"Unexp-ID":>{NUM_COL}} {"Unexp-OOD":>{NUM_COL}}')
     print('-' * SUMMARY_WIDTH)
 
+    def fmt(value, spec='.1f'):
+        return format(value, spec) if value is not None else 'N/A'
+
     for log_path in log_files:
         name = os.path.splitext(os.path.basename(log_path))[0]  # Remove .log
         r = parse_log(log_path)
 
-        epoch_str = f"{r['final_epoch']}" if r.get('final_epoch') is not None else 'N/A'
-        best_str = f"{r['best_test_acc']:.1f}" if r.get('best_test_acc') is not None else 'N/A'
-        first_str = f"{r['first_task_acc']:.1f}" if r.get('first_task_acc') is not None else 'N/A'
-        eid_str = f"{r['exposed_in_dist']:.1f}" if r.get('exposed_in_dist') is not None else 'N/A'
-        eood_str = f"{r['exposed_ood']:.1f}" if r.get('exposed_ood') is not None else 'N/A'
-        uid_str = f"{r['unexposed_in_dist']:.1f}" if r.get('unexposed_in_dist') is not None else 'N/A'
-        uood_str = f"{r['unexposed_ood']:.1f}" if r.get('unexposed_ood') is not None else 'N/A'
+        cols = [fmt(r.get('final_epoch'), ''),
+                fmt(r.get('best_test_acc')), fmt(r.get('first_task_acc')),
+                fmt(r.get('exposed_in_dist')), fmt(r.get('exposed_ood')),
+                fmt(r.get('unexposed_in_dist')), fmt(r.get('unexposed_ood'))]
 
-        print(f'{name:<{NAME_COL}} {epoch_str:>{EPOCH_COL}} {best_str:>{NUM_COL}} {first_str:>{NUM_COL}} '
-              f'{eid_str:>{NUM_COL}} {eood_str:>{NUM_COL}} {uid_str:>{NUM_COL}} {uood_str:>{NUM_COL}}')
+        print(f'{name:<{NAME_COL}} {cols[0]:>{EPOCH_COL}} '
+              + ' '.join(f'{c:>{NUM_COL}}' for c in cols[1:]))
 
     print('=' * SUMMARY_WIDTH)
 
