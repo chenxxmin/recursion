@@ -2,10 +2,14 @@ import os
 import sys
 import argparse
 
+# Lines starting with this prefix were written by a buggy per-rule print and
+# are removed from logs (see module docstring usage in main()).
+BROKEN_LINE_PREFIX = "per-rule acc: {0:"
+
 
 def remove_broken_per_rule_lines(folder):
     """
-    Remove lines starting with 'per-rule acc: {0:' from all .log files in folder.
+    Remove lines starting with BROKEN_LINE_PREFIX from all .log files in folder.
     """
     folder = os.path.abspath(folder)
     if not os.path.isdir(folder):
@@ -27,11 +31,10 @@ def remove_broken_per_rule_lines(folder):
             print(f"[Error] Cannot read {filename}: {e}")
             continue
 
-        target_prefix = "per-rule acc: {0:"
         cleaned = []
         removed = 0
         for line in lines:
-            if line.lstrip().startswith(target_prefix):
+            if line.lstrip().startswith(BROKEN_LINE_PREFIX):
                 removed += 1
             else:
                 cleaned.append(line)
@@ -52,7 +55,7 @@ def remove_broken_per_rule_lines(folder):
 
 def main():
     parser = argparse.ArgumentParser(
-        description="Remove broken 'per-rule acc: {0: ...' lines from log files."
+        description=f"Remove broken '{BROKEN_LINE_PREFIX} ...' lines from log files."
     )
     parser.add_argument(
         'folder',

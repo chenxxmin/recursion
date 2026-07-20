@@ -441,3 +441,15 @@
 **原因**：路径常量与 IO 辅助必须单一来源。
 
 **验证**：端到端——构造假 experiments（成功/失败/缺失各一）跑 `main()`，rerun JSON 内容正确、metadata 保留、成功实验的 .err 被清理。
+
+---
+
+## 32. fix_logs.py target_prefix 三处重复且定义在循环内
+
+**问题**：字面量 `"per-rule acc: {0:"` 出现在函数体（循环内每次迭代重复赋值）、docstring、argparse description 三处。
+
+**修改**：提取模块级常量 `BROKEN_LINE_PREFIX`；docstring 改述常量名，description 用 f-string 引用，删除循环内的重复赋值和中间变量 `target_prefix`。
+
+**原因**：修复目标字符串必须单一来源——改 prefix 时漏一处就会清错行。
+
+**验证**：py_compile 通过。
