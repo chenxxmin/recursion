@@ -193,3 +193,15 @@
 **原因**：把隐式约定变成有名字的显式判断。
 
 **验证**：py_compile 通过；replace_all 精确替换 3 处。
+
+---
+
+## 13. visualize.py 魔法数字常量化
+
+**问题**：`set_ylim(-0.05, 1.05)` 重复 4 次；loss 轴上限的 `0.95` 分位数、`*1.2` 余量、`0.5` 下限三个数字挤在一行；epoch 刻度数量单图用 `//10`、网格图用 `//5`，差异无说明；`dpi=150` 重复 3 次；`os.path.basename(lp)[:-4]` 手写去扩展名。
+
+**修改**：提取常量 `ACC_YLIM / FIG_DPI / LOSS_YLIM_QUANTILE / LOSS_YLIM_MARGIN / LOSS_YLIM_MIN / MAX_YTICKS_SINGLE / MAX_YTICKS_GRID`（各带注释，两个刻度常量的命名直接体现"单图 vs 网格图"的差异）；`[:-4]` 改为 `os.path.splitext`。
+
+**原因**：同 AA-6；刻度数量不一致从"可疑的笔误"变成"有意的差异"。
+
+**验证**：分组与 --no-group 两种模式出图均正常。

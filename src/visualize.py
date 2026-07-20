@@ -10,6 +10,15 @@ import matplotlib
 matplotlib.use('Agg')  # non-interactive backend
 import matplotlib.pyplot as plt
 
+# Plot style constants
+ACC_YLIM = (-0.05, 1.05)   # y-range for accuracy axes (small pad around [0, 1])
+FIG_DPI = 150              # saved figure resolution
+LOSS_YLIM_QUANTILE = 0.95  # loss axis ceiling ignores spikes above this quantile
+LOSS_YLIM_MARGIN = 1.2     # headroom multiplier above the quantile
+LOSS_YLIM_MIN = 0.5        # lower bound for the loss axis ceiling
+MAX_YTICKS_SINGLE = 10     # epoch tick count on single-experiment heatmaps
+MAX_YTICKS_GRID = 5        # epoch tick count on small grid panels
+
 
 def parse_log(log_path):
     """Parse a training log file and return a dict of metrics."""
@@ -153,7 +162,7 @@ def plot_learning_curve(data, title, save_path=None):
         ax.set_title(f'{title} - Accuracy')
         ax.legend(loc='best', fontsize=8)
         ax.grid(True, alpha=0.3)
-        ax.set_ylim(-0.05, 1.05)
+        ax.set_ylim(ACC_YLIM)
 
         ax = axes[1]
         ax.plot(epochs, d['train_loss'], label='Train Loss',
@@ -185,7 +194,7 @@ def plot_learning_curve(data, title, save_path=None):
                           color='tab:green', linewidth=1.0, linestyle='--')
             ax.set_ylabel('Accuracy', color='tab:blue')
             ax.tick_params(axis='y', labelcolor='tab:blue')
-            ax.set_ylim(-0.05, 1.05)
+            ax.set_ylim(ACC_YLIM)
 
             # Right y-axis: loss
             l4, = ax_loss.plot(epochs, d['train_loss'], label='loss',
@@ -194,8 +203,8 @@ def plot_learning_curve(data, title, save_path=None):
             ax_loss.tick_params(axis='y', labelcolor='tab:red')
             # Keep the loss axis focused on the main trend (ignore first-epoch spikes).
             sorted_loss = sorted(d['train_loss'])
-            p95_idx = int(0.95 * len(sorted_loss))
-            loss_ylim = max(sorted_loss[p95_idx] * 1.2, 0.5)
+            p95_idx = int(LOSS_YLIM_QUANTILE * len(sorted_loss))
+            loss_ylim = max(sorted_loss[p95_idx] * LOSS_YLIM_MARGIN, LOSS_YLIM_MIN)
             ax_loss.set_ylim(0, loss_ylim)
 
             ax.set_title(f'seed {label}', fontsize=9)
@@ -212,7 +221,7 @@ def plot_learning_curve(data, title, save_path=None):
         fig.suptitle(f'{title} - Learning Curve', fontsize=12)
 
     out = save_path or ('learning_curve.png' if single_mode else f'{title}_curve.png')
-    fig.savefig(out, dpi=150)
+    fig.savefig(out, dpi=FIG_DPI)
     print(f"Saved learning curve to {out}")
     plt.close(fig)
 
@@ -281,8 +290,8 @@ def plot_per_position(data, title, save_path=None):
         ax.set_xlabel('Position (relative to from-x)')
         ax.set_ylabel('Epoch')
         ax.set_title(f'{title} - Per-position Accuracy')
-        ax.set_yticks(range(0, len(epochs), max(1, len(epochs)//10)))
-        ax.set_yticklabels([epochs[i] for i in range(0, len(epochs), max(1, len(epochs)//10))])
+        ax.set_yticks(range(0, len(epochs), max(1, len(epochs)//MAX_YTICKS_SINGLE)))
+        ax.set_yticklabels([epochs[i] for i in range(0, len(epochs), max(1, len(epochs)//MAX_YTICKS_SINGLE))])
         fig.colorbar(im, ax=ax, label='Accuracy')
         fig.tight_layout()
     else:
@@ -306,14 +315,14 @@ def plot_per_position(data, title, save_path=None):
             ax.set_xlabel('Position', fontsize=8)
             ax.set_ylabel('Epoch', fontsize=8)
             ax.tick_params(axis='both', which='major', labelsize=7)
-            step = max(1, len(epochs)//5)
+            step = max(1, len(epochs)//MAX_YTICKS_GRID)
             ax.set_yticks(range(0, len(epochs), step))
             ax.set_yticklabels([epochs[i] for i in range(0, len(epochs), step)], fontsize=6)
         fig.suptitle(f'{title} - Per-position Accuracy', fontsize=12)
         fig.colorbar(im, ax=axes.ravel().tolist(), label='Accuracy')
 
     out = save_path or ('per_position.png' if single_mode else f'{title}_per_pos.png')
-    fig.savefig(out, dpi=150)
+    fig.savefig(out, dpi=FIG_DPI)
     print(f"Saved per-position heatmap to {out}")
     plt.close(fig)
 
@@ -359,7 +368,7 @@ def plot_per_rule(data, title, save_path=None):
         ax.set_title(f'{title} - Per-rule Accuracy')
         ax.legend(fontsize=8)
         ax.grid(True, alpha=0.3)
-        ax.set_ylim(-0.05, 1.05)
+        ax.set_ylim(ACC_YLIM)
         fig.tight_layout()
     else:
         parsed = []
@@ -405,12 +414,12 @@ def plot_per_rule(data, title, save_path=None):
             ax.tick_params(axis='both', which='major', labelsize=7)
             ax.legend(fontsize=7)
             ax.grid(True, alpha=0.3)
-            ax.set_ylim(-0.05, 1.05)
+            ax.set_ylim(ACC_YLIM)
 
         fig.suptitle(f'{title} - Per-rule Accuracy', fontsize=12)
 
     out = save_path or ('per_rule.png' if single_mode else f'{title}_per_rule.png')
-    fig.savefig(out, dpi=150)
+    fig.savefig(out, dpi=FIG_DPI)
     print(f"Saved per-rule curve to {out}")
     plt.close(fig)
 
@@ -442,7 +451,7 @@ def collect_log_groups(names, log_dir):
         found = glob.glob(pattern)
         if found:
             for lp in found:
-                stem = os.path.basename(lp)[:-4]
+                stem = os.path.splitext(os.path.basename(lp))[0]
                 setting, seed = extract_setting_and_seed(stem)
                 groups.setdefault(setting, []).append((seed, lp))
             continue
