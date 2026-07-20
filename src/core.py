@@ -4,6 +4,9 @@ import torch.nn.functional as F
 import math
 import random
 import os
+import sys
+import time
+import threading
 import itertools
 from torch.utils.data import Dataset, DataLoader, Sampler
 
@@ -1055,6 +1058,7 @@ class MixedABTransformer(FibonacciTransformer):
 
 # ==================== Memory Safety ====================
 EXIT_CUDA_OUT_OF_MEMORY = 77
+EXIT_MEMORY_LIMIT_EXCEEDED = 78
 
 
 def estimate_training_memory_bytes(model, batch_size, seq_len):
@@ -1150,6 +1154,40 @@ def log_memory(label, device='cpu'):
     print(f"[Memory] {label}: " + " | ".join(parts))
 
 
+class MemoryMonitor(threading.Thread):
+    """Background thread that kills the process if CPU RSS exceeds a threshold.
+
+    This is a last-resort safety net to prevent a runaway training process from
+    exhausting system RAM and hanging the server. When the threshold is crossed,
+    the process exits immediately with EXIT_MEMORY_LIMIT_EXCEEDED so the parent
+    batch runner can stop the whole batch.
+    """
+
+    def __init__(self, threshold_gb=50.0, interval_sec=5.0):
+        super().__init__(daemon=True)
+        self.threshold_gb = threshold_gb
+        self.interval_sec = interval_sec
+        self._stop_event = threading.Event()
+
+    def run(self):
+        while not self._stop_event.is_set():
+            rss_mb = get_cpu_rss_mb()
+            if rss_mb is not None:
+                rss_gb = rss_mb / 1024.0
+                if rss_gb > self.threshold_gb:
+                    print(
+                        f"\n[MemoryMonitor] CPU RSS {rss_gb:.1f}GB exceeds "
+                        f"threshold {self.threshold_gb:.1f}GB. Killing process to "
+                        f"prevent system OOM.",
+                        file=sys.stderr, flush=True
+                    )
+                    os._exit(EXIT_MEMORY_LIMIT_EXCEEDED)
+            self._stop_event.wait(self.interval_sec)
+
+    def stop(self):
+        self._stop_event.set()
+
+
 # ==================== Unified Experiment Entry ====================
 def run_experiment(config_path=None):
     import json
@@ -1174,6 +1212,7 @@ def run_experiment(config_path=None):
     DROPOUT = cfg_main['DROPOUT']
     ENTROPY_PENALTY_WEIGHT = cfg_main.get('ENTROPY_PENALTY_WEIGHT', 0.0)
     MAX_UNIQUE_RATIO = cfg_main.get('MAX_UNIQUE_RATIO', 0.5)
+    MEMORY_LIMIT_GB = cfg_main.get('MEMORY_LIMIT_GB', 50.0)
 
     # Determine if we need extra room for rule token in mixed_ab label mode.
     # We cannot compute final BLOCK_SIZE until we know the task and use_ab_tag,
@@ -1471,6 +1510,11 @@ def run_experiment(config_path=None):
     optimizer = torch.optim.AdamW(model.parameters(), lr=LR, weight_decay=cfg['WEIGHT_DECAY'])
     scheduler = torch.optim.lr_scheduler.CosineAnnealingLR(optimizer, T_max=EPOCHS)
 
+    # Start background memory monitor. It will kill this process if CPU RSS
+    # exceeds MEMORY_LIMIT_GB, preventing system RAM exhaustion.
+    memory_monitor = MemoryMonitor(threshold_gb=MEMORY_LIMIT_GB)
+    memory_monitor.start()
+
     try:
         best_acc, epoch = run_training_engine(
             model, train_loader, test_loader, optimizer, scheduler, device,
@@ -1492,6 +1536,9 @@ def run_experiment(config_path=None):
                 torch.cuda.empty_cache()
             sys.exit(EXIT_CUDA_OUT_OF_MEMORY)
         raise
+    finally:
+        memory_monitor.stop()
+        memory_monitor.join(timeout=1.0)
 
     log_memory("after training", device)
 

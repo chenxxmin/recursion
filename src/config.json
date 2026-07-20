@@ -31,7 +31,8 @@
     "RANDOM_SEED": 42,
     "EVAL_INTERVAL": 20,
     "EARLY_STOP_NO_IMPROVE": 3000,
-    "EARLY_STOP_ACCURACY": 0.99
+    "EARLY_STOP_ACCURACY": 0.99,
+    "MEMORY_LIMIT_GB": 50.0
   },
   "test": {},
   "tribonacci": {

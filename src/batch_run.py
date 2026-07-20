@@ -24,6 +24,8 @@ DEFAULT_MODEL_BASE_DIR = '/data/cxm/models'
 
 # Exit code used by core.py when the model does not fit in GPU memory.
 EXIT_CUDA_OUT_OF_MEMORY = 77
+# Exit code used by core.py when CPU RSS exceeds MEMORY_LIMIT_GB.
+EXIT_MEMORY_LIMIT_EXCEEDED = 78
 
 # These are updated per experiment in main().
 LOG_DIR = 'logs'
@@ -386,20 +388,27 @@ def main():
         else:
             return run_single(exp, base_config, effective_workers, None)
 
-    oom_stop = False
+    resource_stop = False
 
     def handle_result(name, ok, returncode):
-        nonlocal oom_stop
+        nonlocal resource_stop
         results.append((name, ok))
-        if returncode == EXIT_CUDA_OUT_OF_MEMORY and not oom_stop:
+        if resource_stop:
+            return
+        if returncode == EXIT_CUDA_OUT_OF_MEMORY:
             print(f"[{datetime.now().strftime('%H:%M:%S')}] Stopping batch: experiment {name} failed with CUDA out of memory")
-            oom_stop = True
+            resource_stop = True
+        elif returncode == EXIT_MEMORY_LIMIT_EXCEEDED:
+            print(f"[{datetime.now().strftime('%H:%M:%S')}] Stopping batch: experiment {name} exceeded CPU memory limit")
+            resource_stop = True
+
+    skip_reason = "due to earlier resource failure (CUDA OOM or memory limit)"
 
     if effective_workers == 1:
         # Avoid thread overhead for purely serial execution.
         for exp in experiments:
-            if oom_stop:
-                print(f"Skipping {exp['name']} due to earlier CUDA OOM")
+            if resource_stop:
+                print(f"Skipping {exp['name']} {skip_reason}")
                 results.append((exp['name'], False))
                 continue
             name, ok, returncode = run_with_gpu(exp)
@@ -408,8 +417,8 @@ def main():
         submitted_futures = []
         with ThreadPoolExecutor(max_workers=effective_workers) as executor:
             for exp in experiments:
-                if oom_stop:
-                    print(f"Skipping {exp['name']} due to earlier CUDA OOM")
+                if resource_stop:
+                    print(f"Skipping {exp['name']} {skip_reason}")
                     results.append((exp['name'], False))
                     continue
                 submitted_futures.append(executor.submit(run_with_gpu, exp))
@@ -424,8 +433,8 @@ def main():
     for name, ok in results:
         status = "[OK] Success" if ok else "[NG] Failed"
         print(f"{status}: {name}")
-    if oom_stop:
-        print("\n[Error] Batch stopped early because at least one experiment ran out of GPU memory.")
+    if resource_stop:
+        print("\n[Error] Batch stopped early because at least one experiment hit a resource limit (CUDA OOM or CPU memory limit).")
 
     # Run detailed summary
     summarize_experiments()
@@ -433,7 +442,7 @@ def main():
     # Generate grouped plots (one figure per setting, all seeds overlaid)
     generate_grouped_plots()
 
-    if oom_stop:
+    if resource_stop:
         sys.exit(1)
 
 
