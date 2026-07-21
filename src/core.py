@@ -65,7 +65,10 @@ class RecurrenceDataset(Dataset):
 
             self.seen_indices.add(next_idx)
             cycle_vals.append(next_val)
-        return cycle_vals[:1 - self.init_len]
+        # Return the full trajectory (init_len seed values + one value per step).
+        # The number of NEW states on it is len(vals) - (init_len - 1); the
+        # trailing init_len-1 values are needed as seed context for extending.
+        return cycle_vals
 
     def run(self):
         state_space = self.p ** self.init_len
@@ -86,11 +89,15 @@ class RecurrenceDataset(Dataset):
             self.seen_indices.add(start_idx)
             seq = self.generate_cycle(start_idx)
 
-            # Extend cycle by self.length
-            num_inits = len(seq)
-            len_to_be_extended = num_inits + self.length - 1
-            while len(seq) > 0 and len(seq) < len_to_be_extended:
-                seq = seq + seq
+            # One training window per new state on the trajectory.
+            num_inits = len(seq) - (self.init_len - 1)
+
+            # Extend the sequence to num_inits + length - 1 values by continuing
+            # the recurrence step by step. (Periodic doubling would be equivalent
+            # for pure cycles, but wrong for transient trajectories truncated at
+            # an already-seen state: the tail is not periodic.)
+            while len(seq) < num_inits + self.length - 1:
+                seq.append(self.recurrence_fn(seq[-self.init_len:], self.p))
 
             # Append to train/test set
             target = self.train_samples if is_train else self.test_samples
