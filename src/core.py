@@ -1458,7 +1458,7 @@ def _prepare_dynamic_mixed(config):
 
 
 def _prepare_single_recurrence(config, task):
-    """Prepare dataset, model, loaders and training params for addition/multiplication/tribonacci."""
+    """Prepare dataset, model, loaders and training params for addition/multiplication/tribonacci/nonlinear."""
     cfg = dict(config.get('main', {}))
     P = cfg['P']
     D_MODEL = cfg['D_MODEL']
@@ -1500,6 +1500,16 @@ def _prepare_single_recurrence(config, task):
             return (a * seq[-1] + b * seq[-2] + c * seq[-3]) % p
         recurrence_name = f"X(k)=({a}*X(k-1)+{b}*X(k-2)+{c}*X(k-3)) mod {P}"
         save_extra_config = {'a': a, 'b': b, 'c': c, 'recurrence': 'tribonacci'}
+    elif task == 'nonlinear':
+        # X(k) = X(k-1)^2 + X(k-2). The state map (x,y) -> (y, y^2+x) is
+        # bijective for any p (invert: x = z - y^2), so all states lie on
+        # pure cycles.
+        default_num_mask = 1
+        init_len = 2
+        def recurrence_fn(seq, p):
+            return (seq[-1] * seq[-1] + seq[-2]) % p
+        recurrence_name = f"X(k)=(X(k-1)^2+X(k-2)) mod {P}"
+        save_extra_config = {'recurrence': 'nonlinear'}
 
     state_space_size = P ** init_len
     NUM_TRAIN_SAMPLES = max(1, int(state_space_size * MAX_UNIQUE_RATIO))
@@ -1594,7 +1604,7 @@ def run_experiment(config_path=None):
         ctx = _prepare_mixed_ab(config, device)
     elif TASK == 'dynamic_mixed':
         ctx = _prepare_dynamic_mixed(config)
-    elif TASK in ('addition', 'multiplication', 'tribonacci'):
+    elif TASK in ('addition', 'multiplication', 'tribonacci', 'nonlinear'):
         ctx = _prepare_single_recurrence(config, TASK)
     else:
         print(f"Unknown task: {TASK}")

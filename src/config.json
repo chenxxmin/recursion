@@ -41,6 +41,7 @@
     "C": 3
   },
   "multiplicative": {},
+  "nonlinear": {},
   "dynamic_mixed": {
     "P": 53,
     "AB_PAIRS": [[1, 1], [1, 2]],

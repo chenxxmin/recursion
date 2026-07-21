@@ -1,6 +1,6 @@
 # Recursion 训练任务：模型结构与训练设置说明
 
-本文档汇总 `src/` 中 `addition`、`tribonacci`、`multiplication`、`mixed_ab`、`dynamic_mixed` 五种递归训练任务的**模型结构**与**训练设置**。所有任务共享同一套 Transformer 主干，仅在递推规则、状态空间大小、输入格式以及多规则扩展上有所区别。
+本文档汇总 `src/` 中 `addition`、`tribonacci`、`multiplication`、`nonlinear`、`mixed_ab`、`dynamic_mixed` 六种递归训练任务的**模型结构**与**训练设置**。所有任务共享同一套 Transformer 主干，仅在递推规则、状态空间大小、输入格式以及多规则扩展上有所区别。
 
 ---
 
@@ -43,7 +43,20 @@ X(k) = a * X(k-1) + b * X(k-2) + c * X(k-3)  (mod P)
 - 状态空间大小：`P^3 = 23^3 = 12167`
 - 模型：基础 `FibonacciTransformer`
 
-### 1.4 mixed_ab
+### 1.4 nonlinear
+二阶非线性递推：
+
+```
+X(k) = X(k-1)^2 + X(k-2)  (mod P)
+```
+
+- 默认参数：`P = 53`
+- 初始状态长度：`init_len = 2`
+- 状态空间大小：`P^2`
+- 模型：基础 `FibonacciTransformer`
+- 注意：状态映射 `(x, y) -> (y, y^2 + x)` 对任意 P 都是双射（反解 `x = z - y^2`），所有状态都在纯循环上，暴露率配额精确生效。
+
+### 1.5 mixed_ab
 多组二阶线性递推混合训练。对每一组参数 `(a, b)`：
 
 ```
@@ -55,7 +68,7 @@ X(k) = a * X(k-1) + b * X(k-2)  (mod P)
 - 每组规则状态空间：`P^2 = 2809`
 - 模型：`MixedABTransformer`（在 `FibonacciTransformer` 基础上扩展多规则能力）
 
-### 1.5 dynamic_mixed
+### 1.6 dynamic_mixed
 每步规则可变的二阶线性递推。序列格式：
 
 ```
@@ -101,7 +114,7 @@ x_k = a * x_{k-2} + b * x_{k-1}  (mod P)
 | `MAX_UNIQUE_RATIO` | `0.5` | 暴露给训练的初始状态比例（单任务 / mixed_ab 默认 fallback） |
 | `ENTROPY_PENALTY_WEIGHT` | `0.0` | 注意力熵惩罚权重 |
 | `FIRST_TASK_WEIGHT` | `1.0` | 第一个预测位置的损失权重 |
-| `NUM_MASK` | `0` | 0 表示使用任务默认的 mask 起始位置 |
+| `NUM_MASK` | `null` | `null` 表示使用任务默认的 mask 起始位置 |
 | `EVAL_INTERVAL` | `20` | 每隔多少 epoch 评估一次 |
 | `EARLY_STOP_NO_IMPROVE` | `3000` | 测试准确率多久未提升则早停 |
 | `EARLY_STOP_ACCURACY` | `0.99` | 测试准确率达到该值则早停 |
@@ -114,6 +127,7 @@ x_k = a * x_{k-2} + b * x_{k-1}  (mod P)
 |------|--------|
 | `addition` | 无覆盖，使用 `main` 默认配置 |
 | `multiplication` | 无覆盖，使用 `main` 默认配置 |
+| `nonlinear` | 无覆盖，使用 `main` 默认配置 |
 | `tribonacci` | `P: 23`，`A: 1`，`B: 2`，`C: 3` |
 | `mixed_ab` | `USE_AB_TAG: false`，`USE_CONDITIONAL_WTE: false`，`COND_WTE_SHARED_RATIO: 0.0`，`MIXED_AB_MAX_UNIQUE_RATIOS: [0.5, 0.5]` |
 | `dynamic_mixed` | `P: 53`，`AB_PAIRS: [[1,1],[1,2]]`，`NUM_TRAIN_SAMPLES: 10000`，`NUM_TEST_SAMPLES: 2000`，`TRAIN_LEN: 16`，`OOD_LEN: 32` |
@@ -126,7 +140,7 @@ x_k = a * x_{k-2} + b * x_{k-1}  (mod P)
 - **梯度裁剪**：`clip_grad_norm_(model.parameters(), 1.0)`
 - **损失函数**：每个时间步的交叉熵，按 `loss_mask` 平均后加上可选的熵惩罚和 rule loss
 - **mask 策略**：
-  - `addition` / `multiplication`：默认屏蔽前 `1` 个位置（从预测第 3 项开始）
+  - `addition` / `multiplication` / `nonlinear`：默认屏蔽前 `1` 个位置（从预测第 3 项开始）
   - `tribonacci`：默认屏蔽前 `2` 个位置（从预测第 4 项开始）
   - `mixed_ab`：默认屏蔽前 `2` 个位置（从预测第 3 项开始，受 rule token 影响）
   - `dynamic_mixed`：由数据集生成 2D loss_mask，只计算 `x3, x4, ...`
@@ -397,19 +411,19 @@ if mixed_ab:
 
 ## 6. 各任务模型与设置对比
 
-| 项目 | addition | multiplication | tribonacci | mixed_ab | dynamic_mixed |
-|------|----------|----------------|------------|----------|---------------|
-| 递推公式 | `a*x1 + b*x0 mod P` | `x1 * x0 mod P` | `a*x2 + b*x1 + c*x0 mod P` | 多组 `(a,b)` 二阶线性递推 | 每步随机 `(a,b)` 二阶线性递推 |
-| 默认 `P` | 53 | 53 | 23 | 53 | 53 |
-| `init_len` | 2 | 2 | 3 | 2 | 2 |
-| 状态空间 | `P^2` | `P^2` | `P^3` | 每组 `P^2` | 不枚举状态空间 |
-| 默认参数 | `A=1, B=1` | 无 | `A=1, B=2, C=3` | `AB_PAIRS=[[1,1],[1,2]]` | `AB_PAIRS=[[1,1],[1,2]]` |
-| `num_mask` | 1 | 1 | 2 | 2 | 来自数据集 |
-| 模型 | `FibonacciTransformer` | `FibonacciTransformer` | `FibonacciTransformer` | `MixedABTransformer` | `FibonacciTransformer` |
-| 词表扩展 | 无 | 无 | 无 | rule token / cond_wte | flag tokens |
-| 规则预测头 | 无 | 无 | 无 | 有 `rule_head` | 无 |
-| 条件冻结 | 支持 `COND_FIX` | 支持 | 支持 | 常用 `COND_FIX=WTE/LINEAR` | 支持 |
-| final generation test | 有 | 有 | 有 | 有 | 无 |
+| 项目 | addition | multiplication | nonlinear | tribonacci | mixed_ab | dynamic_mixed |
+|------|----------|----------------|-----------|------------|----------|---------------|
+| 递推公式 | `a*x1 + b*x0 mod P` | `x1 * x0 mod P` | `x1^2 + x0 mod P` | `a*x2 + b*x1 + c*x0 mod P` | 多组 `(a,b)` 二阶线性递推 | 每步随机 `(a,b)` 二阶线性递推 |
+| 默认 `P` | 53 | 53 | 53 | 23 | 53 | 53 |
+| `init_len` | 2 | 2 | 2 | 3 | 2 | 2 |
+| 状态空间 | `P^2` | `P^2` | `P^2` | `P^3` | 每组 `P^2` | 不枚举状态空间 |
+| 默认参数 | `A=1, B=1` | 无 | 无 | `A=1, B=2, C=3` | `AB_PAIRS=[[1,1],[1,2]]` | `AB_PAIRS=[[1,1],[1,2]]` |
+| `num_mask` | 1 | 1 | 1 | 2 | 2 | 来自数据集 |
+| 模型 | `FibonacciTransformer` | `FibonacciTransformer` | `FibonacciTransformer` | `FibonacciTransformer` | `MixedABTransformer` | `FibonacciTransformer` |
+| 词表扩展 | 无 | 无 | 无 | 无 | rule token / cond_wte | flag tokens |
+| 规则预测头 | 无 | 无 | 无 | 无 | 有 `rule_head` | 无 |
+| 条件冻结 | 支持 `COND_FIX` | 支持 | 支持 | 支持 | 常用 `COND_FIX=WTE/LINEAR` | 支持 |
+| final generation test | 有 | 有 | 有 | 有 | 有 | 无 |
 
 ---
 

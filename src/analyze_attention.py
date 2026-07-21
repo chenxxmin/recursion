@@ -456,6 +456,10 @@ def _resolve_recurrence(config):
         print(f"Model config: multiplication, p={p}")
         return {'init_len': 2, 'is_dynamic_mixed': False,
                 'next_val': lambda seq: (seq[-1] * seq[-2]) % p}
+    if recurrence == 'nonlinear':
+        print(f"Model config: nonlinear, p={p}")
+        return {'init_len': 2, 'is_dynamic_mixed': False,
+                'next_val': lambda seq: (seq[-1] * seq[-1] + seq[-2]) % p}
     if recurrence == 'dynamic_mixed':
         print(f"Model config: dynamic_mixed, ab_pairs={config['ab_pairs']}, p={p}")
         return {'init_len': 2, 'is_dynamic_mixed': True, 'next_val': None,
