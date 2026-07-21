@@ -652,3 +652,15 @@
 **验证**：multiplication (p=7) 数据集生成从死循环变为正常终止；addition (p=7) 同种子下新旧版本数据集输出逐点一致（证明双射情形不受影响）。
 
 **注意**：暂态起点产生的样本是截断轨迹的延拓（如 (1,0) 轨迹 [1,0] 的周期延拓），语义上是合理的递推样本；这是否纳入训练分布属于实验设计问题，未做进一步处理。
+
+---
+
+## 48. 【行为修复】analyze_attention.py dynamic query mask 下标 off-by-one
+
+**问题**：`_make_dynamic_query_mask` 计算 `query_pos = 2*(k-1)`，与其注释矛盾（注释说"x3 在输入下标 3"，公式却给出 4）。按输入布局 `[x1,x2,f3,x3,f4,x4,...]`，x_k 的正确下标是 `2*(k-1)-1`。且最后一个 k 的 query_pos 恰好等于 mask 长度，必抛 IndexError——dynamic_mixed 的注意力分析路径从未成功运行过（第 8 条重构时确认该 bug 为既有问题）。
+
+**修改**：公式改为 `2*(k-1)-1`，注释同步修正。修复后 mask 恰好标记 x3..x_L 的输入下标（奇数位 3,5,7,...）。
+
+**验证**：mask 内容断言（length=8 → 位置 [3,5,7,9,11,13]）；dynamic_mixed checkpoint 的 `analyze_model_attention` 端到端跑通（此前必崩），输出中逐 query 行恰好是 x_k 位置。
+
+**注意**：mask 语义沿用原注释的意图（query 取 x_k 自身位置而非其前的 flag 位置）；若想改为 flag 位置是另一个分析口径问题，未动。

@@ -503,11 +503,11 @@ def _make_dynamic_query_mask(length):
     # Valid prediction queries for x_k are the input positions of x_{k-1} and flag_k
     # immediately preceding x_k. For x3 (k=3), x3 is at input index 3 (0-based),
     # so we use input position 3 as the query for predicting x3.
-    # General: x_k is at input index 2*(k-1), so the query position is 2*(k-1).
+    # General: x_k is at input index 2*(k-1) - 1, so the query position is 2*(k-1) - 1.
     total_len = 2 * length - 2
     mask = [0] * total_len
     for k in range(3, length + 1):
-        query_pos = 2 * (k - 1)
+        query_pos = 2 * (k - 1) - 1
         mask[query_pos] = 1
     return mask
 
