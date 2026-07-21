@@ -1,0 +1,389 @@
+{
+  "concurrency": 8,
+  "experiments": [
+    {
+      "name": "nonlinear_d64l1r4_P53_seed0",
+      "task": "nonlinear",
+      "config": {
+        "P": 53,
+        "D_MODEL": 64,
+        "N_LAYER": 1,
+        "MLP_RATIO": 4,
+        "NUM_MASK": 1,
+        "RANDOM_SEED": 0
+      }
+    },
+    {
+      "name": "nonlinear_d64l1r4_P53_seed1",
+      "task": "nonlinear",
+      "config": {
+        "P": 53,
+        "D_MODEL": 64,
+        "N_LAYER": 1,
+        "MLP_RATIO": 4,
+        "NUM_MASK": 1,
+        "RANDOM_SEED": 1
+      }
+    },
+    {
+      "name": "nonlinear_d64l1r4_P53_seed2",
+      "task": "nonlinear",
+      "config": {
+        "P": 53,
+        "D_MODEL": 64,
+        "N_LAYER": 1,
+        "MLP_RATIO": 4,
+        "NUM_MASK": 1,
+        "RANDOM_SEED": 2
+      }
+    },
+    {
+      "name": "nonlinear_d64l1r4_P53_seed3",
+      "task": "nonlinear",
+      "config": {
+        "P": 53,
+        "D_MODEL": 64,
+        "N_LAYER": 1,
+        "MLP_RATIO": 4,
+        "NUM_MASK": 1,
+        "RANDOM_SEED": 3
+      }
+    },
+    {
+      "name": "nonlinear_d64l1r4_P53_seed4",
+      "task": "nonlinear",
+      "config": {
+        "P": 53,
+        "D_MODEL": 64,
+        "N_LAYER": 1,
+        "MLP_RATIO": 4,
+        "NUM_MASK": 1,
+        "RANDOM_SEED": 4
+      }
+    },
+    {
+      "name": "nonlinear_d64l1r4_P53_seed5",
+      "task": "nonlinear",
+      "config": {
+        "P": 53,
+        "D_MODEL": 64,
+        "N_LAYER": 1,
+        "MLP_RATIO": 4,
+        "NUM_MASK": 1,
+        "RANDOM_SEED": 5
+      }
+    },
+    {
+      "name": "nonlinear_d64l1r4_P53_seed6",
+      "task": "nonlinear",
+      "config": {
+        "P": 53,
+        "D_MODEL": 64,
+        "N_LAYER": 1,
+        "MLP_RATIO": 4,
+        "NUM_MASK": 1,
+        "RANDOM_SEED": 6
+      }
+    },
+    {
+      "name": "nonlinear_d64l1r4_P53_seed7",
+      "task": "nonlinear",
+      "config": {
+        "P": 53,
+        "D_MODEL": 64,
+        "N_LAYER": 1,
+        "MLP_RATIO": 4,
+        "NUM_MASK": 1,
+        "RANDOM_SEED": 7
+      }
+    },
+    {
+      "name": "nonlinear_d64l1r4_P1009_seed0",
+      "task": "nonlinear",
+      "config": {
+        "P": 1009,
+        "D_MODEL": 64,
+        "N_LAYER": 1,
+        "MLP_RATIO": 4,
+        "NUM_MASK": 1,
+        "RANDOM_SEED": 0
+      }
+    },
+    {
+      "name": "nonlinear_d64l1r4_P1009_seed1",
+      "task": "nonlinear",
+      "config": {
+        "P": 1009,
+        "D_MODEL": 64,
+        "N_LAYER": 1,
+        "MLP_RATIO": 4,
+        "NUM_MASK": 1,
+        "RANDOM_SEED": 1
+      }
+    },
+    {
+      "name": "nonlinear_d64l1r4_P1009_seed2",
+      "task": "nonlinear",
+      "config": {
+        "P": 1009,
+        "D_MODEL": 64,
+        "N_LAYER": 1,
+        "MLP_RATIO": 4,
+        "NUM_MASK": 1,
+        "RANDOM_SEED": 2
+      }
+    },
+    {
+      "name": "nonlinear_d64l1r4_P1009_seed3",
+      "task": "nonlinear",
+      "config": {
+        "P": 1009,
+        "D_MODEL": 64,
+        "N_LAYER": 1,
+        "MLP_RATIO": 4,
+        "NUM_MASK": 1,
+        "RANDOM_SEED": 3
+      }
+    },
+    {
+      "name": "nonlinear_d64l1r4_P1009_seed4",
+      "task": "nonlinear",
+      "config": {
+        "P": 1009,
+        "D_MODEL": 64,
+        "N_LAYER": 1,
+        "MLP_RATIO": 4,
+        "NUM_MASK": 1,
+        "RANDOM_SEED": 4
+      }
+    },
+    {
+      "name": "nonlinear_d64l1r4_P1009_seed5",
+      "task": "nonlinear",
+      "config": {
+        "P": 1009,
+        "D_MODEL": 64,
+        "N_LAYER": 1,
+        "MLP_RATIO": 4,
+        "NUM_MASK": 1,
+        "RANDOM_SEED": 5
+      }
+    },
+    {
+      "name": "nonlinear_d64l1r4_P1009_seed6",
+      "task": "nonlinear",
+      "config": {
+        "P": 1009,
+        "D_MODEL": 64,
+        "N_LAYER": 1,
+        "MLP_RATIO": 4,
+        "NUM_MASK": 1,
+        "RANDOM_SEED": 6
+      }
+    },
+    {
+      "name": "nonlinear_d64l1r4_P1009_seed7",
+      "task": "nonlinear",
+      "config": {
+        "P": 1009,
+        "D_MODEL": 64,
+        "N_LAYER": 1,
+        "MLP_RATIO": 4,
+        "NUM_MASK": 1,
+        "RANDOM_SEED": 7
+      }
+    },
+    {
+      "name": "nonlinear_d256l1r8_P53_seed0",
+      "task": "nonlinear",
+      "config": {
+        "P": 53,
+        "D_MODEL": 256,
+        "N_LAYER": 1,
+        "MLP_RATIO": 8,
+        "NUM_MASK": 1,
+        "RANDOM_SEED": 0
+      }
+    },
+    {
+      "name": "nonlinear_d256l1r8_P53_seed1",
+      "task": "nonlinear",
+      "config": {
+        "P": 53,
+        "D_MODEL": 256,
+        "N_LAYER": 1,
+        "MLP_RATIO": 8,
+        "NUM_MASK": 1,
+        "RANDOM_SEED": 1
+      }
+    },
+    {
+      "name": "nonlinear_d256l1r8_P53_seed2",
+      "task": "nonlinear",
+      "config": {
+        "P": 53,
+        "D_MODEL": 256,
+        "N_LAYER": 1,
+        "MLP_RATIO": 8,
+        "NUM_MASK": 1,
+        "RANDOM_SEED": 2
+      }
+    },
+    {
+      "name": "nonlinear_d256l1r8_P53_seed3",
+      "task": "nonlinear",
+      "config": {
+        "P": 53,
+        "D_MODEL": 256,
+        "N_LAYER": 1,
+        "MLP_RATIO": 8,
+        "NUM_MASK": 1,
+        "RANDOM_SEED": 3
+      }
+    },
+    {
+      "name": "nonlinear_d256l1r8_P53_seed4",
+      "task": "nonlinear",
+      "config": {
+        "P": 53,
+        "D_MODEL": 256,
+        "N_LAYER": 1,
+        "MLP_RATIO": 8,
+        "NUM_MASK": 1,
+        "RANDOM_SEED": 4
+      }
+    },
+    {
+      "name": "nonlinear_d256l1r8_P53_seed5",
+      "task": "nonlinear",
+      "config": {
+        "P": 53,
+        "D_MODEL": 256,
+        "N_LAYER": 1,
+        "MLP_RATIO": 8,
+        "NUM_MASK": 1,
+        "RANDOM_SEED": 5
+      }
+    },
+    {
+      "name": "nonlinear_d256l1r8_P53_seed6",
+      "task": "nonlinear",
+      "config": {
+        "P": 53,
+        "D_MODEL": 256,
+        "N_LAYER": 1,
+        "MLP_RATIO": 8,
+        "NUM_MASK": 1,
+        "RANDOM_SEED": 6
+      }
+    },
+    {
+      "name": "nonlinear_d256l1r8_P53_seed7",
+      "task": "nonlinear",
+      "config": {
+        "P": 53,
+        "D_MODEL": 256,
+        "N_LAYER": 1,
+        "MLP_RATIO": 8,
+        "NUM_MASK": 1,
+        "RANDOM_SEED": 7
+      }
+    },
+    {
+      "name": "nonlinear_d256l1r8_P1009_seed0",
+      "task": "nonlinear",
+      "config": {
+        "P": 1009,
+        "D_MODEL": 256,
+        "N_LAYER": 1,
+        "MLP_RATIO": 8,
+        "NUM_MASK": 1,
+        "RANDOM_SEED": 0
+      }
+    },
+    {
+      "name": "nonlinear_d256l1r8_P1009_seed1",
+      "task": "nonlinear",
+      "config": {
+        "P": 1009,
+        "D_MODEL": 256,
+        "N_LAYER": 1,
+        "MLP_RATIO": 8,
+        "NUM_MASK": 1,
+        "RANDOM_SEED": 1
+      }
+    },
+    {
+      "name": "nonlinear_d256l1r8_P1009_seed2",
+      "task": "nonlinear",
+      "config": {
+        "P": 1009,
+        "D_MODEL": 256,
+        "N_LAYER": 1,
+        "MLP_RATIO": 8,
+        "NUM_MASK": 1,
+        "RANDOM_SEED": 2
+      }
+    },
+    {
+      "name": "nonlinear_d256l1r8_P1009_seed3",
+      "task": "nonlinear",
+      "config": {
+        "P": 1009,
+        "D_MODEL": 256,
+        "N_LAYER": 1,
+        "MLP_RATIO": 8,
+        "NUM_MASK": 1,
+        "RANDOM_SEED": 3
+      }
+    },
+    {
+      "name": "nonlinear_d256l1r8_P1009_seed4",
+      "task": "nonlinear",
+      "config": {
+        "P": 1009,
+        "D_MODEL": 256,
+        "N_LAYER": 1,
+        "MLP_RATIO": 8,
+        "NUM_MASK": 1,
+        "RANDOM_SEED": 4
+      }
+    },
+    {
+      "name": "nonlinear_d256l1r8_P1009_seed5",
+      "task": "nonlinear",
+      "config": {
+        "P": 1009,
+        "D_MODEL": 256,
+        "N_LAYER": 1,
+        "MLP_RATIO": 8,
+        "NUM_MASK": 1,
+        "RANDOM_SEED": 5
+      }
+    },
+    {
+      "name": "nonlinear_d256l1r8_P1009_seed6",
+      "task": "nonlinear",
+      "config": {
+        "P": 1009,
+        "D_MODEL": 256,
+        "N_LAYER": 1,
+        "MLP_RATIO": 8,
+        "NUM_MASK": 1,
+        "RANDOM_SEED": 6
+      }
+    },
+    {
+      "name": "nonlinear_d256l1r8_P1009_seed7",
+      "task": "nonlinear",
+      "config": {
+        "P": 1009,
+        "D_MODEL": 256,
+        "N_LAYER": 1,
+        "MLP_RATIO": 8,
+        "NUM_MASK": 1,
+        "RANDOM_SEED": 7
+      }
+    }
+  ]
+}
