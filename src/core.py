@@ -52,11 +52,17 @@ class RecurrenceDataset(Dataset):
             for val in cycle_vals[-self.init_len:]:
                 current_state_idx = current_state_idx * self.p + val
             next_idx = (current_state_idx % (self.p ** (self.init_len - 1))) * self.p + next_val
-            
-            if next_idx == start_idx:
+
+            # Break when the trajectory closes back to the start state (a pure
+            # cycle; array_len = cycle_len + (state_len-1)), or when it runs
+            # into an already-seen state. The latter happens for transient
+            # states (e.g. states containing 0 under multiplication, whose
+            # recurrence is not bijective): the trajectory flows into a
+            # previously processed cycle, and without this check the loop
+            # would never terminate.
+            if next_idx == start_idx or next_idx in self.seen_indices:
                 break
-            # break when next_state=start_state, so array_len = cycle_len + (state_len-1)
-            
+
             self.seen_indices.add(next_idx)
             cycle_vals.append(next_val)
         return cycle_vals[:1 - self.init_len]
@@ -491,11 +497,15 @@ def _accumulate_accuracy(logits, targets, loss_mask, pos_correct, pos_total):
     preds = preds[:, :targets.size(1)]  # Align length with targets
     valid_mask = loss_mask > 0
     match = ((preds == targets) & valid_mask).float()
-    for pos in range(valid_mask.size(1)):
-        if valid_mask[:, pos].any():
-            pos_correct[pos] = pos_correct.get(pos, 0) + match[:, pos].sum().item()
-            pos_total[pos] = pos_total.get(pos, 0) + valid_mask[:, pos].sum().item()
-    return match, match.sum().item(), valid_mask.float().sum().item()
+    # One host sync for the whole batch instead of two .item() calls per
+    # position; per-position syncs dominated epoch time on small models.
+    match_per_pos = match.sum(dim=0).tolist()
+    valid_per_pos = valid_mask.float().sum(dim=0).tolist()
+    for pos, (correct, total) in enumerate(zip(match_per_pos, valid_per_pos)):
+        if total > 0:
+            pos_correct[pos] = pos_correct.get(pos, 0) + correct
+            pos_total[pos] = pos_total.get(pos, 0) + total
+    return match, sum(match_per_pos), sum(valid_per_pos)
 
 
 def train_epoch(model, dataloader, optimizer, device, num_mask=1, extra_kwargs_fn=None, first_task_weight=1.0, frozen_param_states=None):
@@ -584,10 +594,14 @@ def evaluate(model, dataloader, device, num_mask=1, extra_kwargs_fn=None):
             
             # Per-rule/group accuracy for mixed_ab
             if ab_labels is not None:
-                for b_idx in range(B):
-                    g = ab_labels[b_idx].item()
-                    group_correct[g] = group_correct.get(g, 0) + match[b_idx].sum().item()
-                    group_total[g] = group_total.get(g, 0) + loss_mask[b_idx].float().sum().item()
+                # One host sync for the whole batch instead of three .item()
+                # calls per sample.
+                labels = ab_labels.tolist()
+                match_per_sample = match.sum(dim=1).tolist()
+                valid_per_sample = loss_mask.float().sum(dim=1).tolist()
+                for g, correct, total in zip(labels, match_per_sample, valid_per_sample):
+                    group_correct[g] = group_correct.get(g, 0) + correct
+                    group_total[g] = group_total.get(g, 0) + total
     
     overall_acc = total_correct / total_samples if total_samples > 0 else 0
     per_pos_acc = {pos: pos_correct[pos] / pos_total[pos] for pos in sorted(pos_total.keys())}
