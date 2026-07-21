@@ -664,3 +664,19 @@
 **验证**：mask 内容断言（length=8 → 位置 [3,5,7,9,11,13]）；dynamic_mixed checkpoint 的 `analyze_model_attention` 端到端跑通（此前必崩），输出中逐 query 行恰好是 x_k 位置。
 
 **注意**：mask 语义沿用原注释的意图（query 取 x_k 自身位置而非其前的 flag 位置）；若想改为 flag 位置是另一个分析口径问题，未动。
+
+---
+
+## 49. 【行为修复】dynamic_mixed 实验覆盖被 base 段回灌，N（规则数）不生效
+
+**问题**：现象——dynamic_mixed 的 N=2~10 实验结果完全相同。根因是配置合并顺序被二次执行：
+1. `batch_run.build_merged_config` 按 "main → 任务段默认 → 实验覆盖" 合并出 `merged_main`（其中 AB_PAIRS 已是实验的 N 对），但 `merged` 顶层仍残留 `src/config.json` 的 `dynamic_mixed` 段（AB_PAIRS 为 base 的 [[1,1],[1,2]]）；
+2. `core._prepare_dynamic_mixed`（及重构前原代码的 dynamic 分支）又执行 `cfg.update(config.get('dynamic_mixed', {}))`，把 base 段重新盖在合并结果上——实验覆盖被静默撤销。
+
+结果：所有 N 的实际训练配置完全相同（AB_PAIRS 恒为 [(1,1),(1,2)]），同 seed 下运行逐点一致。日志具有迷惑性：头部 "Merged Config" 表显示的是 merged_main（正确的 N 对），只有 "[Number theory] Dynamic mixed rules:" 行暴露实际使用的规则。
+
+**修改**：删除 `cfg.update(config.get('dynamic_mixed', {}))` 并加注释说明。合并优先级由 batch_run 单点负责。mixed_ab 与单一递推分支无此二次合并，不受影响。
+
+**验证**：模拟 batch_run 合并后调用 `_prepare_dynamic_mixed`——修复前 N=5 实际得到 2 对规则（复现 bug）；修复后 N=5/N=9 各得到 5/9 对，模型 vocab_size 随 N 正确变化。
+
+**后续**：此前所有 N>2 的 dynamic_mixed 实验结果实际上都是 N=2 的重复运行，需要重跑。

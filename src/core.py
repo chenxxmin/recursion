@@ -1353,8 +1353,12 @@ def _prepare_mixed_ab(config, device):
 def _prepare_dynamic_mixed(config):
     """Prepare dataset, model, loaders and training params for the dynamic_mixed task."""
     cfg_main = config.get('main', {})
+    # batch_run already merges the dynamic_mixed section into main with the
+    # correct precedence (main -> task defaults -> experiment override).
+    # Do NOT re-apply the section here: merged configs still carry the base
+    # section at top level, and re-applying it would clobber experiment
+    # overrides (e.g. every N-variant's AB_PAIRS silently reverted to base).
     cfg = dict(cfg_main)
-    cfg.update(config.get('dynamic_mixed', {}))
 
     P = cfg['P']
     D_MODEL = cfg_main['D_MODEL']
