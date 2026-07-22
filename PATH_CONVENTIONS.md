@@ -84,11 +84,12 @@
 |---|---|
 | 读取/修改日志 | 通过 `folder` 参数传入，无硬编码默认；实际使用应指向 `<base-dir>/<exp-name>/logs/` |
 
-### 3.7 `qk_verification.py`（QK 验证）
+### 3.7 `verify_circle.py`（圆结构验证）
 
 | 操作 | 路径 |
 |---|---|
-| 读取模型 | 通过 `sys.argv[1]` 传入 `.pth` 路径 |
+| 读取模型 | 通过 `pth_path` 参数传入 `.pth` 路径 |
+| 保存图片 | 通过 `--plot` 显式指定，无默认路径 |
 
 ## 4. 一致性检查结果
 
@@ -99,7 +100,7 @@
 | `visualize.py` | `<base-dir>/<exp>/logs/` | `<base-dir>/<exp>/plots/` | - | ✅ |
 | `analyze_attention.py` | 接收传入的 `.pth` | - | 接收传入的 `.pth` | ✅ |
 | `fix_logs.py` | 需手动指定 | - | - | ⚠️ 注意指向 `logs/` 子文件夹 |
-| `qk_verification.py` | 需手动指定 `.pth` | - | 需手动指定 `.pth` | ⚠️ 手动 |
+| `verify_circle.py` | 需手动指定 `.pth` | `--plot` 显式指定 | 需手动指定 `.pth` | ⚠️ 手动 |
 
 ## 5. 注意事项
 

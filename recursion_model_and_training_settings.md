@@ -440,7 +440,7 @@ if mixed_ab:
 | 配置入口 | `src/core.py::run_experiment`（仅由 `src/batch_run.py` 调用） |
 | 批量运行 | `src/batch_run.py` |
 | 注意力可视化 | `src/analyze_attention.py` |
-| QK 性质验证 | `src/qk_verification.py`（独立脚本，不在默认流程中运行） |
+| 圆结构验证（傅里叶/单位圆） | `src/verify_circle.py`（独立脚本，不在默认流程中运行） |
 | 可视化 | `src/visualize.py` |
 
 ---

@@ -704,3 +704,21 @@
 **验证**：5 条规则（含大循环 (2,2)、暂态 (1,0)）exposed 全部精确 70.0%（1966/2809），窗口全部合法，train/test 初始状态无交集。
 
 **行为影响**：所有规则的 train/test 划分在循环边界处可能与旧版不同（这正是修复目的）；双射小循环规则的样本内容不变，仅边界循环的归属可能微调。
+
+---
+
+## 52. 新增 verify_circle.py（圆结构验证），移除 QK 分析
+
+**背景**：QK 性质验证（qk_verification.py）不再使用；需要一个新工具检验"token 0..p-1 经过 attention 层后的表示是否存在一个线性投影使所有点均匀落在单位圆上"——这是线性层学会模加的几何标志。
+
+**修改**：
+- 新增 `src/verify_circle.py`：逐上下文（默认 pairs 模式：固定 w 于位置 0，分析位置 1 全部 p 个 v 的隐向量）做 token 轴 DFT，报告主频率 k*、top1/top5 功率占比、半径变异系数、角度等差相干性（含 shuffle 基线）；`--context single` 为单 token 对照模式；`--plot` 输出投影散点图。
+- 删除 `src/qk_verification.py`；删除 `analyze_attention.py` 中随之失去调用方的 `verify_qk_properties`、`_mean_std`、`CV_MEAN_EPS`（`extract_qk_raw_scores` 保留，`get_attention_weights` 仍在用）。
+- `PATH_CONVENTIONS.md` 与 `recursion_model_and_training_settings.md` 的 QK 条目同步更新为 verify_circle。
+
+**实现中修正的三个方法学问题**（均有单测覆盖）：
+1. 实信号 DFT 的共轲对称使单个圆谐波功率平摊到 k 与 p-k 两个峰——频谱先折叠再取主频；
+2. `spec[k*]` 取的是 e^{-iθ} 分量，投影需取其共轲，否则角度反向、相干性恒为 0；
+3. **同数据投影的角度相干性存在系统性正偏**：投影方向由数据自身主频构造时，Gram 矩阵对角项会注入目标相位，纯随机矩阵也能得到 0.86 的"假阳性"相干性——改为留出式（偶数位置拟合方向、奇数位置检验，双向平均），随机基线从 0.86 降到 0.13。
+
+**验证**：合成完美圆/带噪圆/随机矩阵三组单测（完美圆 top1=1.0、CV≈0、coh=1.0；随机矩阵 coh=0.13）；小 checkpoint 两种模式端到端跑通并出图。

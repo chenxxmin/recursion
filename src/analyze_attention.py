@@ -17,7 +17,6 @@ HEADER_WIDTH = 70       # width of printed section separators
 TOP_K = 3               # how many strongest-attended positions to report per query
 MAX_DISTANCE = 63       # max lag for per-distance attention statistics
 ENTROPY_EPS = 1e-12     # numerical epsilon inside log() for attention entropy
-CV_MEAN_EPS = 1e-6      # guard against division by a ~0 mean in the CV
 MIN_PRINT_VAL = 0.01    # per-distance values below this are omitted from printout
 ITEMS_PER_LINE = 8      # per-distance entries printed per line
 
@@ -282,117 +281,6 @@ def summarize_attention_for_sequence(model, seq, query_mask=None):
     return results
 
 
-def _mean_std(vals):
-    """Return (mean, population std) of a non-empty list of numbers."""
-    mean = sum(vals) / len(vals)
-    std = math.sqrt(sum((v - mean) ** 2 for v in vals) / len(vals))
-    return mean, std
-
-
-def verify_qk_properties(model, test_sequences, init_len, query_masks=None, device='cpu'):
-    """
-    Verify two QK properties:
-    P1: raw_score ≈ 0 when |i-j| > init_len (orthogonality)
-    P2: raw_score constant across positions i for fixed distance d (time-homogeneous)
-
-    test_sequences: list[list[int]], test sequences
-    query_masks: optional list of masks, each of length T (input sequence
-                 length), indicating which query positions should be included.
-    """
-    _print_header("QK Property Verification (Raw Scores, before Softmax)")
-    print(f"Recurrence order init_len={init_len}, num test sequences={len(test_sequences)}")
-    print()
-
-    # Collect QK data for all sequences
-    all_seq_data = []
-    for seq_idx, seq in enumerate(test_sequences):
-        input_ids = torch.tensor([seq], dtype=torch.long).to(device)
-        qk_data = extract_qk_raw_scores(model, input_ids)
-        mask = query_masks[seq_idx] if query_masks is not None else None
-        if mask is not None and isinstance(mask, (list, tuple)):
-            mask = torch.tensor(mask, dtype=torch.bool)
-        all_seq_data.append({
-            'seq': seq,
-            'qk': qk_data,
-            'T': len(seq),
-            'query_mask': mask,
-        })
-    
-    n_layers = len(all_seq_data[0]['qk'])
-    n_heads = all_seq_data[0]['qk'][0]['raw_scores'].shape[0]
-    
-    # ==================== P1: Long-distance Orthogonality ====================
-    print("--- [P1] Long-distance Orthogonality Verification ---")
-    print("Ideal: raw_score mean ≈ 0 and small std when d > init_len")
-    print()
-    
-    for layer_idx in range(n_layers):
-        for h in range(n_heads):
-            # Collect raw scores by distance d
-            scores_by_d = {}
-            for seq_data in all_seq_data:
-                T = seq_data['T']
-                raw = seq_data['qk'][layer_idx]['raw_scores'][h]  # (T, T)
-                mask = seq_data.get('query_mask')
-                for i in range(T):
-                    if mask is not None and not mask[i]:
-                        continue
-                    for j in range(i+1):
-                        d = i - j
-                        if d not in scores_by_d:
-                            scores_by_d[d] = []
-                        scores_by_d[d].append(raw[i, j].item())
-            
-            print(f"  Layer {layer_idx}, Head {h}:")
-            # Effective distances
-            for d in range(1, init_len + 1):
-                vals = scores_by_d.get(d, [])
-                if vals:
-                    mean, std = _mean_std(vals)
-                    print(f"    d={d:2d} (effective): mean={mean:7.3f}, std={std:6.3f}, n={len(vals)}")
-            # long-distance
-            far_vals = []
-            for d, vals in scores_by_d.items():
-                if d > init_len:
-                    far_vals.extend(vals)
-            if far_vals:
-                mean_far, std_far = _mean_std(far_vals)
-                print(f"    d>{init_len} (long-distance): mean={mean_far:7.3f}, std={std_far:6.3f}, n={len(far_vals)}")
-            print()
-    
-    # ==================== P2: Time-homogeneity ====================
-    print("--- [P2] Time-homogeneous Verification ---")
-    print("Ideal: CV of raw_score across positions i ≈ 0 for fixed distance d")
-    print("(CV = std / |mean|, smaller = more constant)")
-    print()
-    
-    for layer_idx in range(n_layers):
-        for h in range(n_heads):
-            print(f"  Layer {layer_idx}, Head {h}:")
-            for d in range(1, init_len + 1):
-                # Collect raw scores at distance d across all sequences and positions i
-                vals = []
-                for seq_data in all_seq_data:
-                    T = seq_data['T']
-                    raw = seq_data['qk'][layer_idx]['raw_scores'][h]
-                    mask = seq_data.get('query_mask')
-                    for i in range(d, T):
-                        if mask is not None and not mask[i]:
-                            continue
-                        vals.append(raw[i, i - d].item())
-                
-                if vals:
-                    mean_v, std_v = _mean_std(vals)
-                    cv = std_v / abs(mean_v) if abs(mean_v) > CV_MEAN_EPS else float('inf')
-                    print(f"    d={d:2d}: mean={mean_v:7.3f}, std={std_v:6.3f}, CV={cv:5.3f}, n={len(vals)}")
-            print()
-    
-    
-    print("=" * HEADER_WIDTH)
-    print("QK Property Verification Completed")
-    print("=" * HEADER_WIDTH)
-
-
 def print_attention_summary(summary, seq=None):
     """Print text summary of attention analysis."""
     if seq is not None and isinstance(seq, torch.Tensor):
@@ -529,8 +417,7 @@ def analyze_model_attention(pth_path, device=None):
     print(f"Training epochs: {checkpoint.get('final_epoch', 'N/A')}")
 
     # Randomly generate one test sequence for attention visualization.
-    # (QK property verification lives in qk_verification.py, which reuses
-    # verify_qk_properties from this module.)
+    # (QK property verification was removed; use verify_circle.py instead.)
     if rec['is_dynamic_mixed']:
         test_seq = _make_dynamic_seq(p, rec['ab_pairs'], rec['flag_start_id'],
                                      rec['dynamic_seq_len'], seed=0)
