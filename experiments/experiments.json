@@ -2,10 +2,41 @@
   "concurrency": 8,
   "experiments": [
     {
-      "name": "dynamic_mixed_d128l1r8_N2_seed0",
+      "name": "mixed_basic_d4096l1r16h4_n2_e50_seed0",
+      "task": "mixed_ab",
+      "config": {
+        "RANDOM_SEED": 0,
+        "D_MODEL": 4096,
+        "N_HEAD": 4,
+        "N_LAYER": 1,
+        "MLP_RATIO": 16,
+        "AB_PAIRS": [
+          [
+            1,
+            1
+          ],
+          [
+            1,
+            2
+          ]
+        ],
+        "MIXED_AB_MAX_UNIQUE_RATIOS": [
+          0.5,
+          0.5
+        ],
+        "TARGET_INIT_COVERAGE": 0.5,
+        "MAX_UNIQUE_RATIO": 0.5,
+        "USE_AB_TAG": false,
+        "USE_CONDITIONAL_WTE": false,
+        "NUM_MASK": 0
+      }
+    },
+    {
+      "name": "dynamic_mixed_d256l1r8h4_N2_seed0",
       "task": "dynamic_mixed",
       "config": {
-        "D_MODEL": 128,
+        "D_MODEL": 256,
+        "N_HEAD": 4,
         "N_LAYER": 1,
         "MLP_RATIO": 8,
         "NUM_TRAIN_SAMPLES": 10000,
@@ -26,10 +57,11 @@
       }
     },
     {
-      "name": "dynamic_mixed_d128l1r8_N3_seed0",
+      "name": "dynamic_mixed_d256l1r8h4_N3_seed0",
       "task": "dynamic_mixed",
       "config": {
-        "D_MODEL": 128,
+        "D_MODEL": 256,
+        "N_HEAD": 4,
         "N_LAYER": 1,
         "MLP_RATIO": 8,
         "NUM_TRAIN_SAMPLES": 10000,
@@ -54,10 +86,11 @@
       }
     },
     {
-      "name": "dynamic_mixed_d128l1r8_N4_seed0",
+      "name": "dynamic_mixed_d256l1r8h4_N4_seed0",
       "task": "dynamic_mixed",
       "config": {
-        "D_MODEL": 128,
+        "D_MODEL": 256,
+        "N_HEAD": 4,
         "N_LAYER": 1,
         "MLP_RATIO": 8,
         "NUM_TRAIN_SAMPLES": 10000,
@@ -86,10 +119,11 @@
       }
     },
     {
-      "name": "dynamic_mixed_d128l1r8_N5_seed0",
+      "name": "dynamic_mixed_d256l1r8h4_N5_seed0",
       "task": "dynamic_mixed",
       "config": {
-        "D_MODEL": 128,
+        "D_MODEL": 256,
+        "N_HEAD": 4,
         "N_LAYER": 1,
         "MLP_RATIO": 8,
         "NUM_TRAIN_SAMPLES": 10000,
@@ -122,10 +156,11 @@
       }
     },
     {
-      "name": "dynamic_mixed_d128l1r8_N6_seed0",
+      "name": "dynamic_mixed_d256l1r8h4_N6_seed0",
       "task": "dynamic_mixed",
       "config": {
-        "D_MODEL": 128,
+        "D_MODEL": 256,
+        "N_HEAD": 4,
         "N_LAYER": 1,
         "MLP_RATIO": 8,
         "NUM_TRAIN_SAMPLES": 10000,
@@ -162,370 +197,11 @@
       }
     },
     {
-      "name": "dynamic_mixed_d128l1r8_N7_seed0",
-      "task": "dynamic_mixed",
-      "config": {
-        "D_MODEL": 128,
-        "N_LAYER": 1,
-        "MLP_RATIO": 8,
-        "NUM_TRAIN_SAMPLES": 10000,
-        "NUM_TEST_SAMPLES": 2000,
-        "TRAIN_LEN": 16,
-        "OOD_LEN": 32,
-        "RANDOM_SEED": 0,
-        "AB_PAIRS": [
-          [
-            1,
-            1
-          ],
-          [
-            1,
-            2
-          ],
-          [
-            1,
-            3
-          ],
-          [
-            1,
-            4
-          ],
-          [
-            1,
-            5
-          ],
-          [
-            1,
-            6
-          ],
-          [
-            1,
-            7
-          ]
-        ]
-      }
-    },
-    {
-      "name": "dynamic_mixed_d128l1r8_N8_seed0",
-      "task": "dynamic_mixed",
-      "config": {
-        "D_MODEL": 128,
-        "N_LAYER": 1,
-        "MLP_RATIO": 8,
-        "NUM_TRAIN_SAMPLES": 10000,
-        "NUM_TEST_SAMPLES": 2000,
-        "TRAIN_LEN": 16,
-        "OOD_LEN": 32,
-        "RANDOM_SEED": 0,
-        "AB_PAIRS": [
-          [
-            1,
-            1
-          ],
-          [
-            1,
-            2
-          ],
-          [
-            1,
-            3
-          ],
-          [
-            1,
-            4
-          ],
-          [
-            1,
-            5
-          ],
-          [
-            1,
-            6
-          ],
-          [
-            1,
-            7
-          ],
-          [
-            1,
-            8
-          ]
-        ]
-      }
-    },
-    {
-      "name": "dynamic_mixed_d128l1r8_N9_seed0",
-      "task": "dynamic_mixed",
-      "config": {
-        "D_MODEL": 128,
-        "N_LAYER": 1,
-        "MLP_RATIO": 8,
-        "NUM_TRAIN_SAMPLES": 10000,
-        "NUM_TEST_SAMPLES": 2000,
-        "TRAIN_LEN": 16,
-        "OOD_LEN": 32,
-        "RANDOM_SEED": 0,
-        "AB_PAIRS": [
-          [
-            1,
-            1
-          ],
-          [
-            1,
-            2
-          ],
-          [
-            1,
-            3
-          ],
-          [
-            1,
-            4
-          ],
-          [
-            1,
-            5
-          ],
-          [
-            1,
-            6
-          ],
-          [
-            1,
-            7
-          ],
-          [
-            1,
-            8
-          ],
-          [
-            1,
-            9
-          ]
-        ]
-      }
-    },
-    {
-      "name": "dynamic_mixed_d128l1r8_N10_seed0",
-      "task": "dynamic_mixed",
-      "config": {
-        "D_MODEL": 128,
-        "N_LAYER": 1,
-        "MLP_RATIO": 8,
-        "NUM_TRAIN_SAMPLES": 10000,
-        "NUM_TEST_SAMPLES": 2000,
-        "TRAIN_LEN": 16,
-        "OOD_LEN": 32,
-        "RANDOM_SEED": 0,
-        "AB_PAIRS": [
-          [
-            1,
-            1
-          ],
-          [
-            1,
-            2
-          ],
-          [
-            1,
-            3
-          ],
-          [
-            1,
-            4
-          ],
-          [
-            1,
-            5
-          ],
-          [
-            1,
-            6
-          ],
-          [
-            1,
-            7
-          ],
-          [
-            1,
-            8
-          ],
-          [
-            1,
-            9
-          ],
-          [
-            1,
-            10
-          ]
-        ]
-      }
-    },
-    {
-      "name": "dynamic_mixed_d256l1r8_N2_seed0",
+      "name": "dynamic_mixed_d256l1r8h4_N7_seed0",
       "task": "dynamic_mixed",
       "config": {
         "D_MODEL": 256,
-        "N_LAYER": 1,
-        "MLP_RATIO": 8,
-        "NUM_TRAIN_SAMPLES": 10000,
-        "NUM_TEST_SAMPLES": 2000,
-        "TRAIN_LEN": 16,
-        "OOD_LEN": 32,
-        "RANDOM_SEED": 0,
-        "AB_PAIRS": [
-          [
-            1,
-            1
-          ],
-          [
-            1,
-            2
-          ]
-        ]
-      }
-    },
-    {
-      "name": "dynamic_mixed_d256l1r8_N3_seed0",
-      "task": "dynamic_mixed",
-      "config": {
-        "D_MODEL": 256,
-        "N_LAYER": 1,
-        "MLP_RATIO": 8,
-        "NUM_TRAIN_SAMPLES": 10000,
-        "NUM_TEST_SAMPLES": 2000,
-        "TRAIN_LEN": 16,
-        "OOD_LEN": 32,
-        "RANDOM_SEED": 0,
-        "AB_PAIRS": [
-          [
-            1,
-            1
-          ],
-          [
-            1,
-            2
-          ],
-          [
-            1,
-            3
-          ]
-        ]
-      }
-    },
-    {
-      "name": "dynamic_mixed_d256l1r8_N4_seed0",
-      "task": "dynamic_mixed",
-      "config": {
-        "D_MODEL": 256,
-        "N_LAYER": 1,
-        "MLP_RATIO": 8,
-        "NUM_TRAIN_SAMPLES": 10000,
-        "NUM_TEST_SAMPLES": 2000,
-        "TRAIN_LEN": 16,
-        "OOD_LEN": 32,
-        "RANDOM_SEED": 0,
-        "AB_PAIRS": [
-          [
-            1,
-            1
-          ],
-          [
-            1,
-            2
-          ],
-          [
-            1,
-            3
-          ],
-          [
-            1,
-            4
-          ]
-        ]
-      }
-    },
-    {
-      "name": "dynamic_mixed_d256l1r8_N5_seed0",
-      "task": "dynamic_mixed",
-      "config": {
-        "D_MODEL": 256,
-        "N_LAYER": 1,
-        "MLP_RATIO": 8,
-        "NUM_TRAIN_SAMPLES": 10000,
-        "NUM_TEST_SAMPLES": 2000,
-        "TRAIN_LEN": 16,
-        "OOD_LEN": 32,
-        "RANDOM_SEED": 0,
-        "AB_PAIRS": [
-          [
-            1,
-            1
-          ],
-          [
-            1,
-            2
-          ],
-          [
-            1,
-            3
-          ],
-          [
-            1,
-            4
-          ],
-          [
-            1,
-            5
-          ]
-        ]
-      }
-    },
-    {
-      "name": "dynamic_mixed_d256l1r8_N6_seed0",
-      "task": "dynamic_mixed",
-      "config": {
-        "D_MODEL": 256,
-        "N_LAYER": 1,
-        "MLP_RATIO": 8,
-        "NUM_TRAIN_SAMPLES": 10000,
-        "NUM_TEST_SAMPLES": 2000,
-        "TRAIN_LEN": 16,
-        "OOD_LEN": 32,
-        "RANDOM_SEED": 0,
-        "AB_PAIRS": [
-          [
-            1,
-            1
-          ],
-          [
-            1,
-            2
-          ],
-          [
-            1,
-            3
-          ],
-          [
-            1,
-            4
-          ],
-          [
-            1,
-            5
-          ],
-          [
-            1,
-            6
-          ]
-        ]
-      }
-    },
-    {
-      "name": "dynamic_mixed_d256l1r8_N7_seed0",
-      "task": "dynamic_mixed",
-      "config": {
-        "D_MODEL": 256,
+        "N_HEAD": 4,
         "N_LAYER": 1,
         "MLP_RATIO": 8,
         "NUM_TRAIN_SAMPLES": 10000,
@@ -566,10 +242,11 @@
       }
     },
     {
-      "name": "dynamic_mixed_d256l1r8_N8_seed0",
+      "name": "dynamic_mixed_d256l1r8h4_N8_seed0",
       "task": "dynamic_mixed",
       "config": {
         "D_MODEL": 256,
+        "N_HEAD": 4,
         "N_LAYER": 1,
         "MLP_RATIO": 8,
         "NUM_TRAIN_SAMPLES": 10000,
@@ -614,10 +291,11 @@
       }
     },
     {
-      "name": "dynamic_mixed_d256l1r8_N9_seed0",
+      "name": "dynamic_mixed_d256l1r8h4_N9_seed0",
       "task": "dynamic_mixed",
       "config": {
         "D_MODEL": 256,
+        "N_HEAD": 4,
         "N_LAYER": 1,
         "MLP_RATIO": 8,
         "NUM_TRAIN_SAMPLES": 10000,
@@ -666,10 +344,11 @@
       }
     },
     {
-      "name": "dynamic_mixed_d256l1r8_N10_seed0",
+      "name": "dynamic_mixed_d256l1r8h4_N10_seed0",
       "task": "dynamic_mixed",
       "config": {
         "D_MODEL": 256,
+        "N_HEAD": 4,
         "N_LAYER": 1,
         "MLP_RATIO": 8,
         "NUM_TRAIN_SAMPLES": 10000,
@@ -722,391 +401,22 @@
       }
     },
     {
-      "name": "nonlinear_d64l1r4_P53_seed0",
-      "task": "nonlinear",
+      "name": "tribonacci_d256l1r4h4_a1b0c2_seed0",
+      "task": "tribonacci",
       "config": {
-        "P": 53,
-        "D_MODEL": 64,
-        "N_LAYER": 1,
-        "MLP_RATIO": 4,
-        "NUM_MASK": 1,
-        "RANDOM_SEED": 0
-      }
-    },
-    {
-      "name": "nonlinear_d64l1r4_P53_seed1",
-      "task": "nonlinear",
-      "config": {
-        "P": 53,
-        "D_MODEL": 64,
-        "N_LAYER": 1,
-        "MLP_RATIO": 4,
-        "NUM_MASK": 1,
-        "RANDOM_SEED": 1
-      }
-    },
-    {
-      "name": "nonlinear_d64l1r4_P53_seed2",
-      "task": "nonlinear",
-      "config": {
-        "P": 53,
-        "D_MODEL": 64,
-        "N_LAYER": 1,
-        "MLP_RATIO": 4,
-        "NUM_MASK": 1,
-        "RANDOM_SEED": 2
-      }
-    },
-    {
-      "name": "nonlinear_d64l1r4_P53_seed3",
-      "task": "nonlinear",
-      "config": {
-        "P": 53,
-        "D_MODEL": 64,
-        "N_LAYER": 1,
-        "MLP_RATIO": 4,
-        "NUM_MASK": 1,
-        "RANDOM_SEED": 3
-      }
-    },
-    {
-      "name": "nonlinear_d64l1r4_P53_seed4",
-      "task": "nonlinear",
-      "config": {
-        "P": 53,
-        "D_MODEL": 64,
-        "N_LAYER": 1,
-        "MLP_RATIO": 4,
-        "NUM_MASK": 1,
-        "RANDOM_SEED": 4
-      }
-    },
-    {
-      "name": "nonlinear_d64l1r4_P53_seed5",
-      "task": "nonlinear",
-      "config": {
-        "P": 53,
-        "D_MODEL": 64,
-        "N_LAYER": 1,
-        "MLP_RATIO": 4,
-        "NUM_MASK": 1,
-        "RANDOM_SEED": 5
-      }
-    },
-    {
-      "name": "nonlinear_d64l1r4_P53_seed6",
-      "task": "nonlinear",
-      "config": {
-        "P": 53,
-        "D_MODEL": 64,
-        "N_LAYER": 1,
-        "MLP_RATIO": 4,
-        "NUM_MASK": 1,
-        "RANDOM_SEED": 6
-      }
-    },
-    {
-      "name": "nonlinear_d64l1r4_P53_seed7",
-      "task": "nonlinear",
-      "config": {
-        "P": 53,
-        "D_MODEL": 64,
-        "N_LAYER": 1,
-        "MLP_RATIO": 4,
-        "NUM_MASK": 1,
-        "RANDOM_SEED": 7
-      }
-    },
-    {
-      "name": "nonlinear_d64l1r4_P1009_seed0",
-      "task": "nonlinear",
-      "config": {
-        "P": 1009,
-        "D_MODEL": 64,
-        "N_LAYER": 1,
-        "MLP_RATIO": 4,
-        "NUM_MASK": 1,
-        "RANDOM_SEED": 0
-      }
-    },
-    {
-      "name": "nonlinear_d64l1r4_P1009_seed1",
-      "task": "nonlinear",
-      "config": {
-        "P": 1009,
-        "D_MODEL": 64,
-        "N_LAYER": 1,
-        "MLP_RATIO": 4,
-        "NUM_MASK": 1,
-        "RANDOM_SEED": 1
-      }
-    },
-    {
-      "name": "nonlinear_d64l1r4_P1009_seed2",
-      "task": "nonlinear",
-      "config": {
-        "P": 1009,
-        "D_MODEL": 64,
-        "N_LAYER": 1,
-        "MLP_RATIO": 4,
-        "NUM_MASK": 1,
-        "RANDOM_SEED": 2
-      }
-    },
-    {
-      "name": "nonlinear_d64l1r4_P1009_seed3",
-      "task": "nonlinear",
-      "config": {
-        "P": 1009,
-        "D_MODEL": 64,
-        "N_LAYER": 1,
-        "MLP_RATIO": 4,
-        "NUM_MASK": 1,
-        "RANDOM_SEED": 3
-      }
-    },
-    {
-      "name": "nonlinear_d64l1r4_P1009_seed4",
-      "task": "nonlinear",
-      "config": {
-        "P": 1009,
-        "D_MODEL": 64,
-        "N_LAYER": 1,
-        "MLP_RATIO": 4,
-        "NUM_MASK": 1,
-        "RANDOM_SEED": 4
-      }
-    },
-    {
-      "name": "nonlinear_d64l1r4_P1009_seed5",
-      "task": "nonlinear",
-      "config": {
-        "P": 1009,
-        "D_MODEL": 64,
-        "N_LAYER": 1,
-        "MLP_RATIO": 4,
-        "NUM_MASK": 1,
-        "RANDOM_SEED": 5
-      }
-    },
-    {
-      "name": "nonlinear_d64l1r4_P1009_seed6",
-      "task": "nonlinear",
-      "config": {
-        "P": 1009,
-        "D_MODEL": 64,
-        "N_LAYER": 1,
-        "MLP_RATIO": 4,
-        "NUM_MASK": 1,
-        "RANDOM_SEED": 6
-      }
-    },
-    {
-      "name": "nonlinear_d64l1r4_P1009_seed7",
-      "task": "nonlinear",
-      "config": {
-        "P": 1009,
-        "D_MODEL": 64,
-        "N_LAYER": 1,
-        "MLP_RATIO": 4,
-        "NUM_MASK": 1,
-        "RANDOM_SEED": 7
-      }
-    },
-    {
-      "name": "nonlinear_d256l1r8_P53_seed0",
-      "task": "nonlinear",
-      "config": {
-        "P": 53,
+        "RANDOM_SEED": 0,
+        "A": 1,
+        "B": 0,
+        "C": 2,
+        "NUM_MASK": 2,
         "D_MODEL": 256,
+        "N_HEAD": 4,
         "N_LAYER": 1,
-        "MLP_RATIO": 8,
-        "NUM_MASK": 1,
-        "RANDOM_SEED": 0
+        "MLP_RATIO": 4
       }
     },
     {
-      "name": "nonlinear_d256l1r8_P53_seed1",
-      "task": "nonlinear",
-      "config": {
-        "P": 53,
-        "D_MODEL": 256,
-        "N_LAYER": 1,
-        "MLP_RATIO": 8,
-        "NUM_MASK": 1,
-        "RANDOM_SEED": 1
-      }
-    },
-    {
-      "name": "nonlinear_d256l1r8_P53_seed2",
-      "task": "nonlinear",
-      "config": {
-        "P": 53,
-        "D_MODEL": 256,
-        "N_LAYER": 1,
-        "MLP_RATIO": 8,
-        "NUM_MASK": 1,
-        "RANDOM_SEED": 2
-      }
-    },
-    {
-      "name": "nonlinear_d256l1r8_P53_seed3",
-      "task": "nonlinear",
-      "config": {
-        "P": 53,
-        "D_MODEL": 256,
-        "N_LAYER": 1,
-        "MLP_RATIO": 8,
-        "NUM_MASK": 1,
-        "RANDOM_SEED": 3
-      }
-    },
-    {
-      "name": "nonlinear_d256l1r8_P53_seed4",
-      "task": "nonlinear",
-      "config": {
-        "P": 53,
-        "D_MODEL": 256,
-        "N_LAYER": 1,
-        "MLP_RATIO": 8,
-        "NUM_MASK": 1,
-        "RANDOM_SEED": 4
-      }
-    },
-    {
-      "name": "nonlinear_d256l1r8_P53_seed5",
-      "task": "nonlinear",
-      "config": {
-        "P": 53,
-        "D_MODEL": 256,
-        "N_LAYER": 1,
-        "MLP_RATIO": 8,
-        "NUM_MASK": 1,
-        "RANDOM_SEED": 5
-      }
-    },
-    {
-      "name": "nonlinear_d256l1r8_P53_seed6",
-      "task": "nonlinear",
-      "config": {
-        "P": 53,
-        "D_MODEL": 256,
-        "N_LAYER": 1,
-        "MLP_RATIO": 8,
-        "NUM_MASK": 1,
-        "RANDOM_SEED": 6
-      }
-    },
-    {
-      "name": "nonlinear_d256l1r8_P53_seed7",
-      "task": "nonlinear",
-      "config": {
-        "P": 53,
-        "D_MODEL": 256,
-        "N_LAYER": 1,
-        "MLP_RATIO": 8,
-        "NUM_MASK": 1,
-        "RANDOM_SEED": 7
-      }
-    },
-    {
-      "name": "nonlinear_d256l1r8_P1009_seed0",
-      "task": "nonlinear",
-      "config": {
-        "P": 1009,
-        "D_MODEL": 256,
-        "N_LAYER": 1,
-        "MLP_RATIO": 8,
-        "NUM_MASK": 1,
-        "RANDOM_SEED": 0
-      }
-    },
-    {
-      "name": "nonlinear_d256l1r8_P1009_seed1",
-      "task": "nonlinear",
-      "config": {
-        "P": 1009,
-        "D_MODEL": 256,
-        "N_LAYER": 1,
-        "MLP_RATIO": 8,
-        "NUM_MASK": 1,
-        "RANDOM_SEED": 1
-      }
-    },
-    {
-      "name": "nonlinear_d256l1r8_P1009_seed2",
-      "task": "nonlinear",
-      "config": {
-        "P": 1009,
-        "D_MODEL": 256,
-        "N_LAYER": 1,
-        "MLP_RATIO": 8,
-        "NUM_MASK": 1,
-        "RANDOM_SEED": 2
-      }
-    },
-    {
-      "name": "nonlinear_d256l1r8_P1009_seed3",
-      "task": "nonlinear",
-      "config": {
-        "P": 1009,
-        "D_MODEL": 256,
-        "N_LAYER": 1,
-        "MLP_RATIO": 8,
-        "NUM_MASK": 1,
-        "RANDOM_SEED": 3
-      }
-    },
-    {
-      "name": "nonlinear_d256l1r8_P1009_seed4",
-      "task": "nonlinear",
-      "config": {
-        "P": 1009,
-        "D_MODEL": 256,
-        "N_LAYER": 1,
-        "MLP_RATIO": 8,
-        "NUM_MASK": 1,
-        "RANDOM_SEED": 4
-      }
-    },
-    {
-      "name": "nonlinear_d256l1r8_P1009_seed5",
-      "task": "nonlinear",
-      "config": {
-        "P": 1009,
-        "D_MODEL": 256,
-        "N_LAYER": 1,
-        "MLP_RATIO": 8,
-        "NUM_MASK": 1,
-        "RANDOM_SEED": 5
-      }
-    },
-    {
-      "name": "nonlinear_d256l1r8_P1009_seed6",
-      "task": "nonlinear",
-      "config": {
-        "P": 1009,
-        "D_MODEL": 256,
-        "N_LAYER": 1,
-        "MLP_RATIO": 8,
-        "NUM_MASK": 1,
-        "RANDOM_SEED": 6
-      }
-    },
-    {
-      "name": "nonlinear_d256l1r8_P1009_seed7",
-      "task": "nonlinear",
-      "config": {
-        "P": 1009,
-        "D_MODEL": 256,
-        "N_LAYER": 1,
-        "MLP_RATIO": 8,
-        "NUM_MASK": 1,
-        "RANDOM_SEED": 7
-      }
-    },
-    {
-      "name": "tribonacci_d256l1r4_a1b1c1_w30_seed0",
+      "name": "tribonacci_d256l1r4h4_a1b1c1_seed0",
       "task": "tribonacci",
       "config": {
         "RANDOM_SEED": 0,
@@ -1115,118 +425,28 @@
         "C": 1,
         "NUM_MASK": 2,
         "D_MODEL": 256,
+        "N_HEAD": 4,
         "N_LAYER": 1,
-        "MLP_RATIO": 4,
-        "FIRST_TASK_WEIGHT": 30
+        "MLP_RATIO": 4
       }
     },
     {
-      "name": "tribonacci_d256l1r4_a1b1c1_w30_seed1",
+      "name": "tribonacci_d256l1r4h4_a1b2c3_seed0",
       "task": "tribonacci",
       "config": {
-        "RANDOM_SEED": 1,
+        "RANDOM_SEED": 0,
         "A": 1,
-        "B": 1,
-        "C": 1,
+        "B": 2,
+        "C": 3,
         "NUM_MASK": 2,
         "D_MODEL": 256,
+        "N_HEAD": 4,
         "N_LAYER": 1,
-        "MLP_RATIO": 4,
-        "FIRST_TASK_WEIGHT": 30
+        "MLP_RATIO": 4
       }
     },
     {
-      "name": "tribonacci_d256l1r4_a1b1c1_w30_seed2",
-      "task": "tribonacci",
-      "config": {
-        "RANDOM_SEED": 2,
-        "A": 1,
-        "B": 1,
-        "C": 1,
-        "NUM_MASK": 2,
-        "D_MODEL": 256,
-        "N_LAYER": 1,
-        "MLP_RATIO": 4,
-        "FIRST_TASK_WEIGHT": 30
-      }
-    },
-    {
-      "name": "tribonacci_d256l1r4_a1b1c1_w30_seed3",
-      "task": "tribonacci",
-      "config": {
-        "RANDOM_SEED": 3,
-        "A": 1,
-        "B": 1,
-        "C": 1,
-        "NUM_MASK": 2,
-        "D_MODEL": 256,
-        "N_LAYER": 1,
-        "MLP_RATIO": 4,
-        "FIRST_TASK_WEIGHT": 30
-      }
-    },
-    {
-      "name": "tribonacci_d256l1r4_a1b1c1_w30_seed4",
-      "task": "tribonacci",
-      "config": {
-        "RANDOM_SEED": 4,
-        "A": 1,
-        "B": 1,
-        "C": 1,
-        "NUM_MASK": 2,
-        "D_MODEL": 256,
-        "N_LAYER": 1,
-        "MLP_RATIO": 4,
-        "FIRST_TASK_WEIGHT": 30
-      }
-    },
-    {
-      "name": "tribonacci_d256l1r4_a1b1c1_w30_seed5",
-      "task": "tribonacci",
-      "config": {
-        "RANDOM_SEED": 5,
-        "A": 1,
-        "B": 1,
-        "C": 1,
-        "NUM_MASK": 2,
-        "D_MODEL": 256,
-        "N_LAYER": 1,
-        "MLP_RATIO": 4,
-        "FIRST_TASK_WEIGHT": 30
-      }
-    },
-    {
-      "name": "tribonacci_d256l1r4_a1b1c1_w30_seed6",
-      "task": "tribonacci",
-      "config": {
-        "RANDOM_SEED": 6,
-        "A": 1,
-        "B": 1,
-        "C": 1,
-        "NUM_MASK": 2,
-        "D_MODEL": 256,
-        "N_LAYER": 1,
-        "MLP_RATIO": 4,
-        "FIRST_TASK_WEIGHT": 30
-      }
-    },
-    {
-      "name": "tribonacci_d256l1r4_a1b1c1_w30_seed7",
-      "task": "tribonacci",
-      "config": {
-        "RANDOM_SEED": 7,
-        "A": 1,
-        "B": 1,
-        "C": 1,
-        "NUM_MASK": 2,
-        "D_MODEL": 256,
-        "N_LAYER": 1,
-        "MLP_RATIO": 4,
-        "FIRST_TASK_WEIGHT": 30
-      }
-    },
-    {
-      "name": "tribonacci_d256l1r4_a1b2c4_w30_seed0",
+      "name": "tribonacci_d256l1r4h4_a1b2c4_seed0",
       "task": "tribonacci",
       "config": {
         "RANDOM_SEED": 0,
@@ -1235,114 +455,351 @@
         "C": 4,
         "NUM_MASK": 2,
         "D_MODEL": 256,
+        "N_HEAD": 4,
         "N_LAYER": 1,
-        "MLP_RATIO": 4,
-        "FIRST_TASK_WEIGHT": 30
+        "MLP_RATIO": 4
       }
     },
     {
-      "name": "tribonacci_d256l1r4_a1b2c4_w30_seed1",
-      "task": "tribonacci",
+      "name": "mixed_basic_d1024l2r8h4_N3_e0.7_seed0",
+      "task": "mixed_ab",
       "config": {
-        "RANDOM_SEED": 1,
-        "A": 1,
-        "B": 2,
-        "C": 4,
-        "NUM_MASK": 2,
-        "D_MODEL": 256,
-        "N_LAYER": 1,
-        "MLP_RATIO": 4,
-        "FIRST_TASK_WEIGHT": 30
+        "RANDOM_SEED": 0,
+        "D_MODEL": 1024,
+        "N_HEAD": 4,
+        "N_LAYER": 2,
+        "MLP_RATIO": 8,
+        "AB_PAIRS": [
+          [
+            1,
+            1
+          ],
+          [
+            1,
+            2
+          ],
+          [
+            2,
+            1
+          ]
+        ],
+        "MIXED_AB_MAX_UNIQUE_RATIOS": [
+          0.7,
+          0.7,
+          0.7
+        ],
+        "USE_AB_TAG": false,
+        "USE_CONDITIONAL_WTE": false,
+        "NUM_MASK": 2
       }
     },
     {
-      "name": "tribonacci_d256l1r4_a1b2c4_w30_seed2",
-      "task": "tribonacci",
+      "name": "mixed_basic_d1024l2r8h4_N4_e0.7_seed0",
+      "task": "mixed_ab",
       "config": {
-        "RANDOM_SEED": 2,
-        "A": 1,
-        "B": 2,
-        "C": 4,
-        "NUM_MASK": 2,
-        "D_MODEL": 256,
-        "N_LAYER": 1,
-        "MLP_RATIO": 4,
-        "FIRST_TASK_WEIGHT": 30
+        "RANDOM_SEED": 0,
+        "D_MODEL": 1024,
+        "N_HEAD": 4,
+        "N_LAYER": 2,
+        "MLP_RATIO": 8,
+        "AB_PAIRS": [
+          [
+            1,
+            1
+          ],
+          [
+            1,
+            2
+          ],
+          [
+            2,
+            1
+          ],
+          [
+            2,
+            2
+          ]
+        ],
+        "MIXED_AB_MAX_UNIQUE_RATIOS": [
+          0.7,
+          0.7,
+          0.7,
+          0.7
+        ],
+        "USE_AB_TAG": false,
+        "USE_CONDITIONAL_WTE": false,
+        "NUM_MASK": 2
       }
     },
     {
-      "name": "tribonacci_d256l1r4_a1b2c4_w30_seed3",
-      "task": "tribonacci",
+      "name": "mixed_basic_d2048l2r8h4_N5_e0.7_seed0",
+      "task": "mixed_ab",
       "config": {
-        "RANDOM_SEED": 3,
-        "A": 1,
-        "B": 2,
-        "C": 4,
-        "NUM_MASK": 2,
-        "D_MODEL": 256,
-        "N_LAYER": 1,
-        "MLP_RATIO": 4,
-        "FIRST_TASK_WEIGHT": 30
+        "RANDOM_SEED": 0,
+        "D_MODEL": 2048,
+        "N_HEAD": 4,
+        "N_LAYER": 2,
+        "MLP_RATIO": 8,
+        "AB_PAIRS": [
+          [
+            1,
+            1
+          ],
+          [
+            1,
+            2
+          ],
+          [
+            2,
+            1
+          ],
+          [
+            2,
+            2
+          ],
+          [
+            1,
+            3
+          ]
+        ],
+        "MIXED_AB_MAX_UNIQUE_RATIOS": [
+          0.7,
+          0.7,
+          0.7,
+          0.7,
+          0.7
+        ],
+        "USE_AB_TAG": false,
+        "USE_CONDITIONAL_WTE": false,
+        "NUM_MASK": 2
       }
     },
     {
-      "name": "tribonacci_d256l1r4_a1b2c4_w30_seed4",
-      "task": "tribonacci",
+      "name": "mixed_cond_d64l1r4h4_N3_e0.7_seed0",
+      "task": "mixed_ab",
       "config": {
-        "RANDOM_SEED": 4,
-        "A": 1,
-        "B": 2,
-        "C": 4,
-        "NUM_MASK": 2,
-        "D_MODEL": 256,
+        "RANDOM_SEED": 0,
+        "D_MODEL": 64,
+        "N_HEAD": 4,
         "N_LAYER": 1,
         "MLP_RATIO": 4,
-        "FIRST_TASK_WEIGHT": 30
+        "AB_PAIRS": [
+          [
+            1,
+            1
+          ],
+          [
+            1,
+            2
+          ],
+          [
+            2,
+            1
+          ]
+        ],
+        "MIXED_AB_MAX_UNIQUE_RATIOS": [
+          0.7,
+          0.7,
+          0.7
+        ],
+        "USE_AB_TAG": false,
+        "USE_CONDITIONAL_WTE": true,
+        "NUM_MASK": 1
       }
     },
     {
-      "name": "tribonacci_d256l1r4_a1b2c4_w30_seed5",
-      "task": "tribonacci",
+      "name": "mixed_cond_d64l1r4h4_N4_e0.7_seed0",
+      "task": "mixed_ab",
       "config": {
-        "RANDOM_SEED": 5,
-        "A": 1,
-        "B": 2,
-        "C": 4,
-        "NUM_MASK": 2,
-        "D_MODEL": 256,
+        "RANDOM_SEED": 0,
+        "D_MODEL": 64,
+        "N_HEAD": 4,
         "N_LAYER": 1,
         "MLP_RATIO": 4,
-        "FIRST_TASK_WEIGHT": 30
+        "AB_PAIRS": [
+          [
+            1,
+            1
+          ],
+          [
+            1,
+            2
+          ],
+          [
+            2,
+            1
+          ],
+          [
+            2,
+            2
+          ]
+        ],
+        "MIXED_AB_MAX_UNIQUE_RATIOS": [
+          0.7,
+          0.7,
+          0.7,
+          0.7
+        ],
+        "USE_AB_TAG": false,
+        "USE_CONDITIONAL_WTE": true,
+        "NUM_MASK": 1
       }
     },
     {
-      "name": "tribonacci_d256l1r4_a1b2c4_w30_seed6",
-      "task": "tribonacci",
+      "name": "mixed_cond_d64l1r4h4_N5_e0.7_seed0",
+      "task": "mixed_ab",
       "config": {
-        "RANDOM_SEED": 6,
-        "A": 1,
-        "B": 2,
-        "C": 4,
-        "NUM_MASK": 2,
-        "D_MODEL": 256,
+        "RANDOM_SEED": 0,
+        "D_MODEL": 64,
+        "N_HEAD": 4,
         "N_LAYER": 1,
         "MLP_RATIO": 4,
-        "FIRST_TASK_WEIGHT": 30
+        "AB_PAIRS": [
+          [
+            1,
+            1
+          ],
+          [
+            1,
+            2
+          ],
+          [
+            2,
+            1
+          ],
+          [
+            2,
+            2
+          ],
+          [
+            1,
+            3
+          ]
+        ],
+        "MIXED_AB_MAX_UNIQUE_RATIOS": [
+          0.7,
+          0.7,
+          0.7,
+          0.7,
+          0.7
+        ],
+        "USE_AB_TAG": false,
+        "USE_CONDITIONAL_WTE": true,
+        "NUM_MASK": 1
       }
     },
     {
-      "name": "tribonacci_d256l1r4_a1b2c4_w30_seed7",
-      "task": "tribonacci",
+      "name": "mixed_label_d64l1r4h4_N3_e0.7_seed0",
+      "task": "mixed_ab",
       "config": {
-        "RANDOM_SEED": 7,
-        "A": 1,
-        "B": 2,
-        "C": 4,
-        "NUM_MASK": 2,
-        "D_MODEL": 256,
+        "RANDOM_SEED": 0,
+        "D_MODEL": 64,
+        "N_HEAD": 4,
         "N_LAYER": 1,
         "MLP_RATIO": 4,
-        "FIRST_TASK_WEIGHT": 30
+        "AB_PAIRS": [
+          [
+            1,
+            1
+          ],
+          [
+            1,
+            2
+          ],
+          [
+            2,
+            1
+          ]
+        ],
+        "MIXED_AB_MAX_UNIQUE_RATIOS": [
+          0.7,
+          0.7,
+          0.7
+        ],
+        "USE_AB_TAG": true,
+        "USE_CONDITIONAL_WTE": false,
+        "NUM_MASK": 2
+      }
+    },
+    {
+      "name": "mixed_label_d64l1r4h4_N4_e0.7_seed0",
+      "task": "mixed_ab",
+      "config": {
+        "RANDOM_SEED": 0,
+        "D_MODEL": 64,
+        "N_HEAD": 4,
+        "N_LAYER": 1,
+        "MLP_RATIO": 4,
+        "AB_PAIRS": [
+          [
+            1,
+            1
+          ],
+          [
+            1,
+            2
+          ],
+          [
+            2,
+            1
+          ],
+          [
+            2,
+            2
+          ]
+        ],
+        "MIXED_AB_MAX_UNIQUE_RATIOS": [
+          0.7,
+          0.7,
+          0.7,
+          0.7
+        ],
+        "USE_AB_TAG": true,
+        "USE_CONDITIONAL_WTE": false,
+        "NUM_MASK": 2
+      }
+    },
+    {
+      "name": "mixed_label_d64l1r4h4_N5_e0.7_seed0",
+      "task": "mixed_ab",
+      "config": {
+        "RANDOM_SEED": 0,
+        "D_MODEL": 64,
+        "N_HEAD": 4,
+        "N_LAYER": 1,
+        "MLP_RATIO": 4,
+        "AB_PAIRS": [
+          [
+            1,
+            1
+          ],
+          [
+            1,
+            2
+          ],
+          [
+            2,
+            1
+          ],
+          [
+            2,
+            2
+          ],
+          [
+            1,
+            3
+          ]
+        ],
+        "MIXED_AB_MAX_UNIQUE_RATIOS": [
+          0.7,
+          0.7,
+          0.7,
+          0.7,
+          0.7
+        ],
+        "USE_AB_TAG": true,
+        "USE_CONDITIONAL_WTE": false,
+        "NUM_MASK": 2
       }
     }
   ]
