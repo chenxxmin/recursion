@@ -631,6 +631,10 @@ def run_training_engine(model, train_loader, test_loader, optimizer, scheduler, 
     no_improve = 0
     frozen_param_states = None
     cond_fix_triggered = False
+    # After test acc first reaches early_stop_accuracy, keep training for this
+    # many extra epochs before stopping (instead of stopping immediately).
+    extra_epochs_after_high_acc = 200
+    high_acc_epoch = None
 
     for epoch in range(epochs):
         train_loss, train_acc, train_pos_acc = train_epoch(
@@ -703,8 +707,13 @@ def run_training_engine(model, train_loader, test_loader, optimizer, scheduler, 
                 accs = ' '.join(f"{test_group_acc[g]:.2f}" for g in sorted(test_group_acc.keys()))
                 print(f"  per-rule acc: {accs}")
             
-            if test_acc >= early_stop_accuracy:
-                print(f"[Early stop] Epoch {epoch}: test set reached high accuracy")
+            if test_acc >= early_stop_accuracy and high_acc_epoch is None:
+                high_acc_epoch = epoch
+                print(f"[Early stop] Epoch {epoch}: test set reached high accuracy, "
+                      f"continuing {extra_epochs_after_high_acc} extra epochs")
+            if high_acc_epoch is not None and epoch - high_acc_epoch >= extra_epochs_after_high_acc:
+                print(f"[Early stop] Epoch {epoch}: finished {extra_epochs_after_high_acc} "
+                      f"extra epochs after reaching high accuracy")
                 break
             if no_improve >= early_stop_no_improve:
                 print(f"[Early stop] No improvement for {early_stop_no_improve} consecutive epochs")
