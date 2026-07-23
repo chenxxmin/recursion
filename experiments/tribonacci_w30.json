@@ -1,0 +1,125 @@
+{
+  "concurrency": 8,
+  "experiments": [
+    {
+      "name": "tribonacci_d512l1r8_a1b2c4_w30_seed0",
+      "task": "tribonacci",
+      "config": {
+        "A": 1,
+        "B": 2,
+        "C": 4,
+        "D_MODEL": 512,
+        "N_LAYER": 1,
+        "MLP_RATIO": 8,
+        "NUM_MASK": 2,
+        "FIRST_TASK_WEIGHT": 30,
+        "RANDOM_SEED": 0
+      }
+    },
+    {
+      "name": "tribonacci_d512l1r8_a1b2c4_w30_seed1",
+      "task": "tribonacci",
+      "config": {
+        "A": 1,
+        "B": 2,
+        "C": 4,
+        "D_MODEL": 512,
+        "N_LAYER": 1,
+        "MLP_RATIO": 8,
+        "NUM_MASK": 2,
+        "FIRST_TASK_WEIGHT": 30,
+        "RANDOM_SEED": 1
+      }
+    },
+    {
+      "name": "tribonacci_d512l1r8_a1b2c4_w30_seed2",
+      "task": "tribonacci",
+      "config": {
+        "A": 1,
+        "B": 2,
+        "C": 4,
+        "D_MODEL": 512,
+        "N_LAYER": 1,
+        "MLP_RATIO": 8,
+        "NUM_MASK": 2,
+        "FIRST_TASK_WEIGHT": 30,
+        "RANDOM_SEED": 2
+      }
+    },
+    {
+      "name": "tribonacci_d512l1r8_a1b2c4_w30_seed3",
+      "task": "tribonacci",
+      "config": {
+        "A": 1,
+        "B": 2,
+        "C": 4,
+        "D_MODEL": 512,
+        "N_LAYER": 1,
+        "MLP_RATIO": 8,
+        "NUM_MASK": 2,
+        "FIRST_TASK_WEIGHT": 30,
+        "RANDOM_SEED": 3
+      }
+    },
+    {
+      "name": "tribonacci_d512l1r8_a1b2c4_w30_seed4",
+      "task": "tribonacci",
+      "config": {
+        "A": 1,
+        "B": 2,
+        "C": 4,
+        "D_MODEL": 512,
+        "N_LAYER": 1,
+        "MLP_RATIO": 8,
+        "NUM_MASK": 2,
+        "FIRST_TASK_WEIGHT": 30,
+        "RANDOM_SEED": 4
+      }
+    },
+    {
+      "name": "tribonacci_d512l1r8_a1b2c4_w30_seed5",
+      "task": "tribonacci",
+      "config": {
+        "A": 1,
+        "B": 2,
+        "C": 4,
+        "D_MODEL": 512,
+        "N_LAYER": 1,
+        "MLP_RATIO": 8,
+        "NUM_MASK": 2,
+        "FIRST_TASK_WEIGHT": 30,
+        "RANDOM_SEED": 5
+      }
+    },
+    {
+      "name": "tribonacci_d512l1r8_a1b2c4_w30_seed6",
+      "task": "tribonacci",
+      "config": {
+        "A": 1,
+        "B": 2,
+        "C": 4,
+        "D_MODEL": 512,
+        "N_LAYER": 1,
+        "MLP_RATIO": 8,
+        "NUM_MASK": 2,
+        "FIRST_TASK_WEIGHT": 30,
+        "RANDOM_SEED": 6
+      }
+    },
+    {
+      "name": "tribonacci_d512l1r8_a1b2c4_w30_seed7",
+      "task": "tribonacci",
+      "config": {
+        "A": 1,
+        "B": 2,
+        "C": 4,
+        "D_MODEL": 512,
+        "N_LAYER": 1,
+        "MLP_RATIO": 8,
+        "NUM_MASK": 2,
+        "FIRST_TASK_WEIGHT": 30,
+        "RANDOM_SEED": 7
+      }
+    }
+  ]
+}
