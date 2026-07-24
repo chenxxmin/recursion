@@ -55,6 +55,12 @@
     "USE_CONDITIONAL_WTE": false,
     "COND_WTE_SHARED_RATIO": 0.0,
     "MIXED_AB_MAX_UNIQUE_RATIOS": [0.7, 0.7]
+  },
+  "mixed_abc": {
+    "USE_AB_TAG": false,
+    "USE_CONDITIONAL_WTE": false,
+    "COND_WTE_SHARED_RATIO": 0.0,
+    "MIXED_AB_MAX_UNIQUE_RATIOS": [0.7, 0.7]
   }
 }
 
