@@ -918,7 +918,7 @@ RULE_LOSS_WEIGHT = 0.5
 
 class MixedABTransformer(FibonacciTransformer):
     def __init__(self, num_ab_pairs=1, use_greedy_generate=True, use_ab_tag=True,
-                 use_conditional_wte=False, cond_wte_shared_ratio=0.0, **kwargs):
+                 use_conditional_wte=False, cond_wte_shared_ratio=0.0, order=2, **kwargs):
         assert not (use_conditional_wte and use_ab_tag), \
             "use_conditional_wte and use_ab_tag cannot both be True"
         p = kwargs.get('p', 53)
@@ -932,6 +932,7 @@ class MixedABTransformer(FibonacciTransformer):
         self.use_ab_tag = use_ab_tag
         self.use_conditional_wte = use_conditional_wte
         self.cond_wte_shared_ratio = cond_wte_shared_ratio
+        self.order = order  # recurrence order; drives rule_start_offset
 
         if self.use_conditional_wte:
             shared_size = int(self.cond_wte_shared_ratio * self.vocab_size)
@@ -1011,10 +1012,10 @@ class MixedABTransformer(FibonacciTransformer):
             logits = self.lm_head(x)
         
         rule_logits = None
-        # Rule head reads positions from x3 onward (the first transition that
-        # reveals the recurrence rule); with a leading rule token, shift the
-        # window by one position.
-        rule_start_offset = 4 if self.use_ab_tag else 3
+        # Rule head reads positions from the first transition that reveals the
+        # recurrence rule: x_{order+1} onward; with a leading rule token, shift
+        # the window by one position.
+        rule_start_offset = self.order + 1 + (1 if self.use_ab_tag else 0)
         if ab_labels is not None and t > rule_start_offset:
             rule_features = x[:, rule_start_offset:, :]
             rule_logits = self.rule_head(rule_features)

@@ -64,6 +64,7 @@ def load_model(pth_path, device='cpu'):
         mixedab_config['use_ab_tag'] = config.get('use_ab_tag', True)
         mixedab_config['use_conditional_wte'] = config.get('use_conditional_wte', any('cond_wte' in k for k in state_keys))
         mixedab_config['cond_wte_shared_ratio'] = config.get('cond_wte_shared_ratio', 0.0)
+        mixedab_config['order'] = config.get('order', 2)
         model = core.MixedABTransformer(num_ab_pairs=num_ab_pairs, **mixedab_config)
     else:
         model = core.FibonacciTransformer(**filtered_config)
