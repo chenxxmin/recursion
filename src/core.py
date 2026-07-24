@@ -1706,42 +1706,42 @@ def run_experiment(config_path=None):
     if cfg.get('SKIP_FINAL_GENERATION_TEST', False):
         print("\n[Config] SKIP_FINAL_GENERATION_TEST=true, skipping final generation test.")
     elif post_train_mode == 'mixed_ab':
-        AB_PAIRS = ctx['ab_pairs']
+        rules = ctx['rules']
+        order = ctx['order']
         print(f"\n{'='*50}")
-        print("Final generation test (batched teacher forcing, validate from position 3)")
+        print(f"Final generation test (batched teacher forcing, validate from position {num_mask+1})")
         print(f"{'='*50}")
         model.eval()
-        test_cases = list(itertools.product(range(P), repeat=2))
+        test_cases = list(itertools.product(range(P), repeat=order))
 
-        # Collect exposed initial states per AB pair from training set
-        train_seen_inits = {idx: set() for idx in range(len(AB_PAIRS))}
+        # Collect exposed initial states per rule from the training set
+        tag_offset = 1 if model.use_ab_tag else 0
+        train_seen_inits = {idx: set() for idx in range(len(rules))}
         for i in range(len(train_dataset)):
-            seq, ab_idx = train_dataset[i]
-            if model.use_ab_tag:
-                x0, x1 = seq[1].item(), seq[2].item()
-            else:
-                x0, x1 = seq[0].item(), seq[1].item()
-            train_seen_inits[ab_idx].add((x0, x1))
+            seq, rule_idx = train_dataset[i]
+            init_state = tuple(seq[tag_offset:tag_offset + order].tolist())
+            train_seen_inits[rule_idx].add(init_state)
 
         batch_size = EVAL_BATCH_SIZE
 
-        for ab_idx, (a, b) in enumerate(AB_PAIRS):
-            print(f"\n--- AB pair {ab_idx+1}: ({a}, {b}) ---")
-            seen = train_seen_inits[ab_idx]
+        for rule_idx, rule in enumerate(rules):
+            print(f"\n--- Rule {rule_idx+1}: {rule.name} {rule.coeffs} ---")
+            seen = train_seen_inits[rule_idx]
+            next_fn = rule.next_fn()
 
             # Build full true sequences for all initial states under this rule
             full_sequences = []
-            for x0, x1 in test_cases:
-                seq = [x0, x1]
+            for init_state in test_cases:
+                seq = list(init_state)
                 while len(seq) < OOD_LEN:
-                    seq.append((a * seq[-1] + b * seq[-2]) % P)
+                    seq.append(next_fn(seq[-order:], P))
                 if model.use_ab_tag:
-                    seq = [P + ab_idx] + seq
+                    seq = [P + rule_idx] + seq
                 full_sequences.append(seq)
             full_sequences = torch.tensor(full_sequences, dtype=torch.long, device=device)
 
-            ab_labels = torch.full((len(test_cases),), ab_idx, dtype=torch.long, device=device)
-            exposed_list = [(x0, x1) in seen for x0, x1 in test_cases]
+            ab_labels = torch.full((len(test_cases),), rule_idx, dtype=torch.long, device=device)
+            exposed_list = [init_state in seen for init_state in test_cases]
             exposed = torch.tensor(exposed_list, dtype=torch.bool, device=device)
 
             seq_len = full_sequences.size(1)
@@ -1762,23 +1762,23 @@ def run_experiment(config_path=None):
             targets = full_sequences[:, 1:]
             correct = (all_preds == targets).float()
 
-            # Loss mask: ignore first num_mask=2 positions
+            # Loss mask: ignore first num_mask positions
             loss_mask = torch.zeros(len(test_cases), target_len, dtype=torch.float, device=device)
-            if target_len > 2:
-                loss_mask[:, 2:] = 1.0
+            if target_len > num_mask:
+                loss_mask[:, num_mask:] = 1.0
 
             # Position masks (absolute position i = t + 1)
             in_dist_mask = torch.arange(target_len, device=device) < (TRAIN_LEN - 1)
             ood_mask = torch.arange(target_len, device=device) >= (TRAIN_LEN - 1)
 
             stats = _split_exposure_stats(correct, loss_mask, exposed, in_dist_mask, ood_mask)
-            _print_exposure_stats(f"AB=({a},{b})",
+            _print_exposure_stats(f"rule={rule.name}",
                                   int(exposed.sum().item()), int((~exposed).sum().item()), stats)
 
             # Per-position accuracy for this rule
-            print(f"\n--- Per-position accuracy for AB=({a},{b}) ---")
+            print(f"\n--- Per-position accuracy for rule={rule.name} ---")
             _print_per_position_exposure(correct, loss_mask, exposed,
-                                         range(2, target_len), TRAIN_LEN)
+                                         range(num_mask, target_len), TRAIN_LEN)
 
         log_memory("after final test", device)
 
