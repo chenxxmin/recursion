@@ -1,0 +1,1157 @@
+{
+  "concurrency": 8,
+  "experiments": [
+    {
+      "name": "tribonacci_d256l1r4_n1_p23_eq_g0_seed81",
+      "task": "tribonacci",
+      "config": {
+        "P": 23,
+        "A": 9,
+        "B": 7,
+        "C": 8,
+        "D_MODEL": 256,
+        "N_HEAD": 1,
+        "N_LAYER": 1,
+        "MLP_RATIO": 4,
+        "NUM_MASK": 2,
+        "RANDOM_SEED": 81
+      }
+    },
+    {
+      "name": "tribonacci_d256l1r4_n1_p23_eq_g0_seed2824",
+      "task": "tribonacci",
+      "config": {
+        "P": 23,
+        "A": 9,
+        "B": 7,
+        "C": 8,
+        "D_MODEL": 256,
+        "N_HEAD": 1,
+        "N_LAYER": 1,
+        "MLP_RATIO": 4,
+        "NUM_MASK": 2,
+        "RANDOM_SEED": 2824
+      }
+    },
+    {
+      "name": "tribonacci_d256l1r4_n1_p23_eq_g0_seed13278",
+      "task": "tribonacci",
+      "config": {
+        "P": 23,
+        "A": 9,
+        "B": 7,
+        "C": 8,
+        "D_MODEL": 256,
+        "N_HEAD": 1,
+        "N_LAYER": 1,
+        "MLP_RATIO": 4,
+        "NUM_MASK": 2,
+        "RANDOM_SEED": 13278
+      }
+    },
+    {
+      "name": "tribonacci_d256l1r4_n4_p23_eq_g0_seed81",
+      "task": "tribonacci",
+      "config": {
+        "P": 23,
+        "A": 9,
+        "B": 7,
+        "C": 8,
+        "D_MODEL": 256,
+        "N_HEAD": 4,
+        "N_LAYER": 1,
+        "MLP_RATIO": 4,
+        "NUM_MASK": 2,
+        "RANDOM_SEED": 81
+      }
+    },
+    {
+      "name": "tribonacci_d256l1r4_n4_p23_eq_g0_seed2824",
+      "task": "tribonacci",
+      "config": {
+        "P": 23,
+        "A": 9,
+        "B": 7,
+        "C": 8,
+        "D_MODEL": 256,
+        "N_HEAD": 4,
+        "N_LAYER": 1,
+        "MLP_RATIO": 4,
+        "NUM_MASK": 2,
+        "RANDOM_SEED": 2824
+      }
+    },
+    {
+      "name": "tribonacci_d256l1r4_n4_p23_eq_g0_seed13278",
+      "task": "tribonacci",
+      "config": {
+        "P": 23,
+        "A": 9,
+        "B": 7,
+        "C": 8,
+        "D_MODEL": 256,
+        "N_HEAD": 4,
+        "N_LAYER": 1,
+        "MLP_RATIO": 4,
+        "NUM_MASK": 2,
+        "RANDOM_SEED": 13278
+      }
+    },
+    {
+      "name": "tribonacci_d256l1r4_n1_p23_eq_g1_seed81",
+      "task": "tribonacci",
+      "config": {
+        "P": 23,
+        "A": 8,
+        "B": 4,
+        "C": 2,
+        "D_MODEL": 256,
+        "N_HEAD": 1,
+        "N_LAYER": 1,
+        "MLP_RATIO": 4,
+        "NUM_MASK": 2,
+        "RANDOM_SEED": 81
+      }
+    },
+    {
+      "name": "tribonacci_d256l1r4_n1_p23_eq_g1_seed2824",
+      "task": "tribonacci",
+      "config": {
+        "P": 23,
+        "A": 8,
+        "B": 4,
+        "C": 2,
+        "D_MODEL": 256,
+        "N_HEAD": 1,
+        "N_LAYER": 1,
+        "MLP_RATIO": 4,
+        "NUM_MASK": 2,
+        "RANDOM_SEED": 2824
+      }
+    },
+    {
+      "name": "tribonacci_d256l1r4_n1_p23_eq_g1_seed13278",
+      "task": "tribonacci",
+      "config": {
+        "P": 23,
+        "A": 8,
+        "B": 4,
+        "C": 2,
+        "D_MODEL": 256,
+        "N_HEAD": 1,
+        "N_LAYER": 1,
+        "MLP_RATIO": 4,
+        "NUM_MASK": 2,
+        "RANDOM_SEED": 13278
+      }
+    },
+    {
+      "name": "tribonacci_d256l1r4_n4_p23_eq_g1_seed81",
+      "task": "tribonacci",
+      "config": {
+        "P": 23,
+        "A": 8,
+        "B": 4,
+        "C": 2,
+        "D_MODEL": 256,
+        "N_HEAD": 4,
+        "N_LAYER": 1,
+        "MLP_RATIO": 4,
+        "NUM_MASK": 2,
+        "RANDOM_SEED": 81
+      }
+    },
+    {
+      "name": "tribonacci_d256l1r4_n4_p23_eq_g1_seed2824",
+      "task": "tribonacci",
+      "config": {
+        "P": 23,
+        "A": 8,
+        "B": 4,
+        "C": 2,
+        "D_MODEL": 256,
+        "N_HEAD": 4,
+        "N_LAYER": 1,
+        "MLP_RATIO": 4,
+        "NUM_MASK": 2,
+        "RANDOM_SEED": 2824
+      }
+    },
+    {
+      "name": "tribonacci_d256l1r4_n4_p23_eq_g1_seed13278",
+      "task": "tribonacci",
+      "config": {
+        "P": 23,
+        "A": 8,
+        "B": 4,
+        "C": 2,
+        "D_MODEL": 256,
+        "N_HEAD": 4,
+        "N_LAYER": 1,
+        "MLP_RATIO": 4,
+        "NUM_MASK": 2,
+        "RANDOM_SEED": 13278
+      }
+    },
+    {
+      "name": "tribonacci_d256l1r4_n1_p23_eq_g2_seed81",
+      "task": "tribonacci",
+      "config": {
+        "P": 23,
+        "A": 4,
+        "B": 21,
+        "C": 1,
+        "D_MODEL": 256,
+        "N_HEAD": 1,
+        "N_LAYER": 1,
+        "MLP_RATIO": 4,
+        "NUM_MASK": 2,
+        "RANDOM_SEED": 81
+      }
+    },
+    {
+      "name": "tribonacci_d256l1r4_n1_p23_eq_g2_seed2824",
+      "task": "tribonacci",
+      "config": {
+        "P": 23,
+        "A": 4,
+        "B": 21,
+        "C": 1,
+        "D_MODEL": 256,
+        "N_HEAD": 1,
+        "N_LAYER": 1,
+        "MLP_RATIO": 4,
+        "NUM_MASK": 2,
+        "RANDOM_SEED": 2824
+      }
+    },
+    {
+      "name": "tribonacci_d256l1r4_n1_p23_eq_g2_seed13278",
+      "task": "tribonacci",
+      "config": {
+        "P": 23,
+        "A": 4,
+        "B": 21,
+        "C": 1,
+        "D_MODEL": 256,
+        "N_HEAD": 1,
+        "N_LAYER": 1,
+        "MLP_RATIO": 4,
+        "NUM_MASK": 2,
+        "RANDOM_SEED": 13278
+      }
+    },
+    {
+      "name": "tribonacci_d256l1r4_n4_p23_eq_g2_seed81",
+      "task": "tribonacci",
+      "config": {
+        "P": 23,
+        "A": 4,
+        "B": 21,
+        "C": 1,
+        "D_MODEL": 256,
+        "N_HEAD": 4,
+        "N_LAYER": 1,
+        "MLP_RATIO": 4,
+        "NUM_MASK": 2,
+        "RANDOM_SEED": 81
+      }
+    },
+    {
+      "name": "tribonacci_d256l1r4_n4_p23_eq_g2_seed2824",
+      "task": "tribonacci",
+      "config": {
+        "P": 23,
+        "A": 4,
+        "B": 21,
+        "C": 1,
+        "D_MODEL": 256,
+        "N_HEAD": 4,
+        "N_LAYER": 1,
+        "MLP_RATIO": 4,
+        "NUM_MASK": 2,
+        "RANDOM_SEED": 2824
+      }
+    },
+    {
+      "name": "tribonacci_d256l1r4_n4_p23_eq_g2_seed13278",
+      "task": "tribonacci",
+      "config": {
+        "P": 23,
+        "A": 4,
+        "B": 21,
+        "C": 1,
+        "D_MODEL": 256,
+        "N_HEAD": 4,
+        "N_LAYER": 1,
+        "MLP_RATIO": 4,
+        "NUM_MASK": 2,
+        "RANDOM_SEED": 13278
+      }
+    },
+    {
+      "name": "tribonacci_d256l1r4_n1_p23_neq_g0_seed81",
+      "task": "tribonacci",
+      "config": {
+        "P": 23,
+        "A": 17,
+        "B": 2,
+        "C": 18,
+        "D_MODEL": 256,
+        "N_HEAD": 1,
+        "N_LAYER": 1,
+        "MLP_RATIO": 4,
+        "NUM_MASK": 2,
+        "RANDOM_SEED": 81
+      }
+    },
+    {
+      "name": "tribonacci_d256l1r4_n1_p23_neq_g0_seed2824",
+      "task": "tribonacci",
+      "config": {
+        "P": 23,
+        "A": 17,
+        "B": 2,
+        "C": 18,
+        "D_MODEL": 256,
+        "N_HEAD": 1,
+        "N_LAYER": 1,
+        "MLP_RATIO": 4,
+        "NUM_MASK": 2,
+        "RANDOM_SEED": 2824
+      }
+    },
+    {
+      "name": "tribonacci_d256l1r4_n1_p23_neq_g0_seed13278",
+      "task": "tribonacci",
+      "config": {
+        "P": 23,
+        "A": 17,
+        "B": 2,
+        "C": 18,
+        "D_MODEL": 256,
+        "N_HEAD": 1,
+        "N_LAYER": 1,
+        "MLP_RATIO": 4,
+        "NUM_MASK": 2,
+        "RANDOM_SEED": 13278
+      }
+    },
+    {
+      "name": "tribonacci_d256l1r4_n4_p23_neq_g0_seed81",
+      "task": "tribonacci",
+      "config": {
+        "P": 23,
+        "A": 17,
+        "B": 2,
+        "C": 18,
+        "D_MODEL": 256,
+        "N_HEAD": 4,
+        "N_LAYER": 1,
+        "MLP_RATIO": 4,
+        "NUM_MASK": 2,
+        "RANDOM_SEED": 81
+      }
+    },
+    {
+      "name": "tribonacci_d256l1r4_n4_p23_neq_g0_seed2824",
+      "task": "tribonacci",
+      "config": {
+        "P": 23,
+        "A": 17,
+        "B": 2,
+        "C": 18,
+        "D_MODEL": 256,
+        "N_HEAD": 4,
+        "N_LAYER": 1,
+        "MLP_RATIO": 4,
+        "NUM_MASK": 2,
+        "RANDOM_SEED": 2824
+      }
+    },
+    {
+      "name": "tribonacci_d256l1r4_n4_p23_neq_g0_seed13278",
+      "task": "tribonacci",
+      "config": {
+        "P": 23,
+        "A": 17,
+        "B": 2,
+        "C": 18,
+        "D_MODEL": 256,
+        "N_HEAD": 4,
+        "N_LAYER": 1,
+        "MLP_RATIO": 4,
+        "NUM_MASK": 2,
+        "RANDOM_SEED": 13278
+      }
+    },
+    {
+      "name": "tribonacci_d256l1r4_n1_p23_neq_g1_seed81",
+      "task": "tribonacci",
+      "config": {
+        "P": 23,
+        "A": 13,
+        "B": 1,
+        "C": 0,
+        "D_MODEL": 256,
+        "N_HEAD": 1,
+        "N_LAYER": 1,
+        "MLP_RATIO": 4,
+        "NUM_MASK": 2,
+        "RANDOM_SEED": 81
+      }
+    },
+    {
+      "name": "tribonacci_d256l1r4_n1_p23_neq_g1_seed2824",
+      "task": "tribonacci",
+      "config": {
+        "P": 23,
+        "A": 13,
+        "B": 1,
+        "C": 0,
+        "D_MODEL": 256,
+        "N_HEAD": 1,
+        "N_LAYER": 1,
+        "MLP_RATIO": 4,
+        "NUM_MASK": 2,
+        "RANDOM_SEED": 2824
+      }
+    },
+    {
+      "name": "tribonacci_d256l1r4_n1_p23_neq_g1_seed13278",
+      "task": "tribonacci",
+      "config": {
+        "P": 23,
+        "A": 13,
+        "B": 1,
+        "C": 0,
+        "D_MODEL": 256,
+        "N_HEAD": 1,
+        "N_LAYER": 1,
+        "MLP_RATIO": 4,
+        "NUM_MASK": 2,
+        "RANDOM_SEED": 13278
+      }
+    },
+    {
+      "name": "tribonacci_d256l1r4_n4_p23_neq_g1_seed81",
+      "task": "tribonacci",
+      "config": {
+        "P": 23,
+        "A": 13,
+        "B": 1,
+        "C": 0,
+        "D_MODEL": 256,
+        "N_HEAD": 4,
+        "N_LAYER": 1,
+        "MLP_RATIO": 4,
+        "NUM_MASK": 2,
+        "RANDOM_SEED": 81
+      }
+    },
+    {
+      "name": "tribonacci_d256l1r4_n4_p23_neq_g1_seed2824",
+      "task": "tribonacci",
+      "config": {
+        "P": 23,
+        "A": 13,
+        "B": 1,
+        "C": 0,
+        "D_MODEL": 256,
+        "N_HEAD": 4,
+        "N_LAYER": 1,
+        "MLP_RATIO": 4,
+        "NUM_MASK": 2,
+        "RANDOM_SEED": 2824
+      }
+    },
+    {
+      "name": "tribonacci_d256l1r4_n4_p23_neq_g1_seed13278",
+      "task": "tribonacci",
+      "config": {
+        "P": 23,
+        "A": 13,
+        "B": 1,
+        "C": 0,
+        "D_MODEL": 256,
+        "N_HEAD": 4,
+        "N_LAYER": 1,
+        "MLP_RATIO": 4,
+        "NUM_MASK": 2,
+        "RANDOM_SEED": 13278
+      }
+    },
+    {
+      "name": "tribonacci_d256l1r4_n1_p23_neq_g2_seed81",
+      "task": "tribonacci",
+      "config": {
+        "P": 23,
+        "A": 2,
+        "B": 6,
+        "C": 7,
+        "D_MODEL": 256,
+        "N_HEAD": 1,
+        "N_LAYER": 1,
+        "MLP_RATIO": 4,
+        "NUM_MASK": 2,
+        "RANDOM_SEED": 81
+      }
+    },
+    {
+      "name": "tribonacci_d256l1r4_n1_p23_neq_g2_seed2824",
+      "task": "tribonacci",
+      "config": {
+        "P": 23,
+        "A": 2,
+        "B": 6,
+        "C": 7,
+        "D_MODEL": 256,
+        "N_HEAD": 1,
+        "N_LAYER": 1,
+        "MLP_RATIO": 4,
+        "NUM_MASK": 2,
+        "RANDOM_SEED": 2824
+      }
+    },
+    {
+      "name": "tribonacci_d256l1r4_n1_p23_neq_g2_seed13278",
+      "task": "tribonacci",
+      "config": {
+        "P": 23,
+        "A": 2,
+        "B": 6,
+        "C": 7,
+        "D_MODEL": 256,
+        "N_HEAD": 1,
+        "N_LAYER": 1,
+        "MLP_RATIO": 4,
+        "NUM_MASK": 2,
+        "RANDOM_SEED": 13278
+      }
+    },
+    {
+      "name": "tribonacci_d256l1r4_n4_p23_neq_g2_seed81",
+      "task": "tribonacci",
+      "config": {
+        "P": 23,
+        "A": 2,
+        "B": 6,
+        "C": 7,
+        "D_MODEL": 256,
+        "N_HEAD": 4,
+        "N_LAYER": 1,
+        "MLP_RATIO": 4,
+        "NUM_MASK": 2,
+        "RANDOM_SEED": 81
+      }
+    },
+    {
+      "name": "tribonacci_d256l1r4_n4_p23_neq_g2_seed2824",
+      "task": "tribonacci",
+      "config": {
+        "P": 23,
+        "A": 2,
+        "B": 6,
+        "C": 7,
+        "D_MODEL": 256,
+        "N_HEAD": 4,
+        "N_LAYER": 1,
+        "MLP_RATIO": 4,
+        "NUM_MASK": 2,
+        "RANDOM_SEED": 2824
+      }
+    },
+    {
+      "name": "tribonacci_d256l1r4_n4_p23_neq_g2_seed13278",
+      "task": "tribonacci",
+      "config": {
+        "P": 23,
+        "A": 2,
+        "B": 6,
+        "C": 7,
+        "D_MODEL": 256,
+        "N_HEAD": 4,
+        "N_LAYER": 1,
+        "MLP_RATIO": 4,
+        "NUM_MASK": 2,
+        "RANDOM_SEED": 13278
+      }
+    },
+    {
+      "name": "tribonacci_d256l1r4_n1_p31_eq_g0_seed81",
+      "task": "tribonacci",
+      "config": {
+        "P": 31,
+        "A": 17,
+        "B": 19,
+        "C": 3,
+        "D_MODEL": 256,
+        "N_HEAD": 1,
+        "N_LAYER": 1,
+        "MLP_RATIO": 4,
+        "NUM_MASK": 2,
+        "RANDOM_SEED": 81
+      }
+    },
+    {
+      "name": "tribonacci_d256l1r4_n1_p31_eq_g0_seed2824",
+      "task": "tribonacci",
+      "config": {
+        "P": 31,
+        "A": 17,
+        "B": 19,
+        "C": 3,
+        "D_MODEL": 256,
+        "N_HEAD": 1,
+        "N_LAYER": 1,
+        "MLP_RATIO": 4,
+        "NUM_MASK": 2,
+        "RANDOM_SEED": 2824
+      }
+    },
+    {
+      "name": "tribonacci_d256l1r4_n1_p31_eq_g0_seed13278",
+      "task": "tribonacci",
+      "config": {
+        "P": 31,
+        "A": 17,
+        "B": 19,
+        "C": 3,
+        "D_MODEL": 256,
+        "N_HEAD": 1,
+        "N_LAYER": 1,
+        "MLP_RATIO": 4,
+        "NUM_MASK": 2,
+        "RANDOM_SEED": 13278
+      }
+    },
+    {
+      "name": "tribonacci_d256l1r4_n4_p31_eq_g0_seed81",
+      "task": "tribonacci",
+      "config": {
+        "P": 31,
+        "A": 17,
+        "B": 19,
+        "C": 3,
+        "D_MODEL": 256,
+        "N_HEAD": 4,
+        "N_LAYER": 1,
+        "MLP_RATIO": 4,
+        "NUM_MASK": 2,
+        "RANDOM_SEED": 81
+      }
+    },
+    {
+      "name": "tribonacci_d256l1r4_n4_p31_eq_g0_seed2824",
+      "task": "tribonacci",
+      "config": {
+        "P": 31,
+        "A": 17,
+        "B": 19,
+        "C": 3,
+        "D_MODEL": 256,
+        "N_HEAD": 4,
+        "N_LAYER": 1,
+        "MLP_RATIO": 4,
+        "NUM_MASK": 2,
+        "RANDOM_SEED": 2824
+      }
+    },
+    {
+      "name": "tribonacci_d256l1r4_n4_p31_eq_g0_seed13278",
+      "task": "tribonacci",
+      "config": {
+        "P": 31,
+        "A": 17,
+        "B": 19,
+        "C": 3,
+        "D_MODEL": 256,
+        "N_HEAD": 4,
+        "N_LAYER": 1,
+        "MLP_RATIO": 4,
+        "NUM_MASK": 2,
+        "RANDOM_SEED": 13278
+      }
+    },
+    {
+      "name": "tribonacci_d256l1r4_n1_p31_eq_g1_seed81",
+      "task": "tribonacci",
+      "config": {
+        "P": 31,
+        "A": 1,
+        "B": 17,
+        "C": 10,
+        "D_MODEL": 256,
+        "N_HEAD": 1,
+        "N_LAYER": 1,
+        "MLP_RATIO": 4,
+        "NUM_MASK": 2,
+        "RANDOM_SEED": 81
+      }
+    },
+    {
+      "name": "tribonacci_d256l1r4_n1_p31_eq_g1_seed2824",
+      "task": "tribonacci",
+      "config": {
+        "P": 31,
+        "A": 1,
+        "B": 17,
+        "C": 10,
+        "D_MODEL": 256,
+        "N_HEAD": 1,
+        "N_LAYER": 1,
+        "MLP_RATIO": 4,
+        "NUM_MASK": 2,
+        "RANDOM_SEED": 2824
+      }
+    },
+    {
+      "name": "tribonacci_d256l1r4_n1_p31_eq_g1_seed13278",
+      "task": "tribonacci",
+      "config": {
+        "P": 31,
+        "A": 1,
+        "B": 17,
+        "C": 10,
+        "D_MODEL": 256,
+        "N_HEAD": 1,
+        "N_LAYER": 1,
+        "MLP_RATIO": 4,
+        "NUM_MASK": 2,
+        "RANDOM_SEED": 13278
+      }
+    },
+    {
+      "name": "tribonacci_d256l1r4_n4_p31_eq_g1_seed81",
+      "task": "tribonacci",
+      "config": {
+        "P": 31,
+        "A": 1,
+        "B": 17,
+        "C": 10,
+        "D_MODEL": 256,
+        "N_HEAD": 4,
+        "N_LAYER": 1,
+        "MLP_RATIO": 4,
+        "NUM_MASK": 2,
+        "RANDOM_SEED": 81
+      }
+    },
+    {
+      "name": "tribonacci_d256l1r4_n4_p31_eq_g1_seed2824",
+      "task": "tribonacci",
+      "config": {
+        "P": 31,
+        "A": 1,
+        "B": 17,
+        "C": 10,
+        "D_MODEL": 256,
+        "N_HEAD": 4,
+        "N_LAYER": 1,
+        "MLP_RATIO": 4,
+        "NUM_MASK": 2,
+        "RANDOM_SEED": 2824
+      }
+    },
+    {
+      "name": "tribonacci_d256l1r4_n4_p31_eq_g1_seed13278",
+      "task": "tribonacci",
+      "config": {
+        "P": 31,
+        "A": 1,
+        "B": 17,
+        "C": 10,
+        "D_MODEL": 256,
+        "N_HEAD": 4,
+        "N_LAYER": 1,
+        "MLP_RATIO": 4,
+        "NUM_MASK": 2,
+        "RANDOM_SEED": 13278
+      }
+    },
+    {
+      "name": "tribonacci_d256l1r4_n1_p31_eq_g2_seed81",
+      "task": "tribonacci",
+      "config": {
+        "P": 31,
+        "A": 7,
+        "B": 22,
+        "C": 16,
+        "D_MODEL": 256,
+        "N_HEAD": 1,
+        "N_LAYER": 1,
+        "MLP_RATIO": 4,
+        "NUM_MASK": 2,
+        "RANDOM_SEED": 81
+      }
+    },
+    {
+      "name": "tribonacci_d256l1r4_n1_p31_eq_g2_seed2824",
+      "task": "tribonacci",
+      "config": {
+        "P": 31,
+        "A": 7,
+        "B": 22,
+        "C": 16,
+        "D_MODEL": 256,
+        "N_HEAD": 1,
+        "N_LAYER": 1,
+        "MLP_RATIO": 4,
+        "NUM_MASK": 2,
+        "RANDOM_SEED": 2824
+      }
+    },
+    {
+      "name": "tribonacci_d256l1r4_n1_p31_eq_g2_seed13278",
+      "task": "tribonacci",
+      "config": {
+        "P": 31,
+        "A": 7,
+        "B": 22,
+        "C": 16,
+        "D_MODEL": 256,
+        "N_HEAD": 1,
+        "N_LAYER": 1,
+        "MLP_RATIO": 4,
+        "NUM_MASK": 2,
+        "RANDOM_SEED": 13278
+      }
+    },
+    {
+      "name": "tribonacci_d256l1r4_n4_p31_eq_g2_seed81",
+      "task": "tribonacci",
+      "config": {
+        "P": 31,
+        "A": 7,
+        "B": 22,
+        "C": 16,
+        "D_MODEL": 256,
+        "N_HEAD": 4,
+        "N_LAYER": 1,
+        "MLP_RATIO": 4,
+        "NUM_MASK": 2,
+        "RANDOM_SEED": 81
+      }
+    },
+    {
+      "name": "tribonacci_d256l1r4_n4_p31_eq_g2_seed2824",
+      "task": "tribonacci",
+      "config": {
+        "P": 31,
+        "A": 7,
+        "B": 22,
+        "C": 16,
+        "D_MODEL": 256,
+        "N_HEAD": 4,
+        "N_LAYER": 1,
+        "MLP_RATIO": 4,
+        "NUM_MASK": 2,
+        "RANDOM_SEED": 2824
+      }
+    },
+    {
+      "name": "tribonacci_d256l1r4_n4_p31_eq_g2_seed13278",
+      "task": "tribonacci",
+      "config": {
+        "P": 31,
+        "A": 7,
+        "B": 22,
+        "C": 16,
+        "D_MODEL": 256,
+        "N_HEAD": 4,
+        "N_LAYER": 1,
+        "MLP_RATIO": 4,
+        "NUM_MASK": 2,
+        "RANDOM_SEED": 13278
+      }
+    },
+    {
+      "name": "tribonacci_d256l1r4_n1_p31_neq_g0_seed81",
+      "task": "tribonacci",
+      "config": {
+        "P": 31,
+        "A": 20,
+        "B": 22,
+        "C": 17,
+        "D_MODEL": 256,
+        "N_HEAD": 1,
+        "N_LAYER": 1,
+        "MLP_RATIO": 4,
+        "NUM_MASK": 2,
+        "RANDOM_SEED": 81
+      }
+    },
+    {
+      "name": "tribonacci_d256l1r4_n1_p31_neq_g0_seed2824",
+      "task": "tribonacci",
+      "config": {
+        "P": 31,
+        "A": 20,
+        "B": 22,
+        "C": 17,
+        "D_MODEL": 256,
+        "N_HEAD": 1,
+        "N_LAYER": 1,
+        "MLP_RATIO": 4,
+        "NUM_MASK": 2,
+        "RANDOM_SEED": 2824
+      }
+    },
+    {
+      "name": "tribonacci_d256l1r4_n1_p31_neq_g0_seed13278",
+      "task": "tribonacci",
+      "config": {
+        "P": 31,
+        "A": 20,
+        "B": 22,
+        "C": 17,
+        "D_MODEL": 256,
+        "N_HEAD": 1,
+        "N_LAYER": 1,
+        "MLP_RATIO": 4,
+        "NUM_MASK": 2,
+        "RANDOM_SEED": 13278
+      }
+    },
+    {
+      "name": "tribonacci_d256l1r4_n4_p31_neq_g0_seed81",
+      "task": "tribonacci",
+      "config": {
+        "P": 31,
+        "A": 20,
+        "B": 22,
+        "C": 17,
+        "D_MODEL": 256,
+        "N_HEAD": 4,
+        "N_LAYER": 1,
+        "MLP_RATIO": 4,
+        "NUM_MASK": 2,
+        "RANDOM_SEED": 81
+      }
+    },
+    {
+      "name": "tribonacci_d256l1r4_n4_p31_neq_g0_seed2824",
+      "task": "tribonacci",
+      "config": {
+        "P": 31,
+        "A": 20,
+        "B": 22,
+        "C": 17,
+        "D_MODEL": 256,
+        "N_HEAD": 4,
+        "N_LAYER": 1,
+        "MLP_RATIO": 4,
+        "NUM_MASK": 2,
+        "RANDOM_SEED": 2824
+      }
+    },
+    {
+      "name": "tribonacci_d256l1r4_n4_p31_neq_g0_seed13278",
+      "task": "tribonacci",
+      "config": {
+        "P": 31,
+        "A": 20,
+        "B": 22,
+        "C": 17,
+        "D_MODEL": 256,
+        "N_HEAD": 4,
+        "N_LAYER": 1,
+        "MLP_RATIO": 4,
+        "NUM_MASK": 2,
+        "RANDOM_SEED": 13278
+      }
+    },
+    {
+      "name": "tribonacci_d256l1r4_n1_p31_neq_g1_seed81",
+      "task": "tribonacci",
+      "config": {
+        "P": 31,
+        "A": 13,
+        "B": 7,
+        "C": 14,
+        "D_MODEL": 256,
+        "N_HEAD": 1,
+        "N_LAYER": 1,
+        "MLP_RATIO": 4,
+        "NUM_MASK": 2,
+        "RANDOM_SEED": 81
+      }
+    },
+    {
+      "name": "tribonacci_d256l1r4_n1_p31_neq_g1_seed2824",
+      "task": "tribonacci",
+      "config": {
+        "P": 31,
+        "A": 13,
+        "B": 7,
+        "C": 14,
+        "D_MODEL": 256,
+        "N_HEAD": 1,
+        "N_LAYER": 1,
+        "MLP_RATIO": 4,
+        "NUM_MASK": 2,
+        "RANDOM_SEED": 2824
+      }
+    },
+    {
+      "name": "tribonacci_d256l1r4_n1_p31_neq_g1_seed13278",
+      "task": "tribonacci",
+      "config": {
+        "P": 31,
+        "A": 13,
+        "B": 7,
+        "C": 14,
+        "D_MODEL": 256,
+        "N_HEAD": 1,
+        "N_LAYER": 1,
+        "MLP_RATIO": 4,
+        "NUM_MASK": 2,
+        "RANDOM_SEED": 13278
+      }
+    },
+    {
+      "name": "tribonacci_d256l1r4_n4_p31_neq_g1_seed81",
+      "task": "tribonacci",
+      "config": {
+        "P": 31,
+        "A": 13,
+        "B": 7,
+        "C": 14,
+        "D_MODEL": 256,
+        "N_HEAD": 4,
+        "N_LAYER": 1,
+        "MLP_RATIO": 4,
+        "NUM_MASK": 2,
+        "RANDOM_SEED": 81
+      }
+    },
+    {
+      "name": "tribonacci_d256l1r4_n4_p31_neq_g1_seed2824",
+      "task": "tribonacci",
+      "config": {
+        "P": 31,
+        "A": 13,
+        "B": 7,
+        "C": 14,
+        "D_MODEL": 256,
+        "N_HEAD": 4,
+        "N_LAYER": 1,
+        "MLP_RATIO": 4,
+        "NUM_MASK": 2,
+        "RANDOM_SEED": 2824
+      }
+    },
+    {
+      "name": "tribonacci_d256l1r4_n4_p31_neq_g1_seed13278",
+      "task": "tribonacci",
+      "config": {
+        "P": 31,
+        "A": 13,
+        "B": 7,
+        "C": 14,
+        "D_MODEL": 256,
+        "N_HEAD": 4,
+        "N_LAYER": 1,
+        "MLP_RATIO": 4,
+        "NUM_MASK": 2,
+        "RANDOM_SEED": 13278
+      }
+    },
+    {
+      "name": "tribonacci_d256l1r4_n1_p31_neq_g2_seed81",
+      "task": "tribonacci",
+      "config": {
+        "P": 31,
+        "A": 18,
+        "B": 8,
+        "C": 25,
+        "D_MODEL": 256,
+        "N_HEAD": 1,
+        "N_LAYER": 1,
+        "MLP_RATIO": 4,
+        "NUM_MASK": 2,
+        "RANDOM_SEED": 81
+      }
+    },
+    {
+      "name": "tribonacci_d256l1r4_n1_p31_neq_g2_seed2824",
+      "task": "tribonacci",
+      "config": {
+        "P": 31,
+        "A": 18,
+        "B": 8,
+        "C": 25,
+        "D_MODEL": 256,
+        "N_HEAD": 1,
+        "N_LAYER": 1,
+        "MLP_RATIO": 4,
+        "NUM_MASK": 2,
+        "RANDOM_SEED": 2824
+      }
+    },
+    {
+      "name": "tribonacci_d256l1r4_n1_p31_neq_g2_seed13278",
+      "task": "tribonacci",
+      "config": {
+        "P": 31,
+        "A": 18,
+        "B": 8,
+        "C": 25,
+        "D_MODEL": 256,
+        "N_HEAD": 1,
+        "N_LAYER": 1,
+        "MLP_RATIO": 4,
+        "NUM_MASK": 2,
+        "RANDOM_SEED": 13278
+      }
+    },
+    {
+      "name": "tribonacci_d256l1r4_n4_p31_neq_g2_seed81",
+      "task": "tribonacci",
+      "config": {
+        "P": 31,
+        "A": 18,
+        "B": 8,
+        "C": 25,
+        "D_MODEL": 256,
+        "N_HEAD": 4,
+        "N_LAYER": 1,
+        "MLP_RATIO": 4,
+        "NUM_MASK": 2,
+        "RANDOM_SEED": 81
+      }
+    },
+    {
+      "name": "tribonacci_d256l1r4_n4_p31_neq_g2_seed2824",
+      "task": "tribonacci",
+      "config": {
+        "P": 31,
+        "A": 18,
+        "B": 8,
+        "C": 25,
+        "D_MODEL": 256,
+        "N_HEAD": 4,
+        "N_LAYER": 1,
+        "MLP_RATIO": 4,
+        "NUM_MASK": 2,
+        "RANDOM_SEED": 2824
+      }
+    },
+    {
+      "name": "tribonacci_d256l1r4_n4_p31_neq_g2_seed13278",
+      "task": "tribonacci",
+      "config": {
+        "P": 31,
+        "A": 18,
+        "B": 8,
+        "C": 25,
+        "D_MODEL": 256,
+        "N_HEAD": 4,
+        "N_LAYER": 1,
+        "MLP_RATIO": 4,
+        "NUM_MASK": 2,
+        "RANDOM_SEED": 13278
+      }
+    }
+  ]
+}
