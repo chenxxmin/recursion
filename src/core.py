@@ -11,6 +11,7 @@ import threading
 import itertools
 from enum import IntEnum
 from torch.utils.data import Dataset, DataLoader, Sampler
+from rules import rules_from_config
 
 # ==================== Data Generation ====================
 class RecurrenceDataset(Dataset):
@@ -1279,8 +1280,11 @@ def _print_task_banner(block_size, train_len, number_theory_msg):
     print()
 
 
-def _prepare_mixed_ab(config, device):
-    """Prepare dataset, model, loaders and training params for the mixed_ab task."""
+def _prepare_mixed_recurrence(config, device, order):
+    """Prepare dataset, model, loaders and training params for mixed_ab (order=2) / mixed_abc (order=3)."""
+    # Local import: mixed_dataset imports core (RecurrenceDataset), so a
+    # module-level import here would be circular.
+    from mixed_dataset import MixedRecurrenceDataset
     cfg = dict(config.get('main', {}))
     P = cfg['P']
     D_MODEL = cfg['D_MODEL']
@@ -1291,9 +1295,8 @@ def _prepare_mixed_ab(config, device):
     OOD_LEN = cfg['OOD_LEN']
     DROPOUT = cfg['DROPOUT']
     MAX_UNIQUE_RATIO = cfg.get('MAX_UNIQUE_RATIO', 0.5)
-    ab_pairs_raw = cfg.get('AB_PAIRS', [(3, 5), [7, 11]])
-    AB_PAIRS = [tuple(pair) for pair in ab_pairs_raw] if ab_pairs_raw else [(3, 5), (7, 11)]
-    state_space_size = P ** 2
+    rules = rules_from_config(cfg, order)
+    state_space_size = P ** order
 
     # block_size must accommodate max sequence length plus an optional leading rule token
     max_seq_len = max(TRAIN_LEN, OOD_LEN)
@@ -1301,30 +1304,31 @@ def _prepare_mixed_ab(config, device):
         max_seq_len += 1
     BLOCK_SIZE = _round_up_pow2(max_seq_len)
 
-    # Per-rule exposure ratio for mixed_ab. MAX_UNIQUE_RATIO means exposed (train) proportion.
+    # Per-rule exposure ratio for mixed tasks. MAX_UNIQUE_RATIO means exposed (train) proportion.
     if 'MIXED_AB_MAX_UNIQUE_RATIOS' in cfg:
         ratios = cfg['MIXED_AB_MAX_UNIQUE_RATIOS']
     else:
-        ratios = [MAX_UNIQUE_RATIO] * len(AB_PAIRS)
+        ratios = [MAX_UNIQUE_RATIO] * len(rules)
     if isinstance(ratios, (int, float)):
-        ratios = [ratios] * len(AB_PAIRS)
-    assert len(ratios) == len(AB_PAIRS), \
-        f"MIXED_AB_MAX_UNIQUE_RATIOS length ({len(ratios)}) must equal AB_PAIRS length ({len(AB_PAIRS)})"
+        ratios = [ratios] * len(rules)
+    assert len(ratios) == len(rules), \
+        f"MIXED_AB_MAX_UNIQUE_RATIOS length ({len(ratios)}) must equal number of rules ({len(rules)})"
     NUM_TRAIN_SAMPLES = [max(1, int(state_space_size * r)) for r in ratios]
 
-    ds = MixedABDataset(p=P, ab_pairs=AB_PAIRS, num_samples=NUM_TRAIN_SAMPLES, length=TRAIN_LEN,
-                        verbose=True, use_ab_tag=cfg.get('USE_AB_TAG', True))
+    ds = MixedRecurrenceDataset(rules=rules, num_samples=NUM_TRAIN_SAMPLES, length=TRAIN_LEN,
+                                verbose=True, use_ab_tag=cfg.get('USE_AB_TAG', True))
     train_dataset = ds.train_data
     test_dataset = ds.test_data
 
-    _print_task_banner(BLOCK_SIZE, TRAIN_LEN, f"AB parameter pairs: {AB_PAIRS}")
+    _print_task_banner(BLOCK_SIZE, TRAIN_LEN, f"Rules: {[r.name for r in rules]}")
 
     train_loader, test_loader = _make_loaders(train_dataset, test_dataset, BATCH_SIZE, mixed_ab_collate_fn)
 
     model = MixedABTransformer(p=P, d_model=D_MODEL, n_head=N_HEAD, n_layer=N_LAYER, block_size=BLOCK_SIZE,
                                dropout=DROPOUT,
                                entropy_penalty_weight=cfg['ENTROPY_PENALTY_WEIGHT'],
-                               num_ab_pairs=len(AB_PAIRS),
+                               num_ab_pairs=len(rules),
+                               order=order,
                                use_greedy_generate=cfg.get('USE_GREEDY_GENERATE', True),
                                use_learnable_pe=cfg.get('USE_LEARNABLE_PE', False),
                                mlp_ratio=cfg.get('MLP_RATIO', 4),
@@ -1332,14 +1336,15 @@ def _prepare_mixed_ab(config, device):
                                use_conditional_wte=cfg.get('USE_CONDITIONAL_WTE', False),
                                cond_wte_shared_ratio=cfg.get('COND_WTE_SHARED_RATIO', 0.0),
                                )
-    # NUM_MASK unset (None) means: x0 and x1 are initial values, so start
-    # evaluating from x2 (the first generated token).
+    # NUM_MASK unset (None) means: the first num_mask positions are initial
+    # values and are not evaluated. Default 2, matching the tribonacci task.
     num_mask_cfg = cfg.get('NUM_MASK')
     num_mask = 2 if num_mask_cfg is None else num_mask_cfg
     extra_kwargs_fn = lambda ab_indices: {'ab_labels': ab_indices.to(device)}
     save_config = {
         'p': P,
-        'ab_pairs': AB_PAIRS,
+        'ab_pairs': [list(r.coeffs) for r in rules],
+        'order': order,
         'mixed_ab_max_unique_ratios': ratios,
         'd_model': D_MODEL,
         'n_head': N_HEAD,
@@ -1350,8 +1355,8 @@ def _prepare_mixed_ab(config, device):
         'use_ab_tag': cfg.get('USE_AB_TAG', True),
         'use_conditional_wte': cfg.get('USE_CONDITIONAL_WTE', False),
         'cond_wte_shared_ratio': cfg.get('COND_WTE_SHARED_RATIO', 0.0),
-        'vocab_size': P + 1 + len(AB_PAIRS) if cfg.get('USE_AB_TAG', True) else P + 1,
-        'pad_token_id': P + len(AB_PAIRS) if cfg.get('USE_AB_TAG', True) else P,
+        'vocab_size': P + 1 + len(rules) if cfg.get('USE_AB_TAG', True) else P + 1,
+        'pad_token_id': P + len(rules) if cfg.get('USE_AB_TAG', True) else P,
     }
     return {
         'post_train_mode': 'mixed_ab',
@@ -1367,7 +1372,8 @@ def _prepare_mixed_ab(config, device):
         'p': P,
         'train_len': TRAIN_LEN,
         'ood_len': OOD_LEN,
-        'ab_pairs': AB_PAIRS,
+        'rules': rules,
+        'order': order,
     }
 
 
@@ -1610,8 +1616,9 @@ def run_experiment(config_path=None):
     # ========================================================================
     # Stage 1: Task branch -- prepare dataset, model, loader, training params
     # ========================================================================
-    if TASK == 'mixed_ab':
-        ctx = _prepare_mixed_ab(config, device)
+    if TASK in ('mixed_ab', 'mixed_abc'):
+        order = 2 if TASK == 'mixed_ab' else 3
+        ctx = _prepare_mixed_recurrence(config, device, order)
     elif TASK == 'dynamic_mixed':
         ctx = _prepare_dynamic_mixed(config)
     elif TASK in ('addition', 'multiplication', 'tribonacci', 'nonlinear'):
