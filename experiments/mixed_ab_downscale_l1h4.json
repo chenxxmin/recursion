@@ -2,100 +2,13 @@
   "concurrency": 8,
   "experiments": [
     {
-      "name": "mixed_basic_d512l1r8h4_P127_N2_e0.7_seed0",
-      "task": "mixed_ab",
-      "config": {
-        "RANDOM_SEED": 0,
-        "P": 127,
-        "D_MODEL": 512,
-        "N_HEAD": 4,
-        "N_LAYER": 1,
-        "MLP_RATIO": 8,
-        "AB_PAIRS": [
-          [
-            1,
-            1
-          ],
-          [
-            1,
-            2
-          ]
-        ],
-        "MIXED_AB_MAX_UNIQUE_RATIOS": [
-          0.7,
-          0.7
-        ],
-        "USE_AB_TAG": false,
-        "USE_CONDITIONAL_WTE": false,
-        "NUM_MASK": 2
-      }
-    },
-    {
-      "name": "mixed_basic_d512l1r8h4_P127_N2_e0.7_seed999",
-      "task": "mixed_ab",
-      "config": {
-        "RANDOM_SEED": 999,
-        "P": 127,
-        "D_MODEL": 512,
-        "N_HEAD": 4,
-        "N_LAYER": 1,
-        "MLP_RATIO": 8,
-        "AB_PAIRS": [
-          [
-            1,
-            1
-          ],
-          [
-            1,
-            2
-          ]
-        ],
-        "MIXED_AB_MAX_UNIQUE_RATIOS": [
-          0.7,
-          0.7
-        ],
-        "USE_AB_TAG": false,
-        "USE_CONDITIONAL_WTE": false,
-        "NUM_MASK": 2
-      }
-    },
-    {
-      "name": "mixed_basic_d512l1r8h4_P127_N2_e0.7_seed12345",
-      "task": "mixed_ab",
-      "config": {
-        "RANDOM_SEED": 12345,
-        "P": 127,
-        "D_MODEL": 512,
-        "N_HEAD": 4,
-        "N_LAYER": 1,
-        "MLP_RATIO": 8,
-        "AB_PAIRS": [
-          [
-            1,
-            1
-          ],
-          [
-            1,
-            2
-          ]
-        ],
-        "MIXED_AB_MAX_UNIQUE_RATIOS": [
-          0.7,
-          0.7
-        ],
-        "USE_AB_TAG": false,
-        "USE_CONDITIONAL_WTE": false,
-        "NUM_MASK": 2
-      }
-    },
-    {
-      "name": "mixed_basic_d256l1r8h4_P127_N2_e0.7_seed0",
+      "name": "mixed_basic_d256l1r8h1_P127_N2_e0.7_seed0",
       "task": "mixed_ab",
       "config": {
         "RANDOM_SEED": 0,
         "P": 127,
         "D_MODEL": 256,
-        "N_HEAD": 4,
+        "N_HEAD": 1,
         "N_LAYER": 1,
         "MLP_RATIO": 8,
         "AB_PAIRS": [
@@ -118,13 +31,13 @@
       }
     },
     {
-      "name": "mixed_basic_d256l1r8h4_P127_N2_e0.7_seed999",
+      "name": "mixed_basic_d256l1r8h1_P127_N2_e0.7_seed999",
       "task": "mixed_ab",
       "config": {
         "RANDOM_SEED": 999,
         "P": 127,
         "D_MODEL": 256,
-        "N_HEAD": 4,
+        "N_HEAD": 1,
         "N_LAYER": 1,
         "MLP_RATIO": 8,
         "AB_PAIRS": [
@@ -147,13 +60,13 @@
       }
     },
     {
-      "name": "mixed_basic_d256l1r8h4_P127_N2_e0.7_seed12345",
+      "name": "mixed_basic_d256l1r8h1_P127_N2_e0.7_seed12345",
       "task": "mixed_ab",
       "config": {
         "RANDOM_SEED": 12345,
         "P": 127,
         "D_MODEL": 256,
-        "N_HEAD": 4,
+        "N_HEAD": 1,
         "N_LAYER": 1,
         "MLP_RATIO": 8,
         "AB_PAIRS": [
@@ -176,13 +89,13 @@
       }
     },
     {
-      "name": "mixed_basic_d512l1r8h4_P509_N2_e0.7_seed0",
+      "name": "mixed_basic_d256l1r8h2_P127_N2_e0.7_seed0",
       "task": "mixed_ab",
       "config": {
         "RANDOM_SEED": 0,
-        "P": 509,
-        "D_MODEL": 512,
-        "N_HEAD": 4,
+        "P": 127,
+        "D_MODEL": 256,
+        "N_HEAD": 2,
         "N_LAYER": 1,
         "MLP_RATIO": 8,
         "AB_PAIRS": [
@@ -205,13 +118,13 @@
       }
     },
     {
-      "name": "mixed_basic_d512l1r8h4_P509_N2_e0.7_seed999",
+      "name": "mixed_basic_d256l1r8h2_P127_N2_e0.7_seed999",
       "task": "mixed_ab",
       "config": {
         "RANDOM_SEED": 999,
-        "P": 509,
-        "D_MODEL": 512,
-        "N_HEAD": 4,
+        "P": 127,
+        "D_MODEL": 256,
+        "N_HEAD": 2,
         "N_LAYER": 1,
         "MLP_RATIO": 8,
         "AB_PAIRS": [
@@ -234,100 +147,13 @@
       }
     },
     {
-      "name": "mixed_basic_d512l1r8h4_P509_N2_e0.7_seed12345",
+      "name": "mixed_basic_d256l1r8h2_P127_N2_e0.7_seed12345",
       "task": "mixed_ab",
       "config": {
         "RANDOM_SEED": 12345,
-        "P": 509,
-        "D_MODEL": 512,
-        "N_HEAD": 4,
-        "N_LAYER": 1,
-        "MLP_RATIO": 8,
-        "AB_PAIRS": [
-          [
-            1,
-            1
-          ],
-          [
-            1,
-            2
-          ]
-        ],
-        "MIXED_AB_MAX_UNIQUE_RATIOS": [
-          0.7,
-          0.7
-        ],
-        "USE_AB_TAG": false,
-        "USE_CONDITIONAL_WTE": false,
-        "NUM_MASK": 2
-      }
-    },
-    {
-      "name": "mixed_basic_d256l1r8h4_P509_N2_e0.7_seed0",
-      "task": "mixed_ab",
-      "config": {
-        "RANDOM_SEED": 0,
-        "P": 509,
+        "P": 127,
         "D_MODEL": 256,
-        "N_HEAD": 4,
-        "N_LAYER": 1,
-        "MLP_RATIO": 8,
-        "AB_PAIRS": [
-          [
-            1,
-            1
-          ],
-          [
-            1,
-            2
-          ]
-        ],
-        "MIXED_AB_MAX_UNIQUE_RATIOS": [
-          0.7,
-          0.7
-        ],
-        "USE_AB_TAG": false,
-        "USE_CONDITIONAL_WTE": false,
-        "NUM_MASK": 2
-      }
-    },
-    {
-      "name": "mixed_basic_d256l1r8h4_P509_N2_e0.7_seed999",
-      "task": "mixed_ab",
-      "config": {
-        "RANDOM_SEED": 999,
-        "P": 509,
-        "D_MODEL": 256,
-        "N_HEAD": 4,
-        "N_LAYER": 1,
-        "MLP_RATIO": 8,
-        "AB_PAIRS": [
-          [
-            1,
-            1
-          ],
-          [
-            1,
-            2
-          ]
-        ],
-        "MIXED_AB_MAX_UNIQUE_RATIOS": [
-          0.7,
-          0.7
-        ],
-        "USE_AB_TAG": false,
-        "USE_CONDITIONAL_WTE": false,
-        "NUM_MASK": 2
-      }
-    },
-    {
-      "name": "mixed_basic_d256l1r8h4_P509_N2_e0.7_seed12345",
-      "task": "mixed_ab",
-      "config": {
-        "RANDOM_SEED": 12345,
-        "P": 509,
-        "D_MODEL": 256,
-        "N_HEAD": 4,
+        "N_HEAD": 2,
         "N_LAYER": 1,
         "MLP_RATIO": 8,
         "AB_PAIRS": [
