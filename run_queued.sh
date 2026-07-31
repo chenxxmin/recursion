@@ -2,8 +2,8 @@
 # 等自己的训练进程结束后，依次运行：
 #   1. experiments/dynamic_d512.json             （dynamic_mixed N2~N10 升到 d512，8 种子，72 runs）
 #   2. experiments/mixed_ab_exposure_p509.json   （P509 exposure 比例研究，24 组 x 3 种子，72 runs）
-# 用法（在仓库根目录）：bash run_big_orbit_and_mixed_abc.sh
-# 建议配合 tmux 或 nohup 使用：nohup bash run_big_orbit_and_mixed_abc.sh > queued_run.log 2>&1 &
+# 用法（在仓库根目录）：bash run_queued.sh
+# 建议配合 tmux 或 nohup 使用：nohup bash run_queued.sh > queued_run.log 2>&1 &
 #
 # 说明：等待条件只匹配本用户的训练进程（batch_run.py / core.run_experiment），
 # 其他用户的 python 不影响——batch_run.py 会自动挑选空闲 GPU
