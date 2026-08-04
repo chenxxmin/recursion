@@ -16,7 +16,7 @@ from rules import rules_from_config
 # ==================== Data Generation ====================
 class RecurrenceDataset(Dataset):
     def __init__(self, p=127, recurrence_fn=None, recurrence_name="X(k)=?", init_len=2, num_samples=1000, length=10,
-                 verbose=True):
+                 verbose=True, missing_prob=0.0, num_mask=0, first_task_weight=1.0):
         self.length = length
         self.p = p
         self.recurrence_fn = recurrence_fn
@@ -24,6 +24,15 @@ class RecurrenceDataset(Dataset):
         self.init_len = init_len
         self.num_samples = num_samples
         self.verbose = verbose
+        # MISSING_PROB: when > 0, each train window is corrupted — every token at
+        # position >= init_len is independently replaced by the missing token
+        # (id == p) with this probability, and items become (seq, loss_mask)
+        # tuples where the prediction loss of corrupted positions is zeroed.
+        # num_mask/first_task_weight reproduce the train_epoch default mask so
+        # the dataset-provided mask is a drop-in replacement.
+        self.missing_prob = missing_prob
+        self.num_mask = num_mask
+        self.first_task_weight = first_task_weight
         self.train_samples = []
         self.test_samples = []
         self.seen_indices = set()
@@ -106,8 +115,13 @@ class RecurrenceDataset(Dataset):
 
             # Append to train/test set
             for i in range(num_inits):
-                target = self.train_samples if n_before + i < self.num_samples else self.test_samples
-                target.append(torch.tensor(seq[i:i + self.length], dtype=torch.long))
+                is_train = n_before + i < self.num_samples
+                target = self.train_samples if is_train else self.test_samples
+                window = torch.tensor(seq[i:i + self.length], dtype=torch.long)
+                if self.missing_prob > 0:
+                    target.append((window, self._corrupt(window, is_train)))
+                else:
+                    target.append(window)
 
         # Shuffle sample order
         random.shuffle(self.train_samples)
@@ -116,9 +130,33 @@ class RecurrenceDataset(Dataset):
             cov = len(self.train_samples) / state_space
             print(f"[Dataset] Cycle traverse + sliding window: {len(self.train_samples)} + {len(self.test_samples)} samples, length {self.length}, mod {self.p}")
             print(f"  - Initial state coverage: {len(self.train_samples)}/{state_space} ({cov*100:.1f}%)")
+            if self.missing_prob > 0:
+                print(f"  - Missing-value corruption: prob={self.missing_prob}, positions >= {self.init_len}, "
+                      f"token id {self.p}, train split only (loss masked at corrupted positions)")
             print(f"Recurrence: {self.recurrence_name}")
             print("-" * 50)
             print("-" * 50)
+
+    def _corrupt(self, window, is_train):
+        """Return the per-position loss mask for a window, corrupting it in place
+        when missing is enabled and the window belongs to the train split.
+
+        The mask reproduces the train_epoch default (zeros up to num_mask, ones
+        after, first_task_weight at num_mask); a corrupted token at position pos
+        additionally zeroes its prediction target at index pos-1. Only train
+        windows are corrupted; test windows keep the clean default mask.
+        """
+        mask = torch.zeros(self.length - 1, dtype=torch.float)
+        if self.length - 1 > self.num_mask:
+            mask[self.num_mask:] = 1.0
+            if self.first_task_weight != 1.0:
+                mask[self.num_mask] = self.first_task_weight
+        if is_train:
+            for pos in range(self.init_len, self.length):
+                if random.random() < self.missing_prob:
+                    window[pos] = self.p  # missing token id == p
+                    mask[pos - 1] = 0.0
+        return mask
 
     def __len__(self):
         data = self.train_samples if self.split == 'train' else self.test_samples
@@ -172,6 +210,13 @@ class BatchTag(IntEnum):
 
 
 def collate_fn(batch):
+    # Samples may be (seq, loss_mask) tuples (RecurrenceDataset with
+    # MISSING_PROB enabled); route them through the DYNAMIC_MIXED payload so
+    # the per-position loss mask reaches the model unchanged.
+    if isinstance(batch[0], tuple):
+        seqs = torch.stack([item[0] for item in batch], dim=0)
+        masks = torch.stack([item[1] for item in batch], dim=0)
+        return seqs, BatchTag.DYNAMIC_MIXED, masks
     return torch.stack(batch, dim=0), BatchTag.PLAIN
 
 
@@ -1286,6 +1331,8 @@ def _prepare_mixed_recurrence(config, device, order):
     # module-level import here would be circular.
     from mixed_dataset import MixedRecurrenceDataset
     cfg = dict(config.get('main', {}))
+    if cfg.get('MISSING_PROB', 0.0) > 0:
+        print("WARNING: MISSING_PROB > 0 is only supported for single-rule tasks; ignoring it for this mixed task.")
     P = cfg['P']
     D_MODEL = cfg['D_MODEL']
     N_HEAD = cfg['N_HEAD']
@@ -1387,6 +1434,8 @@ def _prepare_dynamic_mixed(config):
     # overrides (e.g. every N-variant's AB_PAIRS silently reverted to base).
     cfg = dict(cfg_main)
 
+    if cfg.get('MISSING_PROB', 0.0) > 0:
+        print("WARNING: MISSING_PROB > 0 is only supported for single-rule tasks; ignoring it for dynamic_mixed.")
     P = cfg['P']
     D_MODEL = cfg_main['D_MODEL']
     N_HEAD = cfg_main['N_HEAD']
@@ -1536,7 +1585,10 @@ def _prepare_single_recurrence(config, task):
     ds = RecurrenceDataset(
         p=P, recurrence_fn=recurrence_fn, recurrence_name=recurrence_name,
         init_len=init_len, num_samples=NUM_TRAIN_SAMPLES,
-        length=TRAIN_LEN
+        length=TRAIN_LEN,
+        missing_prob=cfg.get('MISSING_PROB', 0.0),
+        num_mask=num_mask,
+        first_task_weight=cfg.get('FIRST_TASK_WEIGHT', 1.0)
     )
     ds.run()
     train_dataset = ds.train_samples
