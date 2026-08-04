@@ -114,7 +114,7 @@ x_k = a * x_{k-2} + b * x_{k-1}  (mod P)
 | `MAX_UNIQUE_RATIO` | `0.5` | 暴露给训练的初始状态比例（单任务 / mixed_ab 默认 fallback） |
 | `ENTROPY_PENALTY_WEIGHT` | `0.0` | 注意力熵惩罚权重 |
 | `FIRST_TASK_WEIGHT` | `1.0` | 第一个预测位置的损失权重 |
-| `NUM_MASK` | `null` | `null` 表示使用任务默认的 mask 起始位置 |
+| `NUM_MASK` | `null` | `null` 表示使用任务默认的 mask 起始位置。**注意：当前代码中 `0` 是字面值**（首位置也计入损失与评估）；旧代码（≤2026-07-08，如 05fc707）把 `0` 当"未设置"回退到任务默认值。**今后配置不要再写 `NUM_MASK: 0`**——想排除"只看 x0 预测 x1"这个不可预测的首位置时，应显式写 `1`（参考 addition_p127_tr64_ood128 与 addition-p127w64 的口径差异） |
 | `EVAL_INTERVAL` | `20` | 每隔多少 epoch 评估一次 |
 | `EARLY_STOP_NO_IMPROVE` | `3000` | 测试准确率多久未提升则早停 |
 | `EARLY_STOP_ACCURACY` | `0.99` | 测试准确率达到该值则早停 |
