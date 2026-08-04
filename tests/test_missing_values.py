@@ -178,6 +178,34 @@ def test_mixed_test_split_stays_clean():
             assert (mask[:2] == 0).all() and (mask[2:] == 1).all()
 
 
+def test_post_train_init_state_extraction_single():
+    """The post-training generation test indexes raw sample lists; it must
+    normalize (seq, mask) tuples via core._sample_seq."""
+    from core import _sample_seq
+    init_len = 2
+    ds = _make_ds(0.5, init_len=init_len)
+    for split_data in (ds.train_samples, ds.test_samples):
+        for item in split_data:
+            init_state = tuple(_sample_seq(item)[:init_len].tolist())
+            assert len(init_state) == init_len
+            assert all(v < ds.p for v in init_state)  # init values never corrupted
+
+
+def test_post_train_init_state_extraction_mixed():
+    """Mixed post-train loop: seq via _sample_seq, rule index is item[-1] for
+    both (seq, label) and (seq, mask, label) items."""
+    from core import _sample_seq
+    for use_tag in (False, True):
+        tag_offset = 1 if use_tag else 0
+        ds = _make_mixed(0.5, use_ab_tag=use_tag)
+        for item in ds.train_data:
+            seq, rule_idx = _sample_seq(item), item[-1]
+            assert rule_idx in (0, 1)
+            init_state = tuple(seq[tag_offset:tag_offset + ds.order].tolist())
+            assert len(init_state) == ds.order
+            assert all(v < ds.p for v in init_state)
+
+
 if __name__ == '__main__':
     for name, fn in sorted(list(globals().items())):
         if name.startswith('test_') and callable(fn):

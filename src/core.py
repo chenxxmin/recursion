@@ -542,6 +542,17 @@ def _unpack_batch(batch, device, extra_kwargs_fn):
     raise ValueError(f"Unknown batch tag: {tag}")
 
 
+def _sample_seq(item):
+    """Extract the sequence tensor from a dataset item.
+
+    Items are plain tensors normally, but become (seq, loss_mask) /
+    (seq, loss_mask, rule_idx) tuples when MISSING_PROB is enabled. Consumers
+    that index the raw sample lists directly (post-training generation tests)
+    must normalize through this helper.
+    """
+    return item[0] if isinstance(item, tuple) else item
+
+
 def _print_nan_diagnostics(x, logits, loss_mask, targets):
     """Dump batch statistics to stderr when the training loss goes NaN."""
     print("\n[NaN Alert] loss is NaN", file=sys.stderr, flush=True)
@@ -1791,7 +1802,8 @@ def run_experiment(config_path=None):
         tag_offset = 1 if model.use_ab_tag else 0
         train_seen_inits = {idx: set() for idx in range(len(rules))}
         for i in range(len(train_dataset)):
-            seq, rule_idx = train_dataset[i]
+            item = train_dataset[i]
+            seq, rule_idx = _sample_seq(item), item[-1]
             init_state = tuple(seq[tag_offset:tag_offset + order].tolist())
             train_seen_inits[rule_idx].add(init_state)
 
@@ -1866,7 +1878,7 @@ def run_experiment(config_path=None):
         # Collect exposed initial states from training set
         train_seen_inits = set()
         for i in range(len(train_dataset)):
-            seq = train_dataset[i]
+            seq = _sample_seq(train_dataset[i])
             init_state = tuple(seq[:init_len].tolist())
             train_seen_inits.add(init_state)
 
