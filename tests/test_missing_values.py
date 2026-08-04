@@ -15,6 +15,7 @@ sys.path.insert(0, os.path.join(os.path.dirname(os.path.abspath(__file__)), '..'
 import torch
 
 from core import BatchTag, RecurrenceDataset, collate_fn
+from rules import LinearRecurrenceRule
 
 
 def _make_ds(missing_prob, seed=0, p=7, init_len=2, length=8, num_samples=20,
@@ -102,6 +103,79 @@ def test_first_task_weight_passthrough():
         else:
             assert mask[2].item() == 0.0  # corrupted at position 3
     assert seen_weighted  # with prob 0.5 and 40 samples, position 3 stays clean somewhere
+
+
+# ---------------- mixed_ab / mixed_abc (MixedRecurrenceDataset) ----------------
+
+def _make_mixed(missing_prob, use_ab_tag, seed=0, p=7, length=8, num_samples=20,
+                num_mask=2):
+    from mixed_dataset import MixedRecurrenceDataset
+    rules = [LinearRecurrenceRule(coeffs=(1, 1), p=p),
+             LinearRecurrenceRule(coeffs=(1, 2), p=p)]
+    random.seed(seed)
+    return MixedRecurrenceDataset(rules=rules, num_samples=num_samples,
+                                  length=length, verbose=False, use_ab_tag=use_ab_tag,
+                                  missing_prob=missing_prob, num_mask=num_mask)
+
+
+def test_mixed_disabled_keeps_pairs():
+    from core import mixed_ab_collate_fn
+    ds = _make_mixed(0.0, use_ab_tag=False)
+    assert all(len(item) == 2 for item in ds.train_data)
+    batch = mixed_ab_collate_fn(ds.train_data[:4])
+    assert batch[1] == BatchTag.MIXED_AB
+
+
+def test_mixed_basic_missing_alignment():
+    from core import _unpack_batch, mixed_ab_collate_fn
+    p, num_mask, miss = 7, 2, 7  # basic mode: missing token id == p
+    ds = _make_mixed(0.5, use_ab_tag=False, p=p, num_mask=num_mask)
+    saw = False
+    for seq, mask, label in ds.train_data:
+        assert label in (0, 1)
+        assert mask.shape == (ds.length - 1,)
+        assert (seq[:ds.order] < p).all()  # first `order` values stay clean
+        for pos in range(ds.order, ds.length):
+            corrupted = seq[pos].item() == miss
+            saw = saw or corrupted
+            expected = 0.0 if (corrupted or pos - 1 < num_mask) else 1.0
+            assert mask[pos - 1].item() == expected, (pos, corrupted, mask)
+    assert saw
+    seqs, tag, labels, masks = mixed_ab_collate_fn(ds.train_data[:4])
+    assert tag == BatchTag.MIXED_AB_MASKED
+    assert labels.shape == (4,) and masks.shape == (4, ds.length - 1)
+    x, loss_mask, kwargs, ab_labels = _unpack_batch((seqs, tag, labels, masks), 'cpu', None)
+    assert loss_mask is not None and ab_labels is not None and kwargs == {}
+
+
+def test_mixed_tag_missing_alignment():
+    p, num_mask, n_rules = 7, 2, 2
+    miss = p + n_rules  # tag mode: missing id avoids the flag tokens p..p+N-1
+    ds = _make_mixed(0.5, use_ab_tag=True, p=p, num_mask=num_mask)
+    saw = False
+    for seq, mask, label in ds.train_data:
+        assert seq.shape == (ds.length + 1,) and mask.shape == (ds.length,)
+        assert seq[0].item() == p + label  # leading flag token
+        # positions 1..order (x0..x_{order-1}) stay clean; corruptible from order+1
+        assert (seq[1:ds.order + 1] < p).all()
+        for pos in range(1, ds.length + 1):
+            corrupted = seq[pos].item() == miss
+            saw = saw or corrupted
+            expected = 0.0 if (corrupted or pos - 1 < num_mask) else 1.0
+            assert mask[pos - 1].item() == expected, (pos, corrupted, mask)
+    assert saw
+
+
+def test_mixed_test_split_stays_clean():
+    p, n_rules = 7, 2
+    for use_tag, miss in ((False, p), (True, p + n_rules)):
+        ds = _make_mixed(1.0, use_ab_tag=use_tag, p=p)
+        assert len(ds.test_data) > 0
+        for seq, mask, label in ds.test_data:
+            assert (seq != miss).all()  # no missing token in test data
+            # default mask: outer num_mask(=2) prefix zeros in both modes
+            # (tag prepends one zero, inner prefix is shortened by one)
+            assert (mask[:2] == 0).all() and (mask[2:] == 1).all()
 
 
 if __name__ == '__main__':

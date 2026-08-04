@@ -16,7 +16,8 @@ from rules import rules_from_config
 # ==================== Data Generation ====================
 class RecurrenceDataset(Dataset):
     def __init__(self, p=127, recurrence_fn=None, recurrence_name="X(k)=?", init_len=2, num_samples=1000, length=10,
-                 verbose=True, missing_prob=0.0, num_mask=0, first_task_weight=1.0):
+                 verbose=True, missing_prob=0.0, num_mask=0, first_task_weight=1.0,
+                 missing_token=None):
         self.length = length
         self.p = p
         self.recurrence_fn = recurrence_fn
@@ -26,13 +27,16 @@ class RecurrenceDataset(Dataset):
         self.verbose = verbose
         # MISSING_PROB: when > 0, each train window is corrupted — every token at
         # position >= init_len is independently replaced by the missing token
-        # (id == p) with this probability, and items become (seq, loss_mask)
-        # tuples where the prediction loss of corrupted positions is zeroed.
+        # (id == p, or missing_token when overridden, e.g. mixed tag mode uses
+        # p + n_rules to avoid colliding with rule flag tokens) with this
+        # probability, and items become (seq, loss_mask) tuples where the
+        # prediction loss of corrupted positions is zeroed.
         # num_mask/first_task_weight reproduce the train_epoch default mask so
         # the dataset-provided mask is a drop-in replacement.
         self.missing_prob = missing_prob
         self.num_mask = num_mask
         self.first_task_weight = first_task_weight
+        self.missing_token = p if missing_token is None else missing_token
         self.train_samples = []
         self.test_samples = []
         self.seen_indices = set()
@@ -132,7 +136,7 @@ class RecurrenceDataset(Dataset):
             print(f"  - Initial state coverage: {len(self.train_samples)}/{state_space} ({cov*100:.1f}%)")
             if self.missing_prob > 0:
                 print(f"  - Missing-value corruption: prob={self.missing_prob}, positions >= {self.init_len}, "
-                      f"token id {self.p}, train split only (loss masked at corrupted positions)")
+                      f"token id {self.missing_token}, train split only (loss masked at corrupted positions)")
             print(f"Recurrence: {self.recurrence_name}")
             print("-" * 50)
             print("-" * 50)
@@ -154,7 +158,7 @@ class RecurrenceDataset(Dataset):
         if is_train:
             for pos in range(self.init_len, self.length):
                 if random.random() < self.missing_prob:
-                    window[pos] = self.p  # missing token id == p
+                    window[pos] = self.missing_token
                     mask[pos - 1] = 0.0
         return mask
 
@@ -207,6 +211,7 @@ class BatchTag(IntEnum):
     MIXED_AB = 0       # payload: (ab_indices,)  -- per-sample rule index
     DYNAMIC_MIXED = 1  # payload: (loss_mask,)   -- per-position loss mask
     PLAIN = 2          # payload: ()             -- sequences only
+    MIXED_AB_MASKED = 3  # payload: (ab_indices, loss_mask) -- rule index + per-position loss mask
 
 
 def collate_fn(batch):
@@ -528,6 +533,12 @@ def _unpack_batch(batch, device, extra_kwargs_fn):
         if len(batch) != 3:
             raise ValueError(f"DYNAMIC_MIXED batch must carry exactly (loss_mask,), got {len(batch) - 2} payload item(s)")
         return x, batch[2].to(device), {}, None
+    if tag == BatchTag.MIXED_AB_MASKED:
+        if len(batch) != 4:
+            raise ValueError(f"MIXED_AB_MASKED batch must carry exactly (ab_indices, loss_mask), got {len(batch) - 2} payload item(s)")
+        ab_labels = batch[2].to(device)
+        kwargs = extra_kwargs_fn(ab_labels) if extra_kwargs_fn is not None else {}
+        return x, batch[3].to(device), kwargs, ab_labels
     raise ValueError(f"Unknown batch tag: {tag}")
 
 
@@ -883,7 +894,13 @@ class MixedABDataset(Dataset):
 
 def mixed_ab_collate_fn(batch):
     sequences = [item[0] for item in batch]
-    ab_indices = torch.tensor([item[1] for item in batch], dtype=torch.long)
+    ab_indices = torch.tensor([item[-1] for item in batch], dtype=torch.long)
+    # With MISSING_PROB enabled, MixedRecurrenceDataset emits
+    # (seq, loss_mask, rule_idx) triples; route them through MIXED_AB_MASKED.
+    if len(batch[0]) == 3:
+        masks = torch.stack([item[1] for item in batch], dim=0)
+        return (torch.stack(sequences, dim=0), BatchTag.MIXED_AB_MASKED,
+                ab_indices, masks)
     return torch.stack(sequences, dim=0), BatchTag.MIXED_AB, ab_indices
 
 
@@ -1331,8 +1348,6 @@ def _prepare_mixed_recurrence(config, device, order):
     # module-level import here would be circular.
     from mixed_dataset import MixedRecurrenceDataset
     cfg = dict(config.get('main', {}))
-    if cfg.get('MISSING_PROB', 0.0) > 0:
-        print("WARNING: MISSING_PROB > 0 is only supported for single-rule tasks; ignoring it for this mixed task.")
     P = cfg['P']
     D_MODEL = cfg['D_MODEL']
     N_HEAD = cfg['N_HEAD']
@@ -1362,8 +1377,18 @@ def _prepare_mixed_recurrence(config, device, order):
         f"MIXED_AB_MAX_UNIQUE_RATIOS length ({len(ratios)}) must equal number of rules ({len(rules)})"
     NUM_TRAIN_SAMPLES = [max(1, int(state_space_size * r)) for r in ratios]
 
+    # NUM_MASK unset (None) means: the first num_mask positions are initial
+    # values and are not evaluated. Default 2, matching the tribonacci task.
+    # Computed before dataset construction because MISSING_PROB corruption
+    # bakes the mask prefix into per-sample loss masks.
+    num_mask_cfg = cfg.get('NUM_MASK')
+    num_mask = 2 if num_mask_cfg is None else num_mask_cfg
+
     ds = MixedRecurrenceDataset(rules=rules, num_samples=NUM_TRAIN_SAMPLES, length=TRAIN_LEN,
-                                verbose=True, use_ab_tag=cfg.get('USE_AB_TAG', True))
+                                verbose=True, use_ab_tag=cfg.get('USE_AB_TAG', True),
+                                missing_prob=cfg.get('MISSING_PROB', 0.0),
+                                num_mask=num_mask,
+                                first_task_weight=cfg.get('FIRST_TASK_WEIGHT', 1.0))
     train_dataset = ds.train_data
     test_dataset = ds.test_data
 
@@ -1383,10 +1408,6 @@ def _prepare_mixed_recurrence(config, device, order):
                                use_conditional_wte=cfg.get('USE_CONDITIONAL_WTE', False),
                                cond_wte_shared_ratio=cfg.get('COND_WTE_SHARED_RATIO', 0.0),
                                )
-    # NUM_MASK unset (None) means: the first num_mask positions are initial
-    # values and are not evaluated. Default 2, matching the tribonacci task.
-    num_mask_cfg = cfg.get('NUM_MASK')
-    num_mask = 2 if num_mask_cfg is None else num_mask_cfg
     extra_kwargs_fn = lambda ab_indices: {'ab_labels': ab_indices.to(device)}
     save_config = {
         'p': P,
