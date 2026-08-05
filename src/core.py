@@ -17,7 +17,7 @@ from rules import rules_from_config
 class RecurrenceDataset(Dataset):
     def __init__(self, p=127, recurrence_fn=None, recurrence_name="X(k)=?", init_len=2, num_samples=1000, length=10,
                  verbose=True, missing_prob=0.0, num_mask=0, first_task_weight=1.0,
-                 missing_token=None):
+                 missing_token=None, miss_len=1):
         self.length = length
         self.p = p
         self.recurrence_fn = recurrence_fn
@@ -26,18 +26,21 @@ class RecurrenceDataset(Dataset):
         self.num_samples = num_samples
         self.verbose = verbose
         # MISSING_PROB: when > 0, each window (train and test alike) is
-        # corrupted — every token at position >= init_len is independently
+        # corrupted — scanning from init_len, a position hits with this
+        # probability and then a run of MISS_LEN consecutive tokens is
         # replaced by the missing token (id == p, or missing_token when
         # overridden, e.g. mixed tag mode uses p + n_rules to avoid colliding
-        # with rule flag tokens) with this probability, and items become
-        # (seq, loss_mask) tuples where the prediction loss of corrupted
-        # positions is zeroed. num_mask/first_task_weight reproduce the
-        # train_epoch default mask so the dataset-provided mask is a drop-in
-        # replacement.
+        # with rule flag tokens); the position right after a run always stays
+        # clean. Items become (seq, loss_mask) tuples where the prediction
+        # loss of corrupted positions is zeroed.
+        # num_mask/first_task_weight reproduce the train_epoch default mask so
+        # the dataset-provided mask is a drop-in replacement.
+        assert miss_len >= 1, f"miss_len must be >= 1, got {miss_len}"
         self.missing_prob = missing_prob
         self.num_mask = num_mask
         self.first_task_weight = first_task_weight
         self.missing_token = p if missing_token is None else missing_token
+        self.miss_len = miss_len
         self.train_samples = []
         self.test_samples = []
         self.seen_indices = set()
@@ -136,8 +139,9 @@ class RecurrenceDataset(Dataset):
             print(f"[Dataset] Cycle traverse + sliding window: {len(self.train_samples)} + {len(self.test_samples)} samples, length {self.length}, mod {self.p}")
             print(f"  - Initial state coverage: {len(self.train_samples)}/{state_space} ({cov*100:.1f}%)")
             if self.missing_prob > 0:
-                print(f"  - Missing-value corruption: prob={self.missing_prob}, positions >= {self.init_len}, "
-                      f"token id {self.missing_token}, train+test splits (loss masked at corrupted positions)")
+                print(f"  - Missing-value corruption: prob={self.missing_prob}, miss_len={self.miss_len}, "
+                      f"positions >= {self.init_len}, token id {self.missing_token}, "
+                      f"train+test splits (loss masked at corrupted positions)")
             print(f"Recurrence: {self.recurrence_name}")
             print("-" * 50)
             print("-" * 50)
@@ -151,16 +155,28 @@ class RecurrenceDataset(Dataset):
         The mask reproduces the train_epoch default (zeros up to num_mask, ones
         after, first_task_weight at num_mask); a corrupted token at position pos
         additionally zeroes its prediction target at index pos-1.
+
+        Corruption model: scanning from init_len, each position independently
+        hits with probability missing_prob; a hit corrupts a RUN of miss_len
+        consecutive positions, the position right after a run is always left
+        clean, and scanning resumes from the position after that. A run may be
+        truncated at the end of the window.
         """
         mask = torch.zeros(self.length - 1, dtype=torch.float)
         if self.length - 1 > self.num_mask:
             mask[self.num_mask:] = 1.0
             if self.first_task_weight != 1.0:
                 mask[self.num_mask] = self.first_task_weight
-        for pos in range(self.init_len, self.length):
+        pos = self.init_len
+        while pos < self.length:
             if random.random() < self.missing_prob:
-                window[pos] = self.missing_token
-                mask[pos - 1] = 0.0
+                end = min(pos + self.miss_len, self.length)
+                for q in range(pos, end):
+                    window[q] = self.missing_token
+                    mask[q - 1] = 0.0
+                pos = end + 1  # the position right after a run stays clean
+            else:
+                pos += 1
         return mask
 
     def __len__(self):
@@ -1399,6 +1415,7 @@ def _prepare_mixed_recurrence(config, device, order):
     ds = MixedRecurrenceDataset(rules=rules, num_samples=NUM_TRAIN_SAMPLES, length=TRAIN_LEN,
                                 verbose=True, use_ab_tag=cfg.get('USE_AB_TAG', True),
                                 missing_prob=cfg.get('MISSING_PROB', 0.0),
+                                miss_len=cfg.get('MISS_LEN', 1),
                                 num_mask=num_mask,
                                 first_task_weight=cfg.get('FIRST_TASK_WEIGHT', 1.0))
     train_dataset = ds.train_data
@@ -1620,6 +1637,7 @@ def _prepare_single_recurrence(config, task):
         init_len=init_len, num_samples=NUM_TRAIN_SAMPLES,
         length=TRAIN_LEN,
         missing_prob=cfg.get('MISSING_PROB', 0.0),
+        miss_len=cfg.get('MISS_LEN', 1),
         num_mask=num_mask,
         first_task_weight=cfg.get('FIRST_TASK_WEIGHT', 1.0)
     )

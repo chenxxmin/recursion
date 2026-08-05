@@ -23,16 +23,17 @@ class MixedRecurrenceDataset(Dataset):
     test_data to core.mixed_ab_collate_fn / BatchTag.MIXED_AB.
 
     With missing_prob > 0 the per-rule RecurrenceDataset corrupts windows
-    (see core.RecurrenceDataset): tokens at position >= order are replaced by
-    the missing token with that probability, in train and test splits alike
-    (test-side accuracy then measures bridging over gaps). Samples then become
-    (seq, loss_mask, rule_idx) triples routed through BatchTag.MIXED_AB_MASKED.
-    The missing token id is p, or p + len(rules) when use_ab_tag=True (plain p
-    would collide with rule 0's flag token).
+    (see core.RecurrenceDataset): scanning from position >= order, a hit with
+    probability missing_prob corrupts a run of miss_len consecutive tokens,
+    in train and test splits alike (test-side accuracy then measures bridging
+    over gaps). Samples then become (seq, loss_mask, rule_idx) triples routed
+    through BatchTag.MIXED_AB_MASKED. The missing token id is p, or
+    p + len(rules) when use_ab_tag=True (plain p would collide with rule 0's
+    flag token).
     """
 
     def __init__(self, rules, num_samples=1000, length=10, verbose=True, use_ab_tag=False,
-                 missing_prob=0.0, num_mask=0, first_task_weight=1.0):
+                 missing_prob=0.0, num_mask=0, first_task_weight=1.0, miss_len=1):
         assert len(rules) >= 1, "MixedRecurrenceDataset needs at least one rule"
         self.p = rules[0].p
         self.order = rules[0].order
@@ -73,6 +74,7 @@ class MixedRecurrenceDataset(Dataset):
                 num_samples=num_samples_list[idx], length=length,
                 verbose=False,
                 missing_prob=missing_prob,
+                miss_len=miss_len,
                 num_mask=inner_num_mask,
                 first_task_weight=first_task_weight,
                 missing_token=missing_token,
@@ -140,8 +142,9 @@ class MixedRecurrenceDataset(Dataset):
             for rule, n_train, n_test in per_rule_stats:
                 print(f"  - {rule.name} {rule.coeffs}: train {n_train} | test {n_test} | exposed ~{n_train/total_states*100:.1f}%")
             if corrupt:
-                print(f"  - Missing-value corruption: prob={missing_prob}, positions >= {self.order}, "
-                      f"token id {missing_token}, train+test splits (loss masked at corrupted positions)")
+                print(f"  - Missing-value corruption: prob={missing_prob}, miss_len={miss_len}, "
+                      f"positions >= {self.order}, token id {missing_token}, "
+                      f"train+test splits (loss masked at corrupted positions)")
             print("-" * 50)
 
     def __len__(self):

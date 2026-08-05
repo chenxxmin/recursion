@@ -20,14 +20,14 @@ from rules import LinearRecurrenceRule
 
 
 def _make_ds(missing_prob, seed=0, p=7, init_len=2, length=8, num_samples=20,
-             num_mask=1, first_task_weight=1.0):
+             num_mask=1, first_task_weight=1.0, miss_len=1):
     def rec(seq, m):
         return (seq[-1] + seq[-2]) % m if init_len == 2 else (seq[-1] + seq[-2] + seq[-3]) % m
     random.seed(seed)
     ds = RecurrenceDataset(p=p, recurrence_fn=rec, init_len=init_len,
                            num_samples=num_samples, length=length, verbose=False,
                            missing_prob=missing_prob, num_mask=num_mask,
-                           first_task_weight=first_task_weight)
+                           first_task_weight=first_task_weight, miss_len=miss_len)
     ds.run()
     return ds
 
@@ -62,27 +62,74 @@ def test_train_windows_corrupted_and_masked():
 
 
 def test_full_corruption_when_prob_one():
+    # prob=1.0 + miss_len=1: deterministic alternation — corrupt one, skip one.
     p, init_len = 7, 3
     ds = _make_ds(1.0, p=p, init_len=init_len, num_mask=2)
+    # length=8: corrupted {3,5,7}, clean {0,1,2,4,6}, mask [0,0,0,1,0,1,0]
+    expected_mask = torch.tensor([0., 0., 0., 1., 0., 1., 0.])
     for seq, mask in ds.train_samples:
         assert (seq[:init_len] < p).all()
-        assert (seq[init_len:] == p).all()
-        # every corruptible position's prediction target is masked out
-        assert (mask[init_len - 1:] == 0).all()
+        for pos in range(init_len, ds.length):
+            if pos % 2 == 1:  # 3,5,7
+                assert seq[pos].item() == p and mask[pos - 1].item() == 0.0
+            else:             # 4,6 (forced clean after each run)
+                assert seq[pos].item() < p and mask[pos - 1].item() == 1.0
+        assert torch.equal(mask, expected_mask)
+
+
+def test_miss_len_run_structure():
+    """prob=1.0, miss_len=3, length=12: corrupt {2,3,4}, skip 5, corrupt
+    {6,7,8}, skip 9, corrupt {10,11} (truncated at window end)."""
+    ds = _make_ds(1.0, miss_len=3, length=12, num_samples=40, p=11, num_mask=1)
+    corrupted = {2, 3, 4, 6, 7, 8, 10, 11}
+    expected_mask = torch.tensor([0., 0., 0., 0., 1., 0., 0., 0., 1., 0., 0.])
+    for seq, mask in ds.train_samples:
+        for pos in range(ds.length):
+            if pos in corrupted:
+                assert seq[pos].item() == ds.p and mask[pos - 1].item() == 0.0
+            else:
+                assert seq[pos].item() != ds.p
+                if pos - 1 >= 1:
+                    assert mask[pos - 1].item() == 1.0
+        assert torch.equal(mask, expected_mask)
+
+
+def test_miss_len_runs_separated_by_clean():
+    """prob<1: every maximal corrupted run has length miss_len (or is truncated
+    at the window end) and is followed by a guaranteed clean position."""
+    ds = _make_ds(0.5, miss_len=3, length=16, num_samples=60, p=11)
+    saw_run = False
+    for seq, mask in ds.train_samples:
+        pos = ds.init_len
+        while pos < ds.length:
+            if seq[pos].item() == ds.p:
+                saw_run = True
+                end = min(pos + 3, ds.length)
+                assert all(seq[q].item() == ds.p for q in range(pos, end))
+                if end < ds.length:
+                    assert seq[end].item() != ds.p  # forced clean after a run
+                pos = end + 1
+            else:
+                pos += 1
+    assert saw_run
 
 
 def test_test_split_corrupted_with_mask():
-    """test windows are corrupted exactly like train: init values stay clean,
-    every corruptible position becomes the missing token, and each corrupted
-    position's prediction target is masked out."""
+    """test windows follow the same run-corruption rule as train: prob=1.0 +
+    miss_len=1 gives the deterministic corrupt-one/skip-one pattern."""
     p, init_len = 7, 2
     ds = _make_ds(1.0, p=p, init_len=init_len, num_mask=1)
     assert len(ds.test_samples) > 0
+    # length=8: corrupted {2,4,6}, clean {0,1,3,5,7}, mask [0,0,1,0,1,0,1]
+    expected_mask = torch.tensor([0., 0., 1., 0., 1., 0., 1.])
     for seq, mask in ds.test_samples:
-        assert (seq[:init_len] < p).all()        # init values never corrupted
-        assert (seq[init_len:] == p).all()       # prob=1.0 -> all later positions missing
-        assert (mask[:1] == 0).all()             # num_mask prefix
-        assert (mask[init_len - 1:] == 0).all()  # every corrupted target masked
+        assert (seq[:init_len] < p).all()  # init values never corrupted
+        for pos in range(init_len, ds.length):
+            if pos % 2 == 0:  # 2,4,6
+                assert seq[pos].item() == p and mask[pos - 1].item() == 0.0
+            else:             # 3,5,7 forced clean
+                assert seq[pos].item() < p and mask[pos - 1].item() == 1.0
+        assert torch.equal(mask, expected_mask)
 
 
 def test_collate_routes_tuples_to_dynamic_mixed():
@@ -114,14 +161,15 @@ def test_first_task_weight_passthrough():
 # ---------------- mixed_ab / mixed_abc (MixedRecurrenceDataset) ----------------
 
 def _make_mixed(missing_prob, use_ab_tag, seed=0, p=7, length=8, num_samples=20,
-                num_mask=2):
+                num_mask=2, miss_len=1):
     from mixed_dataset import MixedRecurrenceDataset
     rules = [LinearRecurrenceRule(coeffs=(1, 1), p=p),
              LinearRecurrenceRule(coeffs=(1, 2), p=p)]
     random.seed(seed)
     return MixedRecurrenceDataset(rules=rules, num_samples=num_samples,
                                   length=length, verbose=False, use_ab_tag=use_ab_tag,
-                                  missing_prob=missing_prob, num_mask=num_mask)
+                                  missing_prob=missing_prob, num_mask=num_mask,
+                                  miss_len=miss_len)
 
 
 def test_mixed_disabled_keeps_pairs():
@@ -173,16 +221,20 @@ def test_mixed_tag_missing_alignment():
 
 
 def test_mixed_test_split_corrupted():
-    """Mixed test windows are corrupted like train, in both tag modes."""
+    """Mixed test windows use the same run-corruption rule as train, in both
+    tag modes. prob=1.0 + miss_len=1 -> corrupt one, skip one."""
     p, n_rules, order = 7, 2, 2
     for use_tag, miss in ((False, p), (True, p + n_rules)):
         ds = _make_mixed(1.0, use_ab_tag=use_tag, p=p)
         assert len(ds.test_data) > 0
+        start = order + (1 if use_tag else 0)  # first corruptible position
+        seq_len = ds.length + (1 if use_tag else 0)
         for seq, mask, label in ds.test_data:
-            start = order + (1 if use_tag else 0)  # flag + init values stay clean
-            assert (seq[:start] != miss).all()
-            assert (seq[start:] == miss).all()     # prob=1.0 corrupts everything corruptible
-            assert (mask == 0).all()               # prefix + all corrupted targets masked
+            for pos in range(start, seq_len):
+                if (pos - start) % 2 == 0:  # corrupted run positions
+                    assert seq[pos].item() == miss and mask[pos - 1].item() == 0.0
+                else:                       # forced clean after each run
+                    assert seq[pos].item() != miss and mask[pos - 1].item() == 1.0
 
 
 def test_post_train_init_state_extraction_single():
