@@ -25,14 +25,15 @@ class RecurrenceDataset(Dataset):
         self.init_len = init_len
         self.num_samples = num_samples
         self.verbose = verbose
-        # MISSING_PROB: when > 0, each train window is corrupted — every token at
-        # position >= init_len is independently replaced by the missing token
-        # (id == p, or missing_token when overridden, e.g. mixed tag mode uses
-        # p + n_rules to avoid colliding with rule flag tokens) with this
-        # probability, and items become (seq, loss_mask) tuples where the
-        # prediction loss of corrupted positions is zeroed.
-        # num_mask/first_task_weight reproduce the train_epoch default mask so
-        # the dataset-provided mask is a drop-in replacement.
+        # MISSING_PROB: when > 0, each window (train and test alike) is
+        # corrupted — every token at position >= init_len is independently
+        # replaced by the missing token (id == p, or missing_token when
+        # overridden, e.g. mixed tag mode uses p + n_rules to avoid colliding
+        # with rule flag tokens) with this probability, and items become
+        # (seq, loss_mask) tuples where the prediction loss of corrupted
+        # positions is zeroed. num_mask/first_task_weight reproduce the
+        # train_epoch default mask so the dataset-provided mask is a drop-in
+        # replacement.
         self.missing_prob = missing_prob
         self.num_mask = num_mask
         self.first_task_weight = first_task_weight
@@ -136,30 +137,30 @@ class RecurrenceDataset(Dataset):
             print(f"  - Initial state coverage: {len(self.train_samples)}/{state_space} ({cov*100:.1f}%)")
             if self.missing_prob > 0:
                 print(f"  - Missing-value corruption: prob={self.missing_prob}, positions >= {self.init_len}, "
-                      f"token id {self.missing_token}, train split only (loss masked at corrupted positions)")
+                      f"token id {self.missing_token}, train+test splits (loss masked at corrupted positions)")
             print(f"Recurrence: {self.recurrence_name}")
             print("-" * 50)
             print("-" * 50)
 
     def _corrupt(self, window, is_train):
-        """Return the per-position loss mask for a window, corrupting it in place
-        when missing is enabled and the window belongs to the train split.
+        """Return the per-position loss mask for a window, corrupting it in place.
 
+        Corruption applies to train AND test windows alike (is_train is kept
+        only for signature compatibility): the metric of interest is bridging
+        over missing tokens, which must be measurable on held-out states.
         The mask reproduces the train_epoch default (zeros up to num_mask, ones
         after, first_task_weight at num_mask); a corrupted token at position pos
-        additionally zeroes its prediction target at index pos-1. Only train
-        windows are corrupted; test windows keep the clean default mask.
+        additionally zeroes its prediction target at index pos-1.
         """
         mask = torch.zeros(self.length - 1, dtype=torch.float)
         if self.length - 1 > self.num_mask:
             mask[self.num_mask:] = 1.0
             if self.first_task_weight != 1.0:
                 mask[self.num_mask] = self.first_task_weight
-        if is_train:
-            for pos in range(self.init_len, self.length):
-                if random.random() < self.missing_prob:
-                    window[pos] = self.missing_token
-                    mask[pos - 1] = 0.0
+        for pos in range(self.init_len, self.length):
+            if random.random() < self.missing_prob:
+                window[pos] = self.missing_token
+                mask[pos - 1] = 0.0
         return mask
 
     def __len__(self):

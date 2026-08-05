@@ -1,8 +1,9 @@
 """Unit tests for MISSING_PROB corruption in src/core.py RecurrenceDataset.
 
 Covers: legacy path when disabled, corruption confined to positions >= init_len,
-loss-mask alignment (target index = position - 1), clean test split, collate_fn
-routing to BatchTag.DYNAMIC_MIXED, seed determinism, first_task_weight passthrough.
+loss-mask alignment (target index = position - 1), test split corrupted with the
+same rule as train, collate_fn routing to BatchTag.DYNAMIC_MIXED, seed
+determinism, first_task_weight passthrough, and the mixed-rule equivalents.
 
 Requires torch (run on the training server): python -m pytest tests/test_missing_values.py
 """
@@ -70,13 +71,18 @@ def test_full_corruption_when_prob_one():
         assert (mask[init_len - 1:] == 0).all()
 
 
-def test_test_split_stays_clean():
-    p = 7
-    ds = _make_ds(1.0, p=p, num_mask=1)
+def test_test_split_corrupted_with_mask():
+    """test windows are corrupted exactly like train: init values stay clean,
+    every corruptible position becomes the missing token, and each corrupted
+    position's prediction target is masked out."""
+    p, init_len = 7, 2
+    ds = _make_ds(1.0, p=p, init_len=init_len, num_mask=1)
     assert len(ds.test_samples) > 0
     for seq, mask in ds.test_samples:
-        assert (seq < p).all()  # no missing token in test data
-        assert (mask[:1] == 0).all() and (mask[1:] == 1).all()  # default num_mask mask
+        assert (seq[:init_len] < p).all()        # init values never corrupted
+        assert (seq[init_len:] == p).all()       # prob=1.0 -> all later positions missing
+        assert (mask[:1] == 0).all()             # num_mask prefix
+        assert (mask[init_len - 1:] == 0).all()  # every corrupted target masked
 
 
 def test_collate_routes_tuples_to_dynamic_mixed():
@@ -166,16 +172,17 @@ def test_mixed_tag_missing_alignment():
     assert saw
 
 
-def test_mixed_test_split_stays_clean():
-    p, n_rules = 7, 2
+def test_mixed_test_split_corrupted():
+    """Mixed test windows are corrupted like train, in both tag modes."""
+    p, n_rules, order = 7, 2, 2
     for use_tag, miss in ((False, p), (True, p + n_rules)):
         ds = _make_mixed(1.0, use_ab_tag=use_tag, p=p)
         assert len(ds.test_data) > 0
         for seq, mask, label in ds.test_data:
-            assert (seq != miss).all()  # no missing token in test data
-            # default mask: outer num_mask(=2) prefix zeros in both modes
-            # (tag prepends one zero, inner prefix is shortened by one)
-            assert (mask[:2] == 0).all() and (mask[2:] == 1).all()
+            start = order + (1 if use_tag else 0)  # flag + init values stay clean
+            assert (seq[:start] != miss).all()
+            assert (seq[start:] == miss).all()     # prob=1.0 corrupts everything corruptible
+            assert (mask == 0).all()               # prefix + all corrupted targets masked
 
 
 def test_post_train_init_state_extraction_single():

@@ -115,6 +115,7 @@ x_k = a * x_{k-2} + b * x_{k-1}  (mod P)
 | `ENTROPY_PENALTY_WEIGHT` | `0.0` | 注意力熵惩罚权重 |
 | `FIRST_TASK_WEIGHT` | `1.0` | 第一个预测位置的损失权重 |
 | `NUM_MASK` | `null` | `null` 表示使用任务默认的 mask 起始位置。**注意：当前代码中 `0` 是字面值**（首位置也计入损失与评估）；旧代码（≤2026-07-08，如 05fc707）把 `0` 当"未设置"回退到任务默认值。**今后配置不要再写 `NUM_MASK: 0`**——想排除"只看 x0 预测 x1"这个不可预测的首位置时，应显式写 `1`（参考 addition_p127_tr64_ood128 与 addition-p127w64 的口径差异） |
+| `MISSING_PROB` | `0.0` | >0 时启用缺失值污损：train/test 窗口中 index ≥ init_len 的每个 token 以该概率替换为 missing token（id=p；mixed tag 模式为 p+N_rules），被污损位置的预测损失与正确率均不计入（其后一位仍计入，用于测跨缺口补全能力）。仅单规则与 mixed_ab/mixed_abc 任务支持 |
 | `EVAL_INTERVAL` | `20` | 每隔多少 epoch 评估一次 |
 | `EARLY_STOP_NO_IMPROVE` | `3000` | 测试准确率多久未提升则早停 |
 | `EARLY_STOP_ACCURACY` | `0.99` | 测试准确率达到该值则早停 |
