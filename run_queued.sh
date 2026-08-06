@@ -1,7 +1,7 @@
 #!/bin/bash
-# 等自己的训练进程结束后，依次运行：
-#   1. experiments/dynamic_d512.json             （dynamic_mixed N2~N10 升到 d512，8 种子，72 runs）
-#   2. experiments/mixed_ab_exposure_p509.json   （P509 exposure 比例研究，24 组 x 3 种子，72 runs）
+# 等自己的训练进程结束后，运行：
+#   experiments/addition_p127_tr64_ood128_misslen_l3plus.json
+#   （missing 深层网格：N_LAYER 3..miss_len+2 x prob 0.1~0.3 x 8 种子，144 runs）
 # 用法（在仓库根目录）：bash run_queued.sh
 # 建议配合 tmux 或 nohup 使用：nohup bash run_queued.sh > queued_run.log 2>&1 &
 #
@@ -28,12 +28,8 @@ done
 echo "[$(ts)] 已无自己的训练进程。拉取最新代码..."
 git pull || { echo "[$(ts)] git pull 失败，终止"; exit 1; }
 
-echo "[$(ts)] 开始批次 1/2: dynamic_d512.json"
-"$PYTHON_BIN" src/batch_run.py experiments/dynamic_d512.json
-echo "[$(ts)] 批次 1/2 结束（batch_run 退出码 $?）"
-
-echo "[$(ts)] 开始批次 2/2: mixed_ab_exposure_p509.json"
-"$PYTHON_BIN" src/batch_run.py experiments/mixed_ab_exposure_p509.json
-echo "[$(ts)] 批次 2/2 结束（batch_run 退出码 $?）"
+echo "[$(ts)] 开始批次 1/1: addition_p127_tr64_ood128_misslen_l3plus.json"
+"$PYTHON_BIN" src/batch_run.py experiments/addition_p127_tr64_ood128_misslen_l3plus.json
+echo "[$(ts)] 批次 1/1 结束（batch_run 退出码 $?）"
 
 echo "[$(ts)] 全部完成。"
