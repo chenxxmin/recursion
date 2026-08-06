@@ -20,14 +20,15 @@ from rules import LinearRecurrenceRule
 
 
 def _make_ds(missing_prob, seed=0, p=7, init_len=2, length=8, num_samples=20,
-             num_mask=1, first_task_weight=1.0, miss_len=1):
+             num_mask=1, first_task_weight=1.0, miss_len=1, miss_second=False):
     def rec(seq, m):
         return (seq[-1] + seq[-2]) % m if init_len == 2 else (seq[-1] + seq[-2] + seq[-3]) % m
     random.seed(seed)
     ds = RecurrenceDataset(p=p, recurrence_fn=rec, init_len=init_len,
                            num_samples=num_samples, length=length, verbose=False,
                            missing_prob=missing_prob, num_mask=num_mask,
-                           first_task_weight=first_task_weight, miss_len=miss_len)
+                           first_task_weight=first_task_weight, miss_len=miss_len,
+                           miss_second=miss_second)
     ds.run()
     return ds
 
@@ -112,6 +113,31 @@ def test_miss_len_runs_separated_by_clean():
             else:
                 pos += 1
     assert saw_run
+
+
+def test_miss_second_forced_run_deterministic():
+    """miss_second=True, prob=1.0, miss_len=2, length=10: forced {1,2}, then
+    scan from 3 -> {3,4}, skip 5, {6,7}, skip 8, {9} (truncated)."""
+    ds = _make_ds(1.0, miss_len=2, length=10, num_samples=40, p=11, num_mask=1,
+                  miss_second=True)
+    corrupted = {1, 2, 3, 4, 6, 7, 9}
+    expected_mask = torch.tensor([0., 0., 0., 0., 1., 0., 0., 1., 0.])
+    for seq, mask in ds.train_samples + ds.test_samples:
+        for pos in range(ds.length):
+            if pos in corrupted:
+                assert seq[pos].item() == ds.p and mask[pos - 1].item() == 0.0
+            else:
+                assert seq[pos].item() != ds.p
+                if pos - 1 >= 1:
+                    assert mask[pos - 1].item() == 1.0
+        assert torch.equal(mask, expected_mask)
+
+
+def test_miss_second_default_off_unchanged():
+    """miss_second defaults to False: position 1 is never corrupted."""
+    ds = _make_ds(1.0, miss_len=1, p=7)  # prob=1 without the flag
+    for seq, mask in ds.train_samples:
+        assert seq[0].item() < ds.p and seq[1].item() < ds.p
 
 
 def test_test_split_corrupted_with_mask():

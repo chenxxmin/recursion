@@ -33,7 +33,8 @@ class MixedRecurrenceDataset(Dataset):
     """
 
     def __init__(self, rules, num_samples=1000, length=10, verbose=True, use_ab_tag=False,
-                 missing_prob=0.0, num_mask=0, first_task_weight=1.0, miss_len=1):
+                 missing_prob=0.0, num_mask=0, first_task_weight=1.0, miss_len=1,
+                 miss_second=False):
         assert len(rules) >= 1, "MixedRecurrenceDataset needs at least one rule"
         self.p = rules[0].p
         self.order = rules[0].order
@@ -75,6 +76,7 @@ class MixedRecurrenceDataset(Dataset):
                 verbose=False,
                 missing_prob=missing_prob,
                 miss_len=miss_len,
+                miss_second=miss_second,
                 num_mask=inner_num_mask,
                 first_task_weight=first_task_weight,
                 missing_token=missing_token,
