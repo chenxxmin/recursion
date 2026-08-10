@@ -1,9 +1,11 @@
 """Unit tests for MISSING_PROB corruption in src/core.py RecurrenceDataset.
 
-Covers: legacy path when disabled, corruption confined to positions >= init_len,
+Covers: legacy path when disabled, run-based corruption (MISS_LEN, MISS_SECOND),
 loss-mask alignment (target index = position - 1), test split corrupted with the
-same rule as train, collate_fn routing to BatchTag.DYNAMIC_MIXED, seed
-determinism, first_task_weight passthrough, and the mixed-rule equivalents.
+same rule as train, PREDICT_MISSING mode (input = corrupted view, targets =
+clean sequence), explicit collate routing (PLAIN / DYNAMIC_MIXED / PLAIN_TARGET
+/ MIXED_AB_*), seed determinism, first_task_weight passthrough, and the
+mixed-rule equivalents.
 
 Requires torch (run on the training server): python -m pytest tests/test_missing_values.py
 """
@@ -159,8 +161,9 @@ def test_test_split_corrupted_with_mask():
 
 
 def test_collate_routes_tuples_to_dynamic_mixed():
+    from core import collate_fn_masked
     ds = _make_ds(0.3)
-    seqs, tag, masks = collate_fn(ds.train_samples[:4])
+    seqs, tag, masks = collate_fn_masked(ds.train_samples[:4])
     assert tag == BatchTag.DYNAMIC_MIXED
     assert seqs.shape == (4, ds.length)
     assert masks.shape == (4, ds.length - 1)
@@ -207,7 +210,7 @@ def test_mixed_disabled_keeps_pairs():
 
 
 def test_mixed_basic_missing_alignment():
-    from core import _unpack_batch, mixed_ab_collate_fn
+    from core import _unpack_batch, mixed_ab_collate_fn_masked
     p, num_mask, miss = 7, 2, 7  # basic mode: missing token id == p
     ds = _make_mixed(0.5, use_ab_tag=False, p=p, num_mask=num_mask)
     saw = False
@@ -221,11 +224,11 @@ def test_mixed_basic_missing_alignment():
             expected = 0.0 if (corrupted or pos - 1 < num_mask) else 1.0
             assert mask[pos - 1].item() == expected, (pos, corrupted, mask)
     assert saw
-    seqs, tag, labels, masks = mixed_ab_collate_fn(ds.train_data[:4])
+    seqs, tag, labels, masks = mixed_ab_collate_fn_masked(ds.train_data[:4])
     assert tag == BatchTag.MIXED_AB_MASKED
     assert labels.shape == (4,) and masks.shape == (4, ds.length - 1)
-    x, loss_mask, kwargs, ab_labels = _unpack_batch((seqs, tag, labels, masks), 'cpu', None)
-    assert loss_mask is not None and ab_labels is not None and kwargs == {}
+    x, loss_mask, kwargs, ab_labels, t_override = _unpack_batch((seqs, tag, labels, masks), 'cpu', None)
+    assert loss_mask is not None and ab_labels is not None and kwargs == {} and t_override is None
 
 
 def test_mixed_tag_missing_alignment():
@@ -289,6 +292,72 @@ def test_post_train_init_state_extraction_mixed():
             init_state = tuple(seq[tag_offset:tag_offset + ds.order].tolist())
             assert len(init_state) == ds.order
             assert all(v < ds.p for v in init_state)
+
+
+# ---------------- PREDICT_MISSING (targets = clean sequence) ----------------
+
+def _make_ds_predict(prob, seed=0, p=7, init_len=2, length=8, num_samples=20,
+                     miss_len=1):
+    def rec(seq, m):
+        return (seq[-1] + seq[-2]) % m
+    random.seed(seed)
+    ds = RecurrenceDataset(p=p, recurrence_fn=rec, init_len=init_len,
+                           num_samples=num_samples, length=length, verbose=False,
+                           missing_prob=prob, num_mask=1, miss_len=miss_len,
+                           predict_missing=True)
+    ds.run()
+    return ds
+
+
+def test_predict_missing_items_carry_clean_targets():
+    from core import _unpack_batch, collate_fn_predict
+    p = 7
+    ds = _make_ds_predict(0.5, p=p)
+    saw = False
+    for view, clean in ds.train_samples:
+        assert (clean < p).all()                       # clean side never has missing tokens
+        for pos in range(ds.length):
+            if view[pos].item() == p:                  # corrupted in view...
+                saw = True
+                assert clean[pos].item() != p          # ...but holds the true value in clean
+            else:
+                assert view[pos].item() == clean[pos].item()  # uncorrupted positions agree
+    assert saw
+    views, tag, cleans = collate_fn_predict(ds.train_samples[:4])
+    assert tag == BatchTag.PLAIN_TARGET
+    x, loss_mask, kwargs, ab_labels, t_override = _unpack_batch((views, tag, cleans), 'cpu', None)
+    assert loss_mask is None and ab_labels is None
+    assert torch.equal(t_override, cleans)             # targets_override = clean sequences
+
+
+def test_predict_missing_mixed_tag_mode():
+    """Tag mode with PREDICT_MISSING: the flag token is prepended to BOTH the
+    corrupted view and the clean target sequence."""
+    from core import _unpack_batch, mixed_ab_collate_fn_predict
+    from mixed_dataset import MixedRecurrenceDataset
+    p, n_rules = 7, 2
+    miss = p + n_rules
+    rules = [LinearRecurrenceRule(coeffs=(1, 1), p=p),
+             LinearRecurrenceRule(coeffs=(1, 2), p=p)]
+    random.seed(0)
+    ds = MixedRecurrenceDataset(rules=rules, num_samples=20, length=8, verbose=False,
+                                use_ab_tag=True, missing_prob=0.5, num_mask=2,
+                                predict_missing=True)
+    saw = False
+    for view, clean, label in ds.train_data:
+        assert view[0].item() == p + label and clean[0].item() == p + label  # flag on both
+        for pos in range(1, ds.length + 1):
+            if view[pos].item() == miss:
+                saw = True
+                assert clean[pos].item() != miss
+            else:
+                assert view[pos].item() == clean[pos].item()
+    assert saw
+    views, tag, labels, cleans = mixed_ab_collate_fn_predict(ds.train_data[:4])
+    assert tag == BatchTag.MIXED_AB_TARGET and labels.shape == (4,)
+    x, loss_mask, kwargs, ab_labels, t_override = _unpack_batch(
+        (views, tag, labels, cleans), 'cpu', None)
+    assert loss_mask is None and ab_labels is not None and torch.equal(t_override, cleans)
 
 
 if __name__ == '__main__':

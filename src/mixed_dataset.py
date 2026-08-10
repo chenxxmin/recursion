@@ -19,22 +19,27 @@ class MixedRecurrenceDataset(Dataset):
     """Dataset mixed from several linear recurrence rules over Z/pZ.
 
     Samples are (seq, rule_idx) pairs; with use_ab_tag=True a leading flag
-    token p + rule_idx is prepended to every sequence. Feed train_data /
-    test_data to core.mixed_ab_collate_fn / BatchTag.MIXED_AB.
+    token p + rule_idx is prepended to every sequence. The prepare function
+    (core._prepare_mixed_recurrence) selects the collate matching the item
+    layout: mixed_ab_collate_fn / _masked / _predict.
 
     With missing_prob > 0 the per-rule RecurrenceDataset corrupts windows
     (see core.RecurrenceDataset): scanning from position >= order, a hit with
     probability missing_prob corrupts a run of miss_len consecutive tokens,
     in train and test splits alike (test-side accuracy then measures bridging
-    over gaps). Samples then become (seq, loss_mask, rule_idx) triples routed
-    through BatchTag.MIXED_AB_MASKED. The missing token id is p, or
-    p + len(rules) when use_ab_tag=True (plain p would collide with rule 0's
-    flag token).
+    over gaps). Two metric modes:
+      - predict_missing=False: samples are (seq, loss_mask, rule_idx) triples
+        routed through BatchTag.MIXED_AB_MASKED; missing positions are masked.
+      - predict_missing=True: samples are (view, clean_seq, rule_idx) triples
+        routed through BatchTag.MIXED_AB_TARGET; the model sees the corrupted
+        view but loss/accuracy targets are the clean values.
+    The missing token id is p, or p + len(rules) when use_ab_tag=True (plain p
+    would collide with rule 0's flag token).
     """
 
     def __init__(self, rules, num_samples=1000, length=10, verbose=True, use_ab_tag=False,
                  missing_prob=0.0, num_mask=0, first_task_weight=1.0, miss_len=1,
-                 miss_second=False):
+                 miss_second=False, predict_missing=False):
         assert len(rules) >= 1, "MixedRecurrenceDataset needs at least one rule"
         self.p = rules[0].p
         self.order = rules[0].order
@@ -65,7 +70,7 @@ class MixedRecurrenceDataset(Dataset):
         missing_token = self.p + len(self.rules) if use_ab_tag else self.p
 
         all_train, all_test = [], []
-        all_masks_train, all_masks_test = [], []
+        all_extra_train, all_extra_test = [], []  # loss_mask or clean seq per sample
         all_labels_train, all_labels_test = [], []
         per_rule_stats = []
         for idx, rule in enumerate(self.rules):
@@ -80,59 +85,62 @@ class MixedRecurrenceDataset(Dataset):
                 num_mask=inner_num_mask,
                 first_task_weight=first_task_weight,
                 missing_token=missing_token,
+                predict_missing=predict_missing,
             )
             ds.run()
             if corrupt:
                 train_seqs = [s for s, _ in ds.train_samples]
-                train_masks = [m for _, m in ds.train_samples]
+                train_extra = [m for _, m in ds.train_samples]
                 test_seqs = [s for s, _ in ds.test_samples]
-                test_masks = [m for _, m in ds.test_samples]
+                test_extra = [m for _, m in ds.test_samples]
             else:
                 train_seqs, test_seqs = ds.train_samples, ds.test_samples
-                train_masks = test_masks = None
+                train_extra = test_extra = None
             all_train.extend(train_seqs)
             all_test.extend(test_seqs)
             if corrupt:
-                all_masks_train.extend(train_masks)
-                all_masks_test.extend(test_masks)
+                all_extra_train.extend(train_extra)
+                all_extra_test.extend(test_extra)
             all_labels_train.extend([idx] * len(train_seqs))
             all_labels_test.extend([idx] * len(test_seqs))
             per_rule_stats.append((rule, len(train_seqs), len(test_seqs)))
 
         # Prepend rule token if use_ab_tag (DataLoader indexes the flat lists, not __getitem__)
         if self.use_ab_tag:
-            all_train = [
-                torch.cat([torch.tensor([self.p + l], dtype=torch.long), seq], dim=0)
-                for seq, l in zip(all_train, all_labels_train)
-            ]
-            all_test = [
-                torch.cat([torch.tensor([self.p + l], dtype=torch.long), seq], dim=0)
-                for seq, l in zip(all_test, all_labels_test)
-            ]
+            def _prepend(seq, l):
+                return torch.cat([torch.tensor([self.p + l], dtype=torch.long), seq], dim=0)
+            all_train = [_prepend(seq, l) for seq, l in zip(all_train, all_labels_train)]
+            all_test = [_prepend(seq, l) for seq, l in zip(all_test, all_labels_test)]
             if corrupt:
-                # The prepended flag shifts every target by one; grow the mask
-                # with a leading 0 (predicting x0 from the flag alone is
-                # unsupervisable).
-                zero = torch.zeros(1, dtype=torch.float)
-                all_masks_train = [torch.cat([zero, m], dim=0) for m in all_masks_train]
-                all_masks_test = [torch.cat([zero, m], dim=0) for m in all_masks_test]
+                if predict_missing:
+                    # clean target sequences get the same leading flag so that
+                    # targets = clean[:, 1:] stay aligned with the input view
+                    all_extra_train = [_prepend(s, l) for s, l in zip(all_extra_train, all_labels_train)]
+                    all_extra_test = [_prepend(s, l) for s, l in zip(all_extra_test, all_labels_test)]
+                else:
+                    # The prepended flag shifts every target by one; grow the mask
+                    # with a leading 0 (predicting x0 from the flag alone is
+                    # unsupervisable).
+                    zero = torch.zeros(1, dtype=torch.float)
+                    all_extra_train = [torch.cat([zero, m], dim=0) for m in all_extra_train]
+                    all_extra_test = [torch.cat([zero, m], dim=0) for m in all_extra_test]
 
         # One global shuffle of train (seq, rule_idx) pairs (same seed semantics
         # as the legacy MixedABDataset).
         train_triples = list(zip(all_train, all_labels_train,
-                                 all_masks_train if corrupt else [None] * len(all_train)))
+                                 all_extra_train if corrupt else [None] * len(all_train)))
         random.shuffle(train_triples)
         self.train_samples = [s for s, _, _ in train_triples]
         self.rule_labels_train = [l for _, l, _ in train_triples]
-        self.train_masks = [m for _, _, m in train_triples] if corrupt else None
+        self.train_extra = [m for _, _, m in train_triples] if corrupt else None
         self.test_samples = all_test
         self.rule_labels_test = all_labels_test
-        self.test_masks = all_masks_test if corrupt else None
+        self.test_extra = all_extra_test if corrupt else None
 
         # Flat lists that can be fed directly to DataLoader / BucketBatchSampler
         if corrupt:
-            self.train_data = list(zip(self.train_samples, self.train_masks, self.rule_labels_train))
-            self.test_data = list(zip(self.test_samples, self.test_masks, self.rule_labels_test))
+            self.train_data = list(zip(self.train_samples, self.train_extra, self.rule_labels_train))
+            self.test_data = list(zip(self.test_samples, self.test_extra, self.rule_labels_test))
         else:
             self.train_data = list(zip(self.train_samples, self.rule_labels_train))
             self.test_data = list(zip(self.test_samples, self.rule_labels_test))
@@ -145,6 +153,7 @@ class MixedRecurrenceDataset(Dataset):
                 print(f"  - {rule.name} {rule.coeffs}: train {n_train} | test {n_test} | exposed ~{n_train/total_states*100:.1f}%")
             if corrupt:
                 print(f"  - Missing-value corruption: prob={missing_prob}, miss_len={miss_len}, "
+                      f"miss_second={miss_second}, predict_missing={predict_missing}, "
                       f"positions >= {self.order}, token id {missing_token}, "
                       f"train+test splits (loss masked at corrupted positions)")
             print("-" * 50)
@@ -155,9 +164,9 @@ class MixedRecurrenceDataset(Dataset):
 
     def __getitem__(self, idx):
         if self.split == 'train':
-            if self.train_masks is not None:
-                return self.train_samples[idx], self.train_masks[idx], self.rule_labels_train[idx]
+            if self.train_extra is not None:
+                return self.train_samples[idx], self.train_extra[idx], self.rule_labels_train[idx]
             return self.train_samples[idx], self.rule_labels_train[idx]
-        if self.test_masks is not None:
-            return self.test_samples[idx], self.test_masks[idx], self.rule_labels_test[idx]
+        if self.test_extra is not None:
+            return self.test_samples[idx], self.test_extra[idx], self.rule_labels_test[idx]
         return self.test_samples[idx], self.rule_labels_test[idx]

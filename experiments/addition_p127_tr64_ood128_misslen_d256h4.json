@@ -2,7 +2,7 @@
   "concurrency": 8,
   "experiments": [
     {
-      "name": "addition_a1b1_d128l1r4h4_P127_tr64ood128_miss0.1len1_seed17996",
+      "name": "addition_a1b1_d256l1r4h4_P127_tr64ood128_miss0.1len1_seed17996",
       "task": "addition",
       "config": {
         "P": 127,
@@ -12,7 +12,7 @@
         "OOD_LEN": 128,
         "MAX_UNIQUE_RATIO": 0.7,
         "NUM_MASK": 1,
-        "D_MODEL": 128,
+        "D_MODEL": 256,
         "N_HEAD": 4,
         "MLP_RATIO": 4,
         "BATCH_SIZE": 128,
@@ -29,7 +29,7 @@
       }
     },
     {
-      "name": "addition_a1b1_d128l1r4h4_P127_tr64ood128_miss0.1len1_seed18318",
+      "name": "addition_a1b1_d256l1r4h4_P127_tr64ood128_miss0.1len1_seed18318",
       "task": "addition",
       "config": {
         "P": 127,
@@ -39,7 +39,7 @@
         "OOD_LEN": 128,
         "MAX_UNIQUE_RATIO": 0.7,
         "NUM_MASK": 1,
-        "D_MODEL": 128,
+        "D_MODEL": 256,
         "N_HEAD": 4,
         "MLP_RATIO": 4,
         "BATCH_SIZE": 128,
@@ -56,7 +56,7 @@
       }
     },
     {
-      "name": "addition_a1b1_d128l1r4h4_P127_tr64ood128_miss0.1len1_seed34789",
+      "name": "addition_a1b1_d256l1r4h4_P127_tr64ood128_miss0.1len1_seed34789",
       "task": "addition",
       "config": {
         "P": 127,
@@ -66,7 +66,7 @@
         "OOD_LEN": 128,
         "MAX_UNIQUE_RATIO": 0.7,
         "NUM_MASK": 1,
-        "D_MODEL": 128,
+        "D_MODEL": 256,
         "N_HEAD": 4,
         "MLP_RATIO": 4,
         "BATCH_SIZE": 128,
@@ -83,7 +83,7 @@
       }
     },
     {
-      "name": "addition_a1b1_d128l1r4h4_P127_tr64ood128_miss0.1len1_seed44536",
+      "name": "addition_a1b1_d256l1r4h4_P127_tr64ood128_miss0.1len1_seed44536",
       "task": "addition",
       "config": {
         "P": 127,
@@ -93,7 +93,7 @@
         "OOD_LEN": 128,
         "MAX_UNIQUE_RATIO": 0.7,
         "NUM_MASK": 1,
-        "D_MODEL": 128,
+        "D_MODEL": 256,
         "N_HEAD": 4,
         "MLP_RATIO": 4,
         "BATCH_SIZE": 128,
@@ -110,7 +110,7 @@
       }
     },
     {
-      "name": "addition_a1b1_d128l1r4h4_P127_tr64ood128_miss0.1len1_seed62513",
+      "name": "addition_a1b1_d256l1r4h4_P127_tr64ood128_miss0.1len1_seed62513",
       "task": "addition",
       "config": {
         "P": 127,
@@ -120,7 +120,7 @@
         "OOD_LEN": 128,
         "MAX_UNIQUE_RATIO": 0.7,
         "NUM_MASK": 1,
-        "D_MODEL": 128,
+        "D_MODEL": 256,
         "N_HEAD": 4,
         "MLP_RATIO": 4,
         "BATCH_SIZE": 128,
@@ -137,7 +137,7 @@
       }
     },
     {
-      "name": "addition_a1b1_d128l1r4h4_P127_tr64ood128_miss0.1len1_seed64154",
+      "name": "addition_a1b1_d256l1r4h4_P127_tr64ood128_miss0.1len1_seed64154",
       "task": "addition",
       "config": {
         "P": 127,
@@ -147,7 +147,7 @@
         "OOD_LEN": 128,
         "MAX_UNIQUE_RATIO": 0.7,
         "NUM_MASK": 1,
-        "D_MODEL": 128,
+        "D_MODEL": 256,
         "N_HEAD": 4,
         "MLP_RATIO": 4,
         "BATCH_SIZE": 128,
@@ -164,7 +164,7 @@
       }
     },
     {
-      "name": "addition_a1b1_d128l1r4h4_P127_tr64ood128_miss0.1len1_seed72814",
+      "name": "addition_a1b1_d256l1r4h4_P127_tr64ood128_miss0.1len1_seed72814",
       "task": "addition",
       "config": {
         "P": 127,
@@ -174,7 +174,7 @@
         "OOD_LEN": 128,
         "MAX_UNIQUE_RATIO": 0.7,
         "NUM_MASK": 1,
-        "D_MODEL": 128,
+        "D_MODEL": 256,
         "N_HEAD": 4,
         "MLP_RATIO": 4,
         "BATCH_SIZE": 128,
@@ -191,7 +191,7 @@
       }
     },
     {
-      "name": "addition_a1b1_d128l1r4h4_P127_tr64ood128_miss0.1len1_seed82585",
+      "name": "addition_a1b1_d256l1r4h4_P127_tr64ood128_miss0.1len1_seed82585",
       "task": "addition",
       "config": {
         "P": 127,
@@ -201,7 +201,7 @@
         "OOD_LEN": 128,
         "MAX_UNIQUE_RATIO": 0.7,
         "NUM_MASK": 1,
-        "D_MODEL": 128,
+        "D_MODEL": 256,
         "N_HEAD": 4,
         "MLP_RATIO": 4,
         "BATCH_SIZE": 128,
@@ -218,7 +218,7 @@
       }
     },
     {
-      "name": "addition_a1b1_d128l1r4h4_P127_tr64ood128_miss0.1len2_seed17996",
+      "name": "addition_a1b1_d256l1r4h4_P127_tr64ood128_miss0.1len2_seed17996",
       "task": "addition",
       "config": {
         "P": 127,
@@ -228,7 +228,7 @@
         "OOD_LEN": 128,
         "MAX_UNIQUE_RATIO": 0.7,
         "NUM_MASK": 1,
-        "D_MODEL": 128,
+        "D_MODEL": 256,
         "N_HEAD": 4,
         "MLP_RATIO": 4,
         "BATCH_SIZE": 128,
@@ -245,7 +245,7 @@
       }
     },
     {
-      "name": "addition_a1b1_d128l1r4h4_P127_tr64ood128_miss0.1len2_seed18318",
+      "name": "addition_a1b1_d256l1r4h4_P127_tr64ood128_miss0.1len2_seed18318",
       "task": "addition",
       "config": {
         "P": 127,
@@ -255,7 +255,7 @@
         "OOD_LEN": 128,
         "MAX_UNIQUE_RATIO": 0.7,
         "NUM_MASK": 1,
-        "D_MODEL": 128,
+        "D_MODEL": 256,
         "N_HEAD": 4,
         "MLP_RATIO": 4,
         "BATCH_SIZE": 128,
@@ -272,7 +272,7 @@
       }
     },
     {
-      "name": "addition_a1b1_d128l1r4h4_P127_tr64ood128_miss0.1len2_seed34789",
+      "name": "addition_a1b1_d256l1r4h4_P127_tr64ood128_miss0.1len2_seed34789",
       "task": "addition",
       "config": {
         "P": 127,
@@ -282,7 +282,7 @@
         "OOD_LEN": 128,
         "MAX_UNIQUE_RATIO": 0.7,
         "NUM_MASK": 1,
-        "D_MODEL": 128,
+        "D_MODEL": 256,
         "N_HEAD": 4,
         "MLP_RATIO": 4,
         "BATCH_SIZE": 128,
@@ -299,7 +299,7 @@
       }
     },
     {
-      "name": "addition_a1b1_d128l1r4h4_P127_tr64ood128_miss0.1len2_seed44536",
+      "name": "addition_a1b1_d256l1r4h4_P127_tr64ood128_miss0.1len2_seed44536",
       "task": "addition",
       "config": {
         "P": 127,
@@ -309,7 +309,7 @@
         "OOD_LEN": 128,
         "MAX_UNIQUE_RATIO": 0.7,
         "NUM_MASK": 1,
-        "D_MODEL": 128,
+        "D_MODEL": 256,
         "N_HEAD": 4,
         "MLP_RATIO": 4,
         "BATCH_SIZE": 128,
@@ -326,7 +326,7 @@
       }
     },
     {
-      "name": "addition_a1b1_d128l1r4h4_P127_tr64ood128_miss0.1len2_seed62513",
+      "name": "addition_a1b1_d256l1r4h4_P127_tr64ood128_miss0.1len2_seed62513",
       "task": "addition",
       "config": {
         "P": 127,
@@ -336,7 +336,7 @@
         "OOD_LEN": 128,
         "MAX_UNIQUE_RATIO": 0.7,
         "NUM_MASK": 1,
-        "D_MODEL": 128,
+        "D_MODEL": 256,
         "N_HEAD": 4,
         "MLP_RATIO": 4,
         "BATCH_SIZE": 128,
@@ -353,7 +353,7 @@
       }
     },
     {
-      "name": "addition_a1b1_d128l1r4h4_P127_tr64ood128_miss0.1len2_seed64154",
+      "name": "addition_a1b1_d256l1r4h4_P127_tr64ood128_miss0.1len2_seed64154",
       "task": "addition",
       "config": {
         "P": 127,
@@ -363,7 +363,7 @@
         "OOD_LEN": 128,
         "MAX_UNIQUE_RATIO": 0.7,
         "NUM_MASK": 1,
-        "D_MODEL": 128,
+        "D_MODEL": 256,
         "N_HEAD": 4,
         "MLP_RATIO": 4,
         "BATCH_SIZE": 128,
@@ -380,7 +380,7 @@
       }
     },
     {
-      "name": "addition_a1b1_d128l1r4h4_P127_tr64ood128_miss0.1len2_seed72814",
+      "name": "addition_a1b1_d256l1r4h4_P127_tr64ood128_miss0.1len2_seed72814",
       "task": "addition",
       "config": {
         "P": 127,
@@ -390,7 +390,7 @@
         "OOD_LEN": 128,
         "MAX_UNIQUE_RATIO": 0.7,
         "NUM_MASK": 1,
-        "D_MODEL": 128,
+        "D_MODEL": 256,
         "N_HEAD": 4,
         "MLP_RATIO": 4,
         "BATCH_SIZE": 128,
@@ -407,7 +407,7 @@
       }
     },
     {
-      "name": "addition_a1b1_d128l1r4h4_P127_tr64ood128_miss0.1len2_seed82585",
+      "name": "addition_a1b1_d256l1r4h4_P127_tr64ood128_miss0.1len2_seed82585",
       "task": "addition",
       "config": {
         "P": 127,
@@ -417,7 +417,7 @@
         "OOD_LEN": 128,
         "MAX_UNIQUE_RATIO": 0.7,
         "NUM_MASK": 1,
-        "D_MODEL": 128,
+        "D_MODEL": 256,
         "N_HEAD": 4,
         "MLP_RATIO": 4,
         "BATCH_SIZE": 128,
@@ -434,7 +434,7 @@
       }
     },
     {
-      "name": "addition_a1b1_d128l1r4h4_P127_tr64ood128_miss0.2len1_seed17996",
+      "name": "addition_a1b1_d256l1r4h4_P127_tr64ood128_miss0.2len1_seed17996",
       "task": "addition",
       "config": {
         "P": 127,
@@ -444,7 +444,7 @@
         "OOD_LEN": 128,
         "MAX_UNIQUE_RATIO": 0.7,
         "NUM_MASK": 1,
-        "D_MODEL": 128,
+        "D_MODEL": 256,
         "N_HEAD": 4,
         "MLP_RATIO": 4,
         "BATCH_SIZE": 128,
@@ -461,7 +461,7 @@
       }
     },
     {
-      "name": "addition_a1b1_d128l1r4h4_P127_tr64ood128_miss0.2len1_seed18318",
+      "name": "addition_a1b1_d256l1r4h4_P127_tr64ood128_miss0.2len1_seed18318",
       "task": "addition",
       "config": {
         "P": 127,
@@ -471,7 +471,7 @@
         "OOD_LEN": 128,
         "MAX_UNIQUE_RATIO": 0.7,
         "NUM_MASK": 1,
-        "D_MODEL": 128,
+        "D_MODEL": 256,
         "N_HEAD": 4,
         "MLP_RATIO": 4,
         "BATCH_SIZE": 128,
@@ -488,7 +488,7 @@
       }
     },
     {
-      "name": "addition_a1b1_d128l1r4h4_P127_tr64ood128_miss0.2len1_seed34789",
+      "name": "addition_a1b1_d256l1r4h4_P127_tr64ood128_miss0.2len1_seed34789",
       "task": "addition",
       "config": {
         "P": 127,
@@ -498,7 +498,7 @@
         "OOD_LEN": 128,
         "MAX_UNIQUE_RATIO": 0.7,
         "NUM_MASK": 1,
-        "D_MODEL": 128,
+        "D_MODEL": 256,
         "N_HEAD": 4,
         "MLP_RATIO": 4,
         "BATCH_SIZE": 128,
@@ -515,7 +515,7 @@
       }
     },
     {
-      "name": "addition_a1b1_d128l1r4h4_P127_tr64ood128_miss0.2len1_seed44536",
+      "name": "addition_a1b1_d256l1r4h4_P127_tr64ood128_miss0.2len1_seed44536",
       "task": "addition",
       "config": {
         "P": 127,
@@ -525,7 +525,7 @@
         "OOD_LEN": 128,
         "MAX_UNIQUE_RATIO": 0.7,
         "NUM_MASK": 1,
-        "D_MODEL": 128,
+        "D_MODEL": 256,
         "N_HEAD": 4,
         "MLP_RATIO": 4,
         "BATCH_SIZE": 128,
@@ -542,7 +542,7 @@
       }
     },
     {
-      "name": "addition_a1b1_d128l1r4h4_P127_tr64ood128_miss0.2len1_seed62513",
+      "name": "addition_a1b1_d256l1r4h4_P127_tr64ood128_miss0.2len1_seed62513",
       "task": "addition",
       "config": {
         "P": 127,
@@ -552,7 +552,7 @@
         "OOD_LEN": 128,
         "MAX_UNIQUE_RATIO": 0.7,
         "NUM_MASK": 1,
-        "D_MODEL": 128,
+        "D_MODEL": 256,
         "N_HEAD": 4,
         "MLP_RATIO": 4,
         "BATCH_SIZE": 128,
@@ -569,7 +569,7 @@
       }
     },
     {
-      "name": "addition_a1b1_d128l1r4h4_P127_tr64ood128_miss0.2len1_seed64154",
+      "name": "addition_a1b1_d256l1r4h4_P127_tr64ood128_miss0.2len1_seed64154",
       "task": "addition",
       "config": {
         "P": 127,
@@ -579,7 +579,7 @@
         "OOD_LEN": 128,
         "MAX_UNIQUE_RATIO": 0.7,
         "NUM_MASK": 1,
-        "D_MODEL": 128,
+        "D_MODEL": 256,
         "N_HEAD": 4,
         "MLP_RATIO": 4,
         "BATCH_SIZE": 128,
@@ -596,7 +596,7 @@
       }
     },
     {
-      "name": "addition_a1b1_d128l1r4h4_P127_tr64ood128_miss0.2len1_seed72814",
+      "name": "addition_a1b1_d256l1r4h4_P127_tr64ood128_miss0.2len1_seed72814",
       "task": "addition",
       "config": {
         "P": 127,
@@ -606,7 +606,7 @@
         "OOD_LEN": 128,
         "MAX_UNIQUE_RATIO": 0.7,
         "NUM_MASK": 1,
-        "D_MODEL": 128,
+        "D_MODEL": 256,
         "N_HEAD": 4,
         "MLP_RATIO": 4,
         "BATCH_SIZE": 128,
@@ -623,7 +623,7 @@
       }
     },
     {
-      "name": "addition_a1b1_d128l1r4h4_P127_tr64ood128_miss0.2len1_seed82585",
+      "name": "addition_a1b1_d256l1r4h4_P127_tr64ood128_miss0.2len1_seed82585",
       "task": "addition",
       "config": {
         "P": 127,
@@ -633,7 +633,7 @@
         "OOD_LEN": 128,
         "MAX_UNIQUE_RATIO": 0.7,
         "NUM_MASK": 1,
-        "D_MODEL": 128,
+        "D_MODEL": 256,
         "N_HEAD": 4,
         "MLP_RATIO": 4,
         "BATCH_SIZE": 128,
@@ -650,7 +650,7 @@
       }
     },
     {
-      "name": "addition_a1b1_d128l1r4h4_P127_tr64ood128_miss0.2len2_seed17996",
+      "name": "addition_a1b1_d256l1r4h4_P127_tr64ood128_miss0.2len2_seed17996",
       "task": "addition",
       "config": {
         "P": 127,
@@ -660,7 +660,7 @@
         "OOD_LEN": 128,
         "MAX_UNIQUE_RATIO": 0.7,
         "NUM_MASK": 1,
-        "D_MODEL": 128,
+        "D_MODEL": 256,
         "N_HEAD": 4,
         "MLP_RATIO": 4,
         "BATCH_SIZE": 128,
@@ -677,7 +677,7 @@
       }
     },
     {
-      "name": "addition_a1b1_d128l1r4h4_P127_tr64ood128_miss0.2len2_seed18318",
+      "name": "addition_a1b1_d256l1r4h4_P127_tr64ood128_miss0.2len2_seed18318",
       "task": "addition",
       "config": {
         "P": 127,
@@ -687,7 +687,7 @@
         "OOD_LEN": 128,
         "MAX_UNIQUE_RATIO": 0.7,
         "NUM_MASK": 1,
-        "D_MODEL": 128,
+        "D_MODEL": 256,
         "N_HEAD": 4,
         "MLP_RATIO": 4,
         "BATCH_SIZE": 128,
@@ -704,7 +704,7 @@
       }
     },
     {
-      "name": "addition_a1b1_d128l1r4h4_P127_tr64ood128_miss0.2len2_seed34789",
+      "name": "addition_a1b1_d256l1r4h4_P127_tr64ood128_miss0.2len2_seed34789",
       "task": "addition",
       "config": {
         "P": 127,
@@ -714,7 +714,7 @@
         "OOD_LEN": 128,
         "MAX_UNIQUE_RATIO": 0.7,
         "NUM_MASK": 1,
-        "D_MODEL": 128,
+        "D_MODEL": 256,
         "N_HEAD": 4,
         "MLP_RATIO": 4,
         "BATCH_SIZE": 128,
@@ -731,7 +731,7 @@
       }
     },
     {
-      "name": "addition_a1b1_d128l1r4h4_P127_tr64ood128_miss0.2len2_seed44536",
+      "name": "addition_a1b1_d256l1r4h4_P127_tr64ood128_miss0.2len2_seed44536",
       "task": "addition",
       "config": {
         "P": 127,
@@ -741,7 +741,7 @@
         "OOD_LEN": 128,
         "MAX_UNIQUE_RATIO": 0.7,
         "NUM_MASK": 1,
-        "D_MODEL": 128,
+        "D_MODEL": 256,
         "N_HEAD": 4,
         "MLP_RATIO": 4,
         "BATCH_SIZE": 128,
@@ -758,7 +758,7 @@
       }
     },
     {
-      "name": "addition_a1b1_d128l1r4h4_P127_tr64ood128_miss0.2len2_seed62513",
+      "name": "addition_a1b1_d256l1r4h4_P127_tr64ood128_miss0.2len2_seed62513",
       "task": "addition",
       "config": {
         "P": 127,
@@ -768,7 +768,7 @@
         "OOD_LEN": 128,
         "MAX_UNIQUE_RATIO": 0.7,
         "NUM_MASK": 1,
-        "D_MODEL": 128,
+        "D_MODEL": 256,
         "N_HEAD": 4,
         "MLP_RATIO": 4,
         "BATCH_SIZE": 128,
@@ -785,7 +785,7 @@
       }
     },
     {
-      "name": "addition_a1b1_d128l1r4h4_P127_tr64ood128_miss0.2len2_seed64154",
+      "name": "addition_a1b1_d256l1r4h4_P127_tr64ood128_miss0.2len2_seed64154",
       "task": "addition",
       "config": {
         "P": 127,
@@ -795,7 +795,7 @@
         "OOD_LEN": 128,
         "MAX_UNIQUE_RATIO": 0.7,
         "NUM_MASK": 1,
-        "D_MODEL": 128,
+        "D_MODEL": 256,
         "N_HEAD": 4,
         "MLP_RATIO": 4,
         "BATCH_SIZE": 128,
@@ -812,7 +812,7 @@
       }
     },
     {
-      "name": "addition_a1b1_d128l1r4h4_P127_tr64ood128_miss0.2len2_seed72814",
+      "name": "addition_a1b1_d256l1r4h4_P127_tr64ood128_miss0.2len2_seed72814",
       "task": "addition",
       "config": {
         "P": 127,
@@ -822,7 +822,7 @@
         "OOD_LEN": 128,
         "MAX_UNIQUE_RATIO": 0.7,
         "NUM_MASK": 1,
-        "D_MODEL": 128,
+        "D_MODEL": 256,
         "N_HEAD": 4,
         "MLP_RATIO": 4,
         "BATCH_SIZE": 128,
@@ -839,7 +839,7 @@
       }
     },
     {
-      "name": "addition_a1b1_d128l1r4h4_P127_tr64ood128_miss0.2len2_seed82585",
+      "name": "addition_a1b1_d256l1r4h4_P127_tr64ood128_miss0.2len2_seed82585",
       "task": "addition",
       "config": {
         "P": 127,
@@ -849,7 +849,7 @@
         "OOD_LEN": 128,
         "MAX_UNIQUE_RATIO": 0.7,
         "NUM_MASK": 1,
-        "D_MODEL": 128,
+        "D_MODEL": 256,
         "N_HEAD": 4,
         "MLP_RATIO": 4,
         "BATCH_SIZE": 128,
@@ -866,7 +866,7 @@
       }
     },
     {
-      "name": "addition_a1b1_d128l1r4h4_P127_tr64ood128_miss0.3len1_seed17996",
+      "name": "addition_a1b1_d256l1r4h4_P127_tr64ood128_miss0.3len1_seed17996",
       "task": "addition",
       "config": {
         "P": 127,
@@ -876,7 +876,7 @@
         "OOD_LEN": 128,
         "MAX_UNIQUE_RATIO": 0.7,
         "NUM_MASK": 1,
-        "D_MODEL": 128,
+        "D_MODEL": 256,
         "N_HEAD": 4,
         "MLP_RATIO": 4,
         "BATCH_SIZE": 128,
@@ -893,7 +893,7 @@
       }
     },
     {
-      "name": "addition_a1b1_d128l1r4h4_P127_tr64ood128_miss0.3len1_seed18318",
+      "name": "addition_a1b1_d256l1r4h4_P127_tr64ood128_miss0.3len1_seed18318",
       "task": "addition",
       "config": {
         "P": 127,
@@ -903,7 +903,7 @@
         "OOD_LEN": 128,
         "MAX_UNIQUE_RATIO": 0.7,
         "NUM_MASK": 1,
-        "D_MODEL": 128,
+        "D_MODEL": 256,
         "N_HEAD": 4,
         "MLP_RATIO": 4,
         "BATCH_SIZE": 128,
@@ -920,7 +920,7 @@
       }
     },
     {
-      "name": "addition_a1b1_d128l1r4h4_P127_tr64ood128_miss0.3len1_seed34789",
+      "name": "addition_a1b1_d256l1r4h4_P127_tr64ood128_miss0.3len1_seed34789",
       "task": "addition",
       "config": {
         "P": 127,
@@ -930,7 +930,7 @@
         "OOD_LEN": 128,
         "MAX_UNIQUE_RATIO": 0.7,
         "NUM_MASK": 1,
-        "D_MODEL": 128,
+        "D_MODEL": 256,
         "N_HEAD": 4,
         "MLP_RATIO": 4,
         "BATCH_SIZE": 128,
@@ -947,7 +947,7 @@
       }
     },
     {
-      "name": "addition_a1b1_d128l1r4h4_P127_tr64ood128_miss0.3len1_seed44536",
+      "name": "addition_a1b1_d256l1r4h4_P127_tr64ood128_miss0.3len1_seed44536",
       "task": "addition",
       "config": {
         "P": 127,
@@ -957,7 +957,7 @@
         "OOD_LEN": 128,
         "MAX_UNIQUE_RATIO": 0.7,
         "NUM_MASK": 1,
-        "D_MODEL": 128,
+        "D_MODEL": 256,
         "N_HEAD": 4,
         "MLP_RATIO": 4,
         "BATCH_SIZE": 128,
@@ -974,7 +974,7 @@
       }
     },
     {
-      "name": "addition_a1b1_d128l1r4h4_P127_tr64ood128_miss0.3len1_seed62513",
+      "name": "addition_a1b1_d256l1r4h4_P127_tr64ood128_miss0.3len1_seed62513",
       "task": "addition",
       "config": {
         "P": 127,
@@ -984,7 +984,7 @@
         "OOD_LEN": 128,
         "MAX_UNIQUE_RATIO": 0.7,
         "NUM_MASK": 1,
-        "D_MODEL": 128,
+        "D_MODEL": 256,
         "N_HEAD": 4,
         "MLP_RATIO": 4,
         "BATCH_SIZE": 128,
@@ -1001,7 +1001,7 @@
       }
     },
     {
-      "name": "addition_a1b1_d128l1r4h4_P127_tr64ood128_miss0.3len1_seed64154",
+      "name": "addition_a1b1_d256l1r4h4_P127_tr64ood128_miss0.3len1_seed64154",
       "task": "addition",
       "config": {
         "P": 127,
@@ -1011,7 +1011,7 @@
         "OOD_LEN": 128,
         "MAX_UNIQUE_RATIO": 0.7,
         "NUM_MASK": 1,
-        "D_MODEL": 128,
+        "D_MODEL": 256,
         "N_HEAD": 4,
         "MLP_RATIO": 4,
         "BATCH_SIZE": 128,
@@ -1028,7 +1028,7 @@
       }
     },
     {
-      "name": "addition_a1b1_d128l1r4h4_P127_tr64ood128_miss0.3len1_seed72814",
+      "name": "addition_a1b1_d256l1r4h4_P127_tr64ood128_miss0.3len1_seed72814",
       "task": "addition",
       "config": {
         "P": 127,
@@ -1038,7 +1038,7 @@
         "OOD_LEN": 128,
         "MAX_UNIQUE_RATIO": 0.7,
         "NUM_MASK": 1,
-        "D_MODEL": 128,
+        "D_MODEL": 256,
         "N_HEAD": 4,
         "MLP_RATIO": 4,
         "BATCH_SIZE": 128,
@@ -1055,7 +1055,7 @@
       }
     },
     {
-      "name": "addition_a1b1_d128l1r4h4_P127_tr64ood128_miss0.3len1_seed82585",
+      "name": "addition_a1b1_d256l1r4h4_P127_tr64ood128_miss0.3len1_seed82585",
       "task": "addition",
       "config": {
         "P": 127,
@@ -1065,7 +1065,7 @@
         "OOD_LEN": 128,
         "MAX_UNIQUE_RATIO": 0.7,
         "NUM_MASK": 1,
-        "D_MODEL": 128,
+        "D_MODEL": 256,
         "N_HEAD": 4,
         "MLP_RATIO": 4,
         "BATCH_SIZE": 128,
@@ -1082,7 +1082,7 @@
       }
     },
     {
-      "name": "addition_a1b1_d128l1r4h4_P127_tr64ood128_miss0.3len2_seed17996",
+      "name": "addition_a1b1_d256l1r4h4_P127_tr64ood128_miss0.3len2_seed17996",
       "task": "addition",
       "config": {
         "P": 127,
@@ -1092,7 +1092,7 @@
         "OOD_LEN": 128,
         "MAX_UNIQUE_RATIO": 0.7,
         "NUM_MASK": 1,
-        "D_MODEL": 128,
+        "D_MODEL": 256,
         "N_HEAD": 4,
         "MLP_RATIO": 4,
         "BATCH_SIZE": 128,
@@ -1109,7 +1109,7 @@
       }
     },
     {
-      "name": "addition_a1b1_d128l1r4h4_P127_tr64ood128_miss0.3len2_seed18318",
+      "name": "addition_a1b1_d256l1r4h4_P127_tr64ood128_miss0.3len2_seed18318",
       "task": "addition",
       "config": {
         "P": 127,
@@ -1119,7 +1119,7 @@
         "OOD_LEN": 128,
         "MAX_UNIQUE_RATIO": 0.7,
         "NUM_MASK": 1,
-        "D_MODEL": 128,
+        "D_MODEL": 256,
         "N_HEAD": 4,
         "MLP_RATIO": 4,
         "BATCH_SIZE": 128,
@@ -1136,7 +1136,7 @@
       }
     },
     {
-      "name": "addition_a1b1_d128l1r4h4_P127_tr64ood128_miss0.3len2_seed34789",
+      "name": "addition_a1b1_d256l1r4h4_P127_tr64ood128_miss0.3len2_seed34789",
       "task": "addition",
       "config": {
         "P": 127,
@@ -1146,7 +1146,7 @@
         "OOD_LEN": 128,
         "MAX_UNIQUE_RATIO": 0.7,
         "NUM_MASK": 1,
-        "D_MODEL": 128,
+        "D_MODEL": 256,
         "N_HEAD": 4,
         "MLP_RATIO": 4,
         "BATCH_SIZE": 128,
@@ -1163,7 +1163,7 @@
       }
     },
     {
-      "name": "addition_a1b1_d128l1r4h4_P127_tr64ood128_miss0.3len2_seed44536",
+      "name": "addition_a1b1_d256l1r4h4_P127_tr64ood128_miss0.3len2_seed44536",
       "task": "addition",
       "config": {
         "P": 127,
@@ -1173,7 +1173,7 @@
         "OOD_LEN": 128,
         "MAX_UNIQUE_RATIO": 0.7,
         "NUM_MASK": 1,
-        "D_MODEL": 128,
+        "D_MODEL": 256,
         "N_HEAD": 4,
         "MLP_RATIO": 4,
         "BATCH_SIZE": 128,
@@ -1190,7 +1190,7 @@
       }
     },
     {
-      "name": "addition_a1b1_d128l1r4h4_P127_tr64ood128_miss0.3len2_seed62513",
+      "name": "addition_a1b1_d256l1r4h4_P127_tr64ood128_miss0.3len2_seed62513",
       "task": "addition",
       "config": {
         "P": 127,
@@ -1200,7 +1200,7 @@
         "OOD_LEN": 128,
         "MAX_UNIQUE_RATIO": 0.7,
         "NUM_MASK": 1,
-        "D_MODEL": 128,
+        "D_MODEL": 256,
         "N_HEAD": 4,
         "MLP_RATIO": 4,
         "BATCH_SIZE": 128,
@@ -1217,7 +1217,7 @@
       }
     },
     {
-      "name": "addition_a1b1_d128l1r4h4_P127_tr64ood128_miss0.3len2_seed64154",
+      "name": "addition_a1b1_d256l1r4h4_P127_tr64ood128_miss0.3len2_seed64154",
       "task": "addition",
       "config": {
         "P": 127,
@@ -1227,7 +1227,7 @@
         "OOD_LEN": 128,
         "MAX_UNIQUE_RATIO": 0.7,
         "NUM_MASK": 1,
-        "D_MODEL": 128,
+        "D_MODEL": 256,
         "N_HEAD": 4,
         "MLP_RATIO": 4,
         "BATCH_SIZE": 128,
@@ -1244,7 +1244,7 @@
       }
     },
     {
-      "name": "addition_a1b1_d128l1r4h4_P127_tr64ood128_miss0.3len2_seed72814",
+      "name": "addition_a1b1_d256l1r4h4_P127_tr64ood128_miss0.3len2_seed72814",
       "task": "addition",
       "config": {
         "P": 127,
@@ -1254,7 +1254,7 @@
         "OOD_LEN": 128,
         "MAX_UNIQUE_RATIO": 0.7,
         "NUM_MASK": 1,
-        "D_MODEL": 128,
+        "D_MODEL": 256,
         "N_HEAD": 4,
         "MLP_RATIO": 4,
         "BATCH_SIZE": 128,
@@ -1271,7 +1271,7 @@
       }
     },
     {
-      "name": "addition_a1b1_d128l1r4h4_P127_tr64ood128_miss0.3len2_seed82585",
+      "name": "addition_a1b1_d256l1r4h4_P127_tr64ood128_miss0.3len2_seed82585",
       "task": "addition",
       "config": {
         "P": 127,
@@ -1281,7 +1281,7 @@
         "OOD_LEN": 128,
         "MAX_UNIQUE_RATIO": 0.7,
         "NUM_MASK": 1,
-        "D_MODEL": 128,
+        "D_MODEL": 256,
         "N_HEAD": 4,
         "MLP_RATIO": 4,
         "BATCH_SIZE": 128,
@@ -1298,7 +1298,7 @@
       }
     },
     {
-      "name": "addition_a1b1_d128l2r4h4_P127_tr64ood128_miss0.1len1_seed17996",
+      "name": "addition_a1b1_d256l2r4h4_P127_tr64ood128_miss0.1len1_seed17996",
       "task": "addition",
       "config": {
         "P": 127,
@@ -1308,7 +1308,7 @@
         "OOD_LEN": 128,
         "MAX_UNIQUE_RATIO": 0.7,
         "NUM_MASK": 1,
-        "D_MODEL": 128,
+        "D_MODEL": 256,
         "N_HEAD": 4,
         "MLP_RATIO": 4,
         "BATCH_SIZE": 128,
@@ -1325,7 +1325,7 @@
       }
     },
     {
-      "name": "addition_a1b1_d128l2r4h4_P127_tr64ood128_miss0.1len1_seed18318",
+      "name": "addition_a1b1_d256l2r4h4_P127_tr64ood128_miss0.1len1_seed18318",
       "task": "addition",
       "config": {
         "P": 127,
@@ -1335,7 +1335,7 @@
         "OOD_LEN": 128,
         "MAX_UNIQUE_RATIO": 0.7,
         "NUM_MASK": 1,
-        "D_MODEL": 128,
+        "D_MODEL": 256,
         "N_HEAD": 4,
         "MLP_RATIO": 4,
         "BATCH_SIZE": 128,
@@ -1352,7 +1352,7 @@
       }
     },
     {
-      "name": "addition_a1b1_d128l2r4h4_P127_tr64ood128_miss0.1len1_seed34789",
+      "name": "addition_a1b1_d256l2r4h4_P127_tr64ood128_miss0.1len1_seed34789",
       "task": "addition",
       "config": {
         "P": 127,
@@ -1362,7 +1362,7 @@
         "OOD_LEN": 128,
         "MAX_UNIQUE_RATIO": 0.7,
         "NUM_MASK": 1,
-        "D_MODEL": 128,
+        "D_MODEL": 256,
         "N_HEAD": 4,
         "MLP_RATIO": 4,
         "BATCH_SIZE": 128,
@@ -1379,7 +1379,7 @@
       }
     },
     {
-      "name": "addition_a1b1_d128l2r4h4_P127_tr64ood128_miss0.1len1_seed44536",
+      "name": "addition_a1b1_d256l2r4h4_P127_tr64ood128_miss0.1len1_seed44536",
       "task": "addition",
       "config": {
         "P": 127,
@@ -1389,7 +1389,7 @@
         "OOD_LEN": 128,
         "MAX_UNIQUE_RATIO": 0.7,
         "NUM_MASK": 1,
-        "D_MODEL": 128,
+        "D_MODEL": 256,
         "N_HEAD": 4,
         "MLP_RATIO": 4,
         "BATCH_SIZE": 128,
@@ -1406,7 +1406,7 @@
       }
     },
     {
-      "name": "addition_a1b1_d128l2r4h4_P127_tr64ood128_miss0.1len1_seed62513",
+      "name": "addition_a1b1_d256l2r4h4_P127_tr64ood128_miss0.1len1_seed62513",
       "task": "addition",
       "config": {
         "P": 127,
@@ -1416,7 +1416,7 @@
         "OOD_LEN": 128,
         "MAX_UNIQUE_RATIO": 0.7,
         "NUM_MASK": 1,
-        "D_MODEL": 128,
+        "D_MODEL": 256,
         "N_HEAD": 4,
         "MLP_RATIO": 4,
         "BATCH_SIZE": 128,
@@ -1433,7 +1433,7 @@
       }
     },
     {
-      "name": "addition_a1b1_d128l2r4h4_P127_tr64ood128_miss0.1len1_seed64154",
+      "name": "addition_a1b1_d256l2r4h4_P127_tr64ood128_miss0.1len1_seed64154",
       "task": "addition",
       "config": {
         "P": 127,
@@ -1443,7 +1443,7 @@
         "OOD_LEN": 128,
         "MAX_UNIQUE_RATIO": 0.7,
         "NUM_MASK": 1,
-        "D_MODEL": 128,
+        "D_MODEL": 256,
         "N_HEAD": 4,
         "MLP_RATIO": 4,
         "BATCH_SIZE": 128,
@@ -1460,7 +1460,7 @@
       }
     },
     {
-      "name": "addition_a1b1_d128l2r4h4_P127_tr64ood128_miss0.1len1_seed72814",
+      "name": "addition_a1b1_d256l2r4h4_P127_tr64ood128_miss0.1len1_seed72814",
       "task": "addition",
       "config": {
         "P": 127,
@@ -1470,7 +1470,7 @@
         "OOD_LEN": 128,
         "MAX_UNIQUE_RATIO": 0.7,
         "NUM_MASK": 1,
-        "D_MODEL": 128,
+        "D_MODEL": 256,
         "N_HEAD": 4,
         "MLP_RATIO": 4,
         "BATCH_SIZE": 128,
@@ -1487,7 +1487,7 @@
       }
     },
     {
-      "name": "addition_a1b1_d128l2r4h4_P127_tr64ood128_miss0.1len1_seed82585",
+      "name": "addition_a1b1_d256l2r4h4_P127_tr64ood128_miss0.1len1_seed82585",
       "task": "addition",
       "config": {
         "P": 127,
@@ -1497,7 +1497,7 @@
         "OOD_LEN": 128,
         "MAX_UNIQUE_RATIO": 0.7,
         "NUM_MASK": 1,
-        "D_MODEL": 128,
+        "D_MODEL": 256,
         "N_HEAD": 4,
         "MLP_RATIO": 4,
         "BATCH_SIZE": 128,
@@ -1514,7 +1514,7 @@
       }
     },
     {
-      "name": "addition_a1b1_d128l2r4h4_P127_tr64ood128_miss0.1len2_seed17996",
+      "name": "addition_a1b1_d256l2r4h4_P127_tr64ood128_miss0.1len2_seed17996",
       "task": "addition",
       "config": {
         "P": 127,
@@ -1524,7 +1524,7 @@
         "OOD_LEN": 128,
         "MAX_UNIQUE_RATIO": 0.7,
         "NUM_MASK": 1,
-        "D_MODEL": 128,
+        "D_MODEL": 256,
         "N_HEAD": 4,
         "MLP_RATIO": 4,
         "BATCH_SIZE": 128,
@@ -1541,7 +1541,7 @@
       }
     },
     {
-      "name": "addition_a1b1_d128l2r4h4_P127_tr64ood128_miss0.1len2_seed18318",
+      "name": "addition_a1b1_d256l2r4h4_P127_tr64ood128_miss0.1len2_seed18318",
       "task": "addition",
       "config": {
         "P": 127,
@@ -1551,7 +1551,7 @@
         "OOD_LEN": 128,
         "MAX_UNIQUE_RATIO": 0.7,
         "NUM_MASK": 1,
-        "D_MODEL": 128,
+        "D_MODEL": 256,
         "N_HEAD": 4,
         "MLP_RATIO": 4,
         "BATCH_SIZE": 128,
@@ -1568,7 +1568,7 @@
       }
     },
     {
-      "name": "addition_a1b1_d128l2r4h4_P127_tr64ood128_miss0.1len2_seed34789",
+      "name": "addition_a1b1_d256l2r4h4_P127_tr64ood128_miss0.1len2_seed34789",
       "task": "addition",
       "config": {
         "P": 127,
@@ -1578,7 +1578,7 @@
         "OOD_LEN": 128,
         "MAX_UNIQUE_RATIO": 0.7,
         "NUM_MASK": 1,
-        "D_MODEL": 128,
+        "D_MODEL": 256,
         "N_HEAD": 4,
         "MLP_RATIO": 4,
         "BATCH_SIZE": 128,
@@ -1595,7 +1595,7 @@
       }
     },
     {
-      "name": "addition_a1b1_d128l2r4h4_P127_tr64ood128_miss0.1len2_seed44536",
+      "name": "addition_a1b1_d256l2r4h4_P127_tr64ood128_miss0.1len2_seed44536",
       "task": "addition",
       "config": {
         "P": 127,
@@ -1605,7 +1605,7 @@
         "OOD_LEN": 128,
         "MAX_UNIQUE_RATIO": 0.7,
         "NUM_MASK": 1,
-        "D_MODEL": 128,
+        "D_MODEL": 256,
         "N_HEAD": 4,
         "MLP_RATIO": 4,
         "BATCH_SIZE": 128,
@@ -1622,7 +1622,7 @@
       }
     },
     {
-      "name": "addition_a1b1_d128l2r4h4_P127_tr64ood128_miss0.1len2_seed62513",
+      "name": "addition_a1b1_d256l2r4h4_P127_tr64ood128_miss0.1len2_seed62513",
       "task": "addition",
       "config": {
         "P": 127,
@@ -1632,7 +1632,7 @@
         "OOD_LEN": 128,
         "MAX_UNIQUE_RATIO": 0.7,
         "NUM_MASK": 1,
-        "D_MODEL": 128,
+        "D_MODEL": 256,
         "N_HEAD": 4,
         "MLP_RATIO": 4,
         "BATCH_SIZE": 128,
@@ -1649,7 +1649,7 @@
       }
     },
     {
-      "name": "addition_a1b1_d128l2r4h4_P127_tr64ood128_miss0.1len2_seed64154",
+      "name": "addition_a1b1_d256l2r4h4_P127_tr64ood128_miss0.1len2_seed64154",
       "task": "addition",
       "config": {
         "P": 127,
@@ -1659,7 +1659,7 @@
         "OOD_LEN": 128,
         "MAX_UNIQUE_RATIO": 0.7,
         "NUM_MASK": 1,
-        "D_MODEL": 128,
+        "D_MODEL": 256,
         "N_HEAD": 4,
         "MLP_RATIO": 4,
         "BATCH_SIZE": 128,
@@ -1676,7 +1676,7 @@
       }
     },
     {
-      "name": "addition_a1b1_d128l2r4h4_P127_tr64ood128_miss0.1len2_seed72814",
+      "name": "addition_a1b1_d256l2r4h4_P127_tr64ood128_miss0.1len2_seed72814",
       "task": "addition",
       "config": {
         "P": 127,
@@ -1686,7 +1686,7 @@
         "OOD_LEN": 128,
         "MAX_UNIQUE_RATIO": 0.7,
         "NUM_MASK": 1,
-        "D_MODEL": 128,
+        "D_MODEL": 256,
         "N_HEAD": 4,
         "MLP_RATIO": 4,
         "BATCH_SIZE": 128,
@@ -1703,7 +1703,7 @@
       }
     },
     {
-      "name": "addition_a1b1_d128l2r4h4_P127_tr64ood128_miss0.1len2_seed82585",
+      "name": "addition_a1b1_d256l2r4h4_P127_tr64ood128_miss0.1len2_seed82585",
       "task": "addition",
       "config": {
         "P": 127,
@@ -1713,7 +1713,7 @@
         "OOD_LEN": 128,
         "MAX_UNIQUE_RATIO": 0.7,
         "NUM_MASK": 1,
-        "D_MODEL": 128,
+        "D_MODEL": 256,
         "N_HEAD": 4,
         "MLP_RATIO": 4,
         "BATCH_SIZE": 128,
@@ -1730,7 +1730,7 @@
       }
     },
     {
-      "name": "addition_a1b1_d128l2r4h4_P127_tr64ood128_miss0.2len1_seed17996",
+      "name": "addition_a1b1_d256l2r4h4_P127_tr64ood128_miss0.2len1_seed17996",
       "task": "addition",
       "config": {
         "P": 127,
@@ -1740,7 +1740,7 @@
         "OOD_LEN": 128,
         "MAX_UNIQUE_RATIO": 0.7,
         "NUM_MASK": 1,
-        "D_MODEL": 128,
+        "D_MODEL": 256,
         "N_HEAD": 4,
         "MLP_RATIO": 4,
         "BATCH_SIZE": 128,
@@ -1757,7 +1757,7 @@
       }
     },
     {
-      "name": "addition_a1b1_d128l2r4h4_P127_tr64ood128_miss0.2len1_seed18318",
+      "name": "addition_a1b1_d256l2r4h4_P127_tr64ood128_miss0.2len1_seed18318",
       "task": "addition",
       "config": {
         "P": 127,
@@ -1767,7 +1767,7 @@
         "OOD_LEN": 128,
         "MAX_UNIQUE_RATIO": 0.7,
         "NUM_MASK": 1,
-        "D_MODEL": 128,
+        "D_MODEL": 256,
         "N_HEAD": 4,
         "MLP_RATIO": 4,
         "BATCH_SIZE": 128,
@@ -1784,7 +1784,7 @@
       }
     },
     {
-      "name": "addition_a1b1_d128l2r4h4_P127_tr64ood128_miss0.2len1_seed34789",
+      "name": "addition_a1b1_d256l2r4h4_P127_tr64ood128_miss0.2len1_seed34789",
       "task": "addition",
       "config": {
         "P": 127,
@@ -1794,7 +1794,7 @@
         "OOD_LEN": 128,
         "MAX_UNIQUE_RATIO": 0.7,
         "NUM_MASK": 1,
-        "D_MODEL": 128,
+        "D_MODEL": 256,
         "N_HEAD": 4,
         "MLP_RATIO": 4,
         "BATCH_SIZE": 128,
@@ -1811,7 +1811,7 @@
       }
     },
     {
-      "name": "addition_a1b1_d128l2r4h4_P127_tr64ood128_miss0.2len1_seed44536",
+      "name": "addition_a1b1_d256l2r4h4_P127_tr64ood128_miss0.2len1_seed44536",
       "task": "addition",
       "config": {
         "P": 127,
@@ -1821,7 +1821,7 @@
         "OOD_LEN": 128,
         "MAX_UNIQUE_RATIO": 0.7,
         "NUM_MASK": 1,
-        "D_MODEL": 128,
+        "D_MODEL": 256,
         "N_HEAD": 4,
         "MLP_RATIO": 4,
         "BATCH_SIZE": 128,
@@ -1838,7 +1838,7 @@
       }
     },
     {
-      "name": "addition_a1b1_d128l2r4h4_P127_tr64ood128_miss0.2len1_seed62513",
+      "name": "addition_a1b1_d256l2r4h4_P127_tr64ood128_miss0.2len1_seed62513",
       "task": "addition",
       "config": {
         "P": 127,
@@ -1848,7 +1848,7 @@
         "OOD_LEN": 128,
         "MAX_UNIQUE_RATIO": 0.7,
         "NUM_MASK": 1,
-        "D_MODEL": 128,
+        "D_MODEL": 256,
         "N_HEAD": 4,
         "MLP_RATIO": 4,
         "BATCH_SIZE": 128,
@@ -1865,7 +1865,7 @@
       }
     },
     {
-      "name": "addition_a1b1_d128l2r4h4_P127_tr64ood128_miss0.2len1_seed64154",
+      "name": "addition_a1b1_d256l2r4h4_P127_tr64ood128_miss0.2len1_seed64154",
       "task": "addition",
       "config": {
         "P": 127,
@@ -1875,7 +1875,7 @@
         "OOD_LEN": 128,
         "MAX_UNIQUE_RATIO": 0.7,
         "NUM_MASK": 1,
-        "D_MODEL": 128,
+        "D_MODEL": 256,
         "N_HEAD": 4,
         "MLP_RATIO": 4,
         "BATCH_SIZE": 128,
@@ -1892,7 +1892,7 @@
       }
     },
     {
-      "name": "addition_a1b1_d128l2r4h4_P127_tr64ood128_miss0.2len1_seed72814",
+      "name": "addition_a1b1_d256l2r4h4_P127_tr64ood128_miss0.2len1_seed72814",
       "task": "addition",
       "config": {
         "P": 127,
@@ -1902,7 +1902,7 @@
         "OOD_LEN": 128,
         "MAX_UNIQUE_RATIO": 0.7,
         "NUM_MASK": 1,
-        "D_MODEL": 128,
+        "D_MODEL": 256,
         "N_HEAD": 4,
         "MLP_RATIO": 4,
         "BATCH_SIZE": 128,
@@ -1919,7 +1919,7 @@
       }
     },
     {
-      "name": "addition_a1b1_d128l2r4h4_P127_tr64ood128_miss0.2len1_seed82585",
+      "name": "addition_a1b1_d256l2r4h4_P127_tr64ood128_miss0.2len1_seed82585",
       "task": "addition",
       "config": {
         "P": 127,
@@ -1929,7 +1929,7 @@
         "OOD_LEN": 128,
         "MAX_UNIQUE_RATIO": 0.7,
         "NUM_MASK": 1,
-        "D_MODEL": 128,
+        "D_MODEL": 256,
         "N_HEAD": 4,
         "MLP_RATIO": 4,
         "BATCH_SIZE": 128,
@@ -1946,7 +1946,7 @@
       }
     },
     {
-      "name": "addition_a1b1_d128l2r4h4_P127_tr64ood128_miss0.2len2_seed17996",
+      "name": "addition_a1b1_d256l2r4h4_P127_tr64ood128_miss0.2len2_seed17996",
       "task": "addition",
       "config": {
         "P": 127,
@@ -1956,7 +1956,7 @@
         "OOD_LEN": 128,
         "MAX_UNIQUE_RATIO": 0.7,
         "NUM_MASK": 1,
-        "D_MODEL": 128,
+        "D_MODEL": 256,
         "N_HEAD": 4,
         "MLP_RATIO": 4,
         "BATCH_SIZE": 128,
@@ -1973,7 +1973,7 @@
       }
     },
     {
-      "name": "addition_a1b1_d128l2r4h4_P127_tr64ood128_miss0.2len2_seed18318",
+      "name": "addition_a1b1_d256l2r4h4_P127_tr64ood128_miss0.2len2_seed18318",
       "task": "addition",
       "config": {
         "P": 127,
@@ -1983,7 +1983,7 @@
         "OOD_LEN": 128,
         "MAX_UNIQUE_RATIO": 0.7,
         "NUM_MASK": 1,
-        "D_MODEL": 128,
+        "D_MODEL": 256,
         "N_HEAD": 4,
         "MLP_RATIO": 4,
         "BATCH_SIZE": 128,
@@ -2000,7 +2000,7 @@
       }
     },
     {
-      "name": "addition_a1b1_d128l2r4h4_P127_tr64ood128_miss0.2len2_seed34789",
+      "name": "addition_a1b1_d256l2r4h4_P127_tr64ood128_miss0.2len2_seed34789",
       "task": "addition",
       "config": {
         "P": 127,
@@ -2010,7 +2010,7 @@
         "OOD_LEN": 128,
         "MAX_UNIQUE_RATIO": 0.7,
         "NUM_MASK": 1,
-        "D_MODEL": 128,
+        "D_MODEL": 256,
         "N_HEAD": 4,
         "MLP_RATIO": 4,
         "BATCH_SIZE": 128,
@@ -2027,7 +2027,7 @@
       }
     },
     {
-      "name": "addition_a1b1_d128l2r4h4_P127_tr64ood128_miss0.2len2_seed44536",
+      "name": "addition_a1b1_d256l2r4h4_P127_tr64ood128_miss0.2len2_seed44536",
       "task": "addition",
       "config": {
         "P": 127,
@@ -2037,7 +2037,7 @@
         "OOD_LEN": 128,
         "MAX_UNIQUE_RATIO": 0.7,
         "NUM_MASK": 1,
-        "D_MODEL": 128,
+        "D_MODEL": 256,
         "N_HEAD": 4,
         "MLP_RATIO": 4,
         "BATCH_SIZE": 128,
@@ -2054,7 +2054,7 @@
       }
     },
     {
-      "name": "addition_a1b1_d128l2r4h4_P127_tr64ood128_miss0.2len2_seed62513",
+      "name": "addition_a1b1_d256l2r4h4_P127_tr64ood128_miss0.2len2_seed62513",
       "task": "addition",
       "config": {
         "P": 127,
@@ -2064,7 +2064,7 @@
         "OOD_LEN": 128,
         "MAX_UNIQUE_RATIO": 0.7,
         "NUM_MASK": 1,
-        "D_MODEL": 128,
+        "D_MODEL": 256,
         "N_HEAD": 4,
         "MLP_RATIO": 4,
         "BATCH_SIZE": 128,
@@ -2081,7 +2081,7 @@
       }
     },
     {
-      "name": "addition_a1b1_d128l2r4h4_P127_tr64ood128_miss0.2len2_seed64154",
+      "name": "addition_a1b1_d256l2r4h4_P127_tr64ood128_miss0.2len2_seed64154",
       "task": "addition",
       "config": {
         "P": 127,
@@ -2091,7 +2091,7 @@
         "OOD_LEN": 128,
         "MAX_UNIQUE_RATIO": 0.7,
         "NUM_MASK": 1,
-        "D_MODEL": 128,
+        "D_MODEL": 256,
         "N_HEAD": 4,
         "MLP_RATIO": 4,
         "BATCH_SIZE": 128,
@@ -2108,7 +2108,7 @@
       }
     },
     {
-      "name": "addition_a1b1_d128l2r4h4_P127_tr64ood128_miss0.2len2_seed72814",
+      "name": "addition_a1b1_d256l2r4h4_P127_tr64ood128_miss0.2len2_seed72814",
       "task": "addition",
       "config": {
         "P": 127,
@@ -2118,7 +2118,7 @@
         "OOD_LEN": 128,
         "MAX_UNIQUE_RATIO": 0.7,
         "NUM_MASK": 1,
-        "D_MODEL": 128,
+        "D_MODEL": 256,
         "N_HEAD": 4,
         "MLP_RATIO": 4,
         "BATCH_SIZE": 128,
@@ -2135,7 +2135,7 @@
       }
     },
     {
-      "name": "addition_a1b1_d128l2r4h4_P127_tr64ood128_miss0.2len2_seed82585",
+      "name": "addition_a1b1_d256l2r4h4_P127_tr64ood128_miss0.2len2_seed82585",
       "task": "addition",
       "config": {
         "P": 127,
@@ -2145,7 +2145,7 @@
         "OOD_LEN": 128,
         "MAX_UNIQUE_RATIO": 0.7,
         "NUM_MASK": 1,
-        "D_MODEL": 128,
+        "D_MODEL": 256,
         "N_HEAD": 4,
         "MLP_RATIO": 4,
         "BATCH_SIZE": 128,
@@ -2162,7 +2162,7 @@
       }
     },
     {
-      "name": "addition_a1b1_d128l2r4h4_P127_tr64ood128_miss0.3len1_seed17996",
+      "name": "addition_a1b1_d256l2r4h4_P127_tr64ood128_miss0.3len1_seed17996",
       "task": "addition",
       "config": {
         "P": 127,
@@ -2172,7 +2172,7 @@
         "OOD_LEN": 128,
         "MAX_UNIQUE_RATIO": 0.7,
         "NUM_MASK": 1,
-        "D_MODEL": 128,
+        "D_MODEL": 256,
         "N_HEAD": 4,
         "MLP_RATIO": 4,
         "BATCH_SIZE": 128,
@@ -2189,7 +2189,7 @@
       }
     },
     {
-      "name": "addition_a1b1_d128l2r4h4_P127_tr64ood128_miss0.3len1_seed18318",
+      "name": "addition_a1b1_d256l2r4h4_P127_tr64ood128_miss0.3len1_seed18318",
       "task": "addition",
       "config": {
         "P": 127,
@@ -2199,7 +2199,7 @@
         "OOD_LEN": 128,
         "MAX_UNIQUE_RATIO": 0.7,
         "NUM_MASK": 1,
-        "D_MODEL": 128,
+        "D_MODEL": 256,
         "N_HEAD": 4,
         "MLP_RATIO": 4,
         "BATCH_SIZE": 128,
@@ -2216,7 +2216,7 @@
       }
     },
     {
-      "name": "addition_a1b1_d128l2r4h4_P127_tr64ood128_miss0.3len1_seed34789",
+      "name": "addition_a1b1_d256l2r4h4_P127_tr64ood128_miss0.3len1_seed34789",
       "task": "addition",
       "config": {
         "P": 127,
@@ -2226,7 +2226,7 @@
         "OOD_LEN": 128,
         "MAX_UNIQUE_RATIO": 0.7,
         "NUM_MASK": 1,
-        "D_MODEL": 128,
+        "D_MODEL": 256,
         "N_HEAD": 4,
         "MLP_RATIO": 4,
         "BATCH_SIZE": 128,
@@ -2243,7 +2243,7 @@
       }
     },
     {
-      "name": "addition_a1b1_d128l2r4h4_P127_tr64ood128_miss0.3len1_seed44536",
+      "name": "addition_a1b1_d256l2r4h4_P127_tr64ood128_miss0.3len1_seed44536",
       "task": "addition",
       "config": {
         "P": 127,
@@ -2253,7 +2253,7 @@
         "OOD_LEN": 128,
         "MAX_UNIQUE_RATIO": 0.7,
         "NUM_MASK": 1,
-        "D_MODEL": 128,
+        "D_MODEL": 256,
         "N_HEAD": 4,
         "MLP_RATIO": 4,
         "BATCH_SIZE": 128,
@@ -2270,7 +2270,7 @@
       }
     },
     {
-      "name": "addition_a1b1_d128l2r4h4_P127_tr64ood128_miss0.3len1_seed62513",
+      "name": "addition_a1b1_d256l2r4h4_P127_tr64ood128_miss0.3len1_seed62513",
       "task": "addition",
       "config": {
         "P": 127,
@@ -2280,7 +2280,7 @@
         "OOD_LEN": 128,
         "MAX_UNIQUE_RATIO": 0.7,
         "NUM_MASK": 1,
-        "D_MODEL": 128,
+        "D_MODEL": 256,
         "N_HEAD": 4,
         "MLP_RATIO": 4,
         "BATCH_SIZE": 128,
@@ -2297,7 +2297,7 @@
       }
     },
     {
-      "name": "addition_a1b1_d128l2r4h4_P127_tr64ood128_miss0.3len1_seed64154",
+      "name": "addition_a1b1_d256l2r4h4_P127_tr64ood128_miss0.3len1_seed64154",
       "task": "addition",
       "config": {
         "P": 127,
@@ -2307,7 +2307,7 @@
         "OOD_LEN": 128,
         "MAX_UNIQUE_RATIO": 0.7,
         "NUM_MASK": 1,
-        "D_MODEL": 128,
+        "D_MODEL": 256,
         "N_HEAD": 4,
         "MLP_RATIO": 4,
         "BATCH_SIZE": 128,
@@ -2324,7 +2324,7 @@
       }
     },
     {
-      "name": "addition_a1b1_d128l2r4h4_P127_tr64ood128_miss0.3len1_seed72814",
+      "name": "addition_a1b1_d256l2r4h4_P127_tr64ood128_miss0.3len1_seed72814",
       "task": "addition",
       "config": {
         "P": 127,
@@ -2334,7 +2334,7 @@
         "OOD_LEN": 128,
         "MAX_UNIQUE_RATIO": 0.7,
         "NUM_MASK": 1,
-        "D_MODEL": 128,
+        "D_MODEL": 256,
         "N_HEAD": 4,
         "MLP_RATIO": 4,
         "BATCH_SIZE": 128,
@@ -2351,7 +2351,7 @@
       }
     },
     {
-      "name": "addition_a1b1_d128l2r4h4_P127_tr64ood128_miss0.3len1_seed82585",
+      "name": "addition_a1b1_d256l2r4h4_P127_tr64ood128_miss0.3len1_seed82585",
       "task": "addition",
       "config": {
         "P": 127,
@@ -2361,7 +2361,7 @@
         "OOD_LEN": 128,
         "MAX_UNIQUE_RATIO": 0.7,
         "NUM_MASK": 1,
-        "D_MODEL": 128,
+        "D_MODEL": 256,
         "N_HEAD": 4,
         "MLP_RATIO": 4,
         "BATCH_SIZE": 128,
@@ -2378,7 +2378,7 @@
       }
     },
     {
-      "name": "addition_a1b1_d128l2r4h4_P127_tr64ood128_miss0.3len2_seed17996",
+      "name": "addition_a1b1_d256l2r4h4_P127_tr64ood128_miss0.3len2_seed17996",
       "task": "addition",
       "config": {
         "P": 127,
@@ -2388,7 +2388,7 @@
         "OOD_LEN": 128,
         "MAX_UNIQUE_RATIO": 0.7,
         "NUM_MASK": 1,
-        "D_MODEL": 128,
+        "D_MODEL": 256,
         "N_HEAD": 4,
         "MLP_RATIO": 4,
         "BATCH_SIZE": 128,
@@ -2405,7 +2405,7 @@
       }
     },
     {
-      "name": "addition_a1b1_d128l2r4h4_P127_tr64ood128_miss0.3len2_seed18318",
+      "name": "addition_a1b1_d256l2r4h4_P127_tr64ood128_miss0.3len2_seed18318",
       "task": "addition",
       "config": {
         "P": 127,
@@ -2415,7 +2415,7 @@
         "OOD_LEN": 128,
         "MAX_UNIQUE_RATIO": 0.7,
         "NUM_MASK": 1,
-        "D_MODEL": 128,
+        "D_MODEL": 256,
         "N_HEAD": 4,
         "MLP_RATIO": 4,
         "BATCH_SIZE": 128,
@@ -2432,7 +2432,7 @@
       }
     },
     {
-      "name": "addition_a1b1_d128l2r4h4_P127_tr64ood128_miss0.3len2_seed34789",
+      "name": "addition_a1b1_d256l2r4h4_P127_tr64ood128_miss0.3len2_seed34789",
       "task": "addition",
       "config": {
         "P": 127,
@@ -2442,7 +2442,7 @@
         "OOD_LEN": 128,
         "MAX_UNIQUE_RATIO": 0.7,
         "NUM_MASK": 1,
-        "D_MODEL": 128,
+        "D_MODEL": 256,
         "N_HEAD": 4,
         "MLP_RATIO": 4,
         "BATCH_SIZE": 128,
@@ -2459,7 +2459,7 @@
       }
     },
     {
-      "name": "addition_a1b1_d128l2r4h4_P127_tr64ood128_miss0.3len2_seed44536",
+      "name": "addition_a1b1_d256l2r4h4_P127_tr64ood128_miss0.3len2_seed44536",
       "task": "addition",
       "config": {
         "P": 127,
@@ -2469,7 +2469,7 @@
         "OOD_LEN": 128,
         "MAX_UNIQUE_RATIO": 0.7,
         "NUM_MASK": 1,
-        "D_MODEL": 128,
+        "D_MODEL": 256,
         "N_HEAD": 4,
         "MLP_RATIO": 4,
         "BATCH_SIZE": 128,
@@ -2486,7 +2486,7 @@
       }
     },
     {
-      "name": "addition_a1b1_d128l2r4h4_P127_tr64ood128_miss0.3len2_seed62513",
+      "name": "addition_a1b1_d256l2r4h4_P127_tr64ood128_miss0.3len2_seed62513",
       "task": "addition",
       "config": {
         "P": 127,
@@ -2496,7 +2496,7 @@
         "OOD_LEN": 128,
         "MAX_UNIQUE_RATIO": 0.7,
         "NUM_MASK": 1,
-        "D_MODEL": 128,
+        "D_MODEL": 256,
         "N_HEAD": 4,
         "MLP_RATIO": 4,
         "BATCH_SIZE": 128,
@@ -2513,7 +2513,7 @@
       }
     },
     {
-      "name": "addition_a1b1_d128l2r4h4_P127_tr64ood128_miss0.3len2_seed64154",
+      "name": "addition_a1b1_d256l2r4h4_P127_tr64ood128_miss0.3len2_seed64154",
       "task": "addition",
       "config": {
         "P": 127,
@@ -2523,7 +2523,7 @@
         "OOD_LEN": 128,
         "MAX_UNIQUE_RATIO": 0.7,
         "NUM_MASK": 1,
-        "D_MODEL": 128,
+        "D_MODEL": 256,
         "N_HEAD": 4,
         "MLP_RATIO": 4,
         "BATCH_SIZE": 128,
@@ -2540,7 +2540,7 @@
       }
     },
     {
-      "name": "addition_a1b1_d128l2r4h4_P127_tr64ood128_miss0.3len2_seed72814",
+      "name": "addition_a1b1_d256l2r4h4_P127_tr64ood128_miss0.3len2_seed72814",
       "task": "addition",
       "config": {
         "P": 127,
@@ -2550,7 +2550,7 @@
         "OOD_LEN": 128,
         "MAX_UNIQUE_RATIO": 0.7,
         "NUM_MASK": 1,
-        "D_MODEL": 128,
+        "D_MODEL": 256,
         "N_HEAD": 4,
         "MLP_RATIO": 4,
         "BATCH_SIZE": 128,
@@ -2567,7 +2567,7 @@
       }
     },
     {
-      "name": "addition_a1b1_d128l2r4h4_P127_tr64ood128_miss0.3len2_seed82585",
+      "name": "addition_a1b1_d256l2r4h4_P127_tr64ood128_miss0.3len2_seed82585",
       "task": "addition",
       "config": {
         "P": 127,
@@ -2577,7 +2577,7 @@
         "OOD_LEN": 128,
         "MAX_UNIQUE_RATIO": 0.7,
         "NUM_MASK": 1,
-        "D_MODEL": 128,
+        "D_MODEL": 256,
         "N_HEAD": 4,
         "MLP_RATIO": 4,
         "BATCH_SIZE": 128,
@@ -2594,7 +2594,7 @@
       }
     },
     {
-      "name": "addition_a1b1_d128l3r4h4_P127_tr64ood128_miss0.1len2_seed17996",
+      "name": "addition_a1b1_d256l3r4h4_P127_tr64ood128_miss0.1len2_seed17996",
       "task": "addition",
       "config": {
         "P": 127,
@@ -2604,7 +2604,7 @@
         "OOD_LEN": 128,
         "MAX_UNIQUE_RATIO": 0.7,
         "NUM_MASK": 1,
-        "D_MODEL": 128,
+        "D_MODEL": 256,
         "N_HEAD": 4,
         "MLP_RATIO": 4,
         "BATCH_SIZE": 128,
@@ -2621,7 +2621,7 @@
       }
     },
     {
-      "name": "addition_a1b1_d128l3r4h4_P127_tr64ood128_miss0.1len2_seed18318",
+      "name": "addition_a1b1_d256l3r4h4_P127_tr64ood128_miss0.1len2_seed18318",
       "task": "addition",
       "config": {
         "P": 127,
@@ -2631,7 +2631,7 @@
         "OOD_LEN": 128,
         "MAX_UNIQUE_RATIO": 0.7,
         "NUM_MASK": 1,
-        "D_MODEL": 128,
+        "D_MODEL": 256,
         "N_HEAD": 4,
         "MLP_RATIO": 4,
         "BATCH_SIZE": 128,
@@ -2648,7 +2648,7 @@
       }
     },
     {
-      "name": "addition_a1b1_d128l3r4h4_P127_tr64ood128_miss0.1len2_seed34789",
+      "name": "addition_a1b1_d256l3r4h4_P127_tr64ood128_miss0.1len2_seed34789",
       "task": "addition",
       "config": {
         "P": 127,
@@ -2658,7 +2658,7 @@
         "OOD_LEN": 128,
         "MAX_UNIQUE_RATIO": 0.7,
         "NUM_MASK": 1,
-        "D_MODEL": 128,
+        "D_MODEL": 256,
         "N_HEAD": 4,
         "MLP_RATIO": 4,
         "BATCH_SIZE": 128,
@@ -2675,7 +2675,7 @@
       }
     },
     {
-      "name": "addition_a1b1_d128l3r4h4_P127_tr64ood128_miss0.1len2_seed44536",
+      "name": "addition_a1b1_d256l3r4h4_P127_tr64ood128_miss0.1len2_seed44536",
       "task": "addition",
       "config": {
         "P": 127,
@@ -2685,7 +2685,7 @@
         "OOD_LEN": 128,
         "MAX_UNIQUE_RATIO": 0.7,
         "NUM_MASK": 1,
-        "D_MODEL": 128,
+        "D_MODEL": 256,
         "N_HEAD": 4,
         "MLP_RATIO": 4,
         "BATCH_SIZE": 128,
@@ -2702,7 +2702,7 @@
       }
     },
     {
-      "name": "addition_a1b1_d128l3r4h4_P127_tr64ood128_miss0.1len2_seed62513",
+      "name": "addition_a1b1_d256l3r4h4_P127_tr64ood128_miss0.1len2_seed62513",
       "task": "addition",
       "config": {
         "P": 127,
@@ -2712,7 +2712,7 @@
         "OOD_LEN": 128,
         "MAX_UNIQUE_RATIO": 0.7,
         "NUM_MASK": 1,
-        "D_MODEL": 128,
+        "D_MODEL": 256,
         "N_HEAD": 4,
         "MLP_RATIO": 4,
         "BATCH_SIZE": 128,
@@ -2729,7 +2729,7 @@
       }
     },
     {
-      "name": "addition_a1b1_d128l3r4h4_P127_tr64ood128_miss0.1len2_seed64154",
+      "name": "addition_a1b1_d256l3r4h4_P127_tr64ood128_miss0.1len2_seed64154",
       "task": "addition",
       "config": {
         "P": 127,
@@ -2739,7 +2739,7 @@
         "OOD_LEN": 128,
         "MAX_UNIQUE_RATIO": 0.7,
         "NUM_MASK": 1,
-        "D_MODEL": 128,
+        "D_MODEL": 256,
         "N_HEAD": 4,
         "MLP_RATIO": 4,
         "BATCH_SIZE": 128,
@@ -2756,7 +2756,7 @@
       }
     },
     {
-      "name": "addition_a1b1_d128l3r4h4_P127_tr64ood128_miss0.1len2_seed72814",
+      "name": "addition_a1b1_d256l3r4h4_P127_tr64ood128_miss0.1len2_seed72814",
       "task": "addition",
       "config": {
         "P": 127,
@@ -2766,7 +2766,7 @@
         "OOD_LEN": 128,
         "MAX_UNIQUE_RATIO": 0.7,
         "NUM_MASK": 1,
-        "D_MODEL": 128,
+        "D_MODEL": 256,
         "N_HEAD": 4,
         "MLP_RATIO": 4,
         "BATCH_SIZE": 128,
@@ -2783,7 +2783,7 @@
       }
     },
     {
-      "name": "addition_a1b1_d128l3r4h4_P127_tr64ood128_miss0.1len2_seed82585",
+      "name": "addition_a1b1_d256l3r4h4_P127_tr64ood128_miss0.1len2_seed82585",
       "task": "addition",
       "config": {
         "P": 127,
@@ -2793,7 +2793,7 @@
         "OOD_LEN": 128,
         "MAX_UNIQUE_RATIO": 0.7,
         "NUM_MASK": 1,
-        "D_MODEL": 128,
+        "D_MODEL": 256,
         "N_HEAD": 4,
         "MLP_RATIO": 4,
         "BATCH_SIZE": 128,
@@ -2810,7 +2810,7 @@
       }
     },
     {
-      "name": "addition_a1b1_d128l3r4h4_P127_tr64ood128_miss0.2len2_seed17996",
+      "name": "addition_a1b1_d256l3r4h4_P127_tr64ood128_miss0.2len2_seed17996",
       "task": "addition",
       "config": {
         "P": 127,
@@ -2820,7 +2820,7 @@
         "OOD_LEN": 128,
         "MAX_UNIQUE_RATIO": 0.7,
         "NUM_MASK": 1,
-        "D_MODEL": 128,
+        "D_MODEL": 256,
         "N_HEAD": 4,
         "MLP_RATIO": 4,
         "BATCH_SIZE": 128,
@@ -2837,7 +2837,7 @@
       }
     },
     {
-      "name": "addition_a1b1_d128l3r4h4_P127_tr64ood128_miss0.2len2_seed18318",
+      "name": "addition_a1b1_d256l3r4h4_P127_tr64ood128_miss0.2len2_seed18318",
       "task": "addition",
       "config": {
         "P": 127,
@@ -2847,7 +2847,7 @@
         "OOD_LEN": 128,
         "MAX_UNIQUE_RATIO": 0.7,
         "NUM_MASK": 1,
-        "D_MODEL": 128,
+        "D_MODEL": 256,
         "N_HEAD": 4,
         "MLP_RATIO": 4,
         "BATCH_SIZE": 128,
@@ -2864,7 +2864,7 @@
       }
     },
     {
-      "name": "addition_a1b1_d128l3r4h4_P127_tr64ood128_miss0.2len2_seed34789",
+      "name": "addition_a1b1_d256l3r4h4_P127_tr64ood128_miss0.2len2_seed34789",
       "task": "addition",
       "config": {
         "P": 127,
@@ -2874,7 +2874,7 @@
         "OOD_LEN": 128,
         "MAX_UNIQUE_RATIO": 0.7,
         "NUM_MASK": 1,
-        "D_MODEL": 128,
+        "D_MODEL": 256,
         "N_HEAD": 4,
         "MLP_RATIO": 4,
         "BATCH_SIZE": 128,
@@ -2891,7 +2891,7 @@
       }
     },
     {
-      "name": "addition_a1b1_d128l3r4h4_P127_tr64ood128_miss0.2len2_seed44536",
+      "name": "addition_a1b1_d256l3r4h4_P127_tr64ood128_miss0.2len2_seed44536",
       "task": "addition",
       "config": {
         "P": 127,
@@ -2901,7 +2901,7 @@
         "OOD_LEN": 128,
         "MAX_UNIQUE_RATIO": 0.7,
         "NUM_MASK": 1,
-        "D_MODEL": 128,
+        "D_MODEL": 256,
         "N_HEAD": 4,
         "MLP_RATIO": 4,
         "BATCH_SIZE": 128,
@@ -2918,7 +2918,7 @@
       }
     },
     {
-      "name": "addition_a1b1_d128l3r4h4_P127_tr64ood128_miss0.2len2_seed62513",
+      "name": "addition_a1b1_d256l3r4h4_P127_tr64ood128_miss0.2len2_seed62513",
       "task": "addition",
       "config": {
         "P": 127,
@@ -2928,7 +2928,7 @@
         "OOD_LEN": 128,
         "MAX_UNIQUE_RATIO": 0.7,
         "NUM_MASK": 1,
-        "D_MODEL": 128,
+        "D_MODEL": 256,
         "N_HEAD": 4,
         "MLP_RATIO": 4,
         "BATCH_SIZE": 128,
@@ -2945,7 +2945,7 @@
       }
     },
     {
-      "name": "addition_a1b1_d128l3r4h4_P127_tr64ood128_miss0.2len2_seed64154",
+      "name": "addition_a1b1_d256l3r4h4_P127_tr64ood128_miss0.2len2_seed64154",
       "task": "addition",
       "config": {
         "P": 127,
@@ -2955,7 +2955,7 @@
         "OOD_LEN": 128,
         "MAX_UNIQUE_RATIO": 0.7,
         "NUM_MASK": 1,
-        "D_MODEL": 128,
+        "D_MODEL": 256,
         "N_HEAD": 4,
         "MLP_RATIO": 4,
         "BATCH_SIZE": 128,
@@ -2972,7 +2972,7 @@
       }
     },
     {
-      "name": "addition_a1b1_d128l3r4h4_P127_tr64ood128_miss0.2len2_seed72814",
+      "name": "addition_a1b1_d256l3r4h4_P127_tr64ood128_miss0.2len2_seed72814",
       "task": "addition",
       "config": {
         "P": 127,
@@ -2982,7 +2982,7 @@
         "OOD_LEN": 128,
         "MAX_UNIQUE_RATIO": 0.7,
         "NUM_MASK": 1,
-        "D_MODEL": 128,
+        "D_MODEL": 256,
         "N_HEAD": 4,
         "MLP_RATIO": 4,
         "BATCH_SIZE": 128,
@@ -2999,7 +2999,7 @@
       }
     },
     {
-      "name": "addition_a1b1_d128l3r4h4_P127_tr64ood128_miss0.2len2_seed82585",
+      "name": "addition_a1b1_d256l3r4h4_P127_tr64ood128_miss0.2len2_seed82585",
       "task": "addition",
       "config": {
         "P": 127,
@@ -3009,7 +3009,7 @@
         "OOD_LEN": 128,
         "MAX_UNIQUE_RATIO": 0.7,
         "NUM_MASK": 1,
-        "D_MODEL": 128,
+        "D_MODEL": 256,
         "N_HEAD": 4,
         "MLP_RATIO": 4,
         "BATCH_SIZE": 128,
@@ -3026,7 +3026,7 @@
       }
     },
     {
-      "name": "addition_a1b1_d128l3r4h4_P127_tr64ood128_miss0.3len2_seed17996",
+      "name": "addition_a1b1_d256l3r4h4_P127_tr64ood128_miss0.3len2_seed17996",
       "task": "addition",
       "config": {
         "P": 127,
@@ -3036,7 +3036,7 @@
         "OOD_LEN": 128,
         "MAX_UNIQUE_RATIO": 0.7,
         "NUM_MASK": 1,
-        "D_MODEL": 128,
+        "D_MODEL": 256,
         "N_HEAD": 4,
         "MLP_RATIO": 4,
         "BATCH_SIZE": 128,
@@ -3053,7 +3053,7 @@
       }
     },
     {
-      "name": "addition_a1b1_d128l3r4h4_P127_tr64ood128_miss0.3len2_seed18318",
+      "name": "addition_a1b1_d256l3r4h4_P127_tr64ood128_miss0.3len2_seed18318",
       "task": "addition",
       "config": {
         "P": 127,
@@ -3063,7 +3063,7 @@
         "OOD_LEN": 128,
         "MAX_UNIQUE_RATIO": 0.7,
         "NUM_MASK": 1,
-        "D_MODEL": 128,
+        "D_MODEL": 256,
         "N_HEAD": 4,
         "MLP_RATIO": 4,
         "BATCH_SIZE": 128,
@@ -3080,7 +3080,7 @@
       }
     },
     {
-      "name": "addition_a1b1_d128l3r4h4_P127_tr64ood128_miss0.3len2_seed34789",
+      "name": "addition_a1b1_d256l3r4h4_P127_tr64ood128_miss0.3len2_seed34789",
       "task": "addition",
       "config": {
         "P": 127,
@@ -3090,7 +3090,7 @@
         "OOD_LEN": 128,
         "MAX_UNIQUE_RATIO": 0.7,
         "NUM_MASK": 1,
-        "D_MODEL": 128,
+        "D_MODEL": 256,
         "N_HEAD": 4,
         "MLP_RATIO": 4,
         "BATCH_SIZE": 128,
@@ -3107,7 +3107,7 @@
       }
     },
     {
-      "name": "addition_a1b1_d128l3r4h4_P127_tr64ood128_miss0.3len2_seed44536",
+      "name": "addition_a1b1_d256l3r4h4_P127_tr64ood128_miss0.3len2_seed44536",
       "task": "addition",
       "config": {
         "P": 127,
@@ -3117,7 +3117,7 @@
         "OOD_LEN": 128,
         "MAX_UNIQUE_RATIO": 0.7,
         "NUM_MASK": 1,
-        "D_MODEL": 128,
+        "D_MODEL": 256,
         "N_HEAD": 4,
         "MLP_RATIO": 4,
         "BATCH_SIZE": 128,
@@ -3134,7 +3134,7 @@
       }
     },
     {
-      "name": "addition_a1b1_d128l3r4h4_P127_tr64ood128_miss0.3len2_seed62513",
+      "name": "addition_a1b1_d256l3r4h4_P127_tr64ood128_miss0.3len2_seed62513",
       "task": "addition",
       "config": {
         "P": 127,
@@ -3144,7 +3144,7 @@
         "OOD_LEN": 128,
         "MAX_UNIQUE_RATIO": 0.7,
         "NUM_MASK": 1,
-        "D_MODEL": 128,
+        "D_MODEL": 256,
         "N_HEAD": 4,
         "MLP_RATIO": 4,
         "BATCH_SIZE": 128,
@@ -3161,7 +3161,7 @@
       }
     },
     {
-      "name": "addition_a1b1_d128l3r4h4_P127_tr64ood128_miss0.3len2_seed64154",
+      "name": "addition_a1b1_d256l3r4h4_P127_tr64ood128_miss0.3len2_seed64154",
       "task": "addition",
       "config": {
         "P": 127,
@@ -3171,7 +3171,7 @@
         "OOD_LEN": 128,
         "MAX_UNIQUE_RATIO": 0.7,
         "NUM_MASK": 1,
-        "D_MODEL": 128,
+        "D_MODEL": 256,
         "N_HEAD": 4,
         "MLP_RATIO": 4,
         "BATCH_SIZE": 128,
@@ -3188,7 +3188,7 @@
       }
     },
     {
-      "name": "addition_a1b1_d128l3r4h4_P127_tr64ood128_miss0.3len2_seed72814",
+      "name": "addition_a1b1_d256l3r4h4_P127_tr64ood128_miss0.3len2_seed72814",
       "task": "addition",
       "config": {
         "P": 127,
@@ -3198,7 +3198,7 @@
         "OOD_LEN": 128,
         "MAX_UNIQUE_RATIO": 0.7,
         "NUM_MASK": 1,
-        "D_MODEL": 128,
+        "D_MODEL": 256,
         "N_HEAD": 4,
         "MLP_RATIO": 4,
         "BATCH_SIZE": 128,
@@ -3215,7 +3215,7 @@
       }
     },
     {
-      "name": "addition_a1b1_d128l3r4h4_P127_tr64ood128_miss0.3len2_seed82585",
+      "name": "addition_a1b1_d256l3r4h4_P127_tr64ood128_miss0.3len2_seed82585",
       "task": "addition",
       "config": {
         "P": 127,
@@ -3225,7 +3225,7 @@
         "OOD_LEN": 128,
         "MAX_UNIQUE_RATIO": 0.7,
         "NUM_MASK": 1,
-        "D_MODEL": 128,
+        "D_MODEL": 256,
         "N_HEAD": 4,
         "MLP_RATIO": 4,
         "BATCH_SIZE": 128,

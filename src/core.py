@@ -17,7 +17,8 @@ from rules import rules_from_config
 class RecurrenceDataset(Dataset):
     def __init__(self, p=127, recurrence_fn=None, recurrence_name="X(k)=?", init_len=2, num_samples=1000, length=10,
                  verbose=True, missing_prob=0.0, num_mask=0, first_task_weight=1.0,
-                 missing_token=None, miss_len=1, miss_second=False):
+                 missing_token=None, miss_len=1, miss_second=False,
+                 predict_missing=False):
         self.length = length
         self.p = p
         self.recurrence_fn = recurrence_fn
@@ -48,6 +49,12 @@ class RecurrenceDataset(Dataset):
         self.missing_token = p if missing_token is None else missing_token
         self.miss_len = miss_len
         self.miss_second = miss_second
+        # PREDICT_MISSING: when true, items are (corrupted_view, clean_seq)
+        # tuples — the model trains on the corrupted input but the loss/accuracy
+        # targets are the clean values (missing positions must be filled in).
+        # When false (default), items are (corrupted_seq, loss_mask) and the
+        # missing positions are masked out of the metrics.
+        self.predict_missing = predict_missing
         self.train_samples = []
         self.test_samples = []
         self.seen_indices = set()
@@ -134,7 +141,12 @@ class RecurrenceDataset(Dataset):
                 target = self.train_samples if is_train else self.test_samples
                 window = torch.tensor(seq[i:i + self.length], dtype=torch.long)
                 if self.missing_prob > 0:
-                    target.append((window, self._corrupt(window, is_train)))
+                    if self.predict_missing:
+                        clean = window.clone()
+                        self._corrupt(window, is_train)  # corrupts in place; mask unused
+                        target.append((window, clean))
+                    else:
+                        target.append((window, self._corrupt(window, is_train)))
                 else:
                     target.append(window)
 
@@ -147,8 +159,9 @@ class RecurrenceDataset(Dataset):
             print(f"  - Initial state coverage: {len(self.train_samples)}/{state_space} ({cov*100:.1f}%)")
             if self.missing_prob > 0:
                 print(f"  - Missing-value corruption: prob={self.missing_prob}, miss_len={self.miss_len}, "
-                      f"miss_second={self.miss_second}, positions >= {self.init_len}, "
-                      f"token id {self.missing_token}, train+test splits (loss masked at corrupted positions)")
+                      f"miss_second={self.miss_second}, predict_missing={self.predict_missing}, "
+                      f"positions >= {self.init_len}, token id {self.missing_token}, "
+                      f"train+test splits (loss masked at corrupted positions)")
             print(f"Recurrence: {self.recurrence_name}")
             print("-" * 50)
             print("-" * 50)
@@ -240,22 +253,39 @@ class BucketBatchSampler(Sampler):
 
 # Every collate_fn returns (x, tag, *payload); the tag tells consumers how to
 # interpret the payload. See _unpack_batch for the layout of each tag.
+# Routing is EXPLICIT: the prepare functions select the collate that matches
+# the dataset's item layout (plain tensor / (seq, mask) / (view, clean) etc.);
+# collates never guess from item types.
 class BatchTag(IntEnum):
     MIXED_AB = 0       # payload: (ab_indices,)  -- per-sample rule index
     DYNAMIC_MIXED = 1  # payload: (loss_mask,)   -- per-position loss mask
     PLAIN = 2          # payload: ()             -- sequences only
     MIXED_AB_MASKED = 3  # payload: (ab_indices, loss_mask) -- rule index + per-position loss mask
+    PLAIN_TARGET = 4     # payload: (clean_seqs,) -- clean sequences; targets = clean[:, 1:]
+    MIXED_AB_TARGET = 5  # payload: (ab_indices, clean_seqs) -- rule index + clean sequences
 
 
 def collate_fn(batch):
-    # Samples may be (seq, loss_mask) tuples (RecurrenceDataset with
-    # MISSING_PROB enabled); route them through the DYNAMIC_MIXED payload so
-    # the per-position loss mask reaches the model unchanged.
-    if isinstance(batch[0], tuple):
-        seqs = torch.stack([item[0] for item in batch], dim=0)
-        masks = torch.stack([item[1] for item in batch], dim=0)
-        return seqs, BatchTag.DYNAMIC_MIXED, masks
+    """Plain tensor samples -> PLAIN."""
     return torch.stack(batch, dim=0), BatchTag.PLAIN
+
+
+def collate_fn_masked(batch):
+    """(seq, loss_mask) samples (MISSING_PROB, mask mode) -> DYNAMIC_MIXED."""
+    seqs = torch.stack([item[0] for item in batch], dim=0)
+    masks = torch.stack([item[1] for item in batch], dim=0)
+    return seqs, BatchTag.DYNAMIC_MIXED, masks
+
+
+def collate_fn_predict(batch):
+    """(view, clean) samples (MISSING_PROB + PREDICT_MISSING) -> PLAIN_TARGET.
+
+    The model input is the corrupted view; the loss/accuracy targets are the
+    clean sequence (targets = clean[:, 1:] at the call site).
+    """
+    views = torch.stack([item[0] for item in batch], dim=0)
+    cleans = torch.stack([item[1] for item in batch], dim=0)
+    return views, BatchTag.PLAIN_TARGET, cleans
 
 
 # ==================== RoPE Definition ====================
@@ -539,12 +569,18 @@ def freeze_partial(model, cond_fix):
 def _unpack_batch(batch, device, extra_kwargs_fn):
     """Unpack a dataloader batch of the form (x, tag, *payload).
 
-    Returns (x, loss_mask, kwargs, ab_labels). The tag (see BatchTag) selects
-    the payload layout:
-      PLAIN         -> no payload
-      MIXED_AB      -> (ab_indices,); passed through extra_kwargs_fn and also
-                       returned as ab_labels for per-rule evaluation stats
-      DYNAMIC_MIXED -> (loss_mask,)
+    Returns (x, loss_mask, kwargs, ab_labels, targets_override). The tag (see
+    BatchTag) selects the payload layout:
+      PLAIN          -> no payload
+      MIXED_AB       -> (ab_indices,)
+      DYNAMIC_MIXED  -> (loss_mask,)
+      MIXED_AB_MASKED -> (ab_indices, loss_mask)
+      PLAIN_TARGET   -> (clean_seqs,); targets_override = clean_seqs
+      MIXED_AB_TARGET -> (ab_indices, clean_seqs)
+    ab_indices are passed through extra_kwargs_fn and also returned as
+    ab_labels for per-rule evaluation stats. targets_override (when not None)
+    replaces the default targets x[:, 1:] — used by PREDICT_MISSING mode where
+    the input is corrupted but the loss targets are the clean values.
 
     Malformed batches raise immediately instead of being guessed by shape.
     """
@@ -555,23 +591,33 @@ def _unpack_batch(batch, device, extra_kwargs_fn):
     if tag == BatchTag.PLAIN:
         if len(batch) != 2:
             raise ValueError(f"PLAIN batch must have no payload, got {len(batch) - 2} extra item(s)")
-        return x, None, {}, None
+        return x, None, {}, None, None
     if tag == BatchTag.MIXED_AB:
         if len(batch) != 3:
             raise ValueError(f"MIXED_AB batch must carry exactly (ab_indices,), got {len(batch) - 2} payload item(s)")
         ab_labels = batch[2].to(device)
         kwargs = extra_kwargs_fn(ab_labels) if extra_kwargs_fn is not None else {}
-        return x, None, kwargs, ab_labels
+        return x, None, kwargs, ab_labels, None
     if tag == BatchTag.DYNAMIC_MIXED:
         if len(batch) != 3:
             raise ValueError(f"DYNAMIC_MIXED batch must carry exactly (loss_mask,), got {len(batch) - 2} payload item(s)")
-        return x, batch[2].to(device), {}, None
+        return x, batch[2].to(device), {}, None, None
     if tag == BatchTag.MIXED_AB_MASKED:
         if len(batch) != 4:
             raise ValueError(f"MIXED_AB_MASKED batch must carry exactly (ab_indices, loss_mask), got {len(batch) - 2} payload item(s)")
         ab_labels = batch[2].to(device)
         kwargs = extra_kwargs_fn(ab_labels) if extra_kwargs_fn is not None else {}
-        return x, batch[3].to(device), kwargs, ab_labels
+        return x, batch[3].to(device), kwargs, ab_labels, None
+    if tag == BatchTag.PLAIN_TARGET:
+        if len(batch) != 3:
+            raise ValueError(f"PLAIN_TARGET batch must carry exactly (clean_seqs,), got {len(batch) - 2} payload item(s)")
+        return x, None, {}, None, batch[2].to(device)
+    if tag == BatchTag.MIXED_AB_TARGET:
+        if len(batch) != 4:
+            raise ValueError(f"MIXED_AB_TARGET batch must carry exactly (ab_indices, clean_seqs), got {len(batch) - 2} payload item(s)")
+        ab_labels = batch[2].to(device)
+        kwargs = extra_kwargs_fn(ab_labels) if extra_kwargs_fn is not None else {}
+        return x, None, kwargs, ab_labels, batch[3].to(device)
     raise ValueError(f"Unknown batch tag: {tag}")
 
 
@@ -629,12 +675,13 @@ def train_epoch(model, dataloader, optimizer, device, num_mask=1, extra_kwargs_f
     pos_total = {}
     
     for batch in dataloader:
-        x, loss_mask, kwargs, _ = _unpack_batch(batch, device, extra_kwargs_fn)
+        x, loss_mask, kwargs, _, targets_override = _unpack_batch(batch, device, extra_kwargs_fn)
         B = x.size(0)
-        
+
         # Construct targets (no padding, no PAD token)
         # Input [a,b,c,d,e], targets [b,c,d,e], aligned to L-1
-        targets = x[:, 1:]  # (B, L-1)
+        # PREDICT_MISSING batches carry the clean sequence as override.
+        targets = targets_override[:, 1:] if targets_override is not None else x[:, 1:]  # (B, L-1)
         if loss_mask is None:
             loss_len = targets.size(1)
             loss_mask = torch.zeros(B, loss_len, dtype=torch.float, device=device)
@@ -685,11 +732,12 @@ def evaluate(model, dataloader, device, num_mask=1, extra_kwargs_fn=None):
     debug_printed = False
     with torch.no_grad():
         for batch in dataloader:
-            x, loss_mask, kwargs, ab_labels = _unpack_batch(batch, device, extra_kwargs_fn)
+            x, loss_mask, kwargs, ab_labels, targets_override = _unpack_batch(batch, device, extra_kwargs_fn)
 
             B = x.size(0)
-            
-            targets = x[:, 1:]  # (B, L-1)
+
+            # PREDICT_MISSING batches carry the clean sequence as override.
+            targets = targets_override[:, 1:] if targets_override is not None else x[:, 1:]  # (B, L-1)
             if loss_mask is None:
                 loss_len = targets.size(1)
                 loss_mask = torch.zeros(B, loss_len, dtype=torch.float, device=device)
@@ -937,15 +985,31 @@ class MixedABDataset(Dataset):
 
 
 def mixed_ab_collate_fn(batch):
+    """(seq, rule_idx) samples -> MIXED_AB."""
     sequences = [item[0] for item in batch]
-    ab_indices = torch.tensor([item[-1] for item in batch], dtype=torch.long)
-    # With MISSING_PROB enabled, MixedRecurrenceDataset emits
-    # (seq, loss_mask, rule_idx) triples; route them through MIXED_AB_MASKED.
-    if len(batch[0]) == 3:
-        masks = torch.stack([item[1] for item in batch], dim=0)
-        return (torch.stack(sequences, dim=0), BatchTag.MIXED_AB_MASKED,
-                ab_indices, masks)
+    ab_indices = torch.tensor([item[1] for item in batch], dtype=torch.long)
     return torch.stack(sequences, dim=0), BatchTag.MIXED_AB, ab_indices
+
+
+def mixed_ab_collate_fn_masked(batch):
+    """(seq, loss_mask, rule_idx) samples (MISSING_PROB, mask mode)
+    -> MIXED_AB_MASKED."""
+    sequences = [item[0] for item in batch]
+    masks = torch.stack([item[1] for item in batch], dim=0)
+    ab_indices = torch.tensor([item[2] for item in batch], dtype=torch.long)
+    return (torch.stack(sequences, dim=0), BatchTag.MIXED_AB_MASKED,
+            ab_indices, masks)
+
+
+def mixed_ab_collate_fn_predict(batch):
+    """(view, clean, rule_idx) samples (MISSING_PROB + PREDICT_MISSING)
+    -> MIXED_AB_TARGET. Model input is the corrupted view; targets are the
+    clean sequence."""
+    views = [item[0] for item in batch]
+    cleans = torch.stack([item[1] for item in batch], dim=0)
+    ab_indices = torch.tensor([item[2] for item in batch], dtype=torch.long)
+    return (torch.stack(views, dim=0), BatchTag.MIXED_AB_TARGET,
+            ab_indices, cleans)
 
 
 class DynamicMixedDataset(Dataset):
@@ -1428,11 +1492,14 @@ def _prepare_mixed_recurrence(config, device, order):
     num_mask_cfg = cfg.get('NUM_MASK')
     num_mask = 2 if num_mask_cfg is None else num_mask_cfg
 
+    missing_prob = cfg.get('MISSING_PROB', 0.0)
+    predict_missing = cfg.get('PREDICT_MISSING', False)
     ds = MixedRecurrenceDataset(rules=rules, num_samples=NUM_TRAIN_SAMPLES, length=TRAIN_LEN,
                                 verbose=True, use_ab_tag=cfg.get('USE_AB_TAG', True),
-                                missing_prob=cfg.get('MISSING_PROB', 0.0),
+                                missing_prob=missing_prob,
                                 miss_len=cfg.get('MISS_LEN', 1),
                                 miss_second=cfg.get('MISS_SECOND', False),
+                                predict_missing=predict_missing,
                                 num_mask=num_mask,
                                 first_task_weight=cfg.get('FIRST_TASK_WEIGHT', 1.0))
     train_dataset = ds.train_data
@@ -1440,7 +1507,14 @@ def _prepare_mixed_recurrence(config, device, order):
 
     _print_task_banner(BLOCK_SIZE, TRAIN_LEN, f"Rules: {[r.name for r in rules]}")
 
-    train_loader, test_loader = _make_loaders(train_dataset, test_dataset, BATCH_SIZE, mixed_ab_collate_fn)
+    # Explicit collate selection matching the dataset's item layout.
+    if missing_prob > 0 and predict_missing:
+        mixed_collate = mixed_ab_collate_fn_predict   # (view, clean, label) -> MIXED_AB_TARGET
+    elif missing_prob > 0:
+        mixed_collate = mixed_ab_collate_fn_masked    # (seq, mask, label) -> MIXED_AB_MASKED
+    else:
+        mixed_collate = mixed_ab_collate_fn           # (seq, label) -> MIXED_AB
+    train_loader, test_loader = _make_loaders(train_dataset, test_dataset, BATCH_SIZE, mixed_collate)
 
     model = MixedABTransformer(p=P, d_model=D_MODEL, n_head=N_HEAD, n_layer=N_LAYER, block_size=BLOCK_SIZE,
                                dropout=DROPOUT,
@@ -1503,6 +1577,8 @@ def _prepare_dynamic_mixed(config):
 
     if cfg.get('MISSING_PROB', 0.0) > 0:
         print("WARNING: MISSING_PROB > 0 is only supported for single-rule tasks; ignoring it for dynamic_mixed.")
+    if cfg.get('PREDICT_MISSING', False):
+        print("WARNING: PREDICT_MISSING is only supported for single-rule and mixed_ab/mixed_abc tasks; ignoring it for dynamic_mixed.")
     P = cfg['P']
     D_MODEL = cfg_main['D_MODEL']
     N_HEAD = cfg_main['N_HEAD']
@@ -1649,13 +1725,16 @@ def _prepare_single_recurrence(config, task):
     num_mask_cfg = cfg.get('NUM_MASK')
     num_mask = default_num_mask if num_mask_cfg is None else num_mask_cfg
 
+    missing_prob = cfg.get('MISSING_PROB', 0.0)
+    predict_missing = cfg.get('PREDICT_MISSING', False)
     ds = RecurrenceDataset(
         p=P, recurrence_fn=recurrence_fn, recurrence_name=recurrence_name,
         init_len=init_len, num_samples=NUM_TRAIN_SAMPLES,
         length=TRAIN_LEN,
-        missing_prob=cfg.get('MISSING_PROB', 0.0),
+        missing_prob=missing_prob,
         miss_len=cfg.get('MISS_LEN', 1),
         miss_second=cfg.get('MISS_SECOND', False),
+        predict_missing=predict_missing,
         num_mask=num_mask,
         first_task_weight=cfg.get('FIRST_TASK_WEIGHT', 1.0)
     )
@@ -1665,7 +1744,15 @@ def _prepare_single_recurrence(config, task):
 
     _print_task_banner(BLOCK_SIZE, TRAIN_LEN, recurrence_name)
 
-    train_loader, test_loader = _make_loaders(train_dataset, test_dataset, BATCH_SIZE, collate_fn)
+    # Explicit collate selection: the dataset's item layout is determined by
+    # the missing-value config, and the collate must match it.
+    if missing_prob > 0 and predict_missing:
+        collate = collate_fn_predict      # (view, clean) -> PLAIN_TARGET
+    elif missing_prob > 0:
+        collate = collate_fn_masked       # (seq, mask) -> DYNAMIC_MIXED
+    else:
+        collate = collate_fn              # plain tensors -> PLAIN
+    train_loader, test_loader = _make_loaders(train_dataset, test_dataset, BATCH_SIZE, collate)
 
     model = FibonacciTransformer(
         p=P, d_model=D_MODEL, n_head=N_HEAD, n_layer=N_LAYER,
