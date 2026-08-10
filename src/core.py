@@ -1545,6 +1545,12 @@ def _prepare_mixed_recurrence(config, device, order):
         'cond_wte_shared_ratio': cfg.get('COND_WTE_SHARED_RATIO', 0.0),
         'vocab_size': P + 1 + len(rules) if cfg.get('USE_AB_TAG', True) else P + 1,
         'pad_token_id': P + len(rules) if cfg.get('USE_AB_TAG', True) else P,
+        # for analyze_attention.py: in-dist length and corruption settings
+        'train_len': TRAIN_LEN,
+        'missing_prob': cfg.get('MISSING_PROB', 0.0),
+        'miss_len': cfg.get('MISS_LEN', 1),
+        'miss_second': cfg.get('MISS_SECOND', False),
+        'predict_missing': cfg.get('PREDICT_MISSING', False),
     }
     return {
         'post_train_mode': 'mixed_ab',
@@ -1769,6 +1775,12 @@ def _prepare_single_recurrence(config, task):
         'block_size': BLOCK_SIZE,
         'use_learnable_pe': USE_LEARNABLE_PE,
         'mlp_ratio': cfg.get('MLP_RATIO', 4),
+        # for analyze_attention.py: in-dist length and corruption settings
+        'train_len': TRAIN_LEN,
+        'missing_prob': cfg.get('MISSING_PROB', 0.0),
+        'miss_len': cfg.get('MISS_LEN', 1),
+        'miss_second': cfg.get('MISS_SECOND', False),
+        'predict_missing': cfg.get('PREDICT_MISSING', False),
     }
     save_config.update(save_extra_config)
     return {

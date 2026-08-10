@@ -17,7 +17,7 @@ HEADER_WIDTH = 70       # width of printed section separators
 TOP_K = 3               # how many strongest-attended positions to report per query
 MAX_DISTANCE = 63       # max lag for per-distance attention statistics
 ENTROPY_EPS = 1e-12     # numerical epsilon inside log() for attention entropy
-MIN_PRINT_VAL = 0.01    # per-distance values below this are omitted from printout
+MIN_PRINT_VAL = 0.05    # per-position/per-distance values below this are omitted from printout
 ITEMS_PER_LINE = 8      # per-distance entries printed per line
 
 
@@ -303,11 +303,13 @@ def print_attention_summary(summary, seq=None):
             attn_mat = head['attention_matrix']
             T = len(attn_mat)
             query_positions = head.get('query_positions', list(range(T)))
-            print(f"    Attention coefficients from each query position to previous positions:")
+            print(f"    Attention coefficients from each query position to previous positions (>= {MIN_PRINT_VAL}):")
             for i in query_positions:
                 if i < T:
-                    parts = [f"j={j}:{attn_mat[i][j]:.3f}" for j in range(i+1)]
-                    print(f"      i={i:2d} -> " + ", ".join(parts))
+                    parts = [f"j={j}:{attn_mat[i][j]:.3f}" for j in range(i+1)
+                             if attn_mat[i][j] >= MIN_PRINT_VAL]
+                    line = ", ".join(parts) if parts else f"(all < {MIN_PRINT_VAL})"
+                    print(f"      i={i:2d} -> " + line)
             
             # Average attention per distance (no filtering, print all for debugging)
             if head.get('focus_by_distance'):
@@ -322,6 +324,27 @@ def print_attention_summary(summary, seq=None):
                         print("      " + ", ".join(line_parts))
                         line_parts = []
         print()
+
+
+def print_attention_overview_table(summary):
+    """Print a head x layer overview table: each cell lists the attention
+    distances whose average value is >= MIN_PRINT_VAL (d = positions back)."""
+    _print_header(f"Attention overview: significant targets (>= {MIN_PRINT_VAL}) per head x layer")
+    n_heads = max(len(layer['heads']) for layer in summary)
+    col_w = 28
+    print('head \\ layer'.ljust(13) + ''.join(
+        f"layer {layer['layer']}".rjust(col_w) for layer in summary))
+    for h in range(n_heads):
+        cells = []
+        for layer in summary:
+            if h < len(layer['heads']):
+                fbd = layer['heads'][h].get('focus_by_distance', {})
+                parts = [f"d{d}:{v:.3f}" for d, v in sorted(fbd.items()) if v >= MIN_PRINT_VAL]
+                cells.append(' '.join(parts) if parts else '-')
+            else:
+                cells.append('-')
+        print(f"head {h}".ljust(13) + ''.join(c.rjust(col_w) for c in cells))
+    print()
 
 
 def _resolve_recurrence(config):
@@ -353,7 +376,7 @@ def _resolve_recurrence(config):
         print(f"Model config: dynamic_mixed, ab_pairs={config['ab_pairs']}, p={p}")
         return {'init_len': 2, 'is_dynamic_mixed': True, 'next_val': None,
                 'ab_pairs': config['ab_pairs'], 'flag_start_id': p + 1,
-                'dynamic_seq_len': config.get('ood_len', 32)}
+                'dynamic_seq_len': config.get('train_len') or config.get('ood_len', 32)}
     if 'a' in config and 'b' in config:
         a, b = config['a'], config['b']
         print(f"Model config: addition, a={a}, b={b}, p={p}")
@@ -424,16 +447,37 @@ def analyze_model_attention(pth_path, device=None):
                                      rec['dynamic_seq_len'], seed=0)
         query_mask = _make_dynamic_query_mask(rec['dynamic_seq_len'])
     else:
-        max_len = config.get('block_size', 20)
+        # In-distribution length only (train_len); old checkpoints without it
+        # fall back to block_size.
+        max_len = config.get('train_len') or config.get('block_size', 20)
         test_seq = [random.randint(0, p - 1) for _ in range(rec['init_len'])]
         for _ in range(rec['init_len'], max_len):
             test_seq.append(rec['next_val'](test_seq))
+        # Missing-value experiments: corrupt the analysis input with the same
+        # rule as the dataset (RecurrenceDataset._corrupt).
+        if config.get('missing_prob', 0.0) > 0:
+            n_rules = len(config.get('ab_pairs') or [1])
+            use_tag = config.get('use_ab_tag', False)
+            missing_token = p + n_rules if use_tag else p
+            helper = core.RecurrenceDataset(
+                p=p, init_len=rec['init_len'], length=len(test_seq), verbose=False,
+                missing_prob=config['missing_prob'],
+                miss_len=config.get('miss_len', 1),
+                miss_second=config.get('miss_second', False),
+                missing_token=missing_token)
+            window = torch.tensor(test_seq, dtype=torch.long)
+            helper._corrupt(window, True)
+            test_seq = window.tolist()
+            print(f"Missing-value corruption applied to the analysis input: "
+                  f"prob={config['missing_prob']}, miss_len={config.get('miss_len', 1)}, "
+                  f"miss_second={config.get('miss_second', False)}")
         query_mask = None
 
     # Attention visualization uses this single sequence
     print(f"\nRandom test sequence (length {len(test_seq)}): {test_seq[:20]}{'...' if len(test_seq) > 20 else ''}")
     summary = summarize_attention_for_sequence(model, test_seq, query_mask=query_mask)
     print_attention_summary(summary, test_seq)
+    print_attention_overview_table(summary)
 
 
 if __name__ == "__main__":
