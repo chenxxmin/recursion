@@ -2,7 +2,7 @@
   "concurrency": 8,
   "experiments": [
     {
-      "name": "addition_a1b1_d64l1r4h1_P127_tr64ood128_miss0.1len1_2nd_seed17996",
+      "name": "addition_a1b1_d256l1r4h4_P127_tr64ood128_miss0.1len1_2nd_seed17996",
       "task": "addition",
       "config": {
         "P": 127,
@@ -11,9 +11,9 @@
         "TRAIN_LEN": 64,
         "OOD_LEN": 128,
         "MAX_UNIQUE_RATIO": 0.7,
-        "NUM_MASK": 1,
-        "D_MODEL": 64,
-        "N_HEAD": 1,
+        "NUM_MASK": 2,
+        "D_MODEL": 256,
+        "N_HEAD": 4,
         "MLP_RATIO": 4,
         "BATCH_SIZE": 128,
         "LR": 0.0003,
@@ -30,7 +30,7 @@
       }
     },
     {
-      "name": "addition_a1b1_d64l1r4h1_P127_tr64ood128_miss0.1len1_2nd_seed18318",
+      "name": "addition_a1b1_d256l1r4h4_P127_tr64ood128_miss0.1len1_2nd_seed18318",
       "task": "addition",
       "config": {
         "P": 127,
@@ -39,9 +39,9 @@
         "TRAIN_LEN": 64,
         "OOD_LEN": 128,
         "MAX_UNIQUE_RATIO": 0.7,
-        "NUM_MASK": 1,
-        "D_MODEL": 64,
-        "N_HEAD": 1,
+        "NUM_MASK": 2,
+        "D_MODEL": 256,
+        "N_HEAD": 4,
         "MLP_RATIO": 4,
         "BATCH_SIZE": 128,
         "LR": 0.0003,
@@ -58,7 +58,7 @@
       }
     },
     {
-      "name": "addition_a1b1_d64l1r4h1_P127_tr64ood128_miss0.1len1_2nd_seed34789",
+      "name": "addition_a1b1_d256l1r4h4_P127_tr64ood128_miss0.1len1_2nd_seed34789",
       "task": "addition",
       "config": {
         "P": 127,
@@ -67,9 +67,9 @@
         "TRAIN_LEN": 64,
         "OOD_LEN": 128,
         "MAX_UNIQUE_RATIO": 0.7,
-        "NUM_MASK": 1,
-        "D_MODEL": 64,
-        "N_HEAD": 1,
+        "NUM_MASK": 2,
+        "D_MODEL": 256,
+        "N_HEAD": 4,
         "MLP_RATIO": 4,
         "BATCH_SIZE": 128,
         "LR": 0.0003,
@@ -86,7 +86,7 @@
       }
     },
     {
-      "name": "addition_a1b1_d64l1r4h1_P127_tr64ood128_miss0.1len1_2nd_seed44536",
+      "name": "addition_a1b1_d256l1r4h4_P127_tr64ood128_miss0.1len1_2nd_seed44536",
       "task": "addition",
       "config": {
         "P": 127,
@@ -95,9 +95,9 @@
         "TRAIN_LEN": 64,
         "OOD_LEN": 128,
         "MAX_UNIQUE_RATIO": 0.7,
-        "NUM_MASK": 1,
-        "D_MODEL": 64,
-        "N_HEAD": 1,
+        "NUM_MASK": 2,
+        "D_MODEL": 256,
+        "N_HEAD": 4,
         "MLP_RATIO": 4,
         "BATCH_SIZE": 128,
         "LR": 0.0003,
@@ -114,7 +114,7 @@
       }
     },
     {
-      "name": "addition_a1b1_d64l1r4h1_P127_tr64ood128_miss0.1len1_2nd_seed62513",
+      "name": "addition_a1b1_d256l1r4h4_P127_tr64ood128_miss0.1len1_2nd_seed62513",
       "task": "addition",
       "config": {
         "P": 127,
@@ -123,9 +123,9 @@
         "TRAIN_LEN": 64,
         "OOD_LEN": 128,
         "MAX_UNIQUE_RATIO": 0.7,
-        "NUM_MASK": 1,
-        "D_MODEL": 64,
-        "N_HEAD": 1,
+        "NUM_MASK": 2,
+        "D_MODEL": 256,
+        "N_HEAD": 4,
         "MLP_RATIO": 4,
         "BATCH_SIZE": 128,
         "LR": 0.0003,
@@ -142,7 +142,7 @@
       }
     },
     {
-      "name": "addition_a1b1_d64l1r4h1_P127_tr64ood128_miss0.1len1_2nd_seed64154",
+      "name": "addition_a1b1_d256l1r4h4_P127_tr64ood128_miss0.1len1_2nd_seed64154",
       "task": "addition",
       "config": {
         "P": 127,
@@ -151,9 +151,9 @@
         "TRAIN_LEN": 64,
         "OOD_LEN": 128,
         "MAX_UNIQUE_RATIO": 0.7,
-        "NUM_MASK": 1,
-        "D_MODEL": 64,
-        "N_HEAD": 1,
+        "NUM_MASK": 2,
+        "D_MODEL": 256,
+        "N_HEAD": 4,
         "MLP_RATIO": 4,
         "BATCH_SIZE": 128,
         "LR": 0.0003,
@@ -170,7 +170,7 @@
       }
     },
     {
-      "name": "addition_a1b1_d64l1r4h1_P127_tr64ood128_miss0.1len1_2nd_seed72814",
+      "name": "addition_a1b1_d256l1r4h4_P127_tr64ood128_miss0.1len1_2nd_seed72814",
       "task": "addition",
       "config": {
         "P": 127,
@@ -179,9 +179,9 @@
         "TRAIN_LEN": 64,
         "OOD_LEN": 128,
         "MAX_UNIQUE_RATIO": 0.7,
-        "NUM_MASK": 1,
-        "D_MODEL": 64,
-        "N_HEAD": 1,
+        "NUM_MASK": 2,
+        "D_MODEL": 256,
+        "N_HEAD": 4,
         "MLP_RATIO": 4,
         "BATCH_SIZE": 128,
         "LR": 0.0003,
@@ -198,7 +198,7 @@
       }
     },
     {
-      "name": "addition_a1b1_d64l1r4h1_P127_tr64ood128_miss0.1len1_2nd_seed82585",
+      "name": "addition_a1b1_d256l1r4h4_P127_tr64ood128_miss0.1len1_2nd_seed82585",
       "task": "addition",
       "config": {
         "P": 127,
@@ -207,9 +207,9 @@
         "TRAIN_LEN": 64,
         "OOD_LEN": 128,
         "MAX_UNIQUE_RATIO": 0.7,
-        "NUM_MASK": 1,
-        "D_MODEL": 64,
-        "N_HEAD": 1,
+        "NUM_MASK": 2,
+        "D_MODEL": 256,
+        "N_HEAD": 4,
         "MLP_RATIO": 4,
         "BATCH_SIZE": 128,
         "LR": 0.0003,
@@ -226,7 +226,7 @@
       }
     },
     {
-      "name": "addition_a1b1_d64l1r4h1_P127_tr64ood128_miss0.1len2_2nd_seed17996",
+      "name": "addition_a1b1_d256l1r4h4_P127_tr64ood128_miss0.1len2_2nd_seed17996",
       "task": "addition",
       "config": {
         "P": 127,
@@ -235,9 +235,9 @@
         "TRAIN_LEN": 64,
         "OOD_LEN": 128,
         "MAX_UNIQUE_RATIO": 0.7,
-        "NUM_MASK": 1,
-        "D_MODEL": 64,
-        "N_HEAD": 1,
+        "NUM_MASK": 2,
+        "D_MODEL": 256,
+        "N_HEAD": 4,
         "MLP_RATIO": 4,
         "BATCH_SIZE": 128,
         "LR": 0.0003,
@@ -254,7 +254,7 @@
       }
     },
     {
-      "name": "addition_a1b1_d64l1r4h1_P127_tr64ood128_miss0.1len2_2nd_seed18318",
+      "name": "addition_a1b1_d256l1r4h4_P127_tr64ood128_miss0.1len2_2nd_seed18318",
       "task": "addition",
       "config": {
         "P": 127,
@@ -263,9 +263,9 @@
         "TRAIN_LEN": 64,
         "OOD_LEN": 128,
         "MAX_UNIQUE_RATIO": 0.7,
-        "NUM_MASK": 1,
-        "D_MODEL": 64,
-        "N_HEAD": 1,
+        "NUM_MASK": 2,
+        "D_MODEL": 256,
+        "N_HEAD": 4,
         "MLP_RATIO": 4,
         "BATCH_SIZE": 128,
         "LR": 0.0003,
@@ -282,7 +282,7 @@
       }
     },
     {
-      "name": "addition_a1b1_d64l1r4h1_P127_tr64ood128_miss0.1len2_2nd_seed34789",
+      "name": "addition_a1b1_d256l1r4h4_P127_tr64ood128_miss0.1len2_2nd_seed34789",
       "task": "addition",
       "config": {
         "P": 127,
@@ -291,9 +291,9 @@
         "TRAIN_LEN": 64,
         "OOD_LEN": 128,
         "MAX_UNIQUE_RATIO": 0.7,
-        "NUM_MASK": 1,
-        "D_MODEL": 64,
-        "N_HEAD": 1,
+        "NUM_MASK": 2,
+        "D_MODEL": 256,
+        "N_HEAD": 4,
         "MLP_RATIO": 4,
         "BATCH_SIZE": 128,
         "LR": 0.0003,
@@ -310,7 +310,7 @@
       }
     },
     {
-      "name": "addition_a1b1_d64l1r4h1_P127_tr64ood128_miss0.1len2_2nd_seed44536",
+      "name": "addition_a1b1_d256l1r4h4_P127_tr64ood128_miss0.1len2_2nd_seed44536",
       "task": "addition",
       "config": {
         "P": 127,
@@ -319,9 +319,9 @@
         "TRAIN_LEN": 64,
         "OOD_LEN": 128,
         "MAX_UNIQUE_RATIO": 0.7,
-        "NUM_MASK": 1,
-        "D_MODEL": 64,
-        "N_HEAD": 1,
+        "NUM_MASK": 2,
+        "D_MODEL": 256,
+        "N_HEAD": 4,
         "MLP_RATIO": 4,
         "BATCH_SIZE": 128,
         "LR": 0.0003,
@@ -338,7 +338,7 @@
       }
     },
     {
-      "name": "addition_a1b1_d64l1r4h1_P127_tr64ood128_miss0.1len2_2nd_seed62513",
+      "name": "addition_a1b1_d256l1r4h4_P127_tr64ood128_miss0.1len2_2nd_seed62513",
       "task": "addition",
       "config": {
         "P": 127,
@@ -347,9 +347,9 @@
         "TRAIN_LEN": 64,
         "OOD_LEN": 128,
         "MAX_UNIQUE_RATIO": 0.7,
-        "NUM_MASK": 1,
-        "D_MODEL": 64,
-        "N_HEAD": 1,
+        "NUM_MASK": 2,
+        "D_MODEL": 256,
+        "N_HEAD": 4,
         "MLP_RATIO": 4,
         "BATCH_SIZE": 128,
         "LR": 0.0003,
@@ -366,7 +366,7 @@
       }
     },
     {
-      "name": "addition_a1b1_d64l1r4h1_P127_tr64ood128_miss0.1len2_2nd_seed64154",
+      "name": "addition_a1b1_d256l1r4h4_P127_tr64ood128_miss0.1len2_2nd_seed64154",
       "task": "addition",
       "config": {
         "P": 127,
@@ -375,9 +375,9 @@
         "TRAIN_LEN": 64,
         "OOD_LEN": 128,
         "MAX_UNIQUE_RATIO": 0.7,
-        "NUM_MASK": 1,
-        "D_MODEL": 64,
-        "N_HEAD": 1,
+        "NUM_MASK": 2,
+        "D_MODEL": 256,
+        "N_HEAD": 4,
         "MLP_RATIO": 4,
         "BATCH_SIZE": 128,
         "LR": 0.0003,
@@ -394,7 +394,7 @@
       }
     },
     {
-      "name": "addition_a1b1_d64l1r4h1_P127_tr64ood128_miss0.1len2_2nd_seed72814",
+      "name": "addition_a1b1_d256l1r4h4_P127_tr64ood128_miss0.1len2_2nd_seed72814",
       "task": "addition",
       "config": {
         "P": 127,
@@ -403,9 +403,9 @@
         "TRAIN_LEN": 64,
         "OOD_LEN": 128,
         "MAX_UNIQUE_RATIO": 0.7,
-        "NUM_MASK": 1,
-        "D_MODEL": 64,
-        "N_HEAD": 1,
+        "NUM_MASK": 2,
+        "D_MODEL": 256,
+        "N_HEAD": 4,
         "MLP_RATIO": 4,
         "BATCH_SIZE": 128,
         "LR": 0.0003,
@@ -422,7 +422,7 @@
       }
     },
     {
-      "name": "addition_a1b1_d64l1r4h1_P127_tr64ood128_miss0.1len2_2nd_seed82585",
+      "name": "addition_a1b1_d256l1r4h4_P127_tr64ood128_miss0.1len2_2nd_seed82585",
       "task": "addition",
       "config": {
         "P": 127,
@@ -431,9 +431,9 @@
         "TRAIN_LEN": 64,
         "OOD_LEN": 128,
         "MAX_UNIQUE_RATIO": 0.7,
-        "NUM_MASK": 1,
-        "D_MODEL": 64,
-        "N_HEAD": 1,
+        "NUM_MASK": 2,
+        "D_MODEL": 256,
+        "N_HEAD": 4,
         "MLP_RATIO": 4,
         "BATCH_SIZE": 128,
         "LR": 0.0003,
@@ -450,7 +450,7 @@
       }
     },
     {
-      "name": "addition_a1b1_d64l1r4h1_P127_tr64ood128_miss0.1len3_2nd_seed17996",
+      "name": "addition_a1b1_d256l1r4h4_P127_tr64ood128_miss0.1len3_2nd_seed17996",
       "task": "addition",
       "config": {
         "P": 127,
@@ -459,9 +459,9 @@
         "TRAIN_LEN": 64,
         "OOD_LEN": 128,
         "MAX_UNIQUE_RATIO": 0.7,
-        "NUM_MASK": 1,
-        "D_MODEL": 64,
-        "N_HEAD": 1,
+        "NUM_MASK": 2,
+        "D_MODEL": 256,
+        "N_HEAD": 4,
         "MLP_RATIO": 4,
         "BATCH_SIZE": 128,
         "LR": 0.0003,
@@ -478,7 +478,7 @@
       }
     },
     {
-      "name": "addition_a1b1_d64l1r4h1_P127_tr64ood128_miss0.1len3_2nd_seed18318",
+      "name": "addition_a1b1_d256l1r4h4_P127_tr64ood128_miss0.1len3_2nd_seed18318",
       "task": "addition",
       "config": {
         "P": 127,
@@ -487,9 +487,9 @@
         "TRAIN_LEN": 64,
         "OOD_LEN": 128,
         "MAX_UNIQUE_RATIO": 0.7,
-        "NUM_MASK": 1,
-        "D_MODEL": 64,
-        "N_HEAD": 1,
+        "NUM_MASK": 2,
+        "D_MODEL": 256,
+        "N_HEAD": 4,
         "MLP_RATIO": 4,
         "BATCH_SIZE": 128,
         "LR": 0.0003,
@@ -506,7 +506,7 @@
       }
     },
     {
-      "name": "addition_a1b1_d64l1r4h1_P127_tr64ood128_miss0.1len3_2nd_seed34789",
+      "name": "addition_a1b1_d256l1r4h4_P127_tr64ood128_miss0.1len3_2nd_seed34789",
       "task": "addition",
       "config": {
         "P": 127,
@@ -515,9 +515,9 @@
         "TRAIN_LEN": 64,
         "OOD_LEN": 128,
         "MAX_UNIQUE_RATIO": 0.7,
-        "NUM_MASK": 1,
-        "D_MODEL": 64,
-        "N_HEAD": 1,
+        "NUM_MASK": 2,
+        "D_MODEL": 256,
+        "N_HEAD": 4,
         "MLP_RATIO": 4,
         "BATCH_SIZE": 128,
         "LR": 0.0003,
@@ -534,7 +534,7 @@
       }
     },
     {
-      "name": "addition_a1b1_d64l1r4h1_P127_tr64ood128_miss0.1len3_2nd_seed44536",
+      "name": "addition_a1b1_d256l1r4h4_P127_tr64ood128_miss0.1len3_2nd_seed44536",
       "task": "addition",
       "config": {
         "P": 127,
@@ -543,9 +543,9 @@
         "TRAIN_LEN": 64,
         "OOD_LEN": 128,
         "MAX_UNIQUE_RATIO": 0.7,
-        "NUM_MASK": 1,
-        "D_MODEL": 64,
-        "N_HEAD": 1,
+        "NUM_MASK": 2,
+        "D_MODEL": 256,
+        "N_HEAD": 4,
         "MLP_RATIO": 4,
         "BATCH_SIZE": 128,
         "LR": 0.0003,
@@ -562,7 +562,7 @@
       }
     },
     {
-      "name": "addition_a1b1_d64l1r4h1_P127_tr64ood128_miss0.1len3_2nd_seed62513",
+      "name": "addition_a1b1_d256l1r4h4_P127_tr64ood128_miss0.1len3_2nd_seed62513",
       "task": "addition",
       "config": {
         "P": 127,
@@ -571,9 +571,9 @@
         "TRAIN_LEN": 64,
         "OOD_LEN": 128,
         "MAX_UNIQUE_RATIO": 0.7,
-        "NUM_MASK": 1,
-        "D_MODEL": 64,
-        "N_HEAD": 1,
+        "NUM_MASK": 2,
+        "D_MODEL": 256,
+        "N_HEAD": 4,
         "MLP_RATIO": 4,
         "BATCH_SIZE": 128,
         "LR": 0.0003,
@@ -590,7 +590,7 @@
       }
     },
     {
-      "name": "addition_a1b1_d64l1r4h1_P127_tr64ood128_miss0.1len3_2nd_seed64154",
+      "name": "addition_a1b1_d256l1r4h4_P127_tr64ood128_miss0.1len3_2nd_seed64154",
       "task": "addition",
       "config": {
         "P": 127,
@@ -599,9 +599,9 @@
         "TRAIN_LEN": 64,
         "OOD_LEN": 128,
         "MAX_UNIQUE_RATIO": 0.7,
-        "NUM_MASK": 1,
-        "D_MODEL": 64,
-        "N_HEAD": 1,
+        "NUM_MASK": 2,
+        "D_MODEL": 256,
+        "N_HEAD": 4,
         "MLP_RATIO": 4,
         "BATCH_SIZE": 128,
         "LR": 0.0003,
@@ -618,7 +618,7 @@
       }
     },
     {
-      "name": "addition_a1b1_d64l1r4h1_P127_tr64ood128_miss0.1len3_2nd_seed72814",
+      "name": "addition_a1b1_d256l1r4h4_P127_tr64ood128_miss0.1len3_2nd_seed72814",
       "task": "addition",
       "config": {
         "P": 127,
@@ -627,9 +627,9 @@
         "TRAIN_LEN": 64,
         "OOD_LEN": 128,
         "MAX_UNIQUE_RATIO": 0.7,
-        "NUM_MASK": 1,
-        "D_MODEL": 64,
-        "N_HEAD": 1,
+        "NUM_MASK": 2,
+        "D_MODEL": 256,
+        "N_HEAD": 4,
         "MLP_RATIO": 4,
         "BATCH_SIZE": 128,
         "LR": 0.0003,
@@ -646,7 +646,7 @@
       }
     },
     {
-      "name": "addition_a1b1_d64l1r4h1_P127_tr64ood128_miss0.1len3_2nd_seed82585",
+      "name": "addition_a1b1_d256l1r4h4_P127_tr64ood128_miss0.1len3_2nd_seed82585",
       "task": "addition",
       "config": {
         "P": 127,
@@ -655,9 +655,9 @@
         "TRAIN_LEN": 64,
         "OOD_LEN": 128,
         "MAX_UNIQUE_RATIO": 0.7,
-        "NUM_MASK": 1,
-        "D_MODEL": 64,
-        "N_HEAD": 1,
+        "NUM_MASK": 2,
+        "D_MODEL": 256,
+        "N_HEAD": 4,
         "MLP_RATIO": 4,
         "BATCH_SIZE": 128,
         "LR": 0.0003,
@@ -674,7 +674,7 @@
       }
     },
     {
-      "name": "addition_a1b1_d64l1r4h1_P127_tr64ood128_miss0.2len1_2nd_seed17996",
+      "name": "addition_a1b1_d256l1r4h4_P127_tr64ood128_miss0.2len1_2nd_seed17996",
       "task": "addition",
       "config": {
         "P": 127,
@@ -683,9 +683,9 @@
         "TRAIN_LEN": 64,
         "OOD_LEN": 128,
         "MAX_UNIQUE_RATIO": 0.7,
-        "NUM_MASK": 1,
-        "D_MODEL": 64,
-        "N_HEAD": 1,
+        "NUM_MASK": 2,
+        "D_MODEL": 256,
+        "N_HEAD": 4,
         "MLP_RATIO": 4,
         "BATCH_SIZE": 128,
         "LR": 0.0003,
@@ -702,7 +702,7 @@
       }
     },
     {
-      "name": "addition_a1b1_d64l1r4h1_P127_tr64ood128_miss0.2len1_2nd_seed18318",
+      "name": "addition_a1b1_d256l1r4h4_P127_tr64ood128_miss0.2len1_2nd_seed18318",
       "task": "addition",
       "config": {
         "P": 127,
@@ -711,9 +711,9 @@
         "TRAIN_LEN": 64,
         "OOD_LEN": 128,
         "MAX_UNIQUE_RATIO": 0.7,
-        "NUM_MASK": 1,
-        "D_MODEL": 64,
-        "N_HEAD": 1,
+        "NUM_MASK": 2,
+        "D_MODEL": 256,
+        "N_HEAD": 4,
         "MLP_RATIO": 4,
         "BATCH_SIZE": 128,
         "LR": 0.0003,
@@ -730,7 +730,7 @@
       }
     },
     {
-      "name": "addition_a1b1_d64l1r4h1_P127_tr64ood128_miss0.2len1_2nd_seed34789",
+      "name": "addition_a1b1_d256l1r4h4_P127_tr64ood128_miss0.2len1_2nd_seed34789",
       "task": "addition",
       "config": {
         "P": 127,
@@ -739,9 +739,9 @@
         "TRAIN_LEN": 64,
         "OOD_LEN": 128,
         "MAX_UNIQUE_RATIO": 0.7,
-        "NUM_MASK": 1,
-        "D_MODEL": 64,
-        "N_HEAD": 1,
+        "NUM_MASK": 2,
+        "D_MODEL": 256,
+        "N_HEAD": 4,
         "MLP_RATIO": 4,
         "BATCH_SIZE": 128,
         "LR": 0.0003,
@@ -758,7 +758,7 @@
       }
     },
     {
-      "name": "addition_a1b1_d64l1r4h1_P127_tr64ood128_miss0.2len1_2nd_seed44536",
+      "name": "addition_a1b1_d256l1r4h4_P127_tr64ood128_miss0.2len1_2nd_seed44536",
       "task": "addition",
       "config": {
         "P": 127,
@@ -767,9 +767,9 @@
         "TRAIN_LEN": 64,
         "OOD_LEN": 128,
         "MAX_UNIQUE_RATIO": 0.7,
-        "NUM_MASK": 1,
-        "D_MODEL": 64,
-        "N_HEAD": 1,
+        "NUM_MASK": 2,
+        "D_MODEL": 256,
+        "N_HEAD": 4,
         "MLP_RATIO": 4,
         "BATCH_SIZE": 128,
         "LR": 0.0003,
@@ -786,7 +786,7 @@
       }
     },
     {
-      "name": "addition_a1b1_d64l1r4h1_P127_tr64ood128_miss0.2len1_2nd_seed62513",
+      "name": "addition_a1b1_d256l1r4h4_P127_tr64ood128_miss0.2len1_2nd_seed62513",
       "task": "addition",
       "config": {
         "P": 127,
@@ -795,9 +795,9 @@
         "TRAIN_LEN": 64,
         "OOD_LEN": 128,
         "MAX_UNIQUE_RATIO": 0.7,
-        "NUM_MASK": 1,
-        "D_MODEL": 64,
-        "N_HEAD": 1,
+        "NUM_MASK": 2,
+        "D_MODEL": 256,
+        "N_HEAD": 4,
         "MLP_RATIO": 4,
         "BATCH_SIZE": 128,
         "LR": 0.0003,
@@ -814,7 +814,7 @@
       }
     },
     {
-      "name": "addition_a1b1_d64l1r4h1_P127_tr64ood128_miss0.2len1_2nd_seed64154",
+      "name": "addition_a1b1_d256l1r4h4_P127_tr64ood128_miss0.2len1_2nd_seed64154",
       "task": "addition",
       "config": {
         "P": 127,
@@ -823,9 +823,9 @@
         "TRAIN_LEN": 64,
         "OOD_LEN": 128,
         "MAX_UNIQUE_RATIO": 0.7,
-        "NUM_MASK": 1,
-        "D_MODEL": 64,
-        "N_HEAD": 1,
+        "NUM_MASK": 2,
+        "D_MODEL": 256,
+        "N_HEAD": 4,
         "MLP_RATIO": 4,
         "BATCH_SIZE": 128,
         "LR": 0.0003,
@@ -842,7 +842,7 @@
       }
     },
     {
-      "name": "addition_a1b1_d64l1r4h1_P127_tr64ood128_miss0.2len1_2nd_seed72814",
+      "name": "addition_a1b1_d256l1r4h4_P127_tr64ood128_miss0.2len1_2nd_seed72814",
       "task": "addition",
       "config": {
         "P": 127,
@@ -851,9 +851,9 @@
         "TRAIN_LEN": 64,
         "OOD_LEN": 128,
         "MAX_UNIQUE_RATIO": 0.7,
-        "NUM_MASK": 1,
-        "D_MODEL": 64,
-        "N_HEAD": 1,
+        "NUM_MASK": 2,
+        "D_MODEL": 256,
+        "N_HEAD": 4,
         "MLP_RATIO": 4,
         "BATCH_SIZE": 128,
         "LR": 0.0003,
@@ -870,7 +870,7 @@
       }
     },
     {
-      "name": "addition_a1b1_d64l1r4h1_P127_tr64ood128_miss0.2len1_2nd_seed82585",
+      "name": "addition_a1b1_d256l1r4h4_P127_tr64ood128_miss0.2len1_2nd_seed82585",
       "task": "addition",
       "config": {
         "P": 127,
@@ -879,9 +879,9 @@
         "TRAIN_LEN": 64,
         "OOD_LEN": 128,
         "MAX_UNIQUE_RATIO": 0.7,
-        "NUM_MASK": 1,
-        "D_MODEL": 64,
-        "N_HEAD": 1,
+        "NUM_MASK": 2,
+        "D_MODEL": 256,
+        "N_HEAD": 4,
         "MLP_RATIO": 4,
         "BATCH_SIZE": 128,
         "LR": 0.0003,
@@ -898,7 +898,7 @@
       }
     },
     {
-      "name": "addition_a1b1_d64l1r4h1_P127_tr64ood128_miss0.2len2_2nd_seed17996",
+      "name": "addition_a1b1_d256l1r4h4_P127_tr64ood128_miss0.2len2_2nd_seed17996",
       "task": "addition",
       "config": {
         "P": 127,
@@ -907,9 +907,9 @@
         "TRAIN_LEN": 64,
         "OOD_LEN": 128,
         "MAX_UNIQUE_RATIO": 0.7,
-        "NUM_MASK": 1,
-        "D_MODEL": 64,
-        "N_HEAD": 1,
+        "NUM_MASK": 2,
+        "D_MODEL": 256,
+        "N_HEAD": 4,
         "MLP_RATIO": 4,
         "BATCH_SIZE": 128,
         "LR": 0.0003,
@@ -926,7 +926,7 @@
       }
     },
     {
-      "name": "addition_a1b1_d64l1r4h1_P127_tr64ood128_miss0.2len2_2nd_seed18318",
+      "name": "addition_a1b1_d256l1r4h4_P127_tr64ood128_miss0.2len2_2nd_seed18318",
       "task": "addition",
       "config": {
         "P": 127,
@@ -935,9 +935,9 @@
         "TRAIN_LEN": 64,
         "OOD_LEN": 128,
         "MAX_UNIQUE_RATIO": 0.7,
-        "NUM_MASK": 1,
-        "D_MODEL": 64,
-        "N_HEAD": 1,
+        "NUM_MASK": 2,
+        "D_MODEL": 256,
+        "N_HEAD": 4,
         "MLP_RATIO": 4,
         "BATCH_SIZE": 128,
         "LR": 0.0003,
@@ -954,7 +954,7 @@
       }
     },
     {
-      "name": "addition_a1b1_d64l1r4h1_P127_tr64ood128_miss0.2len2_2nd_seed34789",
+      "name": "addition_a1b1_d256l1r4h4_P127_tr64ood128_miss0.2len2_2nd_seed34789",
       "task": "addition",
       "config": {
         "P": 127,
@@ -963,9 +963,9 @@
         "TRAIN_LEN": 64,
         "OOD_LEN": 128,
         "MAX_UNIQUE_RATIO": 0.7,
-        "NUM_MASK": 1,
-        "D_MODEL": 64,
-        "N_HEAD": 1,
+        "NUM_MASK": 2,
+        "D_MODEL": 256,
+        "N_HEAD": 4,
         "MLP_RATIO": 4,
         "BATCH_SIZE": 128,
         "LR": 0.0003,
@@ -982,7 +982,7 @@
       }
     },
     {
-      "name": "addition_a1b1_d64l1r4h1_P127_tr64ood128_miss0.2len2_2nd_seed44536",
+      "name": "addition_a1b1_d256l1r4h4_P127_tr64ood128_miss0.2len2_2nd_seed44536",
       "task": "addition",
       "config": {
         "P": 127,
@@ -991,9 +991,9 @@
         "TRAIN_LEN": 64,
         "OOD_LEN": 128,
         "MAX_UNIQUE_RATIO": 0.7,
-        "NUM_MASK": 1,
-        "D_MODEL": 64,
-        "N_HEAD": 1,
+        "NUM_MASK": 2,
+        "D_MODEL": 256,
+        "N_HEAD": 4,
         "MLP_RATIO": 4,
         "BATCH_SIZE": 128,
         "LR": 0.0003,
@@ -1010,7 +1010,7 @@
       }
     },
     {
-      "name": "addition_a1b1_d64l1r4h1_P127_tr64ood128_miss0.2len2_2nd_seed62513",
+      "name": "addition_a1b1_d256l1r4h4_P127_tr64ood128_miss0.2len2_2nd_seed62513",
       "task": "addition",
       "config": {
         "P": 127,
@@ -1019,9 +1019,9 @@
         "TRAIN_LEN": 64,
         "OOD_LEN": 128,
         "MAX_UNIQUE_RATIO": 0.7,
-        "NUM_MASK": 1,
-        "D_MODEL": 64,
-        "N_HEAD": 1,
+        "NUM_MASK": 2,
+        "D_MODEL": 256,
+        "N_HEAD": 4,
         "MLP_RATIO": 4,
         "BATCH_SIZE": 128,
         "LR": 0.0003,
@@ -1038,7 +1038,7 @@
       }
     },
     {
-      "name": "addition_a1b1_d64l1r4h1_P127_tr64ood128_miss0.2len2_2nd_seed64154",
+      "name": "addition_a1b1_d256l1r4h4_P127_tr64ood128_miss0.2len2_2nd_seed64154",
       "task": "addition",
       "config": {
         "P": 127,
@@ -1047,9 +1047,9 @@
         "TRAIN_LEN": 64,
         "OOD_LEN": 128,
         "MAX_UNIQUE_RATIO": 0.7,
-        "NUM_MASK": 1,
-        "D_MODEL": 64,
-        "N_HEAD": 1,
+        "NUM_MASK": 2,
+        "D_MODEL": 256,
+        "N_HEAD": 4,
         "MLP_RATIO": 4,
         "BATCH_SIZE": 128,
         "LR": 0.0003,
@@ -1066,7 +1066,7 @@
       }
     },
     {
-      "name": "addition_a1b1_d64l1r4h1_P127_tr64ood128_miss0.2len2_2nd_seed72814",
+      "name": "addition_a1b1_d256l1r4h4_P127_tr64ood128_miss0.2len2_2nd_seed72814",
       "task": "addition",
       "config": {
         "P": 127,
@@ -1075,9 +1075,9 @@
         "TRAIN_LEN": 64,
         "OOD_LEN": 128,
         "MAX_UNIQUE_RATIO": 0.7,
-        "NUM_MASK": 1,
-        "D_MODEL": 64,
-        "N_HEAD": 1,
+        "NUM_MASK": 2,
+        "D_MODEL": 256,
+        "N_HEAD": 4,
         "MLP_RATIO": 4,
         "BATCH_SIZE": 128,
         "LR": 0.0003,
@@ -1094,7 +1094,7 @@
       }
     },
     {
-      "name": "addition_a1b1_d64l1r4h1_P127_tr64ood128_miss0.2len2_2nd_seed82585",
+      "name": "addition_a1b1_d256l1r4h4_P127_tr64ood128_miss0.2len2_2nd_seed82585",
       "task": "addition",
       "config": {
         "P": 127,
@@ -1103,9 +1103,9 @@
         "TRAIN_LEN": 64,
         "OOD_LEN": 128,
         "MAX_UNIQUE_RATIO": 0.7,
-        "NUM_MASK": 1,
-        "D_MODEL": 64,
-        "N_HEAD": 1,
+        "NUM_MASK": 2,
+        "D_MODEL": 256,
+        "N_HEAD": 4,
         "MLP_RATIO": 4,
         "BATCH_SIZE": 128,
         "LR": 0.0003,
@@ -1122,7 +1122,7 @@
       }
     },
     {
-      "name": "addition_a1b1_d64l1r4h1_P127_tr64ood128_miss0.2len3_2nd_seed17996",
+      "name": "addition_a1b1_d256l1r4h4_P127_tr64ood128_miss0.2len3_2nd_seed17996",
       "task": "addition",
       "config": {
         "P": 127,
@@ -1131,9 +1131,9 @@
         "TRAIN_LEN": 64,
         "OOD_LEN": 128,
         "MAX_UNIQUE_RATIO": 0.7,
-        "NUM_MASK": 1,
-        "D_MODEL": 64,
-        "N_HEAD": 1,
+        "NUM_MASK": 2,
+        "D_MODEL": 256,
+        "N_HEAD": 4,
         "MLP_RATIO": 4,
         "BATCH_SIZE": 128,
         "LR": 0.0003,
@@ -1150,7 +1150,7 @@
       }
     },
     {
-      "name": "addition_a1b1_d64l1r4h1_P127_tr64ood128_miss0.2len3_2nd_seed18318",
+      "name": "addition_a1b1_d256l1r4h4_P127_tr64ood128_miss0.2len3_2nd_seed18318",
       "task": "addition",
       "config": {
         "P": 127,
@@ -1159,9 +1159,9 @@
         "TRAIN_LEN": 64,
         "OOD_LEN": 128,
         "MAX_UNIQUE_RATIO": 0.7,
-        "NUM_MASK": 1,
-        "D_MODEL": 64,
-        "N_HEAD": 1,
+        "NUM_MASK": 2,
+        "D_MODEL": 256,
+        "N_HEAD": 4,
         "MLP_RATIO": 4,
         "BATCH_SIZE": 128,
         "LR": 0.0003,
@@ -1178,7 +1178,7 @@
       }
     },
     {
-      "name": "addition_a1b1_d64l1r4h1_P127_tr64ood128_miss0.2len3_2nd_seed34789",
+      "name": "addition_a1b1_d256l1r4h4_P127_tr64ood128_miss0.2len3_2nd_seed34789",
       "task": "addition",
       "config": {
         "P": 127,
@@ -1187,9 +1187,9 @@
         "TRAIN_LEN": 64,
         "OOD_LEN": 128,
         "MAX_UNIQUE_RATIO": 0.7,
-        "NUM_MASK": 1,
-        "D_MODEL": 64,
-        "N_HEAD": 1,
+        "NUM_MASK": 2,
+        "D_MODEL": 256,
+        "N_HEAD": 4,
         "MLP_RATIO": 4,
         "BATCH_SIZE": 128,
         "LR": 0.0003,
@@ -1206,7 +1206,7 @@
       }
     },
     {
-      "name": "addition_a1b1_d64l1r4h1_P127_tr64ood128_miss0.2len3_2nd_seed44536",
+      "name": "addition_a1b1_d256l1r4h4_P127_tr64ood128_miss0.2len3_2nd_seed44536",
       "task": "addition",
       "config": {
         "P": 127,
@@ -1215,9 +1215,9 @@
         "TRAIN_LEN": 64,
         "OOD_LEN": 128,
         "MAX_UNIQUE_RATIO": 0.7,
-        "NUM_MASK": 1,
-        "D_MODEL": 64,
-        "N_HEAD": 1,
+        "NUM_MASK": 2,
+        "D_MODEL": 256,
+        "N_HEAD": 4,
         "MLP_RATIO": 4,
         "BATCH_SIZE": 128,
         "LR": 0.0003,
@@ -1234,7 +1234,7 @@
       }
     },
     {
-      "name": "addition_a1b1_d64l1r4h1_P127_tr64ood128_miss0.2len3_2nd_seed62513",
+      "name": "addition_a1b1_d256l1r4h4_P127_tr64ood128_miss0.2len3_2nd_seed62513",
       "task": "addition",
       "config": {
         "P": 127,
@@ -1243,9 +1243,9 @@
         "TRAIN_LEN": 64,
         "OOD_LEN": 128,
         "MAX_UNIQUE_RATIO": 0.7,
-        "NUM_MASK": 1,
-        "D_MODEL": 64,
-        "N_HEAD": 1,
+        "NUM_MASK": 2,
+        "D_MODEL": 256,
+        "N_HEAD": 4,
         "MLP_RATIO": 4,
         "BATCH_SIZE": 128,
         "LR": 0.0003,
@@ -1262,7 +1262,7 @@
       }
     },
     {
-      "name": "addition_a1b1_d64l1r4h1_P127_tr64ood128_miss0.2len3_2nd_seed64154",
+      "name": "addition_a1b1_d256l1r4h4_P127_tr64ood128_miss0.2len3_2nd_seed64154",
       "task": "addition",
       "config": {
         "P": 127,
@@ -1271,9 +1271,9 @@
         "TRAIN_LEN": 64,
         "OOD_LEN": 128,
         "MAX_UNIQUE_RATIO": 0.7,
-        "NUM_MASK": 1,
-        "D_MODEL": 64,
-        "N_HEAD": 1,
+        "NUM_MASK": 2,
+        "D_MODEL": 256,
+        "N_HEAD": 4,
         "MLP_RATIO": 4,
         "BATCH_SIZE": 128,
         "LR": 0.0003,
@@ -1290,7 +1290,7 @@
       }
     },
     {
-      "name": "addition_a1b1_d64l1r4h1_P127_tr64ood128_miss0.2len3_2nd_seed72814",
+      "name": "addition_a1b1_d256l1r4h4_P127_tr64ood128_miss0.2len3_2nd_seed72814",
       "task": "addition",
       "config": {
         "P": 127,
@@ -1299,9 +1299,9 @@
         "TRAIN_LEN": 64,
         "OOD_LEN": 128,
         "MAX_UNIQUE_RATIO": 0.7,
-        "NUM_MASK": 1,
-        "D_MODEL": 64,
-        "N_HEAD": 1,
+        "NUM_MASK": 2,
+        "D_MODEL": 256,
+        "N_HEAD": 4,
         "MLP_RATIO": 4,
         "BATCH_SIZE": 128,
         "LR": 0.0003,
@@ -1318,7 +1318,7 @@
       }
     },
     {
-      "name": "addition_a1b1_d64l1r4h1_P127_tr64ood128_miss0.2len3_2nd_seed82585",
+      "name": "addition_a1b1_d256l1r4h4_P127_tr64ood128_miss0.2len3_2nd_seed82585",
       "task": "addition",
       "config": {
         "P": 127,
@@ -1327,9 +1327,9 @@
         "TRAIN_LEN": 64,
         "OOD_LEN": 128,
         "MAX_UNIQUE_RATIO": 0.7,
-        "NUM_MASK": 1,
-        "D_MODEL": 64,
-        "N_HEAD": 1,
+        "NUM_MASK": 2,
+        "D_MODEL": 256,
+        "N_HEAD": 4,
         "MLP_RATIO": 4,
         "BATCH_SIZE": 128,
         "LR": 0.0003,
@@ -1346,7 +1346,7 @@
       }
     },
     {
-      "name": "addition_a1b1_d64l1r4h1_P127_tr64ood128_miss0.3len1_2nd_seed17996",
+      "name": "addition_a1b1_d256l1r4h4_P127_tr64ood128_miss0.3len1_2nd_seed17996",
       "task": "addition",
       "config": {
         "P": 127,
@@ -1355,9 +1355,9 @@
         "TRAIN_LEN": 64,
         "OOD_LEN": 128,
         "MAX_UNIQUE_RATIO": 0.7,
-        "NUM_MASK": 1,
-        "D_MODEL": 64,
-        "N_HEAD": 1,
+        "NUM_MASK": 2,
+        "D_MODEL": 256,
+        "N_HEAD": 4,
         "MLP_RATIO": 4,
         "BATCH_SIZE": 128,
         "LR": 0.0003,
@@ -1374,7 +1374,7 @@
       }
     },
     {
-      "name": "addition_a1b1_d64l1r4h1_P127_tr64ood128_miss0.3len1_2nd_seed18318",
+      "name": "addition_a1b1_d256l1r4h4_P127_tr64ood128_miss0.3len1_2nd_seed18318",
       "task": "addition",
       "config": {
         "P": 127,
@@ -1383,9 +1383,9 @@
         "TRAIN_LEN": 64,
         "OOD_LEN": 128,
         "MAX_UNIQUE_RATIO": 0.7,
-        "NUM_MASK": 1,
-        "D_MODEL": 64,
-        "N_HEAD": 1,
+        "NUM_MASK": 2,
+        "D_MODEL": 256,
+        "N_HEAD": 4,
         "MLP_RATIO": 4,
         "BATCH_SIZE": 128,
         "LR": 0.0003,
@@ -1402,7 +1402,7 @@
       }
     },
     {
-      "name": "addition_a1b1_d64l1r4h1_P127_tr64ood128_miss0.3len1_2nd_seed34789",
+      "name": "addition_a1b1_d256l1r4h4_P127_tr64ood128_miss0.3len1_2nd_seed34789",
       "task": "addition",
       "config": {
         "P": 127,
@@ -1411,9 +1411,9 @@
         "TRAIN_LEN": 64,
         "OOD_LEN": 128,
         "MAX_UNIQUE_RATIO": 0.7,
-        "NUM_MASK": 1,
-        "D_MODEL": 64,
-        "N_HEAD": 1,
+        "NUM_MASK": 2,
+        "D_MODEL": 256,
+        "N_HEAD": 4,
         "MLP_RATIO": 4,
         "BATCH_SIZE": 128,
         "LR": 0.0003,
@@ -1430,7 +1430,7 @@
       }
     },
     {
-      "name": "addition_a1b1_d64l1r4h1_P127_tr64ood128_miss0.3len1_2nd_seed44536",
+      "name": "addition_a1b1_d256l1r4h4_P127_tr64ood128_miss0.3len1_2nd_seed44536",
       "task": "addition",
       "config": {
         "P": 127,
@@ -1439,9 +1439,9 @@
         "TRAIN_LEN": 64,
         "OOD_LEN": 128,
         "MAX_UNIQUE_RATIO": 0.7,
-        "NUM_MASK": 1,
-        "D_MODEL": 64,
-        "N_HEAD": 1,
+        "NUM_MASK": 2,
+        "D_MODEL": 256,
+        "N_HEAD": 4,
         "MLP_RATIO": 4,
         "BATCH_SIZE": 128,
         "LR": 0.0003,
@@ -1458,7 +1458,7 @@
       }
     },
     {
-      "name": "addition_a1b1_d64l1r4h1_P127_tr64ood128_miss0.3len1_2nd_seed62513",
+      "name": "addition_a1b1_d256l1r4h4_P127_tr64ood128_miss0.3len1_2nd_seed62513",
       "task": "addition",
       "config": {
         "P": 127,
@@ -1467,9 +1467,9 @@
         "TRAIN_LEN": 64,
         "OOD_LEN": 128,
         "MAX_UNIQUE_RATIO": 0.7,
-        "NUM_MASK": 1,
-        "D_MODEL": 64,
-        "N_HEAD": 1,
+        "NUM_MASK": 2,
+        "D_MODEL": 256,
+        "N_HEAD": 4,
         "MLP_RATIO": 4,
         "BATCH_SIZE": 128,
         "LR": 0.0003,
@@ -1486,7 +1486,7 @@
       }
     },
     {
-      "name": "addition_a1b1_d64l1r4h1_P127_tr64ood128_miss0.3len1_2nd_seed64154",
+      "name": "addition_a1b1_d256l1r4h4_P127_tr64ood128_miss0.3len1_2nd_seed64154",
       "task": "addition",
       "config": {
         "P": 127,
@@ -1495,9 +1495,9 @@
         "TRAIN_LEN": 64,
         "OOD_LEN": 128,
         "MAX_UNIQUE_RATIO": 0.7,
-        "NUM_MASK": 1,
-        "D_MODEL": 64,
-        "N_HEAD": 1,
+        "NUM_MASK": 2,
+        "D_MODEL": 256,
+        "N_HEAD": 4,
         "MLP_RATIO": 4,
         "BATCH_SIZE": 128,
         "LR": 0.0003,
@@ -1514,7 +1514,7 @@
       }
     },
     {
-      "name": "addition_a1b1_d64l1r4h1_P127_tr64ood128_miss0.3len1_2nd_seed72814",
+      "name": "addition_a1b1_d256l1r4h4_P127_tr64ood128_miss0.3len1_2nd_seed72814",
       "task": "addition",
       "config": {
         "P": 127,
@@ -1523,9 +1523,9 @@
         "TRAIN_LEN": 64,
         "OOD_LEN": 128,
         "MAX_UNIQUE_RATIO": 0.7,
-        "NUM_MASK": 1,
-        "D_MODEL": 64,
-        "N_HEAD": 1,
+        "NUM_MASK": 2,
+        "D_MODEL": 256,
+        "N_HEAD": 4,
         "MLP_RATIO": 4,
         "BATCH_SIZE": 128,
         "LR": 0.0003,
@@ -1542,7 +1542,7 @@
       }
     },
     {
-      "name": "addition_a1b1_d64l1r4h1_P127_tr64ood128_miss0.3len1_2nd_seed82585",
+      "name": "addition_a1b1_d256l1r4h4_P127_tr64ood128_miss0.3len1_2nd_seed82585",
       "task": "addition",
       "config": {
         "P": 127,
@@ -1551,9 +1551,9 @@
         "TRAIN_LEN": 64,
         "OOD_LEN": 128,
         "MAX_UNIQUE_RATIO": 0.7,
-        "NUM_MASK": 1,
-        "D_MODEL": 64,
-        "N_HEAD": 1,
+        "NUM_MASK": 2,
+        "D_MODEL": 256,
+        "N_HEAD": 4,
         "MLP_RATIO": 4,
         "BATCH_SIZE": 128,
         "LR": 0.0003,
@@ -1570,7 +1570,7 @@
       }
     },
     {
-      "name": "addition_a1b1_d64l1r4h1_P127_tr64ood128_miss0.3len2_2nd_seed17996",
+      "name": "addition_a1b1_d256l1r4h4_P127_tr64ood128_miss0.3len2_2nd_seed17996",
       "task": "addition",
       "config": {
         "P": 127,
@@ -1579,9 +1579,9 @@
         "TRAIN_LEN": 64,
         "OOD_LEN": 128,
         "MAX_UNIQUE_RATIO": 0.7,
-        "NUM_MASK": 1,
-        "D_MODEL": 64,
-        "N_HEAD": 1,
+        "NUM_MASK": 2,
+        "D_MODEL": 256,
+        "N_HEAD": 4,
         "MLP_RATIO": 4,
         "BATCH_SIZE": 128,
         "LR": 0.0003,
@@ -1598,7 +1598,7 @@
       }
     },
     {
-      "name": "addition_a1b1_d64l1r4h1_P127_tr64ood128_miss0.3len2_2nd_seed18318",
+      "name": "addition_a1b1_d256l1r4h4_P127_tr64ood128_miss0.3len2_2nd_seed18318",
       "task": "addition",
       "config": {
         "P": 127,
@@ -1607,9 +1607,9 @@
         "TRAIN_LEN": 64,
         "OOD_LEN": 128,
         "MAX_UNIQUE_RATIO": 0.7,
-        "NUM_MASK": 1,
-        "D_MODEL": 64,
-        "N_HEAD": 1,
+        "NUM_MASK": 2,
+        "D_MODEL": 256,
+        "N_HEAD": 4,
         "MLP_RATIO": 4,
         "BATCH_SIZE": 128,
         "LR": 0.0003,
@@ -1626,7 +1626,7 @@
       }
     },
     {
-      "name": "addition_a1b1_d64l1r4h1_P127_tr64ood128_miss0.3len2_2nd_seed34789",
+      "name": "addition_a1b1_d256l1r4h4_P127_tr64ood128_miss0.3len2_2nd_seed34789",
       "task": "addition",
       "config": {
         "P": 127,
@@ -1635,9 +1635,9 @@
         "TRAIN_LEN": 64,
         "OOD_LEN": 128,
         "MAX_UNIQUE_RATIO": 0.7,
-        "NUM_MASK": 1,
-        "D_MODEL": 64,
-        "N_HEAD": 1,
+        "NUM_MASK": 2,
+        "D_MODEL": 256,
+        "N_HEAD": 4,
         "MLP_RATIO": 4,
         "BATCH_SIZE": 128,
         "LR": 0.0003,
@@ -1654,7 +1654,7 @@
       }
     },
     {
-      "name": "addition_a1b1_d64l1r4h1_P127_tr64ood128_miss0.3len2_2nd_seed44536",
+      "name": "addition_a1b1_d256l1r4h4_P127_tr64ood128_miss0.3len2_2nd_seed44536",
       "task": "addition",
       "config": {
         "P": 127,
@@ -1663,9 +1663,9 @@
         "TRAIN_LEN": 64,
         "OOD_LEN": 128,
         "MAX_UNIQUE_RATIO": 0.7,
-        "NUM_MASK": 1,
-        "D_MODEL": 64,
-        "N_HEAD": 1,
+        "NUM_MASK": 2,
+        "D_MODEL": 256,
+        "N_HEAD": 4,
         "MLP_RATIO": 4,
         "BATCH_SIZE": 128,
         "LR": 0.0003,
@@ -1682,7 +1682,7 @@
       }
     },
     {
-      "name": "addition_a1b1_d64l1r4h1_P127_tr64ood128_miss0.3len2_2nd_seed62513",
+      "name": "addition_a1b1_d256l1r4h4_P127_tr64ood128_miss0.3len2_2nd_seed62513",
       "task": "addition",
       "config": {
         "P": 127,
@@ -1691,9 +1691,9 @@
         "TRAIN_LEN": 64,
         "OOD_LEN": 128,
         "MAX_UNIQUE_RATIO": 0.7,
-        "NUM_MASK": 1,
-        "D_MODEL": 64,
-        "N_HEAD": 1,
+        "NUM_MASK": 2,
+        "D_MODEL": 256,
+        "N_HEAD": 4,
         "MLP_RATIO": 4,
         "BATCH_SIZE": 128,
         "LR": 0.0003,
@@ -1710,7 +1710,7 @@
       }
     },
     {
-      "name": "addition_a1b1_d64l1r4h1_P127_tr64ood128_miss0.3len2_2nd_seed64154",
+      "name": "addition_a1b1_d256l1r4h4_P127_tr64ood128_miss0.3len2_2nd_seed64154",
       "task": "addition",
       "config": {
         "P": 127,
@@ -1719,9 +1719,9 @@
         "TRAIN_LEN": 64,
         "OOD_LEN": 128,
         "MAX_UNIQUE_RATIO": 0.7,
-        "NUM_MASK": 1,
-        "D_MODEL": 64,
-        "N_HEAD": 1,
+        "NUM_MASK": 2,
+        "D_MODEL": 256,
+        "N_HEAD": 4,
         "MLP_RATIO": 4,
         "BATCH_SIZE": 128,
         "LR": 0.0003,
@@ -1738,7 +1738,7 @@
       }
     },
     {
-      "name": "addition_a1b1_d64l1r4h1_P127_tr64ood128_miss0.3len2_2nd_seed72814",
+      "name": "addition_a1b1_d256l1r4h4_P127_tr64ood128_miss0.3len2_2nd_seed72814",
       "task": "addition",
       "config": {
         "P": 127,
@@ -1747,9 +1747,9 @@
         "TRAIN_LEN": 64,
         "OOD_LEN": 128,
         "MAX_UNIQUE_RATIO": 0.7,
-        "NUM_MASK": 1,
-        "D_MODEL": 64,
-        "N_HEAD": 1,
+        "NUM_MASK": 2,
+        "D_MODEL": 256,
+        "N_HEAD": 4,
         "MLP_RATIO": 4,
         "BATCH_SIZE": 128,
         "LR": 0.0003,
@@ -1766,7 +1766,7 @@
       }
     },
     {
-      "name": "addition_a1b1_d64l1r4h1_P127_tr64ood128_miss0.3len2_2nd_seed82585",
+      "name": "addition_a1b1_d256l1r4h4_P127_tr64ood128_miss0.3len2_2nd_seed82585",
       "task": "addition",
       "config": {
         "P": 127,
@@ -1775,9 +1775,9 @@
         "TRAIN_LEN": 64,
         "OOD_LEN": 128,
         "MAX_UNIQUE_RATIO": 0.7,
-        "NUM_MASK": 1,
-        "D_MODEL": 64,
-        "N_HEAD": 1,
+        "NUM_MASK": 2,
+        "D_MODEL": 256,
+        "N_HEAD": 4,
         "MLP_RATIO": 4,
         "BATCH_SIZE": 128,
         "LR": 0.0003,
@@ -1794,7 +1794,7 @@
       }
     },
     {
-      "name": "addition_a1b1_d64l1r4h1_P127_tr64ood128_miss0.3len3_2nd_seed17996",
+      "name": "addition_a1b1_d256l1r4h4_P127_tr64ood128_miss0.3len3_2nd_seed17996",
       "task": "addition",
       "config": {
         "P": 127,
@@ -1803,9 +1803,9 @@
         "TRAIN_LEN": 64,
         "OOD_LEN": 128,
         "MAX_UNIQUE_RATIO": 0.7,
-        "NUM_MASK": 1,
-        "D_MODEL": 64,
-        "N_HEAD": 1,
+        "NUM_MASK": 2,
+        "D_MODEL": 256,
+        "N_HEAD": 4,
         "MLP_RATIO": 4,
         "BATCH_SIZE": 128,
         "LR": 0.0003,
@@ -1822,7 +1822,7 @@
       }
     },
     {
-      "name": "addition_a1b1_d64l1r4h1_P127_tr64ood128_miss0.3len3_2nd_seed18318",
+      "name": "addition_a1b1_d256l1r4h4_P127_tr64ood128_miss0.3len3_2nd_seed18318",
       "task": "addition",
       "config": {
         "P": 127,
@@ -1831,9 +1831,9 @@
         "TRAIN_LEN": 64,
         "OOD_LEN": 128,
         "MAX_UNIQUE_RATIO": 0.7,
-        "NUM_MASK": 1,
-        "D_MODEL": 64,
-        "N_HEAD": 1,
+        "NUM_MASK": 2,
+        "D_MODEL": 256,
+        "N_HEAD": 4,
         "MLP_RATIO": 4,
         "BATCH_SIZE": 128,
         "LR": 0.0003,
@@ -1850,7 +1850,7 @@
       }
     },
     {
-      "name": "addition_a1b1_d64l1r4h1_P127_tr64ood128_miss0.3len3_2nd_seed34789",
+      "name": "addition_a1b1_d256l1r4h4_P127_tr64ood128_miss0.3len3_2nd_seed34789",
       "task": "addition",
       "config": {
         "P": 127,
@@ -1859,9 +1859,9 @@
         "TRAIN_LEN": 64,
         "OOD_LEN": 128,
         "MAX_UNIQUE_RATIO": 0.7,
-        "NUM_MASK": 1,
-        "D_MODEL": 64,
-        "N_HEAD": 1,
+        "NUM_MASK": 2,
+        "D_MODEL": 256,
+        "N_HEAD": 4,
         "MLP_RATIO": 4,
         "BATCH_SIZE": 128,
         "LR": 0.0003,
@@ -1878,7 +1878,7 @@
       }
     },
     {
-      "name": "addition_a1b1_d64l1r4h1_P127_tr64ood128_miss0.3len3_2nd_seed44536",
+      "name": "addition_a1b1_d256l1r4h4_P127_tr64ood128_miss0.3len3_2nd_seed44536",
       "task": "addition",
       "config": {
         "P": 127,
@@ -1887,9 +1887,9 @@
         "TRAIN_LEN": 64,
         "OOD_LEN": 128,
         "MAX_UNIQUE_RATIO": 0.7,
-        "NUM_MASK": 1,
-        "D_MODEL": 64,
-        "N_HEAD": 1,
+        "NUM_MASK": 2,
+        "D_MODEL": 256,
+        "N_HEAD": 4,
         "MLP_RATIO": 4,
         "BATCH_SIZE": 128,
         "LR": 0.0003,
@@ -1906,7 +1906,7 @@
       }
     },
     {
-      "name": "addition_a1b1_d64l1r4h1_P127_tr64ood128_miss0.3len3_2nd_seed62513",
+      "name": "addition_a1b1_d256l1r4h4_P127_tr64ood128_miss0.3len3_2nd_seed62513",
       "task": "addition",
       "config": {
         "P": 127,
@@ -1915,9 +1915,9 @@
         "TRAIN_LEN": 64,
         "OOD_LEN": 128,
         "MAX_UNIQUE_RATIO": 0.7,
-        "NUM_MASK": 1,
-        "D_MODEL": 64,
-        "N_HEAD": 1,
+        "NUM_MASK": 2,
+        "D_MODEL": 256,
+        "N_HEAD": 4,
         "MLP_RATIO": 4,
         "BATCH_SIZE": 128,
         "LR": 0.0003,
@@ -1934,7 +1934,7 @@
       }
     },
     {
-      "name": "addition_a1b1_d64l1r4h1_P127_tr64ood128_miss0.3len3_2nd_seed64154",
+      "name": "addition_a1b1_d256l1r4h4_P127_tr64ood128_miss0.3len3_2nd_seed64154",
       "task": "addition",
       "config": {
         "P": 127,
@@ -1943,9 +1943,9 @@
         "TRAIN_LEN": 64,
         "OOD_LEN": 128,
         "MAX_UNIQUE_RATIO": 0.7,
-        "NUM_MASK": 1,
-        "D_MODEL": 64,
-        "N_HEAD": 1,
+        "NUM_MASK": 2,
+        "D_MODEL": 256,
+        "N_HEAD": 4,
         "MLP_RATIO": 4,
         "BATCH_SIZE": 128,
         "LR": 0.0003,
@@ -1962,7 +1962,7 @@
       }
     },
     {
-      "name": "addition_a1b1_d64l1r4h1_P127_tr64ood128_miss0.3len3_2nd_seed72814",
+      "name": "addition_a1b1_d256l1r4h4_P127_tr64ood128_miss0.3len3_2nd_seed72814",
       "task": "addition",
       "config": {
         "P": 127,
@@ -1971,9 +1971,9 @@
         "TRAIN_LEN": 64,
         "OOD_LEN": 128,
         "MAX_UNIQUE_RATIO": 0.7,
-        "NUM_MASK": 1,
-        "D_MODEL": 64,
-        "N_HEAD": 1,
+        "NUM_MASK": 2,
+        "D_MODEL": 256,
+        "N_HEAD": 4,
         "MLP_RATIO": 4,
         "BATCH_SIZE": 128,
         "LR": 0.0003,
@@ -1990,7 +1990,7 @@
       }
     },
     {
-      "name": "addition_a1b1_d64l1r4h1_P127_tr64ood128_miss0.3len3_2nd_seed82585",
+      "name": "addition_a1b1_d256l1r4h4_P127_tr64ood128_miss0.3len3_2nd_seed82585",
       "task": "addition",
       "config": {
         "P": 127,
@@ -1999,9 +1999,9 @@
         "TRAIN_LEN": 64,
         "OOD_LEN": 128,
         "MAX_UNIQUE_RATIO": 0.7,
-        "NUM_MASK": 1,
-        "D_MODEL": 64,
-        "N_HEAD": 1,
+        "NUM_MASK": 2,
+        "D_MODEL": 256,
+        "N_HEAD": 4,
         "MLP_RATIO": 4,
         "BATCH_SIZE": 128,
         "LR": 0.0003,
@@ -2018,7 +2018,7 @@
       }
     },
     {
-      "name": "addition_a1b1_d64l2r4h1_P127_tr64ood128_miss0.1len1_2nd_seed17996",
+      "name": "addition_a1b1_d256l2r4h4_P127_tr64ood128_miss0.1len1_2nd_seed17996",
       "task": "addition",
       "config": {
         "P": 127,
@@ -2027,9 +2027,9 @@
         "TRAIN_LEN": 64,
         "OOD_LEN": 128,
         "MAX_UNIQUE_RATIO": 0.7,
-        "NUM_MASK": 1,
-        "D_MODEL": 64,
-        "N_HEAD": 1,
+        "NUM_MASK": 2,
+        "D_MODEL": 256,
+        "N_HEAD": 4,
         "MLP_RATIO": 4,
         "BATCH_SIZE": 128,
         "LR": 0.0003,
@@ -2046,7 +2046,7 @@
       }
     },
     {
-      "name": "addition_a1b1_d64l2r4h1_P127_tr64ood128_miss0.1len1_2nd_seed18318",
+      "name": "addition_a1b1_d256l2r4h4_P127_tr64ood128_miss0.1len1_2nd_seed18318",
       "task": "addition",
       "config": {
         "P": 127,
@@ -2055,9 +2055,9 @@
         "TRAIN_LEN": 64,
         "OOD_LEN": 128,
         "MAX_UNIQUE_RATIO": 0.7,
-        "NUM_MASK": 1,
-        "D_MODEL": 64,
-        "N_HEAD": 1,
+        "NUM_MASK": 2,
+        "D_MODEL": 256,
+        "N_HEAD": 4,
         "MLP_RATIO": 4,
         "BATCH_SIZE": 128,
         "LR": 0.0003,
@@ -2074,7 +2074,7 @@
       }
     },
     {
-      "name": "addition_a1b1_d64l2r4h1_P127_tr64ood128_miss0.1len1_2nd_seed34789",
+      "name": "addition_a1b1_d256l2r4h4_P127_tr64ood128_miss0.1len1_2nd_seed34789",
       "task": "addition",
       "config": {
         "P": 127,
@@ -2083,9 +2083,9 @@
         "TRAIN_LEN": 64,
         "OOD_LEN": 128,
         "MAX_UNIQUE_RATIO": 0.7,
-        "NUM_MASK": 1,
-        "D_MODEL": 64,
-        "N_HEAD": 1,
+        "NUM_MASK": 2,
+        "D_MODEL": 256,
+        "N_HEAD": 4,
         "MLP_RATIO": 4,
         "BATCH_SIZE": 128,
         "LR": 0.0003,
@@ -2102,7 +2102,7 @@
       }
     },
     {
-      "name": "addition_a1b1_d64l2r4h1_P127_tr64ood128_miss0.1len1_2nd_seed44536",
+      "name": "addition_a1b1_d256l2r4h4_P127_tr64ood128_miss0.1len1_2nd_seed44536",
       "task": "addition",
       "config": {
         "P": 127,
@@ -2111,9 +2111,9 @@
         "TRAIN_LEN": 64,
         "OOD_LEN": 128,
         "MAX_UNIQUE_RATIO": 0.7,
-        "NUM_MASK": 1,
-        "D_MODEL": 64,
-        "N_HEAD": 1,
+        "NUM_MASK": 2,
+        "D_MODEL": 256,
+        "N_HEAD": 4,
         "MLP_RATIO": 4,
         "BATCH_SIZE": 128,
         "LR": 0.0003,
@@ -2130,7 +2130,7 @@
       }
     },
     {
-      "name": "addition_a1b1_d64l2r4h1_P127_tr64ood128_miss0.1len1_2nd_seed62513",
+      "name": "addition_a1b1_d256l2r4h4_P127_tr64ood128_miss0.1len1_2nd_seed62513",
       "task": "addition",
       "config": {
         "P": 127,
@@ -2139,9 +2139,9 @@
         "TRAIN_LEN": 64,
         "OOD_LEN": 128,
         "MAX_UNIQUE_RATIO": 0.7,
-        "NUM_MASK": 1,
-        "D_MODEL": 64,
-        "N_HEAD": 1,
+        "NUM_MASK": 2,
+        "D_MODEL": 256,
+        "N_HEAD": 4,
         "MLP_RATIO": 4,
         "BATCH_SIZE": 128,
         "LR": 0.0003,
@@ -2158,7 +2158,7 @@
       }
     },
     {
-      "name": "addition_a1b1_d64l2r4h1_P127_tr64ood128_miss0.1len1_2nd_seed64154",
+      "name": "addition_a1b1_d256l2r4h4_P127_tr64ood128_miss0.1len1_2nd_seed64154",
       "task": "addition",
       "config": {
         "P": 127,
@@ -2167,9 +2167,9 @@
         "TRAIN_LEN": 64,
         "OOD_LEN": 128,
         "MAX_UNIQUE_RATIO": 0.7,
-        "NUM_MASK": 1,
-        "D_MODEL": 64,
-        "N_HEAD": 1,
+        "NUM_MASK": 2,
+        "D_MODEL": 256,
+        "N_HEAD": 4,
         "MLP_RATIO": 4,
         "BATCH_SIZE": 128,
         "LR": 0.0003,
@@ -2186,7 +2186,7 @@
       }
     },
     {
-      "name": "addition_a1b1_d64l2r4h1_P127_tr64ood128_miss0.1len1_2nd_seed72814",
+      "name": "addition_a1b1_d256l2r4h4_P127_tr64ood128_miss0.1len1_2nd_seed72814",
       "task": "addition",
       "config": {
         "P": 127,
@@ -2195,9 +2195,9 @@
         "TRAIN_LEN": 64,
         "OOD_LEN": 128,
         "MAX_UNIQUE_RATIO": 0.7,
-        "NUM_MASK": 1,
-        "D_MODEL": 64,
-        "N_HEAD": 1,
+        "NUM_MASK": 2,
+        "D_MODEL": 256,
+        "N_HEAD": 4,
         "MLP_RATIO": 4,
         "BATCH_SIZE": 128,
         "LR": 0.0003,
@@ -2214,7 +2214,7 @@
       }
     },
     {
-      "name": "addition_a1b1_d64l2r4h1_P127_tr64ood128_miss0.1len1_2nd_seed82585",
+      "name": "addition_a1b1_d256l2r4h4_P127_tr64ood128_miss0.1len1_2nd_seed82585",
       "task": "addition",
       "config": {
         "P": 127,
@@ -2223,9 +2223,9 @@
         "TRAIN_LEN": 64,
         "OOD_LEN": 128,
         "MAX_UNIQUE_RATIO": 0.7,
-        "NUM_MASK": 1,
-        "D_MODEL": 64,
-        "N_HEAD": 1,
+        "NUM_MASK": 2,
+        "D_MODEL": 256,
+        "N_HEAD": 4,
         "MLP_RATIO": 4,
         "BATCH_SIZE": 128,
         "LR": 0.0003,
@@ -2242,7 +2242,7 @@
       }
     },
     {
-      "name": "addition_a1b1_d64l2r4h1_P127_tr64ood128_miss0.1len2_2nd_seed17996",
+      "name": "addition_a1b1_d256l2r4h4_P127_tr64ood128_miss0.1len2_2nd_seed17996",
       "task": "addition",
       "config": {
         "P": 127,
@@ -2251,9 +2251,9 @@
         "TRAIN_LEN": 64,
         "OOD_LEN": 128,
         "MAX_UNIQUE_RATIO": 0.7,
-        "NUM_MASK": 1,
-        "D_MODEL": 64,
-        "N_HEAD": 1,
+        "NUM_MASK": 2,
+        "D_MODEL": 256,
+        "N_HEAD": 4,
         "MLP_RATIO": 4,
         "BATCH_SIZE": 128,
         "LR": 0.0003,
@@ -2270,7 +2270,7 @@
       }
     },
     {
-      "name": "addition_a1b1_d64l2r4h1_P127_tr64ood128_miss0.1len2_2nd_seed18318",
+      "name": "addition_a1b1_d256l2r4h4_P127_tr64ood128_miss0.1len2_2nd_seed18318",
       "task": "addition",
       "config": {
         "P": 127,
@@ -2279,9 +2279,9 @@
         "TRAIN_LEN": 64,
         "OOD_LEN": 128,
         "MAX_UNIQUE_RATIO": 0.7,
-        "NUM_MASK": 1,
-        "D_MODEL": 64,
-        "N_HEAD": 1,
+        "NUM_MASK": 2,
+        "D_MODEL": 256,
+        "N_HEAD": 4,
         "MLP_RATIO": 4,
         "BATCH_SIZE": 128,
         "LR": 0.0003,
@@ -2298,7 +2298,7 @@
       }
     },
     {
-      "name": "addition_a1b1_d64l2r4h1_P127_tr64ood128_miss0.1len2_2nd_seed34789",
+      "name": "addition_a1b1_d256l2r4h4_P127_tr64ood128_miss0.1len2_2nd_seed34789",
       "task": "addition",
       "config": {
         "P": 127,
@@ -2307,9 +2307,9 @@
         "TRAIN_LEN": 64,
         "OOD_LEN": 128,
         "MAX_UNIQUE_RATIO": 0.7,
-        "NUM_MASK": 1,
-        "D_MODEL": 64,
-        "N_HEAD": 1,
+        "NUM_MASK": 2,
+        "D_MODEL": 256,
+        "N_HEAD": 4,
         "MLP_RATIO": 4,
         "BATCH_SIZE": 128,
         "LR": 0.0003,
@@ -2326,7 +2326,7 @@
       }
     },
     {
-      "name": "addition_a1b1_d64l2r4h1_P127_tr64ood128_miss0.1len2_2nd_seed44536",
+      "name": "addition_a1b1_d256l2r4h4_P127_tr64ood128_miss0.1len2_2nd_seed44536",
       "task": "addition",
       "config": {
         "P": 127,
@@ -2335,9 +2335,9 @@
         "TRAIN_LEN": 64,
         "OOD_LEN": 128,
         "MAX_UNIQUE_RATIO": 0.7,
-        "NUM_MASK": 1,
-        "D_MODEL": 64,
-        "N_HEAD": 1,
+        "NUM_MASK": 2,
+        "D_MODEL": 256,
+        "N_HEAD": 4,
         "MLP_RATIO": 4,
         "BATCH_SIZE": 128,
         "LR": 0.0003,
@@ -2354,7 +2354,7 @@
       }
     },
     {
-      "name": "addition_a1b1_d64l2r4h1_P127_tr64ood128_miss0.1len2_2nd_seed62513",
+      "name": "addition_a1b1_d256l2r4h4_P127_tr64ood128_miss0.1len2_2nd_seed62513",
       "task": "addition",
       "config": {
         "P": 127,
@@ -2363,9 +2363,9 @@
         "TRAIN_LEN": 64,
         "OOD_LEN": 128,
         "MAX_UNIQUE_RATIO": 0.7,
-        "NUM_MASK": 1,
-        "D_MODEL": 64,
-        "N_HEAD": 1,
+        "NUM_MASK": 2,
+        "D_MODEL": 256,
+        "N_HEAD": 4,
         "MLP_RATIO": 4,
         "BATCH_SIZE": 128,
         "LR": 0.0003,
@@ -2382,7 +2382,7 @@
       }
     },
     {
-      "name": "addition_a1b1_d64l2r4h1_P127_tr64ood128_miss0.1len2_2nd_seed64154",
+      "name": "addition_a1b1_d256l2r4h4_P127_tr64ood128_miss0.1len2_2nd_seed64154",
       "task": "addition",
       "config": {
         "P": 127,
@@ -2391,9 +2391,9 @@
         "TRAIN_LEN": 64,
         "OOD_LEN": 128,
         "MAX_UNIQUE_RATIO": 0.7,
-        "NUM_MASK": 1,
-        "D_MODEL": 64,
-        "N_HEAD": 1,
+        "NUM_MASK": 2,
+        "D_MODEL": 256,
+        "N_HEAD": 4,
         "MLP_RATIO": 4,
         "BATCH_SIZE": 128,
         "LR": 0.0003,
@@ -2410,7 +2410,7 @@
       }
     },
     {
-      "name": "addition_a1b1_d64l2r4h1_P127_tr64ood128_miss0.1len2_2nd_seed72814",
+      "name": "addition_a1b1_d256l2r4h4_P127_tr64ood128_miss0.1len2_2nd_seed72814",
       "task": "addition",
       "config": {
         "P": 127,
@@ -2419,9 +2419,9 @@
         "TRAIN_LEN": 64,
         "OOD_LEN": 128,
         "MAX_UNIQUE_RATIO": 0.7,
-        "NUM_MASK": 1,
-        "D_MODEL": 64,
-        "N_HEAD": 1,
+        "NUM_MASK": 2,
+        "D_MODEL": 256,
+        "N_HEAD": 4,
         "MLP_RATIO": 4,
         "BATCH_SIZE": 128,
         "LR": 0.0003,
@@ -2438,7 +2438,7 @@
       }
     },
     {
-      "name": "addition_a1b1_d64l2r4h1_P127_tr64ood128_miss0.1len2_2nd_seed82585",
+      "name": "addition_a1b1_d256l2r4h4_P127_tr64ood128_miss0.1len2_2nd_seed82585",
       "task": "addition",
       "config": {
         "P": 127,
@@ -2447,9 +2447,9 @@
         "TRAIN_LEN": 64,
         "OOD_LEN": 128,
         "MAX_UNIQUE_RATIO": 0.7,
-        "NUM_MASK": 1,
-        "D_MODEL": 64,
-        "N_HEAD": 1,
+        "NUM_MASK": 2,
+        "D_MODEL": 256,
+        "N_HEAD": 4,
         "MLP_RATIO": 4,
         "BATCH_SIZE": 128,
         "LR": 0.0003,
@@ -2466,7 +2466,7 @@
       }
     },
     {
-      "name": "addition_a1b1_d64l2r4h1_P127_tr64ood128_miss0.1len3_2nd_seed17996",
+      "name": "addition_a1b1_d256l2r4h4_P127_tr64ood128_miss0.1len3_2nd_seed17996",
       "task": "addition",
       "config": {
         "P": 127,
@@ -2475,9 +2475,9 @@
         "TRAIN_LEN": 64,
         "OOD_LEN": 128,
         "MAX_UNIQUE_RATIO": 0.7,
-        "NUM_MASK": 1,
-        "D_MODEL": 64,
-        "N_HEAD": 1,
+        "NUM_MASK": 2,
+        "D_MODEL": 256,
+        "N_HEAD": 4,
         "MLP_RATIO": 4,
         "BATCH_SIZE": 128,
         "LR": 0.0003,
@@ -2494,7 +2494,7 @@
       }
     },
     {
-      "name": "addition_a1b1_d64l2r4h1_P127_tr64ood128_miss0.1len3_2nd_seed18318",
+      "name": "addition_a1b1_d256l2r4h4_P127_tr64ood128_miss0.1len3_2nd_seed18318",
       "task": "addition",
       "config": {
         "P": 127,
@@ -2503,9 +2503,9 @@
         "TRAIN_LEN": 64,
         "OOD_LEN": 128,
         "MAX_UNIQUE_RATIO": 0.7,
-        "NUM_MASK": 1,
-        "D_MODEL": 64,
-        "N_HEAD": 1,
+        "NUM_MASK": 2,
+        "D_MODEL": 256,
+        "N_HEAD": 4,
         "MLP_RATIO": 4,
         "BATCH_SIZE": 128,
         "LR": 0.0003,
@@ -2522,7 +2522,7 @@
       }
     },
     {
-      "name": "addition_a1b1_d64l2r4h1_P127_tr64ood128_miss0.1len3_2nd_seed34789",
+      "name": "addition_a1b1_d256l2r4h4_P127_tr64ood128_miss0.1len3_2nd_seed34789",
       "task": "addition",
       "config": {
         "P": 127,
@@ -2531,9 +2531,9 @@
         "TRAIN_LEN": 64,
         "OOD_LEN": 128,
         "MAX_UNIQUE_RATIO": 0.7,
-        "NUM_MASK": 1,
-        "D_MODEL": 64,
-        "N_HEAD": 1,
+        "NUM_MASK": 2,
+        "D_MODEL": 256,
+        "N_HEAD": 4,
         "MLP_RATIO": 4,
         "BATCH_SIZE": 128,
         "LR": 0.0003,
@@ -2550,7 +2550,7 @@
       }
     },
     {
-      "name": "addition_a1b1_d64l2r4h1_P127_tr64ood128_miss0.1len3_2nd_seed44536",
+      "name": "addition_a1b1_d256l2r4h4_P127_tr64ood128_miss0.1len3_2nd_seed44536",
       "task": "addition",
       "config": {
         "P": 127,
@@ -2559,9 +2559,9 @@
         "TRAIN_LEN": 64,
         "OOD_LEN": 128,
         "MAX_UNIQUE_RATIO": 0.7,
-        "NUM_MASK": 1,
-        "D_MODEL": 64,
-        "N_HEAD": 1,
+        "NUM_MASK": 2,
+        "D_MODEL": 256,
+        "N_HEAD": 4,
         "MLP_RATIO": 4,
         "BATCH_SIZE": 128,
         "LR": 0.0003,
@@ -2578,7 +2578,7 @@
       }
     },
     {
-      "name": "addition_a1b1_d64l2r4h1_P127_tr64ood128_miss0.1len3_2nd_seed62513",
+      "name": "addition_a1b1_d256l2r4h4_P127_tr64ood128_miss0.1len3_2nd_seed62513",
       "task": "addition",
       "config": {
         "P": 127,
@@ -2587,9 +2587,9 @@
         "TRAIN_LEN": 64,
         "OOD_LEN": 128,
         "MAX_UNIQUE_RATIO": 0.7,
-        "NUM_MASK": 1,
-        "D_MODEL": 64,
-        "N_HEAD": 1,
+        "NUM_MASK": 2,
+        "D_MODEL": 256,
+        "N_HEAD": 4,
         "MLP_RATIO": 4,
         "BATCH_SIZE": 128,
         "LR": 0.0003,
@@ -2606,7 +2606,7 @@
       }
     },
     {
-      "name": "addition_a1b1_d64l2r4h1_P127_tr64ood128_miss0.1len3_2nd_seed64154",
+      "name": "addition_a1b1_d256l2r4h4_P127_tr64ood128_miss0.1len3_2nd_seed64154",
       "task": "addition",
       "config": {
         "P": 127,
@@ -2615,9 +2615,9 @@
         "TRAIN_LEN": 64,
         "OOD_LEN": 128,
         "MAX_UNIQUE_RATIO": 0.7,
-        "NUM_MASK": 1,
-        "D_MODEL": 64,
-        "N_HEAD": 1,
+        "NUM_MASK": 2,
+        "D_MODEL": 256,
+        "N_HEAD": 4,
         "MLP_RATIO": 4,
         "BATCH_SIZE": 128,
         "LR": 0.0003,
@@ -2634,7 +2634,7 @@
       }
     },
     {
-      "name": "addition_a1b1_d64l2r4h1_P127_tr64ood128_miss0.1len3_2nd_seed72814",
+      "name": "addition_a1b1_d256l2r4h4_P127_tr64ood128_miss0.1len3_2nd_seed72814",
       "task": "addition",
       "config": {
         "P": 127,
@@ -2643,9 +2643,9 @@
         "TRAIN_LEN": 64,
         "OOD_LEN": 128,
         "MAX_UNIQUE_RATIO": 0.7,
-        "NUM_MASK": 1,
-        "D_MODEL": 64,
-        "N_HEAD": 1,
+        "NUM_MASK": 2,
+        "D_MODEL": 256,
+        "N_HEAD": 4,
         "MLP_RATIO": 4,
         "BATCH_SIZE": 128,
         "LR": 0.0003,
@@ -2662,7 +2662,7 @@
       }
     },
     {
-      "name": "addition_a1b1_d64l2r4h1_P127_tr64ood128_miss0.1len3_2nd_seed82585",
+      "name": "addition_a1b1_d256l2r4h4_P127_tr64ood128_miss0.1len3_2nd_seed82585",
       "task": "addition",
       "config": {
         "P": 127,
@@ -2671,9 +2671,9 @@
         "TRAIN_LEN": 64,
         "OOD_LEN": 128,
         "MAX_UNIQUE_RATIO": 0.7,
-        "NUM_MASK": 1,
-        "D_MODEL": 64,
-        "N_HEAD": 1,
+        "NUM_MASK": 2,
+        "D_MODEL": 256,
+        "N_HEAD": 4,
         "MLP_RATIO": 4,
         "BATCH_SIZE": 128,
         "LR": 0.0003,
@@ -2690,7 +2690,7 @@
       }
     },
     {
-      "name": "addition_a1b1_d64l2r4h1_P127_tr64ood128_miss0.2len1_2nd_seed17996",
+      "name": "addition_a1b1_d256l2r4h4_P127_tr64ood128_miss0.2len1_2nd_seed17996",
       "task": "addition",
       "config": {
         "P": 127,
@@ -2699,9 +2699,9 @@
         "TRAIN_LEN": 64,
         "OOD_LEN": 128,
         "MAX_UNIQUE_RATIO": 0.7,
-        "NUM_MASK": 1,
-        "D_MODEL": 64,
-        "N_HEAD": 1,
+        "NUM_MASK": 2,
+        "D_MODEL": 256,
+        "N_HEAD": 4,
         "MLP_RATIO": 4,
         "BATCH_SIZE": 128,
         "LR": 0.0003,
@@ -2718,7 +2718,7 @@
       }
     },
     {
-      "name": "addition_a1b1_d64l2r4h1_P127_tr64ood128_miss0.2len1_2nd_seed18318",
+      "name": "addition_a1b1_d256l2r4h4_P127_tr64ood128_miss0.2len1_2nd_seed18318",
       "task": "addition",
       "config": {
         "P": 127,
@@ -2727,9 +2727,9 @@
         "TRAIN_LEN": 64,
         "OOD_LEN": 128,
         "MAX_UNIQUE_RATIO": 0.7,
-        "NUM_MASK": 1,
-        "D_MODEL": 64,
-        "N_HEAD": 1,
+        "NUM_MASK": 2,
+        "D_MODEL": 256,
+        "N_HEAD": 4,
         "MLP_RATIO": 4,
         "BATCH_SIZE": 128,
         "LR": 0.0003,
@@ -2746,7 +2746,7 @@
       }
     },
     {
-      "name": "addition_a1b1_d64l2r4h1_P127_tr64ood128_miss0.2len1_2nd_seed34789",
+      "name": "addition_a1b1_d256l2r4h4_P127_tr64ood128_miss0.2len1_2nd_seed34789",
       "task": "addition",
       "config": {
         "P": 127,
@@ -2755,9 +2755,9 @@
         "TRAIN_LEN": 64,
         "OOD_LEN": 128,
         "MAX_UNIQUE_RATIO": 0.7,
-        "NUM_MASK": 1,
-        "D_MODEL": 64,
-        "N_HEAD": 1,
+        "NUM_MASK": 2,
+        "D_MODEL": 256,
+        "N_HEAD": 4,
         "MLP_RATIO": 4,
         "BATCH_SIZE": 128,
         "LR": 0.0003,
@@ -2774,7 +2774,7 @@
       }
     },
     {
-      "name": "addition_a1b1_d64l2r4h1_P127_tr64ood128_miss0.2len1_2nd_seed44536",
+      "name": "addition_a1b1_d256l2r4h4_P127_tr64ood128_miss0.2len1_2nd_seed44536",
       "task": "addition",
       "config": {
         "P": 127,
@@ -2783,9 +2783,9 @@
         "TRAIN_LEN": 64,
         "OOD_LEN": 128,
         "MAX_UNIQUE_RATIO": 0.7,
-        "NUM_MASK": 1,
-        "D_MODEL": 64,
-        "N_HEAD": 1,
+        "NUM_MASK": 2,
+        "D_MODEL": 256,
+        "N_HEAD": 4,
         "MLP_RATIO": 4,
         "BATCH_SIZE": 128,
         "LR": 0.0003,
@@ -2802,7 +2802,7 @@
       }
     },
     {
-      "name": "addition_a1b1_d64l2r4h1_P127_tr64ood128_miss0.2len1_2nd_seed62513",
+      "name": "addition_a1b1_d256l2r4h4_P127_tr64ood128_miss0.2len1_2nd_seed62513",
       "task": "addition",
       "config": {
         "P": 127,
@@ -2811,9 +2811,9 @@
         "TRAIN_LEN": 64,
         "OOD_LEN": 128,
         "MAX_UNIQUE_RATIO": 0.7,
-        "NUM_MASK": 1,
-        "D_MODEL": 64,
-        "N_HEAD": 1,
+        "NUM_MASK": 2,
+        "D_MODEL": 256,
+        "N_HEAD": 4,
         "MLP_RATIO": 4,
         "BATCH_SIZE": 128,
         "LR": 0.0003,
@@ -2830,7 +2830,7 @@
       }
     },
     {
-      "name": "addition_a1b1_d64l2r4h1_P127_tr64ood128_miss0.2len1_2nd_seed64154",
+      "name": "addition_a1b1_d256l2r4h4_P127_tr64ood128_miss0.2len1_2nd_seed64154",
       "task": "addition",
       "config": {
         "P": 127,
@@ -2839,9 +2839,9 @@
         "TRAIN_LEN": 64,
         "OOD_LEN": 128,
         "MAX_UNIQUE_RATIO": 0.7,
-        "NUM_MASK": 1,
-        "D_MODEL": 64,
-        "N_HEAD": 1,
+        "NUM_MASK": 2,
+        "D_MODEL": 256,
+        "N_HEAD": 4,
         "MLP_RATIO": 4,
         "BATCH_SIZE": 128,
         "LR": 0.0003,
@@ -2858,7 +2858,7 @@
       }
     },
     {
-      "name": "addition_a1b1_d64l2r4h1_P127_tr64ood128_miss0.2len1_2nd_seed72814",
+      "name": "addition_a1b1_d256l2r4h4_P127_tr64ood128_miss0.2len1_2nd_seed72814",
       "task": "addition",
       "config": {
         "P": 127,
@@ -2867,9 +2867,9 @@
         "TRAIN_LEN": 64,
         "OOD_LEN": 128,
         "MAX_UNIQUE_RATIO": 0.7,
-        "NUM_MASK": 1,
-        "D_MODEL": 64,
-        "N_HEAD": 1,
+        "NUM_MASK": 2,
+        "D_MODEL": 256,
+        "N_HEAD": 4,
         "MLP_RATIO": 4,
         "BATCH_SIZE": 128,
         "LR": 0.0003,
@@ -2886,7 +2886,7 @@
       }
     },
     {
-      "name": "addition_a1b1_d64l2r4h1_P127_tr64ood128_miss0.2len1_2nd_seed82585",
+      "name": "addition_a1b1_d256l2r4h4_P127_tr64ood128_miss0.2len1_2nd_seed82585",
       "task": "addition",
       "config": {
         "P": 127,
@@ -2895,9 +2895,9 @@
         "TRAIN_LEN": 64,
         "OOD_LEN": 128,
         "MAX_UNIQUE_RATIO": 0.7,
-        "NUM_MASK": 1,
-        "D_MODEL": 64,
-        "N_HEAD": 1,
+        "NUM_MASK": 2,
+        "D_MODEL": 256,
+        "N_HEAD": 4,
         "MLP_RATIO": 4,
         "BATCH_SIZE": 128,
         "LR": 0.0003,
@@ -2914,7 +2914,7 @@
       }
     },
     {
-      "name": "addition_a1b1_d64l2r4h1_P127_tr64ood128_miss0.2len2_2nd_seed17996",
+      "name": "addition_a1b1_d256l2r4h4_P127_tr64ood128_miss0.2len2_2nd_seed17996",
       "task": "addition",
       "config": {
         "P": 127,
@@ -2923,9 +2923,9 @@
         "TRAIN_LEN": 64,
         "OOD_LEN": 128,
         "MAX_UNIQUE_RATIO": 0.7,
-        "NUM_MASK": 1,
-        "D_MODEL": 64,
-        "N_HEAD": 1,
+        "NUM_MASK": 2,
+        "D_MODEL": 256,
+        "N_HEAD": 4,
         "MLP_RATIO": 4,
         "BATCH_SIZE": 128,
         "LR": 0.0003,
@@ -2942,7 +2942,7 @@
       }
     },
     {
-      "name": "addition_a1b1_d64l2r4h1_P127_tr64ood128_miss0.2len2_2nd_seed18318",
+      "name": "addition_a1b1_d256l2r4h4_P127_tr64ood128_miss0.2len2_2nd_seed18318",
       "task": "addition",
       "config": {
         "P": 127,
@@ -2951,9 +2951,9 @@
         "TRAIN_LEN": 64,
         "OOD_LEN": 128,
         "MAX_UNIQUE_RATIO": 0.7,
-        "NUM_MASK": 1,
-        "D_MODEL": 64,
-        "N_HEAD": 1,
+        "NUM_MASK": 2,
+        "D_MODEL": 256,
+        "N_HEAD": 4,
         "MLP_RATIO": 4,
         "BATCH_SIZE": 128,
         "LR": 0.0003,
@@ -2970,7 +2970,7 @@
       }
     },
     {
-      "name": "addition_a1b1_d64l2r4h1_P127_tr64ood128_miss0.2len2_2nd_seed34789",
+      "name": "addition_a1b1_d256l2r4h4_P127_tr64ood128_miss0.2len2_2nd_seed34789",
       "task": "addition",
       "config": {
         "P": 127,
@@ -2979,9 +2979,9 @@
         "TRAIN_LEN": 64,
         "OOD_LEN": 128,
         "MAX_UNIQUE_RATIO": 0.7,
-        "NUM_MASK": 1,
-        "D_MODEL": 64,
-        "N_HEAD": 1,
+        "NUM_MASK": 2,
+        "D_MODEL": 256,
+        "N_HEAD": 4,
         "MLP_RATIO": 4,
         "BATCH_SIZE": 128,
         "LR": 0.0003,
@@ -2998,7 +2998,7 @@
       }
     },
     {
-      "name": "addition_a1b1_d64l2r4h1_P127_tr64ood128_miss0.2len2_2nd_seed44536",
+      "name": "addition_a1b1_d256l2r4h4_P127_tr64ood128_miss0.2len2_2nd_seed44536",
       "task": "addition",
       "config": {
         "P": 127,
@@ -3007,9 +3007,9 @@
         "TRAIN_LEN": 64,
         "OOD_LEN": 128,
         "MAX_UNIQUE_RATIO": 0.7,
-        "NUM_MASK": 1,
-        "D_MODEL": 64,
-        "N_HEAD": 1,
+        "NUM_MASK": 2,
+        "D_MODEL": 256,
+        "N_HEAD": 4,
         "MLP_RATIO": 4,
         "BATCH_SIZE": 128,
         "LR": 0.0003,
@@ -3026,7 +3026,7 @@
       }
     },
     {
-      "name": "addition_a1b1_d64l2r4h1_P127_tr64ood128_miss0.2len2_2nd_seed62513",
+      "name": "addition_a1b1_d256l2r4h4_P127_tr64ood128_miss0.2len2_2nd_seed62513",
       "task": "addition",
       "config": {
         "P": 127,
@@ -3035,9 +3035,9 @@
         "TRAIN_LEN": 64,
         "OOD_LEN": 128,
         "MAX_UNIQUE_RATIO": 0.7,
-        "NUM_MASK": 1,
-        "D_MODEL": 64,
-        "N_HEAD": 1,
+        "NUM_MASK": 2,
+        "D_MODEL": 256,
+        "N_HEAD": 4,
         "MLP_RATIO": 4,
         "BATCH_SIZE": 128,
         "LR": 0.0003,
@@ -3054,7 +3054,7 @@
       }
     },
     {
-      "name": "addition_a1b1_d64l2r4h1_P127_tr64ood128_miss0.2len2_2nd_seed64154",
+      "name": "addition_a1b1_d256l2r4h4_P127_tr64ood128_miss0.2len2_2nd_seed64154",
       "task": "addition",
       "config": {
         "P": 127,
@@ -3063,9 +3063,9 @@
         "TRAIN_LEN": 64,
         "OOD_LEN": 128,
         "MAX_UNIQUE_RATIO": 0.7,
-        "NUM_MASK": 1,
-        "D_MODEL": 64,
-        "N_HEAD": 1,
+        "NUM_MASK": 2,
+        "D_MODEL": 256,
+        "N_HEAD": 4,
         "MLP_RATIO": 4,
         "BATCH_SIZE": 128,
         "LR": 0.0003,
@@ -3082,7 +3082,7 @@
       }
     },
     {
-      "name": "addition_a1b1_d64l2r4h1_P127_tr64ood128_miss0.2len2_2nd_seed72814",
+      "name": "addition_a1b1_d256l2r4h4_P127_tr64ood128_miss0.2len2_2nd_seed72814",
       "task": "addition",
       "config": {
         "P": 127,
@@ -3091,9 +3091,9 @@
         "TRAIN_LEN": 64,
         "OOD_LEN": 128,
         "MAX_UNIQUE_RATIO": 0.7,
-        "NUM_MASK": 1,
-        "D_MODEL": 64,
-        "N_HEAD": 1,
+        "NUM_MASK": 2,
+        "D_MODEL": 256,
+        "N_HEAD": 4,
         "MLP_RATIO": 4,
         "BATCH_SIZE": 128,
         "LR": 0.0003,
@@ -3110,7 +3110,7 @@
       }
     },
     {
-      "name": "addition_a1b1_d64l2r4h1_P127_tr64ood128_miss0.2len2_2nd_seed82585",
+      "name": "addition_a1b1_d256l2r4h4_P127_tr64ood128_miss0.2len2_2nd_seed82585",
       "task": "addition",
       "config": {
         "P": 127,
@@ -3119,9 +3119,9 @@
         "TRAIN_LEN": 64,
         "OOD_LEN": 128,
         "MAX_UNIQUE_RATIO": 0.7,
-        "NUM_MASK": 1,
-        "D_MODEL": 64,
-        "N_HEAD": 1,
+        "NUM_MASK": 2,
+        "D_MODEL": 256,
+        "N_HEAD": 4,
         "MLP_RATIO": 4,
         "BATCH_SIZE": 128,
         "LR": 0.0003,
@@ -3138,7 +3138,7 @@
       }
     },
     {
-      "name": "addition_a1b1_d64l2r4h1_P127_tr64ood128_miss0.2len3_2nd_seed17996",
+      "name": "addition_a1b1_d256l2r4h4_P127_tr64ood128_miss0.2len3_2nd_seed17996",
       "task": "addition",
       "config": {
         "P": 127,
@@ -3147,9 +3147,9 @@
         "TRAIN_LEN": 64,
         "OOD_LEN": 128,
         "MAX_UNIQUE_RATIO": 0.7,
-        "NUM_MASK": 1,
-        "D_MODEL": 64,
-        "N_HEAD": 1,
+        "NUM_MASK": 2,
+        "D_MODEL": 256,
+        "N_HEAD": 4,
         "MLP_RATIO": 4,
         "BATCH_SIZE": 128,
         "LR": 0.0003,
@@ -3166,7 +3166,7 @@
       }
     },
     {
-      "name": "addition_a1b1_d64l2r4h1_P127_tr64ood128_miss0.2len3_2nd_seed18318",
+      "name": "addition_a1b1_d256l2r4h4_P127_tr64ood128_miss0.2len3_2nd_seed18318",
       "task": "addition",
       "config": {
         "P": 127,
@@ -3175,9 +3175,9 @@
         "TRAIN_LEN": 64,
         "OOD_LEN": 128,
         "MAX_UNIQUE_RATIO": 0.7,
-        "NUM_MASK": 1,
-        "D_MODEL": 64,
-        "N_HEAD": 1,
+        "NUM_MASK": 2,
+        "D_MODEL": 256,
+        "N_HEAD": 4,
         "MLP_RATIO": 4,
         "BATCH_SIZE": 128,
         "LR": 0.0003,
@@ -3194,7 +3194,7 @@
       }
     },
     {
-      "name": "addition_a1b1_d64l2r4h1_P127_tr64ood128_miss0.2len3_2nd_seed34789",
+      "name": "addition_a1b1_d256l2r4h4_P127_tr64ood128_miss0.2len3_2nd_seed34789",
       "task": "addition",
       "config": {
         "P": 127,
@@ -3203,9 +3203,9 @@
         "TRAIN_LEN": 64,
         "OOD_LEN": 128,
         "MAX_UNIQUE_RATIO": 0.7,
-        "NUM_MASK": 1,
-        "D_MODEL": 64,
-        "N_HEAD": 1,
+        "NUM_MASK": 2,
+        "D_MODEL": 256,
+        "N_HEAD": 4,
         "MLP_RATIO": 4,
         "BATCH_SIZE": 128,
         "LR": 0.0003,
@@ -3222,7 +3222,7 @@
       }
     },
     {
-      "name": "addition_a1b1_d64l2r4h1_P127_tr64ood128_miss0.2len3_2nd_seed44536",
+      "name": "addition_a1b1_d256l2r4h4_P127_tr64ood128_miss0.2len3_2nd_seed44536",
       "task": "addition",
       "config": {
         "P": 127,
@@ -3231,9 +3231,9 @@
         "TRAIN_LEN": 64,
         "OOD_LEN": 128,
         "MAX_UNIQUE_RATIO": 0.7,
-        "NUM_MASK": 1,
-        "D_MODEL": 64,
-        "N_HEAD": 1,
+        "NUM_MASK": 2,
+        "D_MODEL": 256,
+        "N_HEAD": 4,
         "MLP_RATIO": 4,
         "BATCH_SIZE": 128,
         "LR": 0.0003,
@@ -3250,7 +3250,7 @@
       }
     },
     {
-      "name": "addition_a1b1_d64l2r4h1_P127_tr64ood128_miss0.2len3_2nd_seed62513",
+      "name": "addition_a1b1_d256l2r4h4_P127_tr64ood128_miss0.2len3_2nd_seed62513",
       "task": "addition",
       "config": {
         "P": 127,
@@ -3259,9 +3259,9 @@
         "TRAIN_LEN": 64,
         "OOD_LEN": 128,
         "MAX_UNIQUE_RATIO": 0.7,
-        "NUM_MASK": 1,
-        "D_MODEL": 64,
-        "N_HEAD": 1,
+        "NUM_MASK": 2,
+        "D_MODEL": 256,
+        "N_HEAD": 4,
         "MLP_RATIO": 4,
         "BATCH_SIZE": 128,
         "LR": 0.0003,
@@ -3278,7 +3278,7 @@
       }
     },
     {
-      "name": "addition_a1b1_d64l2r4h1_P127_tr64ood128_miss0.2len3_2nd_seed64154",
+      "name": "addition_a1b1_d256l2r4h4_P127_tr64ood128_miss0.2len3_2nd_seed64154",
       "task": "addition",
       "config": {
         "P": 127,
@@ -3287,9 +3287,9 @@
         "TRAIN_LEN": 64,
         "OOD_LEN": 128,
         "MAX_UNIQUE_RATIO": 0.7,
-        "NUM_MASK": 1,
-        "D_MODEL": 64,
-        "N_HEAD": 1,
+        "NUM_MASK": 2,
+        "D_MODEL": 256,
+        "N_HEAD": 4,
         "MLP_RATIO": 4,
         "BATCH_SIZE": 128,
         "LR": 0.0003,
@@ -3306,7 +3306,7 @@
       }
     },
     {
-      "name": "addition_a1b1_d64l2r4h1_P127_tr64ood128_miss0.2len3_2nd_seed72814",
+      "name": "addition_a1b1_d256l2r4h4_P127_tr64ood128_miss0.2len3_2nd_seed72814",
       "task": "addition",
       "config": {
         "P": 127,
@@ -3315,9 +3315,9 @@
         "TRAIN_LEN": 64,
         "OOD_LEN": 128,
         "MAX_UNIQUE_RATIO": 0.7,
-        "NUM_MASK": 1,
-        "D_MODEL": 64,
-        "N_HEAD": 1,
+        "NUM_MASK": 2,
+        "D_MODEL": 256,
+        "N_HEAD": 4,
         "MLP_RATIO": 4,
         "BATCH_SIZE": 128,
         "LR": 0.0003,
@@ -3334,7 +3334,7 @@
       }
     },
     {
-      "name": "addition_a1b1_d64l2r4h1_P127_tr64ood128_miss0.2len3_2nd_seed82585",
+      "name": "addition_a1b1_d256l2r4h4_P127_tr64ood128_miss0.2len3_2nd_seed82585",
       "task": "addition",
       "config": {
         "P": 127,
@@ -3343,9 +3343,9 @@
         "TRAIN_LEN": 64,
         "OOD_LEN": 128,
         "MAX_UNIQUE_RATIO": 0.7,
-        "NUM_MASK": 1,
-        "D_MODEL": 64,
-        "N_HEAD": 1,
+        "NUM_MASK": 2,
+        "D_MODEL": 256,
+        "N_HEAD": 4,
         "MLP_RATIO": 4,
         "BATCH_SIZE": 128,
         "LR": 0.0003,
@@ -3362,7 +3362,7 @@
       }
     },
     {
-      "name": "addition_a1b1_d64l2r4h1_P127_tr64ood128_miss0.3len1_2nd_seed17996",
+      "name": "addition_a1b1_d256l2r4h4_P127_tr64ood128_miss0.3len1_2nd_seed17996",
       "task": "addition",
       "config": {
         "P": 127,
@@ -3371,9 +3371,9 @@
         "TRAIN_LEN": 64,
         "OOD_LEN": 128,
         "MAX_UNIQUE_RATIO": 0.7,
-        "NUM_MASK": 1,
-        "D_MODEL": 64,
-        "N_HEAD": 1,
+        "NUM_MASK": 2,
+        "D_MODEL": 256,
+        "N_HEAD": 4,
         "MLP_RATIO": 4,
         "BATCH_SIZE": 128,
         "LR": 0.0003,
@@ -3390,7 +3390,7 @@
       }
     },
     {
-      "name": "addition_a1b1_d64l2r4h1_P127_tr64ood128_miss0.3len1_2nd_seed18318",
+      "name": "addition_a1b1_d256l2r4h4_P127_tr64ood128_miss0.3len1_2nd_seed18318",
       "task": "addition",
       "config": {
         "P": 127,
@@ -3399,9 +3399,9 @@
         "TRAIN_LEN": 64,
         "OOD_LEN": 128,
         "MAX_UNIQUE_RATIO": 0.7,
-        "NUM_MASK": 1,
-        "D_MODEL": 64,
-        "N_HEAD": 1,
+        "NUM_MASK": 2,
+        "D_MODEL": 256,
+        "N_HEAD": 4,
         "MLP_RATIO": 4,
         "BATCH_SIZE": 128,
         "LR": 0.0003,
@@ -3418,7 +3418,7 @@
       }
     },
     {
-      "name": "addition_a1b1_d64l2r4h1_P127_tr64ood128_miss0.3len1_2nd_seed34789",
+      "name": "addition_a1b1_d256l2r4h4_P127_tr64ood128_miss0.3len1_2nd_seed34789",
       "task": "addition",
       "config": {
         "P": 127,
@@ -3427,9 +3427,9 @@
         "TRAIN_LEN": 64,
         "OOD_LEN": 128,
         "MAX_UNIQUE_RATIO": 0.7,
-        "NUM_MASK": 1,
-        "D_MODEL": 64,
-        "N_HEAD": 1,
+        "NUM_MASK": 2,
+        "D_MODEL": 256,
+        "N_HEAD": 4,
         "MLP_RATIO": 4,
         "BATCH_SIZE": 128,
         "LR": 0.0003,
@@ -3446,7 +3446,7 @@
       }
     },
     {
-      "name": "addition_a1b1_d64l2r4h1_P127_tr64ood128_miss0.3len1_2nd_seed44536",
+      "name": "addition_a1b1_d256l2r4h4_P127_tr64ood128_miss0.3len1_2nd_seed44536",
       "task": "addition",
       "config": {
         "P": 127,
@@ -3455,9 +3455,9 @@
         "TRAIN_LEN": 64,
         "OOD_LEN": 128,
         "MAX_UNIQUE_RATIO": 0.7,
-        "NUM_MASK": 1,
-        "D_MODEL": 64,
-        "N_HEAD": 1,
+        "NUM_MASK": 2,
+        "D_MODEL": 256,
+        "N_HEAD": 4,
         "MLP_RATIO": 4,
         "BATCH_SIZE": 128,
         "LR": 0.0003,
@@ -3474,7 +3474,7 @@
       }
     },
     {
-      "name": "addition_a1b1_d64l2r4h1_P127_tr64ood128_miss0.3len1_2nd_seed62513",
+      "name": "addition_a1b1_d256l2r4h4_P127_tr64ood128_miss0.3len1_2nd_seed62513",
       "task": "addition",
       "config": {
         "P": 127,
@@ -3483,9 +3483,9 @@
         "TRAIN_LEN": 64,
         "OOD_LEN": 128,
         "MAX_UNIQUE_RATIO": 0.7,
-        "NUM_MASK": 1,
-        "D_MODEL": 64,
-        "N_HEAD": 1,
+        "NUM_MASK": 2,
+        "D_MODEL": 256,
+        "N_HEAD": 4,
         "MLP_RATIO": 4,
         "BATCH_SIZE": 128,
         "LR": 0.0003,
@@ -3502,7 +3502,7 @@
       }
     },
     {
-      "name": "addition_a1b1_d64l2r4h1_P127_tr64ood128_miss0.3len1_2nd_seed64154",
+      "name": "addition_a1b1_d256l2r4h4_P127_tr64ood128_miss0.3len1_2nd_seed64154",
       "task": "addition",
       "config": {
         "P": 127,
@@ -3511,9 +3511,9 @@
         "TRAIN_LEN": 64,
         "OOD_LEN": 128,
         "MAX_UNIQUE_RATIO": 0.7,
-        "NUM_MASK": 1,
-        "D_MODEL": 64,
-        "N_HEAD": 1,
+        "NUM_MASK": 2,
+        "D_MODEL": 256,
+        "N_HEAD": 4,
         "MLP_RATIO": 4,
         "BATCH_SIZE": 128,
         "LR": 0.0003,
@@ -3530,7 +3530,7 @@
       }
     },
     {
-      "name": "addition_a1b1_d64l2r4h1_P127_tr64ood128_miss0.3len1_2nd_seed72814",
+      "name": "addition_a1b1_d256l2r4h4_P127_tr64ood128_miss0.3len1_2nd_seed72814",
       "task": "addition",
       "config": {
         "P": 127,
@@ -3539,9 +3539,9 @@
         "TRAIN_LEN": 64,
         "OOD_LEN": 128,
         "MAX_UNIQUE_RATIO": 0.7,
-        "NUM_MASK": 1,
-        "D_MODEL": 64,
-        "N_HEAD": 1,
+        "NUM_MASK": 2,
+        "D_MODEL": 256,
+        "N_HEAD": 4,
         "MLP_RATIO": 4,
         "BATCH_SIZE": 128,
         "LR": 0.0003,
@@ -3558,7 +3558,7 @@
       }
     },
     {
-      "name": "addition_a1b1_d64l2r4h1_P127_tr64ood128_miss0.3len1_2nd_seed82585",
+      "name": "addition_a1b1_d256l2r4h4_P127_tr64ood128_miss0.3len1_2nd_seed82585",
       "task": "addition",
       "config": {
         "P": 127,
@@ -3567,9 +3567,9 @@
         "TRAIN_LEN": 64,
         "OOD_LEN": 128,
         "MAX_UNIQUE_RATIO": 0.7,
-        "NUM_MASK": 1,
-        "D_MODEL": 64,
-        "N_HEAD": 1,
+        "NUM_MASK": 2,
+        "D_MODEL": 256,
+        "N_HEAD": 4,
         "MLP_RATIO": 4,
         "BATCH_SIZE": 128,
         "LR": 0.0003,
@@ -3586,7 +3586,7 @@
       }
     },
     {
-      "name": "addition_a1b1_d64l2r4h1_P127_tr64ood128_miss0.3len2_2nd_seed17996",
+      "name": "addition_a1b1_d256l2r4h4_P127_tr64ood128_miss0.3len2_2nd_seed17996",
       "task": "addition",
       "config": {
         "P": 127,
@@ -3595,9 +3595,9 @@
         "TRAIN_LEN": 64,
         "OOD_LEN": 128,
         "MAX_UNIQUE_RATIO": 0.7,
-        "NUM_MASK": 1,
-        "D_MODEL": 64,
-        "N_HEAD": 1,
+        "NUM_MASK": 2,
+        "D_MODEL": 256,
+        "N_HEAD": 4,
         "MLP_RATIO": 4,
         "BATCH_SIZE": 128,
         "LR": 0.0003,
@@ -3614,7 +3614,7 @@
       }
     },
     {
-      "name": "addition_a1b1_d64l2r4h1_P127_tr64ood128_miss0.3len2_2nd_seed18318",
+      "name": "addition_a1b1_d256l2r4h4_P127_tr64ood128_miss0.3len2_2nd_seed18318",
       "task": "addition",
       "config": {
         "P": 127,
@@ -3623,9 +3623,9 @@
         "TRAIN_LEN": 64,
         "OOD_LEN": 128,
         "MAX_UNIQUE_RATIO": 0.7,
-        "NUM_MASK": 1,
-        "D_MODEL": 64,
-        "N_HEAD": 1,
+        "NUM_MASK": 2,
+        "D_MODEL": 256,
+        "N_HEAD": 4,
         "MLP_RATIO": 4,
         "BATCH_SIZE": 128,
         "LR": 0.0003,
@@ -3642,7 +3642,7 @@
       }
     },
     {
-      "name": "addition_a1b1_d64l2r4h1_P127_tr64ood128_miss0.3len2_2nd_seed34789",
+      "name": "addition_a1b1_d256l2r4h4_P127_tr64ood128_miss0.3len2_2nd_seed34789",
       "task": "addition",
       "config": {
         "P": 127,
@@ -3651,9 +3651,9 @@
         "TRAIN_LEN": 64,
         "OOD_LEN": 128,
         "MAX_UNIQUE_RATIO": 0.7,
-        "NUM_MASK": 1,
-        "D_MODEL": 64,
-        "N_HEAD": 1,
+        "NUM_MASK": 2,
+        "D_MODEL": 256,
+        "N_HEAD": 4,
         "MLP_RATIO": 4,
         "BATCH_SIZE": 128,
         "LR": 0.0003,
@@ -3670,7 +3670,7 @@
       }
     },
     {
-      "name": "addition_a1b1_d64l2r4h1_P127_tr64ood128_miss0.3len2_2nd_seed44536",
+      "name": "addition_a1b1_d256l2r4h4_P127_tr64ood128_miss0.3len2_2nd_seed44536",
       "task": "addition",
       "config": {
         "P": 127,
@@ -3679,9 +3679,9 @@
         "TRAIN_LEN": 64,
         "OOD_LEN": 128,
         "MAX_UNIQUE_RATIO": 0.7,
-        "NUM_MASK": 1,
-        "D_MODEL": 64,
-        "N_HEAD": 1,
+        "NUM_MASK": 2,
+        "D_MODEL": 256,
+        "N_HEAD": 4,
         "MLP_RATIO": 4,
         "BATCH_SIZE": 128,
         "LR": 0.0003,
@@ -3698,7 +3698,7 @@
       }
     },
     {
-      "name": "addition_a1b1_d64l2r4h1_P127_tr64ood128_miss0.3len2_2nd_seed62513",
+      "name": "addition_a1b1_d256l2r4h4_P127_tr64ood128_miss0.3len2_2nd_seed62513",
       "task": "addition",
       "config": {
         "P": 127,
@@ -3707,9 +3707,9 @@
         "TRAIN_LEN": 64,
         "OOD_LEN": 128,
         "MAX_UNIQUE_RATIO": 0.7,
-        "NUM_MASK": 1,
-        "D_MODEL": 64,
-        "N_HEAD": 1,
+        "NUM_MASK": 2,
+        "D_MODEL": 256,
+        "N_HEAD": 4,
         "MLP_RATIO": 4,
         "BATCH_SIZE": 128,
         "LR": 0.0003,
@@ -3726,7 +3726,7 @@
       }
     },
     {
-      "name": "addition_a1b1_d64l2r4h1_P127_tr64ood128_miss0.3len2_2nd_seed64154",
+      "name": "addition_a1b1_d256l2r4h4_P127_tr64ood128_miss0.3len2_2nd_seed64154",
       "task": "addition",
       "config": {
         "P": 127,
@@ -3735,9 +3735,9 @@
         "TRAIN_LEN": 64,
         "OOD_LEN": 128,
         "MAX_UNIQUE_RATIO": 0.7,
-        "NUM_MASK": 1,
-        "D_MODEL": 64,
-        "N_HEAD": 1,
+        "NUM_MASK": 2,
+        "D_MODEL": 256,
+        "N_HEAD": 4,
         "MLP_RATIO": 4,
         "BATCH_SIZE": 128,
         "LR": 0.0003,
@@ -3754,7 +3754,7 @@
       }
     },
     {
-      "name": "addition_a1b1_d64l2r4h1_P127_tr64ood128_miss0.3len2_2nd_seed72814",
+      "name": "addition_a1b1_d256l2r4h4_P127_tr64ood128_miss0.3len2_2nd_seed72814",
       "task": "addition",
       "config": {
         "P": 127,
@@ -3763,9 +3763,9 @@
         "TRAIN_LEN": 64,
         "OOD_LEN": 128,
         "MAX_UNIQUE_RATIO": 0.7,
-        "NUM_MASK": 1,
-        "D_MODEL": 64,
-        "N_HEAD": 1,
+        "NUM_MASK": 2,
+        "D_MODEL": 256,
+        "N_HEAD": 4,
         "MLP_RATIO": 4,
         "BATCH_SIZE": 128,
         "LR": 0.0003,
@@ -3782,7 +3782,7 @@
       }
     },
     {
-      "name": "addition_a1b1_d64l2r4h1_P127_tr64ood128_miss0.3len2_2nd_seed82585",
+      "name": "addition_a1b1_d256l2r4h4_P127_tr64ood128_miss0.3len2_2nd_seed82585",
       "task": "addition",
       "config": {
         "P": 127,
@@ -3791,9 +3791,9 @@
         "TRAIN_LEN": 64,
         "OOD_LEN": 128,
         "MAX_UNIQUE_RATIO": 0.7,
-        "NUM_MASK": 1,
-        "D_MODEL": 64,
-        "N_HEAD": 1,
+        "NUM_MASK": 2,
+        "D_MODEL": 256,
+        "N_HEAD": 4,
         "MLP_RATIO": 4,
         "BATCH_SIZE": 128,
         "LR": 0.0003,
@@ -3810,7 +3810,7 @@
       }
     },
     {
-      "name": "addition_a1b1_d64l2r4h1_P127_tr64ood128_miss0.3len3_2nd_seed17996",
+      "name": "addition_a1b1_d256l2r4h4_P127_tr64ood128_miss0.3len3_2nd_seed17996",
       "task": "addition",
       "config": {
         "P": 127,
@@ -3819,9 +3819,9 @@
         "TRAIN_LEN": 64,
         "OOD_LEN": 128,
         "MAX_UNIQUE_RATIO": 0.7,
-        "NUM_MASK": 1,
-        "D_MODEL": 64,
-        "N_HEAD": 1,
+        "NUM_MASK": 2,
+        "D_MODEL": 256,
+        "N_HEAD": 4,
         "MLP_RATIO": 4,
         "BATCH_SIZE": 128,
         "LR": 0.0003,
@@ -3838,7 +3838,7 @@
       }
     },
     {
-      "name": "addition_a1b1_d64l2r4h1_P127_tr64ood128_miss0.3len3_2nd_seed18318",
+      "name": "addition_a1b1_d256l2r4h4_P127_tr64ood128_miss0.3len3_2nd_seed18318",
       "task": "addition",
       "config": {
         "P": 127,
@@ -3847,9 +3847,9 @@
         "TRAIN_LEN": 64,
         "OOD_LEN": 128,
         "MAX_UNIQUE_RATIO": 0.7,
-        "NUM_MASK": 1,
-        "D_MODEL": 64,
-        "N_HEAD": 1,
+        "NUM_MASK": 2,
+        "D_MODEL": 256,
+        "N_HEAD": 4,
         "MLP_RATIO": 4,
         "BATCH_SIZE": 128,
         "LR": 0.0003,
@@ -3866,7 +3866,7 @@
       }
     },
     {
-      "name": "addition_a1b1_d64l2r4h1_P127_tr64ood128_miss0.3len3_2nd_seed34789",
+      "name": "addition_a1b1_d256l2r4h4_P127_tr64ood128_miss0.3len3_2nd_seed34789",
       "task": "addition",
       "config": {
         "P": 127,
@@ -3875,9 +3875,9 @@
         "TRAIN_LEN": 64,
         "OOD_LEN": 128,
         "MAX_UNIQUE_RATIO": 0.7,
-        "NUM_MASK": 1,
-        "D_MODEL": 64,
-        "N_HEAD": 1,
+        "NUM_MASK": 2,
+        "D_MODEL": 256,
+        "N_HEAD": 4,
         "MLP_RATIO": 4,
         "BATCH_SIZE": 128,
         "LR": 0.0003,
@@ -3894,7 +3894,7 @@
       }
     },
     {
-      "name": "addition_a1b1_d64l2r4h1_P127_tr64ood128_miss0.3len3_2nd_seed44536",
+      "name": "addition_a1b1_d256l2r4h4_P127_tr64ood128_miss0.3len3_2nd_seed44536",
       "task": "addition",
       "config": {
         "P": 127,
@@ -3903,9 +3903,9 @@
         "TRAIN_LEN": 64,
         "OOD_LEN": 128,
         "MAX_UNIQUE_RATIO": 0.7,
-        "NUM_MASK": 1,
-        "D_MODEL": 64,
-        "N_HEAD": 1,
+        "NUM_MASK": 2,
+        "D_MODEL": 256,
+        "N_HEAD": 4,
         "MLP_RATIO": 4,
         "BATCH_SIZE": 128,
         "LR": 0.0003,
@@ -3922,7 +3922,7 @@
       }
     },
     {
-      "name": "addition_a1b1_d64l2r4h1_P127_tr64ood128_miss0.3len3_2nd_seed62513",
+      "name": "addition_a1b1_d256l2r4h4_P127_tr64ood128_miss0.3len3_2nd_seed62513",
       "task": "addition",
       "config": {
         "P": 127,
@@ -3931,9 +3931,9 @@
         "TRAIN_LEN": 64,
         "OOD_LEN": 128,
         "MAX_UNIQUE_RATIO": 0.7,
-        "NUM_MASK": 1,
-        "D_MODEL": 64,
-        "N_HEAD": 1,
+        "NUM_MASK": 2,
+        "D_MODEL": 256,
+        "N_HEAD": 4,
         "MLP_RATIO": 4,
         "BATCH_SIZE": 128,
         "LR": 0.0003,
@@ -3950,7 +3950,7 @@
       }
     },
     {
-      "name": "addition_a1b1_d64l2r4h1_P127_tr64ood128_miss0.3len3_2nd_seed64154",
+      "name": "addition_a1b1_d256l2r4h4_P127_tr64ood128_miss0.3len3_2nd_seed64154",
       "task": "addition",
       "config": {
         "P": 127,
@@ -3959,9 +3959,9 @@
         "TRAIN_LEN": 64,
         "OOD_LEN": 128,
         "MAX_UNIQUE_RATIO": 0.7,
-        "NUM_MASK": 1,
-        "D_MODEL": 64,
-        "N_HEAD": 1,
+        "NUM_MASK": 2,
+        "D_MODEL": 256,
+        "N_HEAD": 4,
         "MLP_RATIO": 4,
         "BATCH_SIZE": 128,
         "LR": 0.0003,
@@ -3978,7 +3978,7 @@
       }
     },
     {
-      "name": "addition_a1b1_d64l2r4h1_P127_tr64ood128_miss0.3len3_2nd_seed72814",
+      "name": "addition_a1b1_d256l2r4h4_P127_tr64ood128_miss0.3len3_2nd_seed72814",
       "task": "addition",
       "config": {
         "P": 127,
@@ -3987,9 +3987,9 @@
         "TRAIN_LEN": 64,
         "OOD_LEN": 128,
         "MAX_UNIQUE_RATIO": 0.7,
-        "NUM_MASK": 1,
-        "D_MODEL": 64,
-        "N_HEAD": 1,
+        "NUM_MASK": 2,
+        "D_MODEL": 256,
+        "N_HEAD": 4,
         "MLP_RATIO": 4,
         "BATCH_SIZE": 128,
         "LR": 0.0003,
@@ -4006,7 +4006,7 @@
       }
     },
     {
-      "name": "addition_a1b1_d64l2r4h1_P127_tr64ood128_miss0.3len3_2nd_seed82585",
+      "name": "addition_a1b1_d256l2r4h4_P127_tr64ood128_miss0.3len3_2nd_seed82585",
       "task": "addition",
       "config": {
         "P": 127,
@@ -4015,9 +4015,9 @@
         "TRAIN_LEN": 64,
         "OOD_LEN": 128,
         "MAX_UNIQUE_RATIO": 0.7,
-        "NUM_MASK": 1,
-        "D_MODEL": 64,
-        "N_HEAD": 1,
+        "NUM_MASK": 2,
+        "D_MODEL": 256,
+        "N_HEAD": 4,
         "MLP_RATIO": 4,
         "BATCH_SIZE": 128,
         "LR": 0.0003,
