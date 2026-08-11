@@ -35,8 +35,9 @@ class RecurrenceDataset(Dataset):
         # clean. Items become (seq, loss_mask) tuples where the prediction
         # loss of corrupted positions is zeroed.
         # MISS_SECOND: when true, positions 1..miss_len (the 2nd item plus the
-        # following miss_len-1) are ALWAYS corrupted, and the random scan only
-        # starts at position miss_len+1. NOTE: corrupting position 1 makes the
+        # following miss_len-1) are ALWAYS corrupted, the next position stays
+        # clean (same no-merge rule as random runs), and the random scan only
+        # starts at position miss_len+2. NOTE: corrupting position 1 makes the
         # first init_len tokens no longer equal the true initial state, so the
         # post-training generation test's exposed/unexposed split (which reads
         # initial states back from stored windows) is meaningless in this mode.
@@ -177,13 +178,13 @@ class RecurrenceDataset(Dataset):
         additionally zeroes its prediction target at index pos-1.
 
         Corruption model: when miss_second is set, positions 1..miss_len are
-        corrupted unconditionally; then scanning starts at position
-        miss_len+1 (or init_len if later). Otherwise scanning starts at
-        init_len. During the scan each position independently hits with
-        probability missing_prob; a hit corrupts a RUN of miss_len consecutive
-        positions, the position right after a run is always left clean, and
-        scanning resumes from the position after that. A run may be truncated
-        at the end of the window.
+        corrupted unconditionally, the position right after that forced run
+        stays clean, and scanning starts at position miss_len+2 (or init_len
+        if later). Otherwise scanning starts at init_len. During the scan each
+        position independently hits with probability missing_prob; a hit
+        corrupts a RUN of miss_len consecutive positions, the position right
+        after a run is always left clean, and scanning resumes from the
+        position after that. A run may be truncated at the end of the window.
         """
         mask = torch.zeros(self.length - 1, dtype=torch.float)
         if self.length - 1 > self.num_mask:
@@ -196,7 +197,9 @@ class RecurrenceDataset(Dataset):
             for q in range(1, end):
                 window[q] = self.missing_token
                 mask[q - 1] = 0.0
-            pos = max(pos, end)
+            # like any corrupted run, the forced run is followed by one
+            # guaranteed-clean position, so blocks never merge
+            pos = max(pos, end + 1)
         while pos < self.length:
             if random.random() < self.missing_prob:
                 end = min(pos + self.miss_len, self.length)

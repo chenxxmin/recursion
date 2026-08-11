@@ -118,12 +118,13 @@ def test_miss_len_runs_separated_by_clean():
 
 
 def test_miss_second_forced_run_deterministic():
-    """miss_second=True, prob=1.0, miss_len=2, length=10: forced {1,2}, then
-    scan from 3 -> {3,4}, skip 5, {6,7}, skip 8, {9} (truncated)."""
+    """miss_second=True, prob=1.0, miss_len=2, length=10: forced {1,2}, one
+    guaranteed-clean position 3 (blocks never merge), then scan from 4:
+    {4,5}, skip 6, {7,8}, skip 9."""
     ds = _make_ds(1.0, miss_len=2, length=10, num_samples=40, p=11, num_mask=1,
                   miss_second=True)
-    corrupted = {1, 2, 3, 4, 6, 7, 9}
-    expected_mask = torch.tensor([0., 0., 0., 0., 1., 0., 0., 1., 0.])
+    corrupted = {1, 2, 4, 5, 7, 8}
+    expected_mask = torch.tensor([0., 0., 1., 0., 0., 1., 0., 0., 1.])
     for seq, mask in ds.train_samples + ds.test_samples:
         for pos in range(ds.length):
             if pos in corrupted:
