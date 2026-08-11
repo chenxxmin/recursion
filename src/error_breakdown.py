@@ -14,8 +14,11 @@ if the experiment has no missing configured, "0" falls back to the literal
 token 0.
 
 Usage (repo root):
-    python src/error_breakdown.py <model.pth> [--json experiments/xxx.json]
+    python src/error_breakdown.py <model.pth|dir> [experiments/xxx.json]
            [--seed N] [--samples N] [--length L] [--clean]
+
+The first argument may be a single .pth or a directory of .pth files (each
+analyzed in turn). All output is teed to error_breakdown_output.log.
 """
 import argparse
 import os
@@ -30,7 +33,7 @@ if SCRIPT_DIR not in sys.path:
 
 from analyze_attention import load_model
 from core import RecurrenceDataset
-from verify_sample import build_single_rule, find_exp_config
+from verify_sample import build_single_rule, dispatch_and_log, find_exp_config
 
 CATEGORIES = ['(...,0,0)', '(...,0,x)', '(...,x,0)', 'other(x,x)']
 
@@ -51,21 +54,12 @@ def corrupt_view(seq, cfg, p, init_len):
     return window.tolist(), missing_token
 
 
-def main():
-    ap = argparse.ArgumentParser(description='Error counts by last-two-context gap structure.')
-    ap.add_argument('pth', help='model checkpoint path')
-    ap.add_argument('--json', default=None, help='experiments JSON that generated the model')
-    ap.add_argument('--seed', type=int, default=0, help='seed for sample generation')
-    ap.add_argument('--samples', type=int, default=200, help='number of random samples')
-    ap.add_argument('--length', type=int, default=None, help='sample length (default: TRAIN_LEN)')
-    ap.add_argument('--clean', action='store_true', help='do not corrupt samples')
-    args = ap.parse_args()
-
+def run_one(args, pth_path):
     device = 'cuda' if torch.cuda.is_available() else 'cpu'
-    model, checkpoint = load_model(args.pth, device=device)
+    model, checkpoint = load_model(pth_path, device=device)
     ckpt_cfg = checkpoint['config']
 
-    task, exp_cfg = find_exp_config(args, ckpt_cfg)
+    task, exp_cfg = find_exp_config(pth_path, args.json)
     cfg = dict(ckpt_cfg)
     if exp_cfg:
         cfg.update(exp_cfg)
@@ -143,7 +137,7 @@ def main():
     miss_desc = (f"missing token id {missing_token_used}" if corrupted
                  else "no corruption: '0' = literal token 0")
     print('=' * 64)
-    print(f"Model: {os.path.basename(args.pth)}")
+    print(f"Model: {os.path.basename(pth_path)}")
     print(f"samples={args.samples}, length={length}, corrupted={corrupted} ({miss_desc})")
     if corrupted:
         print(f"missing rule: prob={missing_prob}, miss_len={cfg.get('MISS_LEN', 1)}, "
@@ -161,6 +155,20 @@ def main():
     print('-' * 64)
     tot = tot_c + tot_w
     print(f"{'TOTAL':<14}{tot_c:>10}{tot_w:>10}{tot:>10}{tot_c / tot if tot else float('nan'):>10.3f}")
+
+
+def main():
+    ap = argparse.ArgumentParser(description='Error counts by last-two-context gap structure.')
+    ap.add_argument('target', help='model .pth file, or a directory of .pth files (each analyzed in turn)')
+    ap.add_argument('json', nargs='?', default=None,
+                    help='experiments JSON that generated the model(s) (matched by filename stem)')
+    ap.add_argument('--seed', type=int, default=0, help='seed for sample generation')
+    ap.add_argument('--samples', type=int, default=200, help='number of random samples per model')
+    ap.add_argument('--length', type=int, default=None, help='sample length (default: TRAIN_LEN)')
+    ap.add_argument('--clean', action='store_true', help='do not corrupt samples')
+    args = ap.parse_args()
+    stem = os.path.splitext(os.path.basename(sys.argv[0]))[0]
+    dispatch_and_log(args, stem, run_one)
 
 
 if __name__ == '__main__':

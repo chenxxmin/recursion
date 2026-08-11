@@ -7,12 +7,14 @@ sample is corrupted with the same rule (RecurrenceDataset._corrupt) before
 being shown to the model, so gap-filling can be checked by eye.
 
 Usage (repo root):
-    python src/verify_sample.py <model.pth> [--json experiments/xxx.json]
+    python src/verify_sample.py <model.pth|dir> [experiments/xxx.json]
            [--seed N] [--length L] [--clean]
 
-The experiment config is located by matching the .pth filename stem against
-the 'name' field of the JSON's experiments; without --json (or when not
-found), recurrence parameters fall back to the checkpoint's saved config.
+The first argument may be a single .pth or a directory of .pth files (each
+analyzed in turn). All output is teed to verify_sample_output.log. The
+experiment config is located by matching the .pth filename stem against the
+'name' field of the JSON's experiments; without the JSON (or when not found),
+recurrence parameters fall back to the checkpoint's saved config.
 --clean forces an uncorrupted sample even when MISSING_PROB is configured.
 """
 import argparse
@@ -53,37 +55,74 @@ def build_single_rule(task, cfg):
     raise ValueError(f"unknown single-rule task: {task}")
 
 
-def find_exp_config(args, ckpt_config):
+def find_exp_config(pth_path, json_path):
     """Locate the experiment config in the JSON by model filename stem.
 
     Returns (task, exp_config or None).
     """
-    stem = os.path.splitext(os.path.basename(args.pth))[0]
-    if not args.json:
+    stem = os.path.splitext(os.path.basename(pth_path))[0]
+    if not json_path:
         return None, None
     import json
-    with open(args.json, encoding='utf-8') as f:
+    with open(json_path, encoding='utf-8') as f:
         exps = json.load(f)['experiments']
     for e in exps:
         if e['name'] == stem:
             return e.get('task'), e['config']
-    print(f"[warn] {stem} not found in {args.json}; falling back to checkpoint config")
+    print(f"[warn] {stem} not found in {json_path}; falling back to checkpoint config")
     return None, None
 
 
-def main():
-    ap = argparse.ArgumentParser(description='Print one random sample with aligned model predictions.')
-    ap.add_argument('pth', help='model checkpoint path')
-    ap.add_argument('--json', default=None, help='experiments JSON that generated the model')
-    ap.add_argument('--seed', type=int, default=None, help='seed for sample generation (default: random)')
-    ap.add_argument('--length', type=int, default=None, help='sample length (default: TRAIN_LEN from config)')
-    ap.add_argument('--clean', action='store_true', help='do not corrupt the sample even if MISSING_PROB is set')
-    args = ap.parse_args()
+class _Tee:
+    """Minimal tee: write to multiple text streams at once."""
 
-    model, checkpoint = load_model(args.pth, device='cpu')
+    def __init__(self, *streams):
+        self.streams = streams
+
+    def write(self, s):
+        for st in self.streams:
+            st.write(s)
+
+    def flush(self):
+        for st in self.streams:
+            st.flush()
+
+
+def dispatch_and_log(args, script_stem, run_one):
+    """Shared CLI dispatch: `args.target` may be a .pth file or a directory of
+    .pth files (each is analyzed in turn); all printed output is teed to
+    {script_stem}_output.log in the current directory."""
+    import contextlib
+    import glob
+
+    if os.path.isdir(args.target):
+        targets = sorted(glob.glob(os.path.join(args.target, '*.pth')))
+        if not targets:
+            print(f"No .pth files found in {args.target}")
+            return
+    else:
+        targets = [args.target]
+
+    out_path = f"{script_stem}_output.log"
+    with open(out_path, 'w', encoding='utf-8') as f:
+        tee = _Tee(sys.stdout, f)
+        with contextlib.redirect_stdout(tee):
+            for pth in targets:
+                print('\n' + '#' * 70)
+                print(f"# {pth}")
+                print('#' * 70)
+                try:
+                    run_one(args, pth)
+                except Exception as e:  # keep iterating over the directory
+                    print(f"[error] {pth}: {type(e).__name__}: {e}")
+    print(f"\n[output saved to {out_path}]")
+
+
+def run_one(args, pth_path):
+    model, checkpoint = load_model(pth_path, device='cpu')
     ckpt_cfg = checkpoint['config']
 
-    task, exp_cfg = find_exp_config(args, ckpt_cfg)
+    task, exp_cfg = find_exp_config(pth_path, args.json)
     cfg = dict(ckpt_cfg)
     if exp_cfg:
         cfg.update(exp_cfg)
@@ -162,7 +201,7 @@ def main():
         return 'M' if v == missing_token and missing_token is not None else str(v)
 
     print('=' * 70)
-    print(f"Model : {os.path.basename(args.pth)}")
+    print(f"Model : {os.path.basename(pth_path)}")
     print(f"Task  : {desc}")
     print(f"Seed  : {used_seed}  | length {length}  | corrupted: {corrupted}"
           + (f" (prob={missing_prob}, miss_len={cfg.get('MISS_LEN', 1)}, "
@@ -189,6 +228,19 @@ def main():
     print(f"\naccuracy on this sample: {n_ok}/{n} = {n_ok / n:.1%}"
           " (positions whose input was corrupted count as failures if the clean"
           " value is not recovered)")
+
+
+def main():
+    ap = argparse.ArgumentParser(description='Print random sample(s) with aligned model predictions.')
+    ap.add_argument('target', help='model .pth file, or a directory of .pth files (each analyzed in turn)')
+    ap.add_argument('json', nargs='?', default=None,
+                    help='experiments JSON that generated the model(s) (matched by filename stem)')
+    ap.add_argument('--seed', type=int, default=None, help='seed for sample generation (default: random)')
+    ap.add_argument('--length', type=int, default=None, help='sample length (default: TRAIN_LEN from config)')
+    ap.add_argument('--clean', action='store_true', help='do not corrupt the sample even if MISSING_PROB is set')
+    args = ap.parse_args()
+    stem = os.path.splitext(os.path.basename(sys.argv[0]))[0]
+    dispatch_and_log(args, stem, run_one)
 
 
 if __name__ == '__main__':
