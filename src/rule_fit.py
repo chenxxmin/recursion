@@ -40,12 +40,13 @@ if SCRIPT_DIR not in sys.path:
     sys.path.insert(0, SCRIPT_DIR)
 
 from analyze_attention import load_model
-from report_front_back_attention import (MIN_PRINT_VAL, dump_matrices, parse_log,
+from report_front_back_attention import (dump_matrices, parse_log,
                                          segment_by_attention)
 from verify_sample import _Tee, build_single_rule
 
 MODEL_BASE = '/data/cxm/models'
 LOG_BASE_CANDIDATES = ['/data/cxm/models/{name}/logs', '/data/cxm/recursion/{name}/logs']
+SIG_THRESHOLD = 0.10  # attention values below this are ignored in signatures
 
 
 def solve_mod_p(rows, p):
@@ -114,7 +115,6 @@ def run_one(args, exp_cfg, task, exp_name, pth_path, log_path):
 
     init_len, next_fn, desc = build_single_rule(task, cfg)
     p = cfg['P']
-    length = args.length or cfg.get('TRAIN_LEN', 16)
     num_mask = cfg.get('NUM_MASK') or 0
     random.seed(args.seed)
 
@@ -123,8 +123,12 @@ def run_one(args, exp_cfg, task, exp_name, pth_path, log_path):
     if not attn:
         print('[skip] no attention section in log')
         return
+    T_att = max(i for layer in attn.values() for head in layer.values() for i in head) + 1
+    # probe length must cover the attention matrix coordinates, otherwise
+    # segments beyond TRAIN_LEN would have no data
+    length = args.length or max(cfg.get('TRAIN_LEN', 16), T_att)
     segments = segment_by_attention(attn, start_pos=num_mask - 1,
-                                    threshold=MIN_PRINT_VAL)
+                                    threshold=SIG_THRESHOLD)
     if args.min_seg > 1:
         segments = _merge_short_segments(segments, args.min_seg)
 
