@@ -40,6 +40,7 @@ if SCRIPT_DIR not in sys.path:
     sys.path.insert(0, SCRIPT_DIR)
 
 from analyze_attention import load_model
+from core import RecurrenceDataset
 from report_front_back_attention import (dump_matrices, parse_log,
                                          segment_by_attention)
 from verify_sample import _Tee, build_single_rule
