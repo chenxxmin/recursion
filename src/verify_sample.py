@@ -1,23 +1,22 @@
 """Random-sample prediction check for manual verification.
 
-Load a trained model, generate ONE random sample from the task's recurrence,
-and print the model's next-token predictions aligned with the true values
+Load trained models, generate ONE random sample from the task's recurrence,
+and print each model's next-token predictions aligned with the true values
 position by position. If the experiment config enables MISSING_PROB, the
 sample is corrupted with the same rule (RecurrenceDataset._corrupt) before
 being shown to the model, so gap-filling can be checked by eye.
 
 Usage (repo root):
-    python src/verify_sample.py <model.pth|dir> [experiments/xxx.json]
-           [--seed N] [--length L] [--clean]
+    python src/verify_sample.py <name> [--seed N] [--length L] [--clean]
 
-The first argument may be a single .pth or a directory of .pth files (each
-analyzed in turn). All output is teed to verify_sample_output.log. The
-experiment config is located by matching the .pth filename stem against the
-'name' field of the JSON's experiments; without the JSON (or when not found),
-recurrence parameters fall back to the checkpoint's saved config.
+<name> selects experiments/<name>.json; every experiment's model is read from
+/data/cxm/models/<name>/<exp>.pth. Missing/unreadable models are skipped and
+reported at the end. All output is teed to verify_sample_output.log.
 --clean forces an uncorrupted sample even when MISSING_PROB is configured.
 """
 import argparse
+import contextlib
+import json
 import os
 import random
 import sys
@@ -33,6 +32,7 @@ from analyze_attention import load_model
 from core import RecurrenceDataset
 
 COL_W = 5  # display width per position column
+MODEL_BASE = '/data/cxm/models'
 
 
 def build_single_rule(task, cfg):
@@ -118,14 +118,12 @@ def dispatch_and_log(args, script_stem, run_one):
     print(f"\n[output saved to {out_path}]")
 
 
-def run_one(args, pth_path):
+def run_one(args, exp_cfg, task, exp_name, pth_path):
     model, checkpoint = load_model(pth_path, device='cpu')
     ckpt_cfg = checkpoint['config']
 
-    task, exp_cfg = find_exp_config(pth_path, args.json)
     cfg = dict(ckpt_cfg)
-    if exp_cfg:
-        cfg.update(exp_cfg)
+    cfg.update(exp_cfg)
     cfg['P'] = cfg.get('P', cfg.get('p'))  # checkpoints save lowercase 'p'
     if task is None:
         # checkpoint fallback: single-rule tasks save 'recurrence'; mixed save ab_pairs
@@ -232,15 +230,44 @@ def run_one(args, pth_path):
 
 def main():
     ap = argparse.ArgumentParser(description='Print random sample(s) with aligned model predictions.')
-    ap.add_argument('target', help='model .pth file, or a directory of .pth files (each analyzed in turn)')
-    ap.add_argument('json', nargs='?', default=None,
-                    help='experiments JSON that generated the model(s) (matched by filename stem)')
+    ap.add_argument('name', help='experiment batch name (experiments/<name>.json; '
+                                 'models read from /data/cxm/models/<name>/<exp>.pth)')
     ap.add_argument('--seed', type=int, default=None, help='seed for sample generation (default: random)')
     ap.add_argument('--length', type=int, default=None, help='sample length (default: TRAIN_LEN from config)')
     ap.add_argument('--clean', action='store_true', help='do not corrupt the sample even if MISSING_PROB is set')
     args = ap.parse_args()
-    stem = os.path.splitext(os.path.basename(sys.argv[0]))[0]
-    dispatch_and_log(args, stem, run_one)
+
+    exp_path = f'experiments/{args.name}.json'
+    with open(exp_path, encoding='utf-8') as f:
+        experiments = json.load(f)['experiments']
+
+    out_path = 'verify_sample_output.log'
+    missing = []
+    with open(out_path, 'w', encoding='utf-8') as f:
+        with contextlib.redirect_stdout(_Tee(sys.stdout, f)):
+            for e in experiments:
+                exp_name = e['name']
+                print('\n' + '#' * 70)
+                print(f'# {exp_name}')
+                print('#' * 70)
+                pth = os.path.join(MODEL_BASE, args.name, f'{exp_name}.pth')
+                if not os.path.exists(pth):
+                    missing.append(exp_name)
+                    print(f'[skip] model not found: {pth}')
+                    continue
+                try:
+                    run_one(args, e['config'], e.get('task'), exp_name, pth)
+                except Exception as exc:  # keep iterating over the batch
+                    missing.append(f'{exp_name} (error: {type(exc).__name__}: {exc})')
+                    print(f'[error] {type(exc).__name__}: {exc}')
+
+            print('\n' + '=' * 70)
+            print(f'MISSING REPORT ({len(missing)}/{len(experiments)} skipped):')
+            for m in missing:
+                print(f'  {m}')
+            if not missing:
+                print('  none — all experiments processed')
+    print(f'\n[output saved to {out_path}]')
 
 
 if __name__ == '__main__':
