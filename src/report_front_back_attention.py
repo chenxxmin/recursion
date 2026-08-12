@@ -92,6 +92,39 @@ def split_k(series):
     return None
 
 
+def attention_signature(attn, pos, threshold=MIN_PRINT_VAL):
+    """Significant attention distances at one query position (union over
+    layers/heads): {i-j : attn[pos][j] >= threshold}."""
+    sig = set()
+    for layer in attn.values():
+        for mat in layer.values():
+            row = mat.get(pos, {})
+            for j, v in row.items():
+                if v >= threshold and pos - j >= 0:
+                    sig.add(pos - j)
+    return frozenset(sig)
+
+
+def segment_by_attention(attn, start_pos, threshold=MIN_PRINT_VAL):
+    """Segment consecutive query positions (from start_pos) by identical
+    attention signatures. Returns [(seg_start, seg_end, signature), ...]
+    with inclusive ends; positions with no matrix rows are skipped."""
+    T = max((i for layer in attn.values() for head in layer.values() for i in head),
+            default=-1) + 1
+    segments = []
+    cur_sig, cur_start = None, None
+    for pos in range(start_pos, T):
+        sig = attention_signature(attn, pos, threshold)
+        if cur_sig is None:
+            cur_sig, cur_start = sig, pos
+        elif sig != cur_sig:
+            segments.append((cur_start, pos - 1, cur_sig))
+            cur_sig, cur_start = sig, pos
+    if cur_sig is not None:
+        segments.append((cur_start, T - 1, cur_sig))
+    return segments
+
+
 def focus_by_distance(attn_mat, query_positions):
     """Mean attention per distance over the given query positions."""
     out = {}

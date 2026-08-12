@@ -2,22 +2,28 @@
 
 Given an experiment batch NAME, this script:
   1. reads experiments/<name>.json and iterates its experiments
-  2. for each experiment, finds the training log (attention analysis section)
-     and the model checkpoint
-  3. dumps the len x len attention matrix as a symbol grid
+  2. finds the training log and the model checkpoint for each experiment
+  3. dumps the attention matrix from the log as a symbol grid
      (　<0.05, · 0.05~0.1, ○ 0.1~0.25, × 0.25~0.5, ※ 0.5~1)
-  4. auto-builds candidate feature set C = the distances whose mean attention
-     is >= 0.05 (union over layers/heads, per front/back segment)
-  5. fits the model's argmax predictions on set A (true-rule positions, from
-     the a,b[,c] config) and set C, exactly over F_p (RANSAC fallback)
-  6. reports experiments with missing log/model at the end
+  4. segments prediction positions by ATTENTION SIGNATURE (set of significant
+     distances, union over heads): positions j >= num_mask-1 are scanned in
+     order, and a new segment starts whenever the signature changes
+  5. fits the model's predictions on two candidate feature sets per segment:
+     A = true-rule positions (d0..d{order-1}), C = A ∪ segment signature
+  6. PROBE DATA: probe sequences are fully random (every position iid uniform
+     over F_p, NOT recurrence-following); every segment position contributes
+     the same number of equations (balanced by construction), and feature
+     values marginally cover F_p uniformly
+  7. reports experiments with missing log/model at the end
 
 Paths:
   model: /data/cxm/models/<name>/<exp>.pth
   log:   /data/cxm/models/<name>/logs/<exp>.log  or
          /data/cxm/recursion/<name>/logs/<exp>.log
 
-Usage (repo root):  python src/rule_fit.py <name> [--samples N] [--seed N] [--length L] [--clean]
+Usage (repo root):
+    python src/rule_fit.py <name> [--samples N] [--seed N] [--length L] [--min-seg N]
+
 Output is teed to rule_fit_output.log.
 """
 import argparse
@@ -34,13 +40,12 @@ if SCRIPT_DIR not in sys.path:
     sys.path.insert(0, SCRIPT_DIR)
 
 from analyze_attention import load_model
-from core import RecurrenceDataset
-from report_front_back_attention import dump_matrices, focus_by_distance, parse_log, split_k
+from report_front_back_attention import (MIN_PRINT_VAL, dump_matrices, parse_log,
+                                         segment_by_attention)
 from verify_sample import _Tee, build_single_rule
 
 MODEL_BASE = '/data/cxm/models'
 LOG_BASE_CANDIDATES = ['/data/cxm/models/{name}/logs', '/data/cxm/recursion/{name}/logs']
-ATTN_MIN = 0.05  # distances with mean attention >= this go into candidate set C
 
 
 def solve_mod_p(rows, p):
@@ -74,7 +79,7 @@ def solve_mod_p(rows, p):
     return [A[r][k] for r in range(k)]
 
 
-def fit_and_score(X, y, p, rounds=200):
+def fit_and_score(X, y, p, rounds=300):
     """Return (coeffs, agreement, exact). Exact solve first; RANSAC fallback."""
     k = len(X[0])
     coeffs = solve_mod_p([xi + [yi] for xi, yi in zip(X, y)], p)
@@ -99,16 +104,6 @@ def fmt_equation(dists, coeffs, p):
     return f'x_{{t+1}} = {terms}  (mod {p})'
 
 
-def significant_dists(attn, qpos):
-    """Union over layers/heads of distances with mean attention >= ATTN_MIN."""
-    sig = set()
-    for layer in attn.values():
-        for mat in layer.values():
-            fbd = focus_by_distance(mat, qpos)
-            sig |= {d for d, v in fbd.items() if v >= ATTN_MIN}
-    return sorted(sig)
-
-
 def run_one(args, exp_cfg, task, exp_name, pth_path, log_path):
     model, checkpoint = load_model(pth_path, device='cpu')
     cfg = dict(exp_cfg)
@@ -121,97 +116,69 @@ def run_one(args, exp_cfg, task, exp_name, pth_path, log_path):
     p = cfg['P']
     length = args.length or cfg.get('TRAIN_LEN', 16)
     num_mask = cfg.get('NUM_MASK') or 0
-    missing_prob = cfg.get('MISSING_PROB', 0.0)
     random.seed(args.seed)
 
-    # --- log: split + attention matrices
+    # --- log: attention matrices + signature segmentation
     start_x, series, attn = parse_log(log_path)
-    k = split_k(series)
-    T_att = max((i for layer in attn.values() for head in layer.values() for i in head),
-                default=-1) + 1
+    if not attn:
+        print('[skip] no attention section in log')
+        return
+    segments = segment_by_attention(attn, start_pos=num_mask - 1,
+                                    threshold=MIN_PRINT_VAL)
+    if args.min_seg > 1:
+        segments = _merge_short_segments(segments, args.min_seg)
 
     print(f'Model: {exp_name}')
-    print(f'Rule : {desc} | length={length}, num_mask={num_mask}, missing_prob={missing_prob}')
-    print(f'Log  : front k={k}, attention matrix {"present" if attn else "MISSING"} (T={T_att})')
+    print(f'Rule : {desc} | probe length={length}, num_mask={num_mask}')
+    print(f'Segments (signature = significant attention dists, union over heads):')
+    for a, b, sig in segments:
+        print(f'  positions {a:2d}..{b:2d}  dists={sorted(sig)}')
 
     # attention symbol grids
-    if attn:
-        dump_matrices(attn, print, exp_name)
+    dump_matrices(attn, print, exp_name)
 
-    # --- segments (query position t predicts x_{t+1})
-    lo = max(num_mask, init_len - 1)
-    if k:
-        seg_ranges = [('FRONT', (start_x - 1, start_x - 1 + k)),
-                      ('BACK', (start_x - 1 + k, length - 1))]
-    else:
-        seg_ranges = [('ALL', (lo, length - 1))]
-
+    # --- probe: fully random sequences (off-manifold by design)
+    # every segment position contributes exactly args.samples equations
     set_A = list(range(init_len))
-    # set C per segment: from attention over that segment's queries
-    seg_sets = []
-    for seg, (a, b) in seg_ranges:
-        if attn and T_att > 0:
-            q_lo = max(a, 0)
-            q_hi = min(b, T_att - 1)  # matrix coords; last row has no target
-            qpos = list(range(q_lo, q_hi))
-            cset = sorted(set(set_A) | set(significant_dists(attn, qpos)))
-        else:
-            cset = list(set_A)
-        seg_sets.append((seg, (a, b), set_A, cset))
-
-    # --- forward samples, collect features/preds
-    buckets = {}
-    agree = {}
-    for seg, rng, _, _ in seg_sets:
-        agree[seg] = [0, 0]
-        buckets[seg] = {'A': ([], []), 'C': ([], [])}
+    buckets = {}   # (seg_idx, 'A'|'C') -> (X, y)
+    agree = {}     # seg_idx -> [match, total]  (model pred vs random-seq "truth" is
+                   # meaningless here; instead report pred == recurrence continuation)
+    for i, (a, b, sig) in enumerate(segments):
+        buckets[(i, 'A')] = ([], [])
+        buckets[(i, 'C')] = ([], [])
+        agree[i] = [0, 0]
 
     for _ in range(args.samples):
-        seq = [random.randrange(p) for _ in range(init_len)]
-        while len(seq) < length:
-            seq.append(next_fn(seq))
-        view = list(seq)
-        miss_tok = None
-        if missing_prob > 0 and not args.clean:
-            helper = RecurrenceDataset(p=p, init_len=init_len, length=length, verbose=False,
-                                       missing_prob=missing_prob,
-                                       miss_len=cfg.get('MISS_LEN', 1),
-                                       miss_second=cfg.get('MISS_SECOND', False),
-                                       num_mask=num_mask)
-            window = torch.tensor(view, dtype=torch.long)
-            helper._corrupt(window, True)
-            view = window.tolist()
-            miss_tok = p
-        x = torch.tensor([view], dtype=torch.long)
+        seq = [random.randrange(p) for _ in range(length)]
+        x = torch.tensor([seq], dtype=torch.long)
         with torch.no_grad():
             preds = model(x)[0][0].argmax(dim=-1).tolist()
-
-        for seg, (a, b), _, _ in seg_sets:
-            for t in range(max(lo, a), b):
+        for i, (a, b, sig) in enumerate(segments):
+            dists_C = sorted(set(set_A) | set(sig))
+            for t in range(max(a, 0), min(b, length - 2) + 1):
                 pred = preds[t]
-                agree[seg][1] += 1
-                if pred == seq[t + 1]:
-                    agree[seg][0] += 1
-                for label, dists in (('A', [s for s in seg_sets if s[0] == seg][0][2]),
-                                     ('C', [s for s in seg_sets if s[0] == seg][0][3])):
-                    feats, ok = [], True
-                    for d in dists:
-                        v = view[t - d]
-                        if miss_tok is not None and v == miss_tok:
-                            ok = False
-                            break
-                        feats.append(v)
-                    if ok:
-                        buckets[seg][label][0].append(feats)
-                        buckets[seg][label][1].append(pred)
+                # reference: what the TRUE rule would predict from the last
+                # init_len tokens of the random probe
+                agree[i][1] += 1
+                if t + 1 >= init_len and pred == next_fn(seq[:t + 1]):
+                    agree[i][0] += 1
+                for label, dists in (('A', set_A), ('C', dists_C)):
+                    feats = [seq[t - d] for d in dists if t - d >= 0]
+                    if len(feats) < len(dists):
+                        continue
+                    buckets[(i, label)][0].append(feats)
+                    buckets[(i, label)][1].append(pred)
 
-    # --- fit and report
-    for seg, (a, b), dists_A, dists_C in seg_sets:
-        m, tot = agree[seg]
-        print(f'\n== segment {seg} (queries {max(lo, a)}..{b - 1}): '
-              f'model-vs-truth {m}/{tot} = {m / tot:.1%}' if tot else f'\n== segment {seg}: empty')
-        for label, dists in (('A', dists_A), ('C', dists_C)):
-            X, y = buckets[seg][label]
+    # --- fit and report per segment
+    for i, (a, b, sig) in enumerate(segments):
+        m, tot = agree[i]
+        line = f'\n== segment {i} (positions {a}..{b}), signature {sorted(sig)}'
+        if tot:
+            line += f' | pred == true-rule-on-random-input {m}/{tot} = {m / tot:.1%}'
+        print(line)
+        for label in ('A', 'C'):
+            dists = set_A if label == 'A' else sorted(set(set_A) | set(sig))
+            X, y = buckets[(i, label)]
             if not X:
                 print(f'  set {label} {dists}: no usable positions')
                 continue
@@ -224,13 +191,34 @@ def run_one(args, exp_cfg, task, exp_name, pth_path, log_path):
     print()
 
 
+def _merge_short_segments(segments, min_len):
+    """Merge runs shorter than min_len into the previous segment (or the next
+    one when there is no previous)."""
+    segs = [[a, b, sig] for a, b, sig in segments]
+    i = 0
+    while i < len(segs):
+        if segs[i][1] - segs[i][0] + 1 < min_len and len(segs) > 1:
+            if i == 0:
+                segs[1][0] = segs[0][0]
+            else:
+                segs[i - 1][1] = segs[i][1]
+            del segs[i]
+            i = max(i - 1, 0)
+        else:
+            i += 1
+    return [(a, b, sig) for a, b, sig in segs]
+
+
 def main():
     ap = argparse.ArgumentParser(description='Fit linear formulas to model predictions over F_p.')
     ap.add_argument('name', help='experiment batch name (experiments/<name>.json)')
-    ap.add_argument('--samples', type=int, default=300)
+    ap.add_argument('--samples', type=int, default=500,
+                    help='random probe sequences per model (each position contributes one equation per sequence)')
     ap.add_argument('--seed', type=int, default=0)
-    ap.add_argument('--length', type=int, default=None)
-    ap.add_argument('--clean', action='store_true')
+    ap.add_argument('--length', type=int, default=None, help='probe length (default: TRAIN_LEN)')
+    ap.add_argument('--min-seg', type=int, default=1,
+                    help='merge segments shorter than this into neighbours (default 1 = literal rule)')
+    ap.add_argument('--clean', action='store_true', help='ignored (probes are never corrupted)')
     args = ap.parse_args()
 
     exp_path = f'experiments/{args.name}.json'
