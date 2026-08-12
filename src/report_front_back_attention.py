@@ -112,17 +112,75 @@ def fmt_cell(fbd):
     return ' '.join(parts) if parts else '-'
 
 
+# Symbol scale for the attention matrix dump (ALL full-width, 2 cells each,
+# so the grid aligns in Notepad with a CJK font like SimSun/NSimSun):
+#   <0.05 -> '　', 0.05~0.1 -> '・', 0.1~0.25 -> '○', 0.25~0.5 -> '×', 0.5~1 -> '※'
+SYMBOL_BREAKS = (0.05, 0.1, 0.25, 0.5)
+SYMBOLS = ('　', '·', '○', '×', '※')  # all full-width and GBK-encodable
+FW_DIGITS = '０１２３４５６７８９'  # full-width digits for the column ruler
+
+
+def attn_symbol(v):
+    for i, thr in enumerate(SYMBOL_BREAKS):
+        if v < thr:
+            return SYMBOLS[i]
+    return SYMBOLS[-1]
+
+
+def dump_matrices(attn, emit, title):
+    """Print the T x T attention matrix of every layer/head as a symbol grid.
+    Row i, column j = attention from query position i to key position j.
+    One row per line, no spaces between columns."""
+    for layer in sorted(attn):
+        for head in sorted(attn[layer]):
+            mat = attn[layer][head]
+            T = max(mat.keys()) + 1
+            emit(f'\n{title} | Layer {layer} Head {head}  ({T}x{T})')
+            emit('j\\i ' + ''.join(FW_DIGITS[j % 10] for j in range(T)))
+            for i in range(T):
+                row = mat.get(i, {})
+                emit(f'{i:>3} ' + ''.join(attn_symbol(row.get(j, 0.0)) for j in range(T)).rstrip())
+
+
 def main():
     ap = argparse.ArgumentParser(description='Front/back segmented attention report from logs.')
     ap.add_argument('logs_dirs', nargs='+', help='one or more logs directories')
     ap.add_argument('-o', '--out', default='front_back_attention_report.txt',
                     help='output report path')
+    ap.add_argument('--matrices', action='store_true',
+                    help='dump per-layer/head attention matrices as symbol grids '
+                         '(space, ·, ○, ×, ※ for <0.05/0.1/0.25/0.5/1)')
+    ap.add_argument('--match', default=None,
+                    help='only process logs whose filename contains this substring')
+    ap.add_argument('--seed', default=None,
+                    help='only process the log with this seed number')
     args = ap.parse_args()
 
     lines = []
     def emit(s=''):
         print(s)
         lines.append(s)
+
+    if args.matrices:
+        for logs_dir in args.logs_dirs:
+            for path in sorted(glob.glob(os.path.join(logs_dir, '*.log'))):
+                name = os.path.splitext(os.path.basename(path))[0]
+                if args.match and args.match not in name:
+                    continue
+                if args.seed and not name.endswith(f'_seed{args.seed}'):
+                    continue
+                start_x, series, attn = parse_log(path)
+                k = split_k(series)
+                emit('=' * 78)
+                emit(f'{name}  (front k={k})')
+                if not attn:
+                    emit('  no attention data found, skipped')
+                    continue
+                dump_matrices(attn, emit, name)
+        with open(args.out, 'w', encoding='utf-8') as f:
+            f.write('\n'.join(lines) + '\n')
+        print(f'\n[report saved to {args.out}]')
+        return
 
     for logs_dir in args.logs_dirs:
         emit('=' * 78)
