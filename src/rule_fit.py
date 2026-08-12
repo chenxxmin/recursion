@@ -174,24 +174,62 @@ def run_one(args, exp_cfg, task, exp_name, pth_path, log_path):
                     buckets[(i, label)][1].append(pred)
 
     # --- fit and report per segment
+    seg_results = []  # (a, b, sig, {label: (dists, coeffs, acc, exact)})
     for i, (a, b, sig) in enumerate(segments):
         m, tot = agree[i]
         line = f'\n== segment {i} (positions {a}..{b}), signature {sorted(sig)}'
         if tot:
             line += f' | pred == true-rule-on-random-input {m}/{tot} = {m / tot:.1%}'
         print(line)
+        fits = {}
         for label in ('A', 'C'):
             dists = set_A if label == 'A' else sorted(set(set_A) | set(sig))
             X, y = buckets[(i, label)]
             if not X:
+                fits[label] = (dists, None, 0.0, False)
                 print(f'  set {label} {dists}: no usable positions')
                 continue
             coeffs, acc, exact = fit_and_score(X, y, p)
+            fits[label] = (dists, coeffs, acc, exact)
             if coeffs is None:
                 print(f'  set {label} {dists}: no linear fit (best agreement {acc:.1%})')
             else:
                 tag = 'EXACT' if exact else f'best-effort, agreement {acc:.1%}'
                 print(f'  set {label} {dists}: {fmt_equation(dists, coeffs, p)}  [{tag}]')
+        seg_results.append((a, b, sig, fits))
+
+    # --- merge adjacent segments with identical fitted formula (set C).
+    # Normalization DROPS zero coefficients, so e.g. signature [0,1,6] with
+    # coeffs (c0, 0, c6) merges with [0,6] with coeffs (c0, c6).
+    def norm_C(fits):
+        dists, coeffs, acc, exact = fits['C']
+        if coeffs is None:
+            return None
+        return {d: c % p for d, c in zip(dists, coeffs) if c % p != 0}
+
+    print('== merged formula groups (adjacent segments, identical formula):')
+    groups = []  # each: [start, end, formula_dict, member segment idxs, min_acc, all_exact]
+    for i, (a, b, sig, fits) in enumerate(seg_results):
+        f = norm_C(fits)
+        acc = fits['C'][2]
+        exact = fits['C'][3]
+        if groups and f is not None and groups[-1][2] == f:
+            g = groups[-1]
+            g[1] = b
+            g[3].append(i)
+            g[4] = min(g[4], acc)
+            g[5] = g[5] and exact
+        else:
+            groups.append([a, b, f, [i], acc, exact])
+    for ga, gb, gf, members, min_acc, all_exact in groups:
+        if gf is None:
+            print(f'  positions {ga:2d}..{gb:2d}  (segments {members}): no linear fit')
+            continue
+        dists = sorted(gf)
+        coeffs = [gf[d] for d in dists]
+        tag = 'EXACT' if all_exact else f'min agreement {min_acc:.1%}'
+        print(f'  positions {ga:2d}..{gb:2d}  (segments {members}): '
+              f'{fmt_equation(dists, coeffs, p)}  [{tag}]')
     print()
 
 
