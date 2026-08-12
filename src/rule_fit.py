@@ -5,15 +5,15 @@ Given an experiment batch NAME, this script:
   2. finds the training log and the model checkpoint for each experiment
   3. dumps the attention matrix from the log as a symbol grid
      (　<0.05, · 0.05~0.1, ○ 0.1~0.25, × 0.25~0.5, ※ 0.5~1)
-  4. segments prediction positions by ATTENTION SIGNATURE (set of significant
-     distances, union over heads): positions j >= num_mask-1 are scanned in
-     order, and a new segment starts whenever the signature changes
-  5. fits the model's predictions on two candidate feature sets per segment:
-     A = true-rule positions (d0..d{order-1}), C = A ∪ segment signature
-  6. PROBE DATA: probe sequences are fully random (every position iid uniform
-     over F_p, NOT recurrence-following); every segment position contributes
-     the same number of equations (balanced by construction), and feature
-     values marginally cover F_p uniformly
+  4. MISSING-MODE (experiments with MISSING_PROB > 0): positions are grouped
+     by the corruption pattern of the last two context tokens —
+     (x,x) / (M,x) / (M,M) / (x,M) — and fitted per category; sequences
+     follow the recurrence and are corrupted with the experiment's own rule
+  5. otherwise positions are segmented by ATTENTION SIGNATURE (set of
+     significant distances >= 0.1, union over heads) and fitted per segment
+  6. PROBE DATA for attention mode: fully random sequences (every position
+     iid uniform over F_p); every segment position contributes the same
+     number of equations (balanced by construction)
   7. reports experiments with missing log/model at the end
 
 Paths:
@@ -105,6 +105,92 @@ def fmt_equation(dists, coeffs, p):
     return f'x_{{t+1}} = {terms}  (mod {p})'
 
 
+def run_missing_categories(args, model, cfg, next_fn, init_len, p, exp_name, desc):
+    """Missing-experiment mode: group prediction positions by the corruption
+    pattern of the last two context tokens — (x,x), (M,x), (M,M), (x,M) —
+    and fit per category. Sequences follow the recurrence and are corrupted
+    with the experiment's own missing rule (in-distribution). Features use
+    only VISIBLE positions (missing tokens have no value to fit on).
+    """
+    length = args.length or cfg.get('TRAIN_LEN', 16)
+    num_mask = cfg.get('NUM_MASK') or 0
+    missing_prob = cfg['MISSING_PROB']
+    miss_len = cfg.get('MISS_LEN', 1)
+    helper = RecurrenceDataset(p=p, init_len=init_len, length=length, verbose=False,
+                               missing_prob=missing_prob, miss_len=miss_len,
+                               miss_second=cfg.get('MISS_SECOND', False),
+                               num_mask=num_mask)
+    CATS = ['(x,x)', '(M,x)', '(M,M)', '(x,M)']  # by (view[t-1], view[t])
+    set_A = list(range(init_len))
+    # set C candidate dists: true-rule dists plus enough depth to reconstruct
+    # across a full missing run
+    dists_C_full = list(range(init_len + miss_len + 1))
+
+    buckets = {c: {'A': ([], []), 'C': ([], [])} for c in CATS}
+    agree = {c: [0, 0] for c in CATS}
+    lo = max(num_mask, 1)
+
+    for _ in range(args.samples):
+        seq = [random.randrange(p) for _ in range(init_len)]
+        while len(seq) < length:
+            seq.append(next_fn(seq))
+        window = torch.tensor(seq, dtype=torch.long)
+        helper._corrupt(window, True)
+        view = window.tolist()
+        x = torch.tensor([view], dtype=torch.long)
+        with torch.no_grad():
+            preds = model(x)[0][0].argmax(dim=-1).tolist()
+
+        for t in range(lo, length - 1):
+            s1 = view[t - 1] == p  # second-to-last missing?
+            s0 = view[t] == p      # last missing?
+            cat = ('(M,M)' if s1 and s0 else '(M,x)' if s1 else
+                   '(x,M)' if s0 else '(x,x)')
+            pred = preds[t]
+            agree[cat][1] += 1
+            if pred == seq[t + 1]:
+                agree[cat][0] += 1
+            for label, full_dists in (('A', set_A), ('C', dists_C_full)):
+                dists = [d for d in full_dists
+                         if t - d >= 0 and view[t - d] != p]  # visible only
+                if not dists:
+                    continue
+                feats = [view[t - d] for d in dists]
+                buckets[cat][label][0].append(feats)
+                buckets[cat][label][1].append((dists, pred))
+
+    print(f'Model: {exp_name}')
+    print(f'Rule : {desc} | length={length}, missing prob={missing_prob}, '
+          f'miss_len={miss_len}, miss_second={cfg.get("MISS_SECOND", False)}')
+    print('Grouping: corruption pattern of the last two context tokens')
+    for cat in CATS:
+        m, tot = agree[cat]
+        print(f'\n== category {cat}: model-vs-truth {m}/{tot}'
+              + (f' = {m / tot:.1%}' if tot else ' (no positions)'))
+        for label in ('A', 'C'):
+            Xy = buckets[cat][label]
+            if not Xy[0]:
+                print(f'  set {label}: no usable positions')
+                continue
+            # dists vary per sample (visible-only); group by dist tuple
+            by_dists = {}
+            for feats, (dists, pred) in zip(*Xy):
+                by_dists.setdefault(tuple(dists), ([], []))
+                by_dists[tuple(dists)][0].append(feats)
+                by_dists[tuple(dists)][1].append(pred)
+            for dists_t, (X, y) in sorted(by_dists.items(), key=lambda kv: -len(kv[1][0])):
+                coeffs, acc, exact = fit_and_score(X, y, p)
+                base = 'A' if label == 'A' else 'C'
+                if coeffs is None:
+                    print(f'  set {base} {list(dists_t)}: no linear fit '
+                          f'(best agreement {acc:.1%}, n={len(X)})')
+                else:
+                    tag = 'EXACT' if exact else f'best-effort, agreement {acc:.1%}'
+                    print(f'  set {base} {list(dists_t)}: {fmt_equation(list(dists_t), coeffs, p)}'
+                          f'  [{tag}, n={len(X)}]')
+    print()
+
+
 def run_one(args, exp_cfg, task, exp_name, pth_path, log_path):
     model, checkpoint = load_model(pth_path, device='cpu')
     cfg = dict(exp_cfg)
@@ -117,6 +203,12 @@ def run_one(args, exp_cfg, task, exp_name, pth_path, log_path):
     p = cfg['P']
     num_mask = cfg.get('NUM_MASK') or 0
     random.seed(args.seed)
+
+    # missing experiments: group by corruption pattern of the last two context
+    # tokens instead of attention signatures
+    if cfg.get('MISSING_PROB', 0.0) > 0 and not args.clean:
+        run_missing_categories(args, model, cfg, next_fn, init_len, p, exp_name, desc)
+        return
 
     # --- log: attention matrices + signature segmentation
     start_x, series, attn = parse_log(log_path)
