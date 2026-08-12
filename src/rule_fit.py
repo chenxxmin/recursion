@@ -1,23 +1,28 @@
-"""Fit linear recurrence formulas to a trained model's predictions, over F_p.
+"""Fit linear recurrence formulas to trained models' predictions, over F_p.
 
-For each prediction position, the model's argmax prediction is regressed
-(exactly, mod p) onto candidate feature sets built from the visible context:
+Given an experiment batch NAME, this script:
+  1. reads experiments/<name>.json and iterates its experiments
+  2. for each experiment, finds the training log (attention analysis section)
+     and the model checkpoint
+  3. dumps the len x len attention matrix as a symbol grid
+     (　<0.05, · 0.05~0.1, ○ 0.1~0.25, × 0.25~0.5, ※ 0.5~1)
+  4. auto-builds candidate feature set C = the distances whose mean attention
+     is >= 0.05 (union over layers/heads, per front/back segment)
+  5. fits the model's argmax predictions on set A (true-rule positions, from
+     the a,b[,c] config) and set C, exactly over F_p (RANSAC fallback)
+  6. reports experiments with missing log/model at the end
 
-  set A: the true-rule positions (d0..d{order-1}, i.e. x_i, x_{i-1}, ...)
-  set C: A + extra distances observed in attention (default d7)
+Paths:
+  model: /data/cxm/models/<name>/<exp>.pth
+  log:   /data/cxm/models/<name>/logs/<exp>.log  or
+         /data/cxm/recursion/<name>/logs/<exp>.log
 
-An exact solution (agreement 100%) means the model's predictions ARE that
-linear formula on those positions; a RANSAC best-effort fit is reported
-otherwise. With --log, positions are split into FRONT/BACK segments by the
-shortcut split rule (see analyze_attention.compute_front_split).
-
-Usage (repo root):
-    python src/rule_fit.py <model.pth|dir> [experiments/xxx.json]
-           [--log path] [--samples N] [--seed N] [--length L] [--extra-dists 7 8]
-
+Usage (repo root):  python src/rule_fit.py <name> [--samples N] [--seed N] [--length L] [--clean]
 Output is teed to rule_fit_output.log.
 """
 import argparse
+import contextlib
+import json
 import os
 import random
 import sys
@@ -28,9 +33,14 @@ SCRIPT_DIR = os.path.dirname(os.path.abspath(__file__))
 if SCRIPT_DIR not in sys.path:
     sys.path.insert(0, SCRIPT_DIR)
 
-from analyze_attention import compute_front_split, load_model
+from analyze_attention import load_model
 from core import RecurrenceDataset
-from verify_sample import build_single_rule, dispatch_and_log, find_exp_config
+from report_front_back_attention import dump_matrices, focus_by_distance, parse_log, split_k
+from verify_sample import _Tee, build_single_rule
+
+MODEL_BASE = '/data/cxm/models'
+LOG_BASE_CANDIDATES = ['/data/cxm/models/{name}/logs', '/data/cxm/recursion/{name}/logs']
+ATTN_MIN = 0.05  # distances with mean attention >= this go into candidate set C
 
 
 def solve_mod_p(rows, p):
@@ -72,7 +82,6 @@ def fit_and_score(X, y, p, rounds=200):
         return coeffs, 1.0, True
     best_c, best_acc = None, -1.0
     for _ in range(rounds):
-        # RANSAC: solve exactly from k independent rows, score on all data
         idx = random.sample(range(len(X)), k)
         c = solve_mod_p([[X[i][j] for j in range(k)] + [y[i]] for i in idx], p)
         if c is None:
@@ -90,51 +99,72 @@ def fmt_equation(dists, coeffs, p):
     return f'x_{{t+1}} = {terms}  (mod {p})'
 
 
-def run_one(args, pth_path):
-    device = 'cuda' if torch.cuda.is_available() else 'cpu'
-    model, checkpoint = load_model(pth_path, device=device)
-    ckpt_cfg = checkpoint['config']
+def significant_dists(attn, qpos):
+    """Union over layers/heads of distances with mean attention >= ATTN_MIN."""
+    sig = set()
+    for layer in attn.values():
+        for mat in layer.values():
+            fbd = focus_by_distance(mat, qpos)
+            sig |= {d for d, v in fbd.items() if v >= ATTN_MIN}
+    return sorted(sig)
 
-    task, exp_cfg = find_exp_config(pth_path, args.json)
-    cfg = dict(ckpt_cfg)
-    if exp_cfg:
-        cfg.update(exp_cfg)
+
+def run_one(args, exp_cfg, task, exp_name, pth_path, log_path):
+    model, checkpoint = load_model(pth_path, device='cpu')
+    cfg = dict(exp_cfg)
     cfg['P'] = cfg.get('P', cfg.get('p'))
-    if task is None:
-        task = cfg.get('recurrence') or ('mixed_ab' if cfg.get('ab_pairs') else 'addition')
-    if task in ('mixed_ab', 'mixed_abc') or (cfg.get('ab_pairs') and 'recurrence' not in cfg):
+    if task in ('mixed_ab', 'mixed_abc'):
         print('[skip] mixed tasks are not supported by rule_fit (single-rule only)')
         return
 
     init_len, next_fn, desc = build_single_rule(task, cfg)
     p = cfg['P']
-    length = args.length or cfg.get('TRAIN_LEN', cfg.get('train_len', 16))
+    length = args.length or cfg.get('TRAIN_LEN', 16)
     num_mask = cfg.get('NUM_MASK') or 0
     missing_prob = cfg.get('MISSING_PROB', 0.0)
     random.seed(args.seed)
 
-    # position segments (query position t predicts x_{t+1})
+    # --- log: split + attention matrices
+    start_x, series, attn = parse_log(log_path)
+    k = split_k(series)
+    T_att = max((i for layer in attn.values() for head in layer.values() for i in head),
+                default=-1) + 1
+
+    print(f'Model: {exp_name}')
+    print(f'Rule : {desc} | length={length}, num_mask={num_mask}, missing_prob={missing_prob}')
+    print(f'Log  : front k={k}, attention matrix {"present" if attn else "MISSING"} (T={T_att})')
+
+    # attention symbol grids
+    if attn:
+        dump_matrices(attn, print, exp_name)
+
+    # --- segments (query position t predicts x_{t+1})
     lo = max(num_mask, init_len - 1)
-    segments = [('ALL', None)]
-    if args.log and os.path.exists(args.log):
-        start_x, k = compute_front_split(args.log)
-        if k:
-            segments = [('FRONT', (start_x - 1, start_x - 1 + k)),
-                        ('BACK', (start_x - 1 + k, length - 1))]
-            print(f'split from log: front k={k} (start_x={start_x})')
+    if k:
+        seg_ranges = [('FRONT', (start_x - 1, start_x - 1 + k)),
+                      ('BACK', (start_x - 1 + k, length - 1))]
+    else:
+        seg_ranges = [('ALL', (lo, length - 1))]
+
+    set_A = list(range(init_len))
+    # set C per segment: from attention over that segment's queries
+    seg_sets = []
+    for seg, (a, b) in seg_ranges:
+        if attn and T_att > 0:
+            q_lo = max(a, 0)
+            q_hi = min(b, T_att - 1)  # matrix coords; last row has no target
+            qpos = list(range(q_lo, q_hi))
+            cset = sorted(set(set_A) | set(significant_dists(attn, qpos)))
         else:
-            print(f'split from log: no shortcut (k={k}); fitting ALL positions')
+            cset = list(set_A)
+        seg_sets.append((seg, (a, b), set_A, cset))
 
-    # candidate feature sets as attention distances
-    set_A = list(range(init_len))                       # d0..d{order-1}
-    extra = [d for d in args.extra_dists if d < length - 1]
-    sets = [('A (true-rule positions)', set_A)]
-    if extra:
-        sets.append(('C (A + attention dists)', set_A + extra))
-
-    # collect features/predictions per segment
-    buckets = {(seg, name): ([], []) for seg, _ in segments for name, _ in sets}
-    true_counts = {(seg): [0, 0] for seg, _ in segments}  # [match, total] vs true rule
+    # --- forward samples, collect features/preds
+    buckets = {}
+    agree = {}
+    for seg, rng, _, _ in seg_sets:
+        agree[seg] = [0, 0]
+        buckets[seg] = {'A': ([], []), 'C': ([], [])}
 
     for _ in range(args.samples):
         seq = [random.randrange(p) for _ in range(init_len)]
@@ -152,25 +182,19 @@ def run_one(args, pth_path):
             helper._corrupt(window, True)
             view = window.tolist()
             miss_tok = p
-        x = torch.tensor([view], dtype=torch.long, device=device)
+        x = torch.tensor([view], dtype=torch.long)
         with torch.no_grad():
             preds = model(x)[0][0].argmax(dim=-1).tolist()
 
-        for seg, rng in segments:
-            if rng is None:
-                positions = range(lo, length - 1)
-            else:
-                positions = range(max(lo, rng[0]), rng[1])
-            for t in positions:
+        for seg, (a, b), _, _ in seg_sets:
+            for t in range(max(lo, a), b):
                 pred = preds[t]
-                true_next = seq[t + 1]
-                key = seg
-                true_counts[key][1] += 1
-                if pred == true_next:
-                    true_counts[key][0] += 1
-                for name, dists in sets:
-                    feats = []
-                    ok = True
+                agree[seg][1] += 1
+                if pred == seq[t + 1]:
+                    agree[seg][0] += 1
+                for label, dists in (('A', [s for s in seg_sets if s[0] == seg][0][2]),
+                                     ('C', [s for s in seg_sets if s[0] == seg][0][3])):
+                    feats, ok = [], True
                     for d in dists:
                         v = view[t - d]
                         if miss_tok is not None and v == miss_tok:
@@ -178,43 +202,76 @@ def run_one(args, pth_path):
                             break
                         feats.append(v)
                     if ok:
-                        buckets[(seg, name)][0].append(feats)
-                        buckets[(seg, name)][1].append(pred)
+                        buckets[seg][label][0].append(feats)
+                        buckets[seg][label][1].append(pred)
 
-    print(f'Model: {os.path.basename(pth_path)}')
-    print(f'Rule : {desc} | samples={args.samples}, length={length}, '
-          f'missing_prob={missing_prob}')
-    for seg, _ in segments:
-        m, tot = true_counts[seg]
-        print(f'\n== segment {seg}: model-vs-truth agreement {m}/{tot} '
-              f'= {m / tot:.1%}' if tot else f'\n== segment {seg}: no positions')
-        for name, dists in sets:
-            X, y = buckets[(seg, name)]
+    # --- fit and report
+    for seg, (a, b), dists_A, dists_C in seg_sets:
+        m, tot = agree[seg]
+        print(f'\n== segment {seg} (queries {max(lo, a)}..{b - 1}): '
+              f'model-vs-truth {m}/{tot} = {m / tot:.1%}' if tot else f'\n== segment {seg}: empty')
+        for label, dists in (('A', dists_A), ('C', dists_C)):
+            X, y = buckets[seg][label]
             if not X:
-                print(f'  set {name}: no usable positions (all involve missing tokens)')
+                print(f'  set {label} {dists}: no usable positions')
                 continue
             coeffs, acc, exact = fit_and_score(X, y, p)
             if coeffs is None:
-                print(f'  set {name}: no linear fit found (best agreement {acc:.1%})')
+                print(f'  set {label} {dists}: no linear fit (best agreement {acc:.1%})')
             else:
                 tag = 'EXACT' if exact else f'best-effort, agreement {acc:.1%}'
-                print(f'  set {name} d{dists}: {fmt_equation(dists, coeffs, p)}  [{tag}]')
+                print(f'  set {label} {dists}: {fmt_equation(dists, coeffs, p)}  [{tag}]')
+    print()
 
 
 def main():
     ap = argparse.ArgumentParser(description='Fit linear formulas to model predictions over F_p.')
-    ap.add_argument('target', help='model .pth file, or a directory of .pth files')
-    ap.add_argument('json', nargs='?', default=None, help='experiments JSON (matched by filename stem)')
-    ap.add_argument('--log', default=None, help='training log for front/back split (optional)')
+    ap.add_argument('name', help='experiment batch name (experiments/<name>.json)')
     ap.add_argument('--samples', type=int, default=300)
     ap.add_argument('--seed', type=int, default=0)
     ap.add_argument('--length', type=int, default=None)
-    ap.add_argument('--extra-dists', type=int, nargs='*', default=[7],
-                    help='extra attention distances for candidate set C (default: 7)')
     ap.add_argument('--clean', action='store_true')
     args = ap.parse_args()
-    stem = os.path.splitext(os.path.basename(sys.argv[0]))[0]
-    dispatch_and_log(args, stem, run_one)
+
+    exp_path = f'experiments/{args.name}.json'
+    with open(exp_path, encoding='utf-8') as f:
+        experiments = json.load(f)['experiments']
+
+    out_path = 'rule_fit_output.log'
+    missing = []
+    with open(out_path, 'w', encoding='utf-8') as f:
+        with contextlib.redirect_stdout(_Tee(sys.stdout, f)):
+            for e in experiments:
+                exp_name, task, exp_cfg = e['name'], e.get('task'), e['config']
+                print('=' * 78)
+                print(f'# {exp_name}')
+                print('=' * 78)
+                pth = os.path.join(MODEL_BASE, args.name, f'{exp_name}.pth')
+                log = next((cand for cand in
+                            (os.path.join(base.format(name=args.name), f'{exp_name}.log')
+                             for base in LOG_BASE_CANDIDATES)
+                            if os.path.exists(cand)), None)
+                if not os.path.exists(pth):
+                    missing.append((exp_name, 'model'))
+                    print(f'[skip] model not found: {pth}')
+                    continue
+                if log is None:
+                    missing.append((exp_name, 'log'))
+                    print(f'[skip] log not found for {exp_name}')
+                    continue
+                try:
+                    run_one(args, exp_cfg, task, exp_name, pth, log)
+                except Exception as exc:
+                    missing.append((exp_name, f'error: {type(exc).__name__}: {exc}'))
+                    print(f'[error] {type(exc).__name__}: {exc}')
+
+            print('=' * 78)
+            print(f'MISSING REPORT ({len(missing)}/{len(experiments)} skipped):')
+            for exp_name, why in missing:
+                print(f'  {exp_name}: {why}')
+            if not missing:
+                print('  none — all experiments processed')
+    print(f'\n[output saved to {out_path}]')
 
 
 if __name__ == '__main__':
