@@ -177,7 +177,8 @@ def run_attention_analysis(name, pth_path, log_path, env):
         f.write(f"{'='*70}\n")
 
     analyze_process = _spawn_python(
-        f"from analyze_attention import analyze_model_attention; analyze_model_attention({pth_path!r})",
+        f"from analyze_attention import analyze_model_attention; "
+        f"analyze_model_attention({pth_path!r}, log_path={log_path!r})",
         env, stderr=subprocess.STDOUT)
 
     with open(log_path, 'a', encoding='utf-8') as f:

@@ -1,5 +1,6 @@
 import sys
 import os
+import re
 import torch
 import torch.nn.functional as F
 import math
@@ -326,6 +327,51 @@ def print_attention_summary(summary, seq=None):
         print()
 
 
+def compute_front_split(log_path):
+    """Compute the front/back segment split from a training log.
+
+    Parses the per-position accuracy lines (`from xK: ...`). Rule: skip
+    epoch 0 (untrained init noise); at the first epoch showing a low-high
+    separation — a leading run of positions < 0.1 with the position right
+    after >= 0.15 — the split k is the length of that leading run.
+
+    Returns (start_x, k): start_x is the K of the first `from xK` label (the
+    log line's first value corresponds to predicting x_K); k is the number of
+    leading positions (in log-line order) forming the front segment, 0 means
+    no shortcut was found, None means the positions never separated.
+    """
+    epoch_re = re.compile(r'Epoch\s+(\d+)\s+\|')
+    pos_re = re.compile(r'from x(\d+):\s+(.+)')
+    cur_ep = None
+    start_x = None
+    series = []
+    with open(log_path, encoding='utf-8') as f:
+        for line in f:
+            m = epoch_re.search(line)
+            if m:
+                cur_ep = int(m.group(1))
+                continue
+            m = pos_re.search(line)
+            if m and cur_ep is not None:
+                if start_x is None:
+                    start_x = int(m.group(1))
+                series.append((cur_ep, [float(x) for x in m.group(2).split()]))
+    if start_x is None:
+        return None, None
+    for ep, accs in series:
+        if ep == 0:
+            continue
+        k = 0
+        for a in accs:
+            if a < 0.1:
+                k += 1
+            else:
+                break
+        if k < len(accs) and accs[k] >= 0.15:
+            return start_x, k
+    return start_x, None
+
+
 def print_attention_overview_table(summary):
     """Print a head x layer overview table: each cell lists the attention
     distances whose average value is >= MIN_PRINT_VAL (d = positions back)."""
@@ -428,8 +474,14 @@ def _make_dynamic_query_mask(length):
     return mask
 
 
-def analyze_model_attention(pth_path, device=None):
-    """Main entry: load model and randomly generate a test sequence for attention analysis."""
+def analyze_model_attention(pth_path, device=None, log_path=None):
+    """Main entry: load model and analyze attention on one test sequence.
+
+    When log_path points to the training log and it shows the shortcut
+    pattern (early positions failing while later ones succeed), the analysis
+    is split into FRONT/BACK segments (see compute_front_split) so the two
+    position groups' attention can be compared.
+    """
     if device is None:
         device = 'cuda' if torch.cuda.is_available() else 'cpu'
     model, checkpoint = load_model(pth_path, device=device)
@@ -439,6 +491,18 @@ def analyze_model_attention(pth_path, device=None):
 
     print(f"Best test accuracy: {checkpoint.get('best_accuracy', 'N/A')}")
     print(f"Training epochs: {checkpoint.get('final_epoch', 'N/A')}")
+
+    # Front/back split from the training log (single-rule tasks only).
+    start_x, k = (None, None)
+    if log_path and os.path.exists(log_path) and not rec['is_dynamic_mixed']:
+        start_x, k = compute_front_split(log_path)
+        if k:
+            print(f"Front/back split from log: front = first {k} prediction position(s) "
+                  f"(predicting x{start_x}..x{start_x + k - 1})")
+        elif k == 0:
+            print("Front/back split from log: no shortcut phase found (k=0)")
+        else:
+            print("Front/back split from log: positions never separated (no split)")
 
     # Randomly generate one test sequence for attention visualization.
     # (QK property verification was removed; use verify_circle.py instead.)
@@ -475,17 +539,37 @@ def analyze_model_attention(pth_path, device=None):
 
     # Attention visualization uses this single sequence
     print(f"\nRandom test sequence (length {len(test_seq)}): {test_seq[:20]}{'...' if len(test_seq) > 20 else ''}")
-    summary = summarize_attention_for_sequence(model, test_seq, query_mask=query_mask)
-    print_attention_summary(summary, test_seq)
-    print_attention_overview_table(summary)
+
+    if k:
+        # Segmented analysis: front/back query positions in model-input
+        # coordinates. Log value j (0-based) = predicting x_{start_x+j},
+        # whose query position is start_x + j - 1.
+        T = len(test_seq)
+        segments = [
+            ('FRONT', [1 if start_x - 1 <= t < start_x - 1 + k else 0 for t in range(T)]),
+            ('BACK', [1 if start_x - 1 + k <= t <= T - 2 else 0 for t in range(T)]),
+        ]
+        for seg_name, qm in segments:
+            n_q = sum(qm)
+            print(f"\n{'#' * 70}")
+            print(f"# Segment {seg_name}: {n_q} query positions")
+            print('#' * 70)
+            seg_summary = summarize_attention_for_sequence(model, test_seq, query_mask=qm)
+            print_attention_summary(seg_summary, test_seq)
+            print_attention_overview_table(seg_summary)
+    else:
+        summary = summarize_attention_for_sequence(model, test_seq, query_mask=query_mask)
+        print_attention_summary(summary, test_seq)
+        print_attention_overview_table(summary)
 
 
 if __name__ == "__main__":
     if len(sys.argv) < 2:
-        print("Usage: python analyze_attention.py <path_to_pth>")
+        print("Usage: python analyze_attention.py <path_to_pth> [training_log]")
         print("Example: python analyze_attention.py fibonacci_transformer.pth")
         sys.exit(1)
-    
+
     pth_path = sys.argv[1]
+    log_path = sys.argv[2] if len(sys.argv) > 2 else None
     device = 'cuda' if torch.cuda.is_available() else 'cpu'
-    analyze_model_attention(pth_path, device=device)
+    analyze_model_attention(pth_path, device=device, log_path=log_path)
