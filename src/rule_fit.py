@@ -22,7 +22,10 @@ Paths:
          /data/cxm/recursion/<name>/logs/<exp>.log
 
 Usage (repo root):
-    python src/rule_fit.py <name> [--samples N] [--seed N] [--length L] [--min-seg N]
+    python src/rule_fit.py <name>                 # batch mode: iterate experiments/<name>.json
+    python src/rule_fit.py <model.pth> <cfg.json> # single-model mode: match the
+                                                  # experiment by pth filename stem
+    [--samples N] [--seed N] [--length L] [--min-seg N] [--depth N] [--min-n N]
 
 Output is teed to rule_fit_output.log.
 """
@@ -239,6 +242,9 @@ def run_one(args, exp_cfg, task, exp_name, pth_path, log_path):
         return
 
     # --- log: attention matrices + signature segmentation
+    if log_path is None:
+        print('[skip] attention mode needs the training log (none found for this model)')
+        return
     start_x, series, attn = parse_log(log_path)
     if not attn:
         print('[skip] no attention section in log')
@@ -373,7 +379,10 @@ def _merge_short_segments(segments, min_len):
 
 def main():
     ap = argparse.ArgumentParser(description='Fit linear formulas to model predictions over F_p.')
-    ap.add_argument('name', help='experiment batch name (experiments/<name>.json)')
+    ap.add_argument('name', help='experiment batch name (experiments/<name>.json), '
+                                 'or a .pth path for single-model mode')
+    ap.add_argument('json', nargs='?', default=None,
+                    help='single-model mode: experiments JSON to match the pth filename stem')
     ap.add_argument('--samples', type=int, default=500,
                     help='random probe sequences per model (each position contributes one equation per sequence)')
     ap.add_argument('--seed', type=int, default=0)
@@ -388,6 +397,35 @@ def main():
                     help='attention mode: do not corrupt; also forces attention mode for missing experiments')
     args = ap.parse_args()
 
+    out_path = 'rule_fit_output.log'
+
+    # ---- single-model mode: rule_fit model.pth config.json
+    if args.name.endswith('.pth'):
+        pth = args.name
+        if not args.json:
+            ap.error('single-model mode needs the experiments JSON as second argument')
+        with open(args.json, encoding='utf-8') as f:
+            experiments = json.load(f)['experiments']
+        stem = os.path.splitext(os.path.basename(pth))[0]
+        match = next((e for e in experiments if e['name'] == stem), None)
+        if match is None:
+            print(f'[error] {stem} not found in {args.json}')
+            return
+        batch = os.path.splitext(os.path.basename(args.json))[0]
+        log = next((cand for cand in
+                    (os.path.join(base.format(name=batch), f'{stem}.log')
+                     for base in LOG_BASE_CANDIDATES)
+                    if os.path.exists(cand)), None)
+        with open(out_path, 'w', encoding='utf-8') as f:
+            with contextlib.redirect_stdout(_Tee(sys.stdout, f)):
+                try:
+                    run_one(args, match['config'], match.get('task'), stem, pth, log)
+                except Exception as exc:
+                    print(f'[error] {type(exc).__name__}: {exc}')
+        print(f'\n[output saved to {out_path}]')
+        return
+
+    # ---- batch mode
     exp_path = f'experiments/{args.name}.json'
     with open(exp_path, encoding='utf-8') as f:
         experiments = json.load(f)['experiments']
