@@ -116,7 +116,7 @@ x_k = a * x_{k-2} + b * x_{k-1}  (mod P)
 | `FIRST_TASK_WEIGHT` | `1.0` | 第一个预测位置的损失权重 |
 | `NUM_MASK` | `null` | `null` 表示使用任务默认的 mask 起始位置。**注意：当前代码中 `0` 是字面值**（首位置也计入损失与评估）；旧代码（≤2026-07-08，如 05fc707）把 `0` 当"未设置"回退到任务默认值。**今后配置不要再写 `NUM_MASK: 0`**——想排除"只看 x0 预测 x1"这个不可预测的首位置时，应显式写 `1`（参考 addition_p127_tr64_ood128 与 addition-p127w64 的口径差异） |
 | `MISSING_PROB` | `0.0` | >0 时启用缺失值污损：train/test 窗口中 index ≥ init_len 的位置按该概率触发污损段，被污损位置的预测损失与正确率均不计入（其后一位仍计入，用于测跨缺口补全能力）。仅单规则与 mixed_ab/mixed_abc 任务支持 |
-| `MISS_LEN` | `1` | 污损段长度：命中后连续污损 MISS_LEN 个位置，段后第一个位置强制干净，随后继续按 MISSING_PROB 逐位判定；段尾可在窗口末尾截断 |
+| `MISS_LEN` | `1` | 污损段最大长度：命中后污损**随机长度 ∈ [1, MISS_LEN]** 的连续段，段后第一个位置强制干净；若整个窗口没有任何一段达到 MISS_LEN 则重摇直至达到；段尾可在窗口末尾截断 |
 | `MISS_SECOND` | `false` | true 时第 2 项起连续 MISS_LEN 项**必定**缺失，段后第一个位置强制干净（不会与随机段合并），随机扫描从第 MISS_LEN+2 项开始；false 为原逻辑。注意：此模式下训练样本前 init_len 个 token 不再是真实初始状态，post-train 生成测试的 exposed/unexposed 统计不可用 |
 | `PREDICT_MISSING` | `false` | 污损位的指标口径：false = mask 掉不计入；true = 输入污损序列但以**污损前的值**为目标，污损位必须填出原值并计入损失与正确率（单规则与 mixed_ab/mixed_abc 支持） |
 | `EVAL_INTERVAL` | `20` | 每隔多少 epoch 评估一次 |

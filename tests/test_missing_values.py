@@ -80,60 +80,67 @@ def test_full_corruption_when_prob_one():
         assert torch.equal(mask, expected_mask)
 
 
+def _check_runs(seq, p, init_len, miss_len, start_pos=None):
+    """Run-length invariants for a corrupted window: every maximal run of
+    missing tokens has length in [1, miss_len], is followed by a clean
+    position, and the longest run equals miss_len (when any run exists).
+    Returns the max run length."""
+    pos = start_pos if start_pos is not None else init_len
+    max_run = 0
+    while pos < len(seq):
+        if seq[pos].item() == p:
+            end = pos
+            while end < len(seq) and seq[end].item() == p:
+                end += 1
+            run = end - pos
+            assert 1 <= run <= miss_len, f'run {run} at {pos}'
+            if end < len(seq):
+                assert seq[end].item() != p  # clean after a run
+            max_run = max(max_run, run)
+            pos = end + 1
+        else:
+            pos += 1
+    if max_run:
+        assert max_run == miss_len, f'max run {max_run} != miss_len {miss_len}'
+    return max_run
+
+
 def test_miss_len_run_structure():
-    """prob=1.0, miss_len=3, length=12: corrupt {2,3,4}, skip 5, corrupt
-    {6,7,8}, skip 9, corrupt {10,11} (truncated at window end)."""
+    """prob=1.0, miss_len=3: random run lengths in [1,3], clean separators,
+    and every window's longest run equals 3 (redo guarantee)."""
     ds = _make_ds(1.0, miss_len=3, length=12, num_samples=40, p=11, num_mask=1)
-    corrupted = {2, 3, 4, 6, 7, 8, 10, 11}
-    expected_mask = torch.tensor([0., 0., 0., 0., 1., 0., 0., 0., 1., 0., 0.])
     for seq, mask in ds.train_samples:
-        for pos in range(ds.length):
-            if pos in corrupted:
-                assert seq[pos].item() == ds.p and mask[pos - 1].item() == 0.0
-            else:
-                assert seq[pos].item() != ds.p
-                if pos - 1 >= 1:
-                    assert mask[pos - 1].item() == 1.0
-        assert torch.equal(mask, expected_mask)
+        assert (seq[:ds.init_len] < ds.p).all()
+        _check_runs(seq, ds.p, ds.init_len, 3)
+        for pos in range(ds.init_len, ds.length):
+            if seq[pos].item() == ds.p:
+                assert mask[pos - 1].item() == 0.0
+            elif pos - 1 >= 1:
+                assert mask[pos - 1].item() == 1.0
 
 
 def test_miss_len_runs_separated_by_clean():
-    """prob<1: every maximal corrupted run has length miss_len (or is truncated
-    at the window end) and is followed by a guaranteed clean position."""
+    """prob<1: runs have length in [1, miss_len], a clean position after each
+    run, and max run == miss_len whenever the window has any corruption."""
     ds = _make_ds(0.5, miss_len=3, length=16, num_samples=60, p=11)
     saw_run = False
     for seq, mask in ds.train_samples:
-        pos = ds.init_len
-        while pos < ds.length:
-            if seq[pos].item() == ds.p:
-                saw_run = True
-                end = min(pos + 3, ds.length)
-                assert all(seq[q].item() == ds.p for q in range(pos, end))
-                if end < ds.length:
-                    assert seq[end].item() != ds.p  # forced clean after a run
-                pos = end + 1
-            else:
-                pos += 1
+        saw_run = _check_runs(seq, ds.p, ds.init_len, 3) > 0 or saw_run
     assert saw_run
 
 
 def test_miss_second_forced_run_deterministic():
-    """miss_second=True, prob=1.0, miss_len=2, length=10: forced {1,2}, one
-    guaranteed-clean position 3 (blocks never merge), then scan from 4:
-    {4,5}, skip 6, {7,8}, skip 9."""
+    """miss_second=True: positions 1..miss_len always missing, position
+    miss_len+1 always clean (no merging), random scan resumes at miss_len+2
+    with run lengths in [1, miss_len]."""
     ds = _make_ds(1.0, miss_len=2, length=10, num_samples=40, p=11, num_mask=1,
                   miss_second=True)
-    corrupted = {1, 2, 4, 5, 7, 8}
-    expected_mask = torch.tensor([0., 0., 1., 0., 0., 1., 0., 0., 1.])
     for seq, mask in ds.train_samples + ds.test_samples:
-        for pos in range(ds.length):
-            if pos in corrupted:
-                assert seq[pos].item() == ds.p and mask[pos - 1].item() == 0.0
-            else:
-                assert seq[pos].item() != ds.p
-                if pos - 1 >= 1:
-                    assert mask[pos - 1].item() == 1.0
-        assert torch.equal(mask, expected_mask)
+        assert seq[0].item() != ds.p
+        assert seq[1].item() == ds.p and seq[2].item() == ds.p  # forced run
+        assert seq[3].item() != ds.p                            # guaranteed clean
+        assert mask[0].item() == 0.0 and mask[1].item() == 0.0  # forced-run targets masked
+        _check_runs(seq, ds.p, 1, 2)  # forced run starts at position 1
 
 
 def test_miss_second_default_off_unchanged():

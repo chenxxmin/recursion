@@ -28,12 +28,13 @@ class RecurrenceDataset(Dataset):
         self.verbose = verbose
         # MISSING_PROB: when > 0, each window (train and test alike) is
         # corrupted — scanning from init_len, a position hits with this
-        # probability and then a run of MISS_LEN consecutive tokens is
+        # probability and then a run of random length in [1, MISS_LEN] is
         # replaced by the missing token (id == p, or missing_token when
         # overridden, e.g. mixed tag mode uses p + n_rules to avoid colliding
         # with rule flag tokens); the position right after a run always stays
-        # clean. Items become (seq, loss_mask) tuples where the prediction
-        # loss of corrupted positions is zeroed.
+        # clean, and the random scan is redone until the window's longest run
+        # equals MISS_LEN. Items become (seq, loss_mask) tuples where the
+        # prediction loss of corrupted positions is zeroed.
         # MISS_SECOND: when true, positions 1..miss_len (the 2nd item plus the
         # following miss_len-1) are ALWAYS corrupted, the next position stays
         # clean (same no-merge rule as random runs), and the random scan only
@@ -182,9 +183,12 @@ class RecurrenceDataset(Dataset):
         stays clean, and scanning starts at position miss_len+2 (or init_len
         if later). Otherwise scanning starts at init_len. During the scan each
         position independently hits with probability missing_prob; a hit
-        corrupts a RUN of miss_len consecutive positions, the position right
+        corrupts a RUN of random length in [1, miss_len], the position right
         after a run is always left clean, and scanning resumes from the
         position after that. A run may be truncated at the end of the window.
+        If no random run in the window reaches length miss_len, the whole
+        random scan is redone until it does (miss_second's forced run already
+        satisfies this, so no redo happens in that mode).
         """
         mask = torch.zeros(self.length - 1, dtype=torch.float)
         if self.length - 1 > self.num_mask:
@@ -200,15 +204,33 @@ class RecurrenceDataset(Dataset):
             # like any corrupted run, the forced run is followed by one
             # guaranteed-clean position, so blocks never merge
             pos = max(pos, end + 1)
-        while pos < self.length:
-            if random.random() < self.missing_prob:
-                end = min(pos + self.miss_len, self.length)
-                for q in range(pos, end):
-                    window[q] = self.missing_token
-                    mask[q - 1] = 0.0
-                pos = end + 1  # the position right after a run stays clean
-            else:
-                pos += 1
+        # random scan; redo until the longest random run equals miss_len
+        # (miss_second's forced run already counts as that maximum)
+        retries = 0
+        while True:
+            trial_w = window.clone()
+            trial_m = mask.clone()
+            max_run = self.miss_len if self.miss_second else 0
+            scan = pos
+            while scan < self.length:
+                if random.random() < self.missing_prob:
+                    run = random.randint(1, self.miss_len)
+                    end = min(scan + run, self.length)
+                    for q in range(scan, end):
+                        trial_w[q] = self.missing_token
+                        trial_m[q - 1] = 0.0
+                    max_run = max(max_run, end - scan)
+                    scan = end + 1  # the position right after a run stays clean
+                else:
+                    scan += 1
+            if max_run in (0, self.miss_len) or retries >= 1000:
+                window.copy_(trial_w)
+                mask.copy_(trial_m)
+                if retries >= 1000:
+                    print(f"WARNING: _corrupt gave up matching max run length "
+                          f"{self.miss_len} after {retries} retries")
+                break
+            retries += 1
         return mask
 
     def __len__(self):

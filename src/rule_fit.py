@@ -39,7 +39,7 @@ SCRIPT_DIR = os.path.dirname(os.path.abspath(__file__))
 if SCRIPT_DIR not in sys.path:
     sys.path.insert(0, SCRIPT_DIR)
 
-from analyze_attention import load_model
+from analyze_attention import extract_qk_raw_scores, load_model
 from core import RecurrenceDataset
 from report_front_back_attention import (dump_matrices, parse_log,
                                          segment_by_attention)
@@ -107,29 +107,32 @@ def fmt_equation(dists, coeffs, p):
 
 
 def run_missing_categories(args, model, cfg, next_fn, init_len, p, exp_name, desc):
-    """Missing-experiment mode: group prediction positions by the corruption
-    pattern of the last two context tokens — (x,x), (M,x), (M,M), (x,M) —
-    and fit per category. Sequences follow the recurrence and are corrupted
-    with the experiment's own missing rule (in-distribution). Features use
-    only VISIBLE positions (missing tokens have no value to fit on).
+    """Missing-experiment mode, recursive edition: group prediction positions
+    by the corruption pattern of the last D tokens (D = miss_len + 2 by
+    default; --depth overrides). This unrolls the recursion the user cares
+    about — e.g. within (M,M), positions where x_{t-3} is itself missing show
+    up as their own pattern (M,x,M,M). Per pattern we report model-vs-truth
+    agreement, the mean attention per distance per head (computed live on the
+    corrupted samples), and coefficient fits on visible-position features.
     """
     length = args.length or cfg.get('TRAIN_LEN', 16)
     num_mask = cfg.get('NUM_MASK') or 0
     missing_prob = cfg['MISSING_PROB']
     miss_len = cfg.get('MISS_LEN', 1)
+    D = args.depth or (miss_len + 2)
+    min_n = args.min_n
     helper = RecurrenceDataset(p=p, init_len=init_len, length=length, verbose=False,
                                missing_prob=missing_prob, miss_len=miss_len,
                                miss_second=cfg.get('MISS_SECOND', False),
                                num_mask=num_mask)
     CATS = ['(x,x)', '(M,x)', '(M,M)', '(x,M)']  # by (view[t-1], view[t])
     set_A = list(range(init_len))
-    # set C candidate dists: true-rule dists plus enough depth to reconstruct
-    # across a full missing run
     dists_C_full = list(range(init_len + miss_len + 1))
-
-    buckets = {c: {'A': ([], []), 'C': ([], [])} for c in CATS}
-    agree = {c: [0, 0] for c in CATS}
     lo = max(num_mask, 1)
+    start = max(lo, D - 1)
+
+    cat4 = {c: [0, 0] for c in CATS}
+    P = {}  # pattern tuple -> record
 
     for _ in range(args.samples):
         seq = [random.randrange(p) for _ in range(init_len)]
@@ -141,54 +144,78 @@ def run_missing_categories(args, model, cfg, next_fn, init_len, p, exp_name, des
         x = torch.tensor([view], dtype=torch.long)
         with torch.no_grad():
             preds = model(x)[0][0].argmax(dim=-1).tolist()
+            attn_layers = [lo_['attn_weights'] for lo_ in extract_qk_raw_scores(model, x)]
 
-        for t in range(lo, length - 1):
-            s1 = view[t - 1] == p  # second-to-last missing?
-            s0 = view[t] == p      # last missing?
-            cat = ('(M,M)' if s1 and s0 else '(M,x)' if s1 else
-                   '(x,M)' if s0 else '(x,x)')
+        for t in range(start, length - 1):
+            patt = tuple(view[t - D + 1 + k] == p for k in range(D))
+            rec = P.get(patt)
+            if rec is None:
+                rec = P[patt] = {'n': 0, 'agree': 0, 'fits': {}, 'attn': {}}
+            rec['n'] += 1
+            s1, s0 = patt[-2], patt[-1]
+            cat = '(M,M)' if s1 and s0 else '(M,x)' if s1 else '(x,M)' if s0 else '(x,x)'
+            cat4[cat][1] += 1
             pred = preds[t]
-            agree[cat][1] += 1
             if pred == seq[t + 1]:
-                agree[cat][0] += 1
+                cat4[cat][0] += 1
+                rec['agree'] += 1
             for label, full_dists in (('A', set_A), ('C', dists_C_full)):
-                dists = [d for d in full_dists
-                         if t - d >= 0 and view[t - d] != p]  # visible only
+                dists = [d for d in full_dists if t - d >= 0 and view[t - d] != p]
                 if not dists:
                     continue
-                feats = [view[t - d] for d in dists]
-                buckets[cat][label][0].append(feats)
-                buckets[cat][label][1].append((dists, pred))
+                fb = rec['fits'].setdefault(label, {}).setdefault(tuple(dists), ([], []))
+                fb[0].append([view[t - d] for d in dists])
+                fb[1].append(pred)
+            for li, att in enumerate(attn_layers):
+                row_all = att[:, t, :]  # (H, T)
+                for h in range(att.shape[0]):
+                    acc = rec['attn'].setdefault((li, h), {})
+                    row = row_all[h]
+                    for d in range(t + 1):
+                        v = row[t - d].item()
+                        if d in acc:
+                            acc[d][0] += v
+                            acc[d][1] += 1
+                        else:
+                            acc[d] = [v, 1]
 
     print(f'Model: {exp_name}')
     print(f'Rule : {desc} | length={length}, missing prob={missing_prob}, '
-          f'miss_len={miss_len}, miss_second={cfg.get("MISS_SECOND", False)}')
-    print('Grouping: corruption pattern of the last two context tokens')
+          f'miss_len={miss_len}, miss_second={cfg.get("MISS_SECOND", False)}, depth={D}')
+    print('Top-level grouping (last two context tokens):')
     for cat in CATS:
-        m, tot = agree[cat]
-        print(f'\n== category {cat}: model-vs-truth {m}/{tot}'
+        m, tot = cat4[cat]
+        print(f'  {cat}: model-vs-truth {m}/{tot}'
               + (f' = {m / tot:.1%}' if tot else ' (no positions)'))
+
+    print(f'\nDeep patterns (last {D} tokens, oldest first; n >= {min_n}):')
+    for patt, rec in sorted(P.items(), key=lambda kv: -kv[1]['n']):
+        if rec['n'] < min_n:
+            continue
+        label = '(' + ','.join('M' if m else 'x' for m in patt) + ')'
+        print(f'\n== pattern {label}  n={rec["n"]}, '
+              f'model-vs-truth {rec["agree"] / rec["n"]:.1%}')
+        attn_parts = []
+        for (li, h), acc in sorted(rec['attn'].items()):
+            sig = [(d, s / c) for d, (s, c) in sorted(acc.items()) if s / c >= SIG_THRESHOLD]
+            if sig:
+                attn_parts.append(f'L{li}H{h} ' + ' '.join(f'd{d}:{v:.2f}' for d, v in sig))
+        if attn_parts:
+            print('  attn: ' + ' | '.join(attn_parts))
         for label in ('A', 'C'):
-            Xy = buckets[cat][label]
-            if not Xy[0]:
+            groups = rec['fits'].get(label, {})
+            if not groups:
                 print(f'  set {label}: no usable positions')
                 continue
-            # dists vary per sample (visible-only); group by dist tuple
-            by_dists = {}
-            for feats, (dists, pred) in zip(*Xy):
-                by_dists.setdefault(tuple(dists), ([], []))
-                by_dists[tuple(dists)][0].append(feats)
-                by_dists[tuple(dists)][1].append(pred)
-            for dists_t, (X, y) in sorted(by_dists.items(), key=lambda kv: -len(kv[1][0])):
+            for dists_t, (X, y) in sorted(groups.items(), key=lambda kv: -len(kv[1][0])):
                 coeffs, acc, exact = fit_and_score(X, y, p)
-                base = 'A' if label == 'A' else 'C'
                 if coeffs is None:
-                    print(f'  set {base} {list(dists_t)}: no linear fit '
+                    print(f'  set {label} {list(dists_t)}: no linear fit '
                           f'(best agreement {acc:.1%}, n={len(X)})')
                 else:
                     tag = 'EXACT' if exact else f'best-effort, agreement {acc:.1%}'
-                    print(f'  set {base} {list(dists_t)}: {fmt_equation(list(dists_t), coeffs, p)}'
-                          f'  [{tag}, n={len(X)}]')
+                    print(f'  set {label} {list(dists_t)}: '
+                          f'{fmt_equation(list(dists_t), coeffs, p)}  [{tag}, n={len(X)}]')
     print()
 
 
@@ -353,7 +380,12 @@ def main():
     ap.add_argument('--length', type=int, default=None, help='probe length (default: TRAIN_LEN)')
     ap.add_argument('--min-seg', type=int, default=1,
                     help='merge segments shorter than this into neighbours (default 1 = literal rule)')
-    ap.add_argument('--clean', action='store_true', help='ignored (probes are never corrupted)')
+    ap.add_argument('--depth', type=int, default=None,
+                    help='missing mode: pattern depth D (default miss_len + 2)')
+    ap.add_argument('--min-n', type=int, default=20,
+                    help='missing mode: only print patterns with at least this many positions')
+    ap.add_argument('--clean', action='store_true',
+                    help='attention mode: do not corrupt; also forces attention mode for missing experiments')
     args = ap.parse_args()
 
     exp_path = f'experiments/{args.name}.json'
