@@ -4,7 +4,8 @@ import sys
 
 sys.path.insert(0, os.path.join(os.path.dirname(os.path.abspath(__file__)), '..', 'src'))
 
-from rules import LinearRecurrenceRule, rules_from_config
+from rules import (LinearRecurrenceRule, rules_from_config,
+                   single_rule_from_task, save_config_extra, task_from_save_config)
 
 
 def test_order_property():
@@ -66,6 +67,40 @@ def test_rules_from_config_validation():
             pass
 
 
+def test_single_rule_from_task():
+    p = 23
+    init_len, fn, name = single_rule_from_task('addition', {'P': p, 'A': 2, 'B': 3})
+    assert init_len == 2 and fn([4, 5], p) == (2 * 5 + 3 * 4) % p and 'mod 23' in name
+    # lowercase checkpoint keys and coefficient defaults
+    init_len, fn, _ = single_rule_from_task('addition', {'p': p})
+    assert init_len == 2 and fn([4, 5], p) == (5 + 4) % p
+    init_len, fn, _ = single_rule_from_task('tribonacci', {'P': p, 'A': 1, 'B': 2, 'C': 3})
+    assert init_len == 3 and fn([1, 2, 3], p) == (1 * 3 + 2 * 2 + 3 * 1) % p
+    _, fn, _ = single_rule_from_task('multiplication', {'P': p})
+    assert fn([4, 5], p) == 20 % p
+    _, fn, _ = single_rule_from_task('nonlinear', {'P': p})
+    assert fn([4, 5], p) == (25 + 4) % p
+    try:
+        single_rule_from_task('mixed_ab', {'P': p})
+        assert False, "expected ValueError"
+    except ValueError:
+        pass
+
+
+def test_save_config_round_trip():
+    """save_config_extra (writer) and task_from_save_config (reader) must agree,
+    including the multiplication/multiplicative vocabulary split."""
+    for task in ('addition', 'multiplication', 'tribonacci', 'nonlinear'):
+        cfg = {'P': 23, 'A': 2, 'B': 3, 'C': 4}
+        extra = save_config_extra(task, cfg)
+        assert task_from_save_config(extra) == task, (task, extra)
+    # mixed / dynamic checkpoints are not single-rule
+    assert task_from_save_config({'ab_pairs': [[1, 1]], 'order': 2}) is None
+    assert task_from_save_config({'recurrence': 'dynamic_mixed', 'ab_pairs': [[1, 1]]}) is None
+    # old minimal config defaults to addition
+    assert task_from_save_config({'p': 23}) == 'addition'
+
+
 if __name__ == '__main__':
     test_order_property()
     test_name_auto_generated()
@@ -74,4 +109,6 @@ if __name__ == '__main__':
     test_rules_from_config_order2()
     test_rules_from_config_order3()
     test_rules_from_config_validation()
+    test_single_rule_from_task()
+    test_save_config_round_trip()
     print("ALL TESTS PASSED: test_rules.py")

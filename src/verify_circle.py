@@ -34,7 +34,6 @@ import os
 import sys
 
 import torch
-import torch.nn.functional as F
 
 # Allow running from repo root as: python src/verify_circle.py <pth>
 SCRIPT_DIR = os.path.dirname(os.path.abspath(__file__))
@@ -42,43 +41,17 @@ if SCRIPT_DIR not in sys.path:
     sys.path.insert(0, SCRIPT_DIR)
 
 import core
-from analyze_attention import load_model, _build_input_embedding, HEADER_WIDTH
+from analyze_attention import load_model, _forward_per_layer, HEADER_WIDTH
 
 
 def extract_hidden_after_attention(model, input_ids, ab_label=None):
-    """Manually run the forward pass; return per-layer post-attention residuals.
+    """Return per-layer post-attention residuals from the shared manual forward.
 
     input_ids: (B, T). Returns a list with one (B, T, d) tensor per layer,
     each the residual stream right after x = x + attn(ln_1(x)).
     """
-    x = _build_input_embedding(model, input_ids, ab_label=ab_label)
-    hidden = []
-    for block in model.transformer.h:
-        ln_x = block.ln_1(x)
-        attn = block.attn
-        B, T, C = ln_x.size()
-
-        qkv = attn.c_attn(ln_x)
-        q, k, v = qkv.split(attn.n_embd, dim=2)
-        q = q.view(B, T, attn.n_head, attn.head_size).transpose(1, 2)
-        k = k.view(B, T, attn.n_head, attn.head_size).transpose(1, 2)
-        v = v.view(B, T, attn.n_head, attn.head_size).transpose(1, 2)
-
-        if attn.rope is not None:
-            cos, sin = attn.rope(q, seq_len=T)
-            q = core.apply_rotary_emb(q, cos, sin)
-            k = core.apply_rotary_emb(k, cos, sin)
-
-        att = (q @ k.transpose(-2, -1)) * (1.0 / math.sqrt(attn.head_size))
-        att = att.masked_fill(attn.causal_mask[:, :, :T, :T] == 0, core.ATTN_MASK_NEG)
-        att = F.softmax(att, dim=-1)
-
-        y = att @ v
-        y = y.transpose(1, 2).contiguous().view(B, T, C)
-        x = x + attn.c_proj(y)  # post-attention residual
-        hidden.append(x)
-        x = x + block.mlp(block.ln_2(x))
-    return hidden
+    return [layer['hidden_post_attn']
+            for layer in _forward_per_layer(model, input_ids, ab_label=ab_label)]
 
 
 def _held_out_coherence(H, k_star):

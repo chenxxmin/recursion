@@ -32,42 +32,31 @@ if SCRIPT_DIR not in sys.path:
     sys.path.insert(0, SCRIPT_DIR)
 
 from analyze_attention import load_model
-from core import RecurrenceDataset
-from verify_sample import build_single_rule, dispatch_and_log, find_exp_config
+from core import corrupt_window, missing_token_id
+from rules import LinearRecurrenceRule
+from verify_sample import (build_single_rule, dispatch_and_log, find_exp_config,
+                           resolve_experiment_cfg)
 
 CATEGORIES = ['(...,0,0)', '(...,0,x)', '(...,x,0)', 'other(x,x)']
 
 
-def corrupt_view(seq, cfg, p, init_len):
+def corrupt_view(seq, cfg, p, init_len, is_mixed):
     """Corrupt a clean sample with the experiment's missing rule (dataset logic)."""
-    n_rules = len(cfg.get('ab_pairs') or cfg.get('AB_PAIRS') or cfg.get('ABC_PAIRS') or [1])
-    use_tag = cfg.get('use_ab_tag', cfg.get('USE_AB_TAG', False))
-    missing_token = p + n_rules if (cfg.get('_is_mixed') and use_tag) else p
-    helper = RecurrenceDataset(p=p, init_len=init_len, length=len(seq), verbose=False,
-                               missing_prob=cfg['MISSING_PROB'],
-                               miss_len=cfg.get('MISS_LEN', 1),
-                               miss_second=cfg.get('MISS_SECOND', False),
-                               missing_token=missing_token,
-                               num_mask=cfg.get('NUM_MASK') or 0)
     window = torch.tensor(seq, dtype=torch.long)
-    helper._corrupt(window, True)
-    return window.tolist(), missing_token
+    token = corrupt_window(window, True, p=p, init_len=init_len,
+                           missing_prob=cfg['MISSING_PROB'],
+                           miss_len=cfg.get('MISS_LEN', 1),
+                           miss_second=cfg.get('MISS_SECOND', False),
+                           missing_token=missing_token_id(cfg, p, is_mixed))
+    return window.tolist(), token
 
 
 def run_one(args, pth_path):
     device = 'cuda' if torch.cuda.is_available() else 'cpu'
     model, checkpoint = load_model(pth_path, device=device)
-    ckpt_cfg = checkpoint['config']
 
     task, exp_cfg = find_exp_config(pth_path, args.json)
-    cfg = dict(ckpt_cfg)
-    if exp_cfg:
-        cfg.update(exp_cfg)
-    cfg['P'] = cfg.get('P', cfg.get('p'))
-    if task is None:
-        task = cfg.get('recurrence') or ('mixed_ab' if cfg.get('ab_pairs') else 'addition')
-    is_mixed = task in ('mixed_ab', 'mixed_abc') or (cfg.get('ab_pairs') and 'recurrence' not in cfg)
-    cfg['_is_mixed'] = is_mixed
+    cfg, task, is_mixed = resolve_experiment_cfg(checkpoint['config'], exp_cfg, task)
 
     pairs = None
     if is_mixed:
@@ -76,7 +65,8 @@ def run_one(args, pth_path):
         order = cfg.get('order', len(pairs[0]))
         init_len = order
         def make_next(coeffs):
-            return lambda s: sum(ci * si for ci, si in zip(coeffs, reversed(s[-len(coeffs):]))) % p
+            _next = LinearRecurrenceRule(coeffs=tuple(coeffs), p=p).next_fn()
+            return lambda s: _next(s, p)
     else:
         init_len, next_fn, desc = build_single_rule(task, cfg)
         p = cfg['P']
@@ -103,7 +93,7 @@ def run_one(args, pth_path):
             seq.append(next_fn(seq))
 
         if corrupted:
-            view, missing_token_used = corrupt_view(seq, cfg, p, init_len)
+            view, missing_token_used = corrupt_view(seq, cfg, p, init_len, is_mixed)
         else:
             view = list(seq)
             missing_token_used = 0  # fallback: literal token 0

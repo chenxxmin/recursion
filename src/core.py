@@ -7,11 +7,11 @@ import os
 import sys
 import time
 import json
-import threading
 import itertools
 from enum import IntEnum
 from torch.utils.data import Dataset, DataLoader, Sampler
-from rules import rules_from_config
+from rules import rules_from_config, single_rule_from_task, save_config_extra
+from protocol import BATCH_RUN_MERGED_FLAG
 
 # ==================== Data Generation ====================
 class RecurrenceDataset(Dataset):
@@ -241,6 +241,35 @@ class RecurrenceDataset(Dataset):
         data = self.train_samples if self.split == 'train' else self.test_samples
         return data[idx]
 
+
+def missing_token_id(config, p, is_mixed):
+    """Missing-token id for a (merged or save) config dict.
+
+    Follows MixedRecurrenceDataset's convention: p + n_rules in mixed tag
+    mode (plain p would collide with rule 0's flag token), else p.
+    """
+    use_tag = config.get('use_ab_tag', config.get('USE_AB_TAG', False))
+    if not (is_mixed and use_tag):
+        return p
+    pairs = config.get('ab_pairs') or config.get('AB_PAIRS') or config.get('ABC_PAIRS') or [1]
+    return p + len(pairs)
+
+
+def corrupt_window(window, is_train, *, p, init_len, missing_prob, miss_len=1,
+                   miss_second=False, missing_token=None):
+    """Corrupt `window` (LongTensor) in place with the dataset's missing-value
+    rule, without constructing a full dataset. Returns the missing token id.
+
+    Single source for analysis scripts that need the same corruption the
+    training data went through (see RecurrenceDataset._corrupt).
+    """
+    token = p if missing_token is None else missing_token
+    helper = RecurrenceDataset(p=p, init_len=init_len, length=len(window), verbose=False,
+                               missing_prob=missing_prob, miss_len=miss_len,
+                               miss_second=miss_second, missing_token=token)
+    helper._corrupt(window, is_train)
+    return token
+
 # ==================== BucketBatchSampler (group by same length) ====================
 class BucketBatchSampler(Sampler):
     def __init__(self, dataset, batch_size, shuffle=True):
@@ -426,6 +455,35 @@ class TransformerBlock(nn.Module):
         x = x + self.mlp(self.ln_2(x))
         return x, penalty
 
+
+def _lm_loss(logits, targets, loss_mask, total_penalty):
+    """Masked next-token cross-entropy shared by both model forwards.
+
+    logits/targets are truncated to their common length; positions with
+    loss_mask == 0 are excluded and the loss is normalized by the mask mass
+    (an all-zero mask yields a plain 0.0). total_penalty is added at the end.
+    """
+    b = logits.size(0)
+    t_min = min(logits.size(1), targets.size(1))
+    logits = logits[:, :t_min, :]
+    targets = targets[:, :t_min]
+
+    loss_all = F.cross_entropy(logits.reshape(-1, logits.size(-1)), targets.reshape(-1),
+                               reduction='none')
+    loss_all = loss_all.view(b, t_min)
+
+    if loss_mask is not None:
+        masked_loss = (loss_all * loss_mask.float()).sum()
+        num_loss_positions = loss_mask.float().sum()
+        if num_loss_positions > 0:
+            loss = masked_loss / num_loss_positions
+        else:
+            loss = torch.tensor(0.0, device=logits.device)
+    else:
+        loss = loss_all.mean()
+    return loss + total_penalty
+
+
 class FibonacciTransformer(nn.Module):
     def __init__(self, p=53, d_model=64, n_head=1, n_layer=1, block_size=128, dropout=0.0, 
                  entropy_penalty_weight=0.0, use_learnable_pe=False, mlp_ratio=4, 
@@ -492,75 +550,10 @@ class FibonacciTransformer(nn.Module):
         
         loss = None
         if targets is not None:
-            t_logits = logits.size(1)
-            t_targets = targets.size(1)
-            t_min = min(t_logits, t_targets)
-            logits_for_loss = logits[:, :t_min, :]
-            targets = targets[:, :t_min]
-            
-            logits_flat = logits_for_loss.reshape(-1, self.vocab_size)
-            targets_flat = targets.reshape(-1)
-            
-            loss_all = F.cross_entropy(logits_flat, targets_flat, reduction='none')
-            loss_all = loss_all.view(b, t_min)
-            
-            if loss_mask is not None:
-                masked_loss = (loss_all * loss_mask.float()).sum()
-                num_loss_positions = loss_mask.float().sum()
-                if num_loss_positions > 0:
-                    loss = masked_loss / num_loss_positions
-                else:
-                    loss = torch.tensor(0.0, device=device)
-            else:
-                loss = loss_all.mean()
-            loss = loss + total_penalty
+            loss = _lm_loss(logits, targets, loss_mask, total_penalty)
         
         return logits, loss
     
-    @torch.no_grad()
-    def generate(self, idx, max_new_tokens=10, use_greedy_generate=None, **kwargs):
-        if use_greedy_generate is None:
-            use_greedy_generate = getattr(self, 'use_greedy_generate', True)
-        self.eval()
-        
-        pad_id = getattr(self, 'pad_token_id', getattr(self, 'p', None))
-        if pad_id is None:
-            raise AttributeError("Model must have pad_token_id or p attribute")
-        
-        batch_size = idx.size(0)
-        
-        for _ in range(max_new_tokens):
-            # Crop context to block_size
-            idx_cond = idx if idx.size(1) <= self.block_size else idx[:, -self.block_size:]
-
-            # Extract logits robustly
-            output = self(idx_cond, **kwargs)
-            if isinstance(output, (tuple, list)):
-                logits = output[0]
-            elif hasattr(output, 'logits'):
-                logits = output.logits
-            else:
-                logits = output
-
-            # Take the last time step
-            logits = logits[:, -1, :]  # (B, V)
-
-            # Mask out PAD
-            logits[:, pad_id] = float('-inf')
-            # Mask out other restricted tokens (e.g. rule tokens)
-            restricted = getattr(self, 'restricted_token_ids', None)
-            if restricted is not None:
-                for tid in restricted:
-                    logits[:, tid] = float('-inf')
-            
-            if use_greedy_generate:
-                idx_next = logits.argmax(dim=-1, keepdim=True)
-            else:
-                probs = F.softmax(logits, dim=-1)
-                idx_next = torch.multinomial(probs, num_samples=1)
-            idx = torch.cat((idx, idx_next), dim=1)
-        return idx
-
 # ==================== Training Functions ====================
 def freeze_partial(model, cond_fix):
     """
@@ -691,6 +684,22 @@ def _accumulate_accuracy(logits, targets, loss_mask, pos_correct, pos_total):
     return match, sum(match_per_pos), sum(valid_per_pos)
 
 
+def _default_loss_mask(batch_size, target_len, num_mask, first_task_weight=1.0, device='cpu'):
+    """Default mask: zeros for the first num_mask targets, ones after.
+
+    first_task_weight upweights the first evaluated target (position num_mask).
+    train_epoch passes it through; evaluate and the final generation tests keep
+    the default 1.0 so eval loss stays comparable across runs -- an intentional
+    train/eval difference.
+    """
+    mask = torch.zeros(batch_size, target_len, dtype=torch.float, device=device)
+    if target_len > num_mask:
+        mask[:, num_mask:] = 1.0
+        if first_task_weight != 1.0:
+            mask[:, num_mask] = first_task_weight
+    return mask
+
+
 def train_epoch(model, dataloader, optimizer, device, num_mask=1, extra_kwargs_fn=None, first_task_weight=1.0, frozen_param_states=None):
     model.train()
     total_loss = 0
@@ -708,12 +717,7 @@ def train_epoch(model, dataloader, optimizer, device, num_mask=1, extra_kwargs_f
         # PREDICT_MISSING batches carry the clean sequence as override.
         targets = targets_override[:, 1:] if targets_override is not None else x[:, 1:]  # (B, L-1)
         if loss_mask is None:
-            loss_len = targets.size(1)
-            loss_mask = torch.zeros(B, loss_len, dtype=torch.float, device=device)
-            if loss_len > num_mask:
-                loss_mask[:, num_mask:] = 1.0
-                if first_task_weight != 1.0:
-                    loss_mask[:, num_mask] = first_task_weight
+            loss_mask = _default_loss_mask(B, targets.size(1), num_mask, first_task_weight, device)
         
         optimizer.zero_grad()
         logits, loss, *_ = model(x, targets, loss_mask, **kwargs)
@@ -754,7 +758,6 @@ def evaluate(model, dataloader, device, num_mask=1, extra_kwargs_fn=None):
     group_correct = {}
     group_total = {}
     
-    debug_printed = False
     with torch.no_grad():
         for batch in dataloader:
             x, loss_mask, kwargs, ab_labels, targets_override = _unpack_batch(batch, device, extra_kwargs_fn)
@@ -764,10 +767,9 @@ def evaluate(model, dataloader, device, num_mask=1, extra_kwargs_fn=None):
             # PREDICT_MISSING batches carry the clean sequence as override.
             targets = targets_override[:, 1:] if targets_override is not None else x[:, 1:]  # (B, L-1)
             if loss_mask is None:
-                loss_len = targets.size(1)
-                loss_mask = torch.zeros(B, loss_len, dtype=torch.float, device=device)
-                if loss_len > num_mask:
-                    loss_mask[:, num_mask:] = 1.0  # Start calculating from predicting item (num_mask+2)
+                # Intentionally no first_task_weight here so eval loss stays
+                # comparable across runs; see _default_loss_mask.
+                loss_mask = _default_loss_mask(B, targets.size(1), num_mask, device=device)
             
             logits, loss, *_ = model(x, targets, loss_mask, **kwargs)
 
@@ -913,102 +915,6 @@ def run_training_engine(model, train_loader, test_loader, optimizer, scheduler, 
 
 # ==================== Mixed AB Experiment (mixed training with multiple recurrence params) ====================
 
-class MixedABDataset(Dataset):
-    def __init__(self, p=127, ab_pairs=None, fixed_ab_idx=None, num_samples=1000, length=10,
-                 verbose=True, use_ab_tag=False):
-        self.p = p
-        self.use_ab_tag = use_ab_tag
-        self.ab_pairs = ab_pairs if ab_pairs is not None else [(3, 5), (7, 11)]
-        self.train_samples = []
-        self.test_samples = []
-        self.ab_labels_train = []
-        self.ab_labels_test = []
-        self.split = 'train'
-
-        if fixed_ab_idx is not None:
-            a, b = self.ab_pairs[fixed_ab_idx]
-            ns = num_samples[fixed_ab_idx] if isinstance(num_samples, (list, tuple)) else num_samples
-            self._build_with_ab(a, b, ns, length, verbose)
-        else:
-            self._build_mixed(num_samples, length, verbose)
-
-    def _build_with_ab(self, a, b, num_samples, length, verbose):
-        def recurrence_fn(seq, p):
-            return (a * seq[-1] + b * seq[-2]) % p
-
-        ds = RecurrenceDataset(
-            p=self.p, recurrence_fn=recurrence_fn,
-            recurrence_name=f"X(k)={a}*X(k-1)+{b}*X(k-2)",
-            init_len=2, num_samples=num_samples, length=length,
-            verbose=verbose
-        )
-        ds.run()
-        self.train_samples = ds.train_samples
-        self.test_samples = ds.test_samples
-        self.ab_labels_train = [(a, b)] * len(ds.train_samples)
-        self.ab_labels_test = [(a, b)] * len(ds.test_samples)
-
-    def _build_mixed(self, num_samples, length, verbose):
-        if isinstance(num_samples, (list, tuple)):
-            num_samples_list = list(num_samples)
-        else:
-            num_samples_list = [num_samples] * len(self.ab_pairs)
-        all_train = []
-        all_test = []
-        all_labels_train = []
-        all_labels_test = []
-        per_rule_stats = []
-        for idx, (a, b) in enumerate(self.ab_pairs):
-            self._build_with_ab(a, b, num_samples_list[idx], length, False)
-            all_train.extend(self.train_samples)
-            all_test.extend(self.test_samples)
-            all_labels_train.extend(self.ab_labels_train)
-            all_labels_test.extend(self.ab_labels_test)
-            per_rule_stats.append((a, b, len(self.train_samples), len(self.test_samples)))
-
-        # Prepend rule token if use_ab_tag (DataLoader indexes the flat list, not __getitem__)
-        if self.use_ab_tag:
-            all_train = [
-                torch.cat([torch.tensor([self.p + self.ab_pairs.index(l)], dtype=torch.long), seq], dim=0)
-                for seq, l in zip(all_train, all_labels_train)
-            ]
-            all_test = [
-                torch.cat([torch.tensor([self.p + self.ab_pairs.index(l)], dtype=torch.long), seq], dim=0)
-                for seq, l in zip(all_test, all_labels_test)
-            ]
-
-        train_pairs = list(zip(all_train, all_labels_train))
-        random.shuffle(train_pairs)
-        self.train_samples = [s for s, _ in train_pairs]
-        self.ab_labels_train = [l for _, l in train_pairs]
-        self.test_samples = all_test
-        self.ab_labels_test = all_labels_test
-
-        # Flat lists that can be fed directly to DataLoader / BucketBatchSampler
-        self.train_data = list(zip(self.train_samples, [self.ab_pairs.index(l) for l in self.ab_labels_train]))
-        self.test_data  = list(zip(self.test_samples, [self.ab_pairs.index(l) for l in self.ab_labels_test]))
-
-        if verbose:
-            total_states = self.p * self.p
-            print(f"[Dataset] Mixed mode: generated {len(self.train_samples)} + {len(self.test_samples)} samples, length {length}")
-            print(f"AB parameter pairs: {self.ab_pairs}")
-            for a, b, n_train, n_test in per_rule_stats:
-                print(f"  - AB=({a},{b}): train {n_train} | test {n_test} | exposed ~{n_train/total_states*100:.1f}%")
-            print("-" * 50)
-
-    def __len__(self):
-        seqs = self.train_samples if self.split == 'train' else self.test_samples
-        return len(seqs)
-
-    def __getitem__(self, idx):
-        seqs = self.train_samples if self.split == 'train' else self.test_samples
-        labels = self.ab_labels_train if self.split == 'train' else self.ab_labels_test
-        ab_pair = labels[idx]
-        ab_idx = self.ab_pairs.index(ab_pair)
-        seq = seqs[idx]
-        return seq, ab_idx
-
-
 def mixed_ab_collate_fn(batch):
     """(seq, rule_idx) samples -> MIXED_AB."""
     sequences = [item[0] for item in batch]
@@ -1037,6 +943,35 @@ def mixed_ab_collate_fn_predict(batch):
             ab_indices, cleans)
 
 
+def generate_dynamic_sample(p, ab_pairs, flag_start_id, length, rng):
+    """Generate one dynamic_mixed sequence [x1, x2, flag_3, x3, ..., flag_L, x_L].
+
+    rng: a random.Random instance owned by the caller (seeding decides the
+    sequence). Shared by DynamicMixedDataset and the attention analysis.
+    """
+    x1 = rng.randrange(p)
+    x2 = rng.randrange(p)
+    seq = [x1, x2]
+    values = [x1, x2]  # Only numeric values, used for recurrence
+    for _ in range(2, length):
+        rule_idx = rng.randrange(len(ab_pairs))
+        a, b = ab_pairs[rule_idx]
+        x_next = (a * values[-2] + b * values[-1]) % p
+        seq.append(flag_start_id + rule_idx)
+        seq.append(x_next)
+        values.append(x_next)
+
+    # Sanity check: flag positions should be >= flag_start_id, value positions < p
+    for i, tok in enumerate(seq):
+        if i % 2 == 0 and i >= 2:
+            assert tok >= flag_start_id, \
+                f"Position {i} should be a flag token (>= {flag_start_id}), got {tok}"
+        else:
+            assert tok < p, \
+                f"Position {i} should be a value token (< {p}), got {tok}"
+    return seq
+
+
 class DynamicMixedDataset(Dataset):
     """Dataset where the recurrence rule can change at every step.
 
@@ -1059,18 +994,8 @@ class DynamicMixedDataset(Dataset):
 
     def _generate_sample(self):
         """Generate one sequence with per-step random rules."""
-        x1 = self.rng.randrange(self.p)
-        x2 = self.rng.randrange(self.p)
-        seq = [x1, x2]
-        values = [x1, x2]  # Only numeric values, used for recurrence
-        for _ in range(2, self.length):
-            rule_idx = self.rng.randrange(self.num_ab_pairs)
-            a, b = self.ab_pairs[rule_idx]
-            x_next = (a * values[-2] + b * values[-1]) % self.p
-            flag_id = self.flag_start_id + rule_idx
-            seq.append(flag_id)
-            seq.append(x_next)
-            values.append(x_next)
+        seq = generate_dynamic_sample(self.p, self.ab_pairs, self.flag_start_id,
+                                      self.length, self.rng)
 
         # Build loss mask aligned to targets = seq[1:]
         # Input: [x1, x2, f3, x3, f4, x4, ..., f_L, x_L]
@@ -1082,15 +1007,6 @@ class DynamicMixedDataset(Dataset):
         for k in range(2, self.length):
             target_idx = 2 * (k - 1)
             loss_mask[target_idx] = 1.0
-
-        # Sanity check: flag positions should be >= flag_start_id, value positions < p
-        for i, tok in enumerate(seq):
-            if i % 2 == 0 and i >= 2:
-                assert tok >= self.flag_start_id, \
-                    f"Position {i} should be a flag token (>= {self.flag_start_id}), got {tok}"
-            else:
-                assert tok < self.p, \
-                    f"Position {i} should be a value token (< {self.p}), got {tok}"
 
         seq_tensor = torch.tensor(seq, dtype=torch.long)
         return seq_tensor, loss_mask
@@ -1113,7 +1029,7 @@ RULE_LOSS_WEIGHT = 0.5
 
 
 class MixedABTransformer(FibonacciTransformer):
-    def __init__(self, num_ab_pairs=1, use_greedy_generate=True, use_ab_tag=True,
+    def __init__(self, num_ab_pairs=1, use_ab_tag=True,
                  use_conditional_wte=False, cond_wte_shared_ratio=0.0, order=2, **kwargs):
         assert not (use_conditional_wte and use_ab_tag), \
             "use_conditional_wte and use_ab_tag cannot both be True"
@@ -1124,7 +1040,6 @@ class MixedABTransformer(FibonacciTransformer):
             kwargs['restricted_token_ids'] = list(range(p, p + num_ab_pairs))
         super().__init__(**kwargs)
         self.num_ab_pairs = num_ab_pairs
-        self.use_greedy_generate = use_greedy_generate
         self.use_ab_tag = use_ab_tag
         self.use_conditional_wte = use_conditional_wte
         self.cond_wte_shared_ratio = cond_wte_shared_ratio
@@ -1218,26 +1133,8 @@ class MixedABTransformer(FibonacciTransformer):
         
         loss = None
         if targets is not None:
-            t_logits = logits.size(1)
-            t_targets = targets.size(1)
-            t_min = min(t_logits, t_targets)
-            logits_for_loss = logits[:, :t_min, :]
-            targets = targets[:, :t_min]
-            logits_flat = logits_for_loss.reshape(-1, self.vocab_size)
-            targets_flat = targets.reshape(-1)
-            loss_all = F.cross_entropy(logits_flat, targets_flat, reduction='none')
-            loss_all = loss_all.view(b, t_min)
-            if loss_mask is not None:
-                masked_loss = (loss_all * loss_mask.float()).sum()
-                num_loss_positions = loss_mask.float().sum()
-                if num_loss_positions > 0:
-                    loss = masked_loss / num_loss_positions
-                else:
-                    loss = torch.tensor(0.0, device=device)
-            else:
-                loss = loss_all.mean()
-            loss = loss + total_penalty
-            
+            loss = _lm_loss(logits, targets, loss_mask, total_penalty)
+
             if rule_logits is not None:
                 B, num_pos, _ = rule_logits.shape
                 rule_logits_flat = rule_logits.reshape(-1, self.num_ab_pairs)
@@ -1246,146 +1143,29 @@ class MixedABTransformer(FibonacciTransformer):
                 loss = loss + RULE_LOSS_WEIGHT * rule_loss
         return logits, loss, rule_logits
 
-# ==================== Memory Safety ====================
-EXIT_CUDA_OUT_OF_MEMORY = 77
-EXIT_MEMORY_LIMIT_EXCEEDED = 78
-
-
-def estimate_training_memory_bytes(model, batch_size, seq_len):
-    """Rough upper-bound estimate of peak GPU memory for training.
-
-    Accounts for fp32 parameters, AdamW optimizer state, gradients, and a
-    conservative activation estimate. The result is intentionally pessimistic
-    so that we fail early rather than OOM mid-training.
-    """
-    total_params = sum(p.numel() for p in model.parameters())
-    param_bytes = total_params * 4            # fp32
-    optimizer_bytes = 2 * param_bytes         # AdamW moments
-    grad_bytes = param_bytes
-
-    d_model = getattr(model, 'd_model', 64)
-    transformer = getattr(model, 'transformer', None)
-    layers = getattr(transformer, 'h', []) if transformer is not None else []
-    n_layer = len(layers) if layers else 1
-
-    # Conservative activation estimate per layer:
-    # qkv projection, attention scores, MLP up/down, residuals.
-    # Multiply by a safety factor to cover framework overhead.
-    mlp_hidden = d_model * 4  # default fallback for mlp_ratio=4
-    if layers:
-        try:
-            mlp_hidden = layers[0].mlp[0].out_features
-        except Exception:
-            pass
-    activations_per_layer = batch_size * seq_len * (
-        6 * d_model + mlp_hidden
-    ) * 4
-    activation_bytes = n_layer * activations_per_layer
-
-    # ~1 GB of CUDA context / fragmentation overhead
-    overhead_bytes = 1 * 1024 ** 3
-
-    return param_bytes + optimizer_bytes + grad_bytes + activation_bytes + overhead_bytes
-
-
-def check_gpu_memory(model, device, batch_size, seq_len):
-    """Check whether the model is likely to fit in GPU memory.
-
-    If not, print an error and exit with EXIT_CUDA_OUT_OF_MEMORY so the
-    parent batch runner can stop the whole batch instead of continuing.
-    """
-    if not torch.cuda.is_available() or not device.startswith('cuda'):
-        return
-
-    required_bytes = estimate_training_memory_bytes(model, batch_size, seq_len)
-    total_bytes = torch.cuda.get_device_properties(device).total_memory
-    reserved_bytes = torch.cuda.memory_reserved(device)
-    available_bytes = total_bytes - reserved_bytes
-
-    required_gb = required_bytes / 1024 ** 3
-    available_gb = available_bytes / 1024 ** 3
-    total_gb = total_bytes / 1024 ** 3
-
-    print(f"[Memory check] Estimated required: {required_gb:.1f} GB, "
-          f"available: {available_gb:.1f} GB / total: {total_gb:.1f} GB")
-
-    if required_bytes > available_bytes:
-        print(f"[Error] Insufficient GPU memory on {device}. "
-              f"Estimated need ~{required_gb:.1f} GB, but only "
-              f"{available_gb:.1f} GB is available.",
-              file=sys.stderr)
-        sys.exit(EXIT_CUDA_OUT_OF_MEMORY)
-
-
-def get_cpu_rss_mb():
-    """Return this process's resident set size in MB (Linux only)."""
-    try:
-        with open('/proc/self/status', 'r', encoding='utf-8') as f:
-            for line in f:
-                if line.startswith('VmRSS:'):
-                    kb = int(line.split()[1])
-                    return kb / 1024.0
-    except Exception:
-        return None
-
-
-def log_memory(label, device='cpu'):
-    """Print current CPU RSS and GPU memory usage."""
-    parts = [f"device={device}"]
-
-    cpu_mb = get_cpu_rss_mb()
-    if cpu_mb is not None:
-        parts.append(f"CPU RSS={cpu_mb:.1f}MB")
-
-    if torch.cuda.is_available() and device.startswith('cuda'):
-        try:
-            idx = torch.cuda.current_device() if device == 'cuda' else int(device.split(':')[-1])
-            alloc = torch.cuda.memory_allocated(idx) / 1024 ** 2
-            reserved = torch.cuda.memory_reserved(idx) / 1024 ** 2
-            parts.append(f"GPU alloc={alloc:.1f}MB reserved={reserved:.1f}MB")
-        except Exception:
-            pass
-
-    print(f"[Memory] {label}: " + " | ".join(parts))
-
-
-class MemoryMonitor(threading.Thread):
-    """Background thread that kills the process if CPU RSS exceeds a threshold.
-
-    This is a last-resort safety net to prevent a runaway training process from
-    exhausting system RAM and hanging the server. When the threshold is crossed,
-    the process exits immediately with EXIT_MEMORY_LIMIT_EXCEEDED so the parent
-    batch runner can stop the whole batch.
-    """
-
-    def __init__(self, threshold_gb=50.0, interval_sec=5.0):
-        super().__init__(daemon=True)
-        self.threshold_gb = threshold_gb
-        self.interval_sec = interval_sec
-        self._stop_event = threading.Event()
-
-    def run(self):
-        while not self._stop_event.is_set():
-            rss_mb = get_cpu_rss_mb()
-            if rss_mb is not None:
-                rss_gb = rss_mb / 1024.0
-                if rss_gb > self.threshold_gb:
-                    print(
-                        f"\n[MemoryMonitor] CPU RSS {rss_gb:.1f}GB exceeds "
-                        f"threshold {self.threshold_gb:.1f}GB. Killing process to "
-                        f"prevent system OOM.",
-                        file=sys.stderr, flush=True
-                    )
-                    os._exit(EXIT_MEMORY_LIMIT_EXCEEDED)
-            self._stop_event.wait(self.interval_sec)
-
-    def stop(self):
-        self._stop_event.set()
-
-
 # Batch size for teacher-forced evaluation over the full initial-state space
 # in the final generation tests (large for throughput; no gradients taken).
 EVAL_BATCH_SIZE = 1024
+
+
+def _teacher_forced_correct(model, full_sequences, device, ab_labels=None):
+    """Teacher-forced next-token correctness over full sequences, in batches.
+
+    full_sequences: (N, L) long tensor; ab_labels: optional (N,) rule indices
+    for mixed models. Returns a float tensor (N, L-1) of 0/1 correctness.
+    """
+    n = full_sequences.size(0)
+    all_preds = []
+    with torch.no_grad():
+        for start in range(0, n, EVAL_BATCH_SIZE):
+            batch_seq = full_sequences[start:start + EVAL_BATCH_SIZE]
+            if ab_labels is None:
+                logits = model(batch_seq)[0]
+            else:
+                logits = model(batch_seq, ab_labels=ab_labels[start:start + EVAL_BATCH_SIZE])[0]
+            all_preds.append(logits.argmax(dim=-1)[:, :-1])
+    preds = torch.cat(all_preds, dim=0)
+    return (preds == full_sequences[:, 1:]).float()
 
 
 def _safe_div(a, b):
@@ -1450,9 +1230,8 @@ def _print_per_position_exposure(correct, loss_mask, exposed, positions, train_l
 
 
 # ==================== Unified Experiment Entry ====================
-# Marker that batch_run.py writes into merged configs; run_experiment refuses
-# to run on an unmerged config (raw config.json lacks per-experiment fields).
-BATCH_RUN_MERGED_FLAG = '_BATCH_RUN_MERGED'
+# BATCH_RUN_MERGED_FLAG lives in protocol.py (single source shared with
+# batch_run.py); run_experiment refuses to run on an unmerged config.
 
 
 def _round_up_pow2(n):
@@ -1489,7 +1268,7 @@ def _prepare_mixed_recurrence(config, device, order):
     TRAIN_LEN = cfg['TRAIN_LEN']
     OOD_LEN = cfg['OOD_LEN']
     DROPOUT = cfg['DROPOUT']
-    MAX_UNIQUE_RATIO = cfg.get('MAX_UNIQUE_RATIO', 0.5)
+    MAX_UNIQUE_RATIO = cfg.get('MAX_UNIQUE_RATIO', 0.7)  # default matches src/config.json
     rules = rules_from_config(cfg, order)
     state_space_size = P ** order
 
@@ -1516,6 +1295,10 @@ def _prepare_mixed_recurrence(config, device, order):
     # bakes the mask prefix into per-sample loss masks.
     num_mask_cfg = cfg.get('NUM_MASK')
     num_mask = 2 if num_mask_cfg is None else num_mask_cfg
+    # An all-zero loss mask yields a grad-less constant loss and crashes
+    # backward() far from the cause; require at least one evaluated position.
+    assert num_mask < TRAIN_LEN - 1, \
+        f"NUM_MASK ({num_mask}) must be < TRAIN_LEN - 1 ({TRAIN_LEN - 1})"
 
     missing_prob = cfg.get('MISSING_PROB', 0.0)
     predict_missing = cfg.get('PREDICT_MISSING', False)
@@ -1546,7 +1329,6 @@ def _prepare_mixed_recurrence(config, device, order):
                                entropy_penalty_weight=cfg['ENTROPY_PENALTY_WEIGHT'],
                                num_ab_pairs=len(rules),
                                order=order,
-                               use_greedy_generate=cfg.get('USE_GREEDY_GENERATE', True),
                                use_learnable_pe=cfg.get('USE_LEARNABLE_PE', False),
                                mlp_ratio=cfg.get('MLP_RATIO', 4),
                                use_ab_tag=cfg.get('USE_AB_TAG', True),
@@ -1619,8 +1401,11 @@ def _prepare_dynamic_mixed(config):
     ENTROPY_PENALTY_WEIGHT = cfg_main.get('ENTROPY_PENALTY_WEIGHT', 0.0)
     USE_LEARNABLE_PE = cfg_main.get('USE_LEARNABLE_PE', False)
     AB_PAIRS = [tuple(pair) for pair in cfg.get('AB_PAIRS', [[1, 1], [1, 2]])]
+    for pair in AB_PAIRS:
+        if len(pair) != 2 or any(not 0 <= c < P for c in pair):
+            raise ValueError(f"AB_PAIRS entry {pair} must be two coefficients in [0, {P})")
     NUM_TRAIN_SAMPLES = cfg.get('NUM_TRAIN_SAMPLES', 10000)
-    NUM_TEST_SAMPLES = cfg.get('NUM_TEST_SAMPLES', 1000)
+    NUM_TEST_SAMPLES = cfg.get('NUM_TEST_SAMPLES', 2000)  # default matches src/config.json
     TRAIN_LEN = cfg.get('TRAIN_LEN', 16)
     OOD_LEN = cfg.get('OOD_LEN', 32)
 
@@ -1708,53 +1493,24 @@ def _prepare_single_recurrence(config, task):
     OOD_LEN = cfg['OOD_LEN']
     DROPOUT = cfg['DROPOUT']
     ENTROPY_PENALTY_WEIGHT = cfg.get('ENTROPY_PENALTY_WEIGHT', 0.0)
-    MAX_UNIQUE_RATIO = cfg.get('MAX_UNIQUE_RATIO', 0.5)
+    MAX_UNIQUE_RATIO = cfg.get('MAX_UNIQUE_RATIO', 0.7)  # default matches src/config.json
     USE_LEARNABLE_PE = cfg.get('USE_LEARNABLE_PE', False)
 
     BLOCK_SIZE = _round_up_pow2(max(TRAIN_LEN, OOD_LEN))
 
-    if task == 'addition':
-        default_num_mask = 1
-        init_len = 2
-        a = cfg['A']
-        b = cfg['B']
-        def recurrence_fn(seq, p):
-            return (a * seq[-1] + b * seq[-2]) % p
-        recurrence_name = f"X(k)=({a}*X(k-1)+{b}*X(k-2)) mod {P}"
-        save_extra_config = {'a': a, 'b': b, 'recurrence': 'addition'}
-    elif task == 'multiplication':
-        default_num_mask = 1
-        init_len = 2
-        def recurrence_fn(seq, p):
-            return (seq[-1] * seq[-2]) % p
-        recurrence_name = f"X(k)=(X(k-1)*X(k-2)) mod {P}"
-        save_extra_config = {'recurrence': 'multiplicative'}
-    elif task == 'tribonacci':
-        default_num_mask = 2
-        init_len = 3
-        a = cfg.get('A', 1)
-        b = cfg.get('B', 1)
-        c = cfg.get('C', 1)
-        def recurrence_fn(seq, p):
-            return (a * seq[-1] + b * seq[-2] + c * seq[-3]) % p
-        recurrence_name = f"X(k)=({a}*X(k-1)+{b}*X(k-2)+{c}*X(k-3)) mod {P}"
-        save_extra_config = {'a': a, 'b': b, 'c': c, 'recurrence': 'tribonacci'}
-    elif task == 'nonlinear':
-        # X(k) = X(k-1)^2 + X(k-2). The state map (x,y) -> (y, y^2+x) is
-        # bijective for any p (invert: x = z - y^2), so all states lie on
-        # pure cycles.
-        default_num_mask = 1
-        init_len = 2
-        def recurrence_fn(seq, p):
-            return (seq[-1] * seq[-1] + seq[-2]) % p
-        recurrence_name = f"X(k)=(X(k-1)^2+X(k-2)) mod {P}"
-        save_extra_config = {'recurrence': 'nonlinear'}
+    default_num_mask = {'addition': 1, 'multiplication': 1, 'tribonacci': 2, 'nonlinear': 1}[task]
+    init_len, recurrence_fn, recurrence_name = single_rule_from_task(task, cfg)
+    save_extra_config = save_config_extra(task, cfg)
 
     state_space_size = P ** init_len
     NUM_TRAIN_SAMPLES = max(1, int(state_space_size * MAX_UNIQUE_RATIO))
     # NUM_MASK unset (None) falls back to the task's default mask count.
     num_mask_cfg = cfg.get('NUM_MASK')
     num_mask = default_num_mask if num_mask_cfg is None else num_mask_cfg
+    # An all-zero loss mask yields a grad-less constant loss and crashes
+    # backward() far from the cause; require at least one evaluated position.
+    assert num_mask < TRAIN_LEN - 1, \
+        f"NUM_MASK ({num_mask}) must be < TRAIN_LEN - 1 ({TRAIN_LEN - 1})"
 
     missing_prob = cfg.get('MISSING_PROB', 0.0)
     predict_missing = cfg.get('PREDICT_MISSING', False)
@@ -1837,12 +1593,9 @@ def run_experiment(config_path=None):
     
     cfg_main = config.get('main', {})
     TASK = cfg_main.get('TASK', 'addition')
-    BATCH_SIZE = cfg_main['BATCH_SIZE']
     EPOCHS = cfg_main['EPOCHS']
     LR = cfg_main['LR']
     SAVE_PATH = cfg_main['SAVE_PATH']
-    MEMORY_LIMIT_GB = cfg_main.get('MEMORY_LIMIT_GB', 50.0)
-
     seed = cfg_main['RANDOM_SEED']
     random.seed(seed)
     torch.manual_seed(seed)
@@ -1852,11 +1605,10 @@ def run_experiment(config_path=None):
         torch.backends.cudnn.benchmark = False
     device = 'cuda' if torch.cuda.is_available() else 'cpu'
     print(f"Using device: {device}\n")
-    log_memory("start", device)
 
     if not config.get(BATCH_RUN_MERGED_FLAG):
         print("[Error] Config not merged. Please run via batch_run.py or merge config manually.")
-        return
+        sys.exit(2)  # non-zero so batch_run records failure instead of a silent "success"
 
     # ========================================================================
     # Stage 1: Task branch -- prepare dataset, model, loader, training params
@@ -1870,7 +1622,7 @@ def run_experiment(config_path=None):
         ctx = _prepare_single_recurrence(config, TASK)
     else:
         print(f"Unknown task: {TASK}")
-        return
+        sys.exit(2)  # non-zero so batch_run records failure instead of a silent "success"
 
     model = ctx['model']
     train_dataset = ctx['train_dataset']
@@ -1884,8 +1636,6 @@ def run_experiment(config_path=None):
     TRAIN_LEN = ctx['train_len']
     OOD_LEN = ctx['ood_len']
     post_train_mode = ctx['post_train_mode']
-
-    log_memory("after dataset", device)
 
     # ========================================================================
     # Stage 2: Common training
@@ -1905,45 +1655,22 @@ def run_experiment(config_path=None):
     model = model.to(device)
     print(f"Model parameters: {sum(p.numel() for p in model.parameters())/1e6:.2f}M")
 
-    # Pre-flight memory check: fail fast if the model cannot fit, rather than
-    # letting CUDA OOM hang or kill the server.
-    check_gpu_memory(model, device, BATCH_SIZE, max(TRAIN_LEN, OOD_LEN))
-    log_memory("after model init", device)
-
     optimizer = torch.optim.AdamW(model.parameters(), lr=LR, weight_decay=cfg['WEIGHT_DECAY'])
     scheduler = torch.optim.lr_scheduler.CosineAnnealingLR(optimizer, T_max=EPOCHS)
 
-    # Start background memory monitor. It will kill this process if CPU RSS
-    # exceeds MEMORY_LIMIT_GB, preventing system RAM exhaustion.
-    memory_monitor = MemoryMonitor(threshold_gb=MEMORY_LIMIT_GB)
-    memory_monitor.start()
-
-    try:
-        best_acc, epoch = run_training_engine(
-            model, train_loader, test_loader, optimizer, scheduler, device,
-            epochs=EPOCHS, eval_interval=cfg['EVAL_INTERVAL'],
-            early_stop_accuracy=cfg.get('EARLY_STOP_ACCURACY', 0.99),
-            early_stop_no_improve=cfg.get('EARLY_STOP_NO_IMPROVE', 100),
-            save_path=SAVE_PATH, save_config=save_config,
-            num_mask=num_mask, extra_kwargs_fn=extra_kwargs_fn,
-            first_task_weight=cfg.get('FIRST_TASK_WEIGHT', 1.0),
-            cond_fix=cfg.get('COND_FIX', None),
-            cond_fix_start=cfg.get('COND_FIX_START', None),
-            cond_fix_start_a1=cfg.get('COND_FIX_START_A1', None),
-            cond_fix_start_a2=cfg.get('COND_FIX_START_A2', None)
-        )
-    except RuntimeError as e:
-        if 'out of memory' in str(e).lower():
-            print(f"[Error] CUDA out of memory during training: {e}", file=sys.stderr)
-            if torch.cuda.is_available():
-                torch.cuda.empty_cache()
-            sys.exit(EXIT_CUDA_OUT_OF_MEMORY)
-        raise
-    finally:
-        memory_monitor.stop()
-        memory_monitor.join(timeout=1.0)
-
-    log_memory("after training", device)
+    best_acc, epoch = run_training_engine(
+        model, train_loader, test_loader, optimizer, scheduler, device,
+        epochs=EPOCHS, eval_interval=cfg['EVAL_INTERVAL'],
+        early_stop_accuracy=cfg.get('EARLY_STOP_ACCURACY', 0.99),
+        early_stop_no_improve=cfg.get('EARLY_STOP_NO_IMPROVE', 3000),  # default matches src/config.json
+        save_path=SAVE_PATH, save_config=save_config,
+        num_mask=num_mask, extra_kwargs_fn=extra_kwargs_fn,
+        first_task_weight=cfg.get('FIRST_TASK_WEIGHT', 1.0),
+        cond_fix=cfg.get('COND_FIX', None),
+        cond_fix_start=cfg.get('COND_FIX_START', None),
+        cond_fix_start_a1=cfg.get('COND_FIX_START_A1', None),
+        cond_fix_start_a2=cfg.get('COND_FIX_START_A2', None)
+    )
 
     # ========================================================================
     # Stage 3: Post-processing (mixed_ab final generation test with exposure split)
@@ -1968,8 +1695,6 @@ def run_experiment(config_path=None):
             init_state = tuple(seq[tag_offset:tag_offset + order].tolist())
             train_seen_inits[rule_idx].add(init_state)
 
-        batch_size = EVAL_BATCH_SIZE
-
         for rule_idx, rule in enumerate(rules):
             print(f"\n--- Rule {rule_idx+1}: {rule.name} {rule.coeffs} ---")
             seen = train_seen_inits[rule_idx]
@@ -1993,25 +1718,10 @@ def run_experiment(config_path=None):
             seq_len = full_sequences.size(1)
             target_len = seq_len - 1
 
-            # Teacher-forced forward in batches
-            all_preds = []
-            with torch.no_grad():
-                for start in range(0, len(test_cases), batch_size):
-                    end = min(start + batch_size, len(test_cases))
-                    batch_seq = full_sequences[start:end]
-                    batch_labels = ab_labels[start:end]
-                    logits, _, _ = model(batch_seq, ab_labels=batch_labels)
-                    preds = logits.argmax(dim=-1)[:, :-1]
-                    all_preds.append(preds)
-            all_preds = torch.cat(all_preds, dim=0)
-
-            targets = full_sequences[:, 1:]
-            correct = (all_preds == targets).float()
+            correct = _teacher_forced_correct(model, full_sequences, device, ab_labels=ab_labels)
 
             # Loss mask: ignore first num_mask positions
-            loss_mask = torch.zeros(len(test_cases), target_len, dtype=torch.float, device=device)
-            if target_len > num_mask:
-                loss_mask[:, num_mask:] = 1.0
+            loss_mask = _default_loss_mask(len(test_cases), target_len, num_mask, device=device)
 
             # Position masks (absolute position i = t + 1)
             in_dist_mask = torch.arange(target_len, device=device) < (TRAIN_LEN - 1)
@@ -2025,8 +1735,6 @@ def run_experiment(config_path=None):
             print(f"\n--- Per-position accuracy for rule={rule.name} ---")
             _print_per_position_exposure(correct, loss_mask, exposed,
                                          range(num_mask, target_len), TRAIN_LEN)
-
-        log_memory("after final test", device)
 
     elif post_train_mode == 'single_recurrence':
         recurrence_fn = ctx['recurrence_fn']
@@ -2055,25 +1763,10 @@ def run_experiment(config_path=None):
             full_sequences.append(seq)
         full_sequences = torch.tensor(full_sequences, dtype=torch.long, device=device)
 
-        # Teacher-forced forward in batches
-        batch_size = EVAL_BATCH_SIZE
-        all_preds = []
-        with torch.no_grad():
-            for start in range(0, total_states, batch_size):
-                end = min(start + batch_size, total_states)
-                batch_seq = full_sequences[start:end]
-                logits, _ = model(batch_seq)
-                preds = logits.argmax(dim=-1)[:, :-1]
-                all_preds.append(preds)
-        all_preds = torch.cat(all_preds, dim=0)
-
-        targets = full_sequences[:, 1:]
-        correct = (all_preds == targets).float()
+        correct = _teacher_forced_correct(model, full_sequences, device)
 
         # Loss mask: ignore first num_mask positions
-        loss_mask = torch.zeros(total_states, OOD_LEN - 1, dtype=torch.float, device=device)
-        if OOD_LEN - 1 > num_mask:
-            loss_mask[:, num_mask:] = 1.0
+        loss_mask = _default_loss_mask(total_states, OOD_LEN - 1, num_mask, device=device)
 
         # Position masks (t indexes targets, absolute position i = t + 1)
         in_dist_mask = torch.arange(OOD_LEN - 1, device=device) < (TRAIN_LEN - 1)
@@ -2091,4 +1784,11 @@ def run_experiment(config_path=None):
         _print_per_position_exposure(correct, loss_mask, exposed,
                                      range(num_mask, OOD_LEN - 1), TRAIN_LEN)
 
-        log_memory("after final test", device)
+
+if __name__ == '__main__':
+    # Entry point for the training subprocess spawned by batch_run.py:
+    #   python src/core.py <merged_config.json>
+    if len(sys.argv) != 2:
+        print("Usage: python src/core.py <merged_config.json>", file=sys.stderr)
+        sys.exit(2)
+    run_experiment(sys.argv[1])

@@ -1,0 +1,8 @@
+# Runtime dependencies.
+# NOTE: install torch first, matching your CUDA version, e.g.:
+#   pip install torch --index-url https://download.pytorch.org/whl/cu124
+torch
+matplotlib
+
+# Dev/test only:
+#   pytest   (tests also run without it: each tests/test_*.py has a __main__ runner)

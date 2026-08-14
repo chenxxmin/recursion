@@ -43,9 +43,10 @@ if SCRIPT_DIR not in sys.path:
     sys.path.insert(0, SCRIPT_DIR)
 
 from analyze_attention import extract_qk_raw_scores, load_model
-from core import RecurrenceDataset
+from core import corrupt_window
 from report_front_back_attention import (dump_matrices, parse_log,
                                          segment_by_attention)
+from rules import task_from_save_config
 from verify_sample import _Tee, build_single_rule
 
 MODEL_BASE = '/data/cxm/models'
@@ -124,10 +125,6 @@ def run_missing_categories(args, model, cfg, next_fn, init_len, p, exp_name, des
     miss_len = cfg.get('MISS_LEN', 1)
     D = args.depth or (miss_len + 2)
     min_n = args.min_n
-    helper = RecurrenceDataset(p=p, init_len=init_len, length=length, verbose=False,
-                               missing_prob=missing_prob, miss_len=miss_len,
-                               miss_second=cfg.get('MISS_SECOND', False),
-                               num_mask=num_mask)
     CATS = ['(x,x)', '(M,x)', '(M,M)', '(x,M)']  # by (view[t-1], view[t])
     set_A = list(range(init_len))
     dists_C_full = list(range(init_len + miss_len + 1))
@@ -142,7 +139,9 @@ def run_missing_categories(args, model, cfg, next_fn, init_len, p, exp_name, des
         while len(seq) < length:
             seq.append(next_fn(seq))
         window = torch.tensor(seq, dtype=torch.long)
-        helper._corrupt(window, True)
+        # single-rule only here, so the missing token is plain p
+        corrupt_window(window, True, p=p, init_len=init_len, missing_prob=missing_prob,
+                       miss_len=miss_len, miss_second=cfg.get('MISS_SECOND', False))
         view = window.tolist()
         x = torch.tensor([view], dtype=torch.long)
         with torch.no_grad():
@@ -226,6 +225,13 @@ def run_one(args, exp_cfg, task, exp_name, pth_path, log_path):
     model, checkpoint = load_model(pth_path, device='cpu')
     cfg = dict(exp_cfg)
     cfg['P'] = cfg.get('P', cfg.get('p'))
+    if task is None:
+        # checkpoint fallback: task_from_save_config normalizes the checkpoint
+        # vocabulary ('multiplicative' -> 'multiplication'); None means a
+        # mixed/dynamic checkpoint
+        task = task_from_save_config(checkpoint['config'])
+        if task is None:
+            task = checkpoint['config'].get('recurrence') or 'mixed_ab'
     if task in ('mixed_ab', 'mixed_abc'):
         print('[skip] mixed tasks are not supported by rule_fit (single-rule only)')
         return

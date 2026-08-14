@@ -13,13 +13,11 @@
     "EPOCHS": 6000,
     "LR": 0.0003,
     "SAVE_PATH": "fibonacci_transformer.pth",
-    "USE_GREEDY_GENERATE": true,
     "USE_LEARNABLE_PE": false,
     "MLP_RATIO": 4,
     "TRAIN_LEN": 16,
     "OOD_LEN": 32,
     "DROPOUT": 0.0,
-    "TARGET_INIT_COVERAGE": 0.7,
     "MAX_UNIQUE_RATIO": 0.7,
     "WEIGHT_DECAY": 1,
     "ENTROPY_PENALTY_WEIGHT": 0.0,
@@ -31,8 +29,7 @@
     "RANDOM_SEED": 42,
     "EVAL_INTERVAL": 20,
     "EARLY_STOP_NO_IMPROVE": 3000,
-    "EARLY_STOP_ACCURACY": 0.99,
-    "MEMORY_LIMIT_GB": 50.0
+    "EARLY_STOP_ACCURACY": 0.99
   },
   "tribonacci": {
     "P": 23,
@@ -40,7 +37,7 @@
     "B": 2,
     "C": 3
   },
-  "multiplicative": {},
+  "multiplication": {},
   "nonlinear": {},
   "dynamic_mixed": {
     "P": 53,

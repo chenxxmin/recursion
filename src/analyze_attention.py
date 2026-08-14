@@ -12,6 +12,8 @@ if SCRIPT_DIR not in sys.path:
     sys.path.insert(0, SCRIPT_DIR)
 
 import core
+from rules import LinearRecurrenceRule, single_rule_from_task, task_from_save_config
+from report_front_back_attention import parse_log, split_k
 
 # Display/analysis constants
 HEADER_WIDTH = 70       # width of printed section separators
@@ -104,10 +106,8 @@ def _build_input_embedding(model, input_ids, ab_label=None):
                 + shared_size
             )
             tok_emb[rule_mask] = model.cond_wte(shifted_rule_idx)
-    elif getattr(model, 'use_embedding', True):
-        tok_emb = model.transformer.wte(input_ids)
     else:
-        tok_emb = F.one_hot(input_ids, num_classes=model.vocab_size).float()
+        tok_emb = model.transformer.wte(input_ids)
 
     if getattr(model, 'wpe', None) is not None:
         pos = torch.arange(0, t, dtype=torch.long, device=device)
@@ -128,62 +128,77 @@ def get_attention_weights(model, input_ids, ab_label=None):
     return [layer['attn_weights'] for layer in layer_outputs]
 
 
+def _forward_per_layer(model, input_ids, ab_label=None):
+    """Single-source manual forward pass for analysis scripts.
+
+    Replays the model layer by layer (LN -> QKV -> RoPE -> causal mask ->
+    softmax -> weighted sum -> proj -> residuals -> MLP) and returns a list
+    of per-layer dicts:
+        - 'q', 'k': (B, n_head, T, head_size)
+        - 'raw_scores', 'attn_weights': (B, n_head, T, T)
+        - 'hidden_post_attn': (B, T, C) residual stream right after attention
+    Tensors keep the batch dimension and stay on the model's device.
+    """
+    x = _build_input_embedding(model, input_ids, ab_label=ab_label)
+
+    layer_outputs = []
+
+    for block in model.transformer.h:
+        ln_x = block.ln_1(x)
+        attn_module = block.attn
+        B, T, C = ln_x.size()
+
+        qkv = attn_module.c_attn(ln_x)
+        q, k, v = qkv.split(attn_module.n_embd, dim=2)
+
+        q = q.view(B, T, attn_module.n_head, attn_module.head_size).transpose(1, 2)
+        k = k.view(B, T, attn_module.n_head, attn_module.head_size).transpose(1, 2)
+        v = v.view(B, T, attn_module.n_head, attn_module.head_size).transpose(1, 2)
+
+        # RoPE
+        if attn_module.rope is not None:
+            cos, sin = attn_module.rope(q, seq_len=T)
+            q = core.apply_rotary_emb(q, cos, sin)
+            k = core.apply_rotary_emb(k, cos, sin)
+
+        # Raw QK scores (before softmax)
+        raw_scores = (q @ k.transpose(-2, -1)) * (1.0 / math.sqrt(attn_module.head_size))
+
+        # Attention weights (after softmax)
+        att = raw_scores.masked_fill(attn_module.causal_mask[:, :, :T, :T] == 0, float('-inf'))
+        row_all_inf = torch.isinf(att).all(dim=-1, keepdim=True)
+        att = att.masked_fill(row_all_inf, 0.0)
+        att = F.softmax(att, dim=-1)
+
+        # Continue forward
+        y = att @ v
+        y = y.transpose(1, 2).contiguous().view(B, T, C)
+        y = attn_module.c_proj(y)
+        x = x + y
+        layer_outputs.append({
+            'q': q,
+            'k': k,
+            'raw_scores': raw_scores,
+            'attn_weights': att,
+            'hidden_post_attn': x,
+        })
+        x = x + block.mlp(block.ln_2(x))
+
+    return layer_outputs
+
+
 def extract_qk_raw_scores(model, input_ids, ab_label=None):
     """
     Extract Q, K and raw QK scores (before softmax) for each layer.
-    
+
     Returns: list of dict, each layer contains:
         - 'q': (n_head, T, head_size)
         - 'k': (n_head, T, head_size)
         - 'raw_scores': (n_head, T, T), i.e. q @ k^T / sqrt(d)
         - 'attn_weights': (n_head, T, T), attention after softmax
     """
-    x = _build_input_embedding(model, input_ids, ab_label=ab_label)
-    
-    layer_outputs = []
-    
-    for block in model.transformer.h:
-        ln_x = block.ln_1(x)
-        attn_module = block.attn
-        B, T, C = ln_x.size()
-        
-        qkv = attn_module.c_attn(ln_x)
-        q, k, v = qkv.split(attn_module.n_embd, dim=2)
-        
-        q = q.view(B, T, attn_module.n_head, attn_module.head_size).transpose(1, 2)
-        k = k.view(B, T, attn_module.n_head, attn_module.head_size).transpose(1, 2)
-        v = v.view(B, T, attn_module.n_head, attn_module.head_size).transpose(1, 2)
-        
-        # RoPE
-        if attn_module.rope is not None:
-            cos, sin = attn_module.rope(q, seq_len=T)
-            q = core.apply_rotary_emb(q, cos, sin)
-            k = core.apply_rotary_emb(k, cos, sin)
-        
-        # Raw QK scores (before softmax)
-        raw_scores = (q @ k.transpose(-2, -1)) * (1.0 / math.sqrt(attn_module.head_size))
-        
-        # Attention weights (after softmax)
-        att = raw_scores.masked_fill(attn_module.causal_mask[:, :, :T, :T] == 0, float('-inf'))
-        row_all_inf = torch.isinf(att).all(dim=-1, keepdim=True)
-        att = att.masked_fill(row_all_inf, 0.0)
-        att = F.softmax(att, dim=-1)
-        
-        layer_outputs.append({
-            'q': q[0].detach().cpu(),
-            'k': k[0].detach().cpu(),
-            'raw_scores': raw_scores[0].detach().cpu(),
-            'attn_weights': att[0].detach().cpu(),
-        })
-        
-        # Continue forward
-        y = att @ v
-        y = y.transpose(1, 2).contiguous().view(B, T, C)
-        y = attn_module.c_proj(y)
-        x = x + y
-        x = x + block.mlp(block.ln_2(x))
-    
-    return layer_outputs
+    return [{key: layer[key][0].detach().cpu() for key in ('q', 'k', 'raw_scores', 'attn_weights')}
+            for layer in _forward_per_layer(model, input_ids, ab_label=ab_label)]
 
 
 def summarize_attention_for_sequence(model, seq, query_mask=None):
@@ -340,36 +355,8 @@ def compute_front_split(log_path):
     leading positions (in log-line order) forming the front segment, 0 means
     no shortcut was found, None means the positions never separated.
     """
-    epoch_re = re.compile(r'Epoch\s+(\d+)\s+\|')
-    pos_re = re.compile(r'from x(\d+):\s+(.+)')
-    cur_ep = None
-    start_x = None
-    series = []
-    with open(log_path, encoding='utf-8') as f:
-        for line in f:
-            m = epoch_re.search(line)
-            if m:
-                cur_ep = int(m.group(1))
-                continue
-            m = pos_re.search(line)
-            if m and cur_ep is not None:
-                if start_x is None:
-                    start_x = int(m.group(1))
-                series.append((cur_ep, [float(x) for x in m.group(2).split()]))
-    if start_x is None:
-        return None, None
-    for ep, accs in series:
-        if ep == 0:
-            continue
-        k = 0
-        for a in accs:
-            if a < 0.1:
-                k += 1
-            else:
-                break
-        if k < len(accs) and accs[k] >= 0.15:
-            return start_x, k
-    return start_x, None
+    start_x, series, _ = parse_log(log_path)
+    return start_x, split_k(series)
 
 
 def print_attention_overview_table(summary):
@@ -398,66 +385,42 @@ def _resolve_recurrence(config):
 
     Returns a dict with:
       init_len:         number of initial values the recurrence needs
-      next_val:         callable seq -> next value (None for dynamic_mixed)
+      next_val:         callable seq -> next value (None for dynamic_mixed/mixed)
       is_dynamic_mixed: whether the rule can change at every step
       ab_pairs, flag_start_id, dynamic_seq_len: only for dynamic_mixed
+      is_mixed, rules, order, use_ab_tag: only for mixed_ab/mixed_abc
+        (mixed checkpoints save ab_pairs + order and no 'recurrence' key)
     """
     p = config['p']
     recurrence = config.get('recurrence', 'addition')
 
-    if 'c' in config:
-        a, b, c = config['a'], config['b'], config['c']
-        print(f"Model config: tribonacci, a={a}, b={b}, c={c}, p={p}")
-        return {'init_len': 3, 'is_dynamic_mixed': False,
-                'next_val': lambda seq: (a * seq[-1] + b * seq[-2] + c * seq[-3]) % p}
-    if recurrence == 'multiplicative':
-        print(f"Model config: multiplication, p={p}")
-        return {'init_len': 2, 'is_dynamic_mixed': False,
-                'next_val': lambda seq: (seq[-1] * seq[-2]) % p}
-    if recurrence == 'nonlinear':
-        print(f"Model config: nonlinear, p={p}")
-        return {'init_len': 2, 'is_dynamic_mixed': False,
-                'next_val': lambda seq: (seq[-1] * seq[-1] + seq[-2]) % p}
     if recurrence == 'dynamic_mixed':
         print(f"Model config: dynamic_mixed, ab_pairs={config['ab_pairs']}, p={p}")
         return {'init_len': 2, 'is_dynamic_mixed': True, 'next_val': None,
                 'ab_pairs': config['ab_pairs'], 'flag_start_id': p + 1,
                 'dynamic_seq_len': config.get('train_len') or config.get('ood_len', 32)}
-    if 'a' in config and 'b' in config:
-        a, b = config['a'], config['b']
-        print(f"Model config: addition, a={a}, b={b}, p={p}")
-        return {'init_len': 2, 'is_dynamic_mixed': False,
-                'next_val': lambda seq: (a * seq[-1] + b * seq[-2]) % p}
-    # Fallback: old checkpoint or minimal config defaults to addition
-    print(f"Model config: addition (default), p={p}")
-    return {'init_len': 2, 'is_dynamic_mixed': False,
-            'next_val': lambda seq: (seq[-1] + seq[-2]) % p}
+    if 'ab_pairs' in config and 'order' in config:
+        # mixed_ab / mixed_abc checkpoint: one analysis per rule (see
+        # _analyze_mixed_rules); there is no single next_val.
+        order = config['order']
+        rules = [tuple(pair) for pair in config['ab_pairs']]
+        use_tag = config.get('use_ab_tag', False)
+        print(f"Model config: mixed order-{order}, rules={rules}, p={p}, use_ab_tag={use_tag}")
+        return {'init_len': order, 'is_dynamic_mixed': False, 'is_mixed': True,
+                'next_val': None, 'rules': rules, 'order': order, 'use_ab_tag': use_tag}
+    # Single-rule checkpoint (addition/multiplication/tribonacci/nonlinear,
+    # including old a/b-only or minimal configs defaulting to addition).
+    task = task_from_save_config(config)
+    init_len, next_fn, name = single_rule_from_task(task, config)
+    print(f"Model config: {name}")
+    return {'init_len': init_len, 'is_dynamic_mixed': False,
+            'next_val': lambda seq: next_fn(seq, p)}
 
 
 def _make_dynamic_seq(p, ab_pairs, flag_start_id, length, seed):
     """Generate one dynamic_mixed sequence: [x1, x2, flag_3, x3, ..., flag_L, x_L]."""
-    rng = random.Random(seed)
-    x1 = rng.randint(0, p - 1)
-    x2 = rng.randint(0, p - 1)
-    seq = [x1, x2]
-    values = [x1, x2]  # Only numeric values, used for recurrence
-    for _ in range(2, length):
-        rule_idx = rng.randrange(len(ab_pairs))
-        a, b = ab_pairs[rule_idx]
-        x_next = (a * values[-2] + b * values[-1]) % p
-        seq.append(flag_start_id + rule_idx)
-        seq.append(x_next)
-        values.append(x_next)
-
-    # Sanity check: flag positions should be >= flag_start_id, value positions < p
-    for i, tok in enumerate(seq):
-        if i % 2 == 0 and i >= 2:
-            assert tok >= flag_start_id, \
-                f"Position {i} should be a flag token (>= {flag_start_id}), got {tok}"
-        else:
-            assert tok < p, \
-                f"Position {i} should be a value token (< {p}), got {tok}"
-    return seq
+    return core.generate_dynamic_sample(p, ab_pairs, flag_start_id, length,
+                                        random.Random(seed))
 
 
 def _make_dynamic_query_mask(length):
@@ -474,13 +437,63 @@ def _make_dynamic_query_mask(length):
     return mask
 
 
+def _make_mixed_seq(p, coeffs, rule_idx, n_rules, order, use_ab_tag, length, config):
+    """Generate one mixed-task sequence following a single rule.
+
+    Mirrors MixedRecurrenceDataset's sample layout: missing-value corruption
+    (when configured) is applied first, then the flag token p + rule_idx is
+    prepended in tag mode.
+    """
+    rule = LinearRecurrenceRule(coeffs=tuple(coeffs), p=p)
+    next_fn = rule.next_fn()
+    seq = [random.randint(0, p - 1) for _ in range(order)]
+    for _ in range(order, length):
+        seq.append(next_fn(seq, p))
+    if config.get('missing_prob', 0.0) > 0:
+        window = torch.tensor(seq, dtype=torch.long)
+        core.corrupt_window(window, True, p=p, init_len=order,
+                            missing_prob=config['missing_prob'],
+                            miss_len=config.get('miss_len', 1),
+                            miss_second=config.get('miss_second', False),
+                            missing_token=core.missing_token_id(config, p, is_mixed=True))
+        seq = window.tolist()
+    if use_ab_tag:
+        seq = [p + rule_idx] + seq
+    return rule.name, seq
+
+
+def _analyze_mixed_rules(model, config, p, rec):
+    """Per-rule attention analysis for mixed_ab/mixed_abc checkpoints.
+
+    Each rule gets its own sequence (flag token prepended in tag mode) and a
+    full attention summary, so rule-specific circuits can be compared.
+    """
+    max_len = config.get('train_len') or config.get('block_size', 20)
+    n_rules = len(rec['rules'])
+    for k, coeffs in enumerate(rec['rules']):
+        rule_name, seq = _make_mixed_seq(p, coeffs, k, n_rules, rec['order'],
+                                         rec['use_ab_tag'], max_len, config)
+        print(f"\n{'#' * HEADER_WIDTH}")
+        header = f"# Rule {k + 1}/{n_rules}: {rule_name}"
+        if rec['use_ab_tag']:
+            header += f" (flag token {p + k})"
+        print(header)
+        print('#' * HEADER_WIDTH)
+        print(f"Test sequence (length {len(seq)}): {seq[:20]}{'...' if len(seq) > 20 else ''}")
+        summary = summarize_attention_for_sequence(model, seq, query_mask=None)
+        print_attention_summary(summary, seq)
+        print_attention_overview_table(summary)
+
+
 def analyze_model_attention(pth_path, device=None, log_path=None):
     """Main entry: load model and analyze attention on one test sequence.
 
-    When log_path points to the training log and it shows the shortcut
-    pattern (early positions failing while later ones succeed), the analysis
-    is split into FRONT/BACK segments (see compute_front_split) so the two
-    position groups' attention can be compared.
+    mixed_ab/mixed_abc checkpoints are analyzed per rule (see
+    _analyze_mixed_rules). When log_path points to the training log and it
+    shows the shortcut pattern (early positions failing while later ones
+    succeed), the analysis is split into FRONT/BACK segments (see
+    compute_front_split) so the two position groups' attention can be
+    compared.
     """
     if device is None:
         device = 'cuda' if torch.cuda.is_available() else 'cpu'
@@ -491,6 +504,11 @@ def analyze_model_attention(pth_path, device=None, log_path=None):
 
     print(f"Best test accuracy: {checkpoint.get('best_accuracy', 'N/A')}")
     print(f"Training epochs: {checkpoint.get('final_epoch', 'N/A')}")
+
+    if rec.get('is_mixed'):
+        # mixed_ab/mixed_abc: one full analysis per rule, then done.
+        _analyze_mixed_rules(model, config, p, rec)
+        return
 
     # Front/back split from the training log (single-rule tasks only).
     start_x, k = (None, None)

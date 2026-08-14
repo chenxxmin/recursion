@@ -24,7 +24,6 @@
           0.5,
           0.5
         ],
-        "TARGET_INIT_COVERAGE": 0.5,
         "MAX_UNIQUE_RATIO": 0.5,
         "USE_AB_TAG": false,
         "USE_CONDITIONAL_WTE": false,

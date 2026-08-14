@@ -3,9 +3,10 @@
 Generates data for several LinearRecurrenceRule rules (same modulus p, same
 order), each with its own RecurrenceDataset cycle traversal, then concatenates
 the per-rule samples and tags every sample with its rule index. Mirrors the
-legacy core.MixedABDataset pipeline step for step (same global-random call
+legacy MixedABDataset pipeline step for step (same global-random call
 sequence), so given the same rules and the same seed the produced samples are
-identical to the legacy implementation.
+identical to the legacy implementation (kept in tests/test_mixed_ab_compat.py
+as the golden master).
 """
 import random
 
@@ -50,6 +51,7 @@ class MixedRecurrenceDataset(Dataset):
         assert len(set(coeffs_list)) == len(coeffs_list), \
             "duplicate rule coeffs are not allowed"
         self.rules = list(rules)
+        self.length = length
         self.use_ab_tag = use_ab_tag
         self.missing_prob = missing_prob
         self.split = 'train'

@@ -3,7 +3,6 @@ import glob
 import json
 import os
 import re
-import shutil
 import subprocess
 import sys
 import queue
@@ -17,18 +16,13 @@ SCRIPT_DIR = os.path.dirname(os.path.abspath(__file__))
 if SCRIPT_DIR not in sys.path:
     sys.path.insert(0, SCRIPT_DIR)
 
+from protocol import BATCH_RUN_MERGED_FLAG
+
 BASE_CONFIG_PATH = 'src/config.json'
 DEFAULT_EXPERIMENTS_PATH = 'experiments/experiments.json'
 DEFAULT_BASE_DIR = '/data/cxm/recursion'
 DEFAULT_MODEL_BASE_DIR = '/data/cxm/models'
 
-# Exit code used by core.py when the model does not fit in GPU memory.
-EXIT_CUDA_OUT_OF_MEMORY = 77
-# Exit code used by core.py when CPU RSS exceeds MEMORY_LIMIT_GB.
-EXIT_MEMORY_LIMIT_EXCEEDED = 78
-
-# Marker written into merged configs; core.run_experiment refuses to run without it.
-BATCH_RUN_MERGED_FLAG = '_BATCH_RUN_MERGED'
 # Fallback when the merged config has no SAVE_PATH (should not happen since
 # build_merged_config auto-fills it; kept for defensive .get()).
 DEFAULT_SAVE_PATH = 'fibonacci_transformer.pth'
@@ -52,48 +46,18 @@ def save_json(path, data):
         json.dump(data, f, indent=2, ensure_ascii=False)
 
 
-NET_KEYS = [
-    'D_MODEL', 'N_HEAD', 'N_LAYER', 'MLP_RATIO', 'DROPOUT',
-    'USE_LEARNABLE_PE'
-]
-DATA_KEYS = [
-    'P', 'TASK', 'TRAIN_LEN', 'OOD_LEN', 'MAX_UNIQUE_RATIO',
-    'MIXED_AB_MAX_UNIQUE_RATIOS', 'AB_PAIRS', 'ABC_PAIRS', 'A', 'B', 'C',
-    'NUM_MASK'
-]
-TRAIN_KEYS = [
-    'BATCH_SIZE', 'LR', 'WEIGHT_DECAY', 'EPOCHS', 'RANDOM_SEED',
-    'FIRST_TASK_WEIGHT', 'ENTROPY_PENALTY_WEIGHT', 'EVAL_INTERVAL',
-    'EARLY_STOP_ACCURACY', 'EARLY_STOP_NO_IMPROVE', 'USE_GREEDY_GENERATE'
-]
-
-
-def _append_config_section(lines, title, keys, config):
-    lines.append("-" * SEP_WIDTH)
-    lines.append(title)
-    lines.append("-" * SEP_WIDTH)
-    for key in keys:
-        if key in config:
-            lines.append(f"{key:<25} {config[key]}")
-
-
 def format_config_table(config):
-    """Format merged config into a readable three-section table."""
-    lines = []
-    _append_config_section(lines, "Network Config", NET_KEYS, config)
-    _append_config_section(lines, "Dataset Config", DATA_KEYS, config)
+    """Format the full merged config as a sorted key table.
 
-    lines.append("-" * SEP_WIDTH)
-    lines.append("Training Config")
-    lines.append("-" * SEP_WIDTH)
-    lines.append(f"{'OPTIMIZER':<25} AdamW")
-    lines.append(f"{'SCHEDULER':<25} CosineAnnealingLR(T_max=EPOCHS)")
-    for key in TRAIN_KEYS:
-        if key in config:
-            lines.append(f"{key:<25} {config[key]}")
+    Every key passed to core.py is printed so the log is complete evidence
+    of what actually ran (the old section whitelists omitted live keys such
+    as MISSING_PROB / USE_AB_TAG / COND_FIX_*).
+    """
+    lines = ["-" * SEP_WIDTH, "Merged Config (all keys)", "-" * SEP_WIDTH]
+    for key in sorted(config):
+        lines.append(f"{key:<25} {config[key]}")
     lines.append("-" * SEP_WIDTH)
     lines.append("")
-
     return "\n".join(lines)
 
 
@@ -128,10 +92,14 @@ def _decode(raw):
     return raw.decode('utf-8', errors='replace').replace('\x00', '')
 
 
-def _spawn_python(statement, env, stderr=subprocess.PIPE):
-    """Launch `python -c` with src/ on sys.path, running the given statement."""
-    snippet = f"import sys; sys.path.insert(0, {SCRIPT_DIR!r}); {statement}"
-    return subprocess.Popen([sys.executable, '-c', snippet],
+def _spawn_script(script_name, args, env, stderr=subprocess.PIPE):
+    """Launch a src/ script as a subprocess: python src/<script_name> <args...>.
+
+    Script-file entry points are used instead of `python -c` strings so that
+    renaming/moving a function never silently breaks the command line; the
+    script's own directory lands on sys.path automatically.
+    """
+    return subprocess.Popen([sys.executable, os.path.join(SCRIPT_DIR, script_name), *args],
                             stdout=subprocess.PIPE, stderr=stderr, env=env)
 
 
@@ -145,12 +113,14 @@ def build_merged_config(exp, base_config, model_dir):
     name = exp['name']
     override = exp.get('config', {})
 
-    # 1. Read task type
+    # 1. Read task type. The top-level `task` field is the single routing
+    # source; a divergent TASK inside the experiment's config override is
+    # ignored (with a warning) so the two can never silently disagree.
     task = exp.get('task', 'addition')
-
-    # Auto-inject TASK into config if not explicitly set
-    if 'TASK' not in override:
-        override = {**override, 'TASK': task}
+    if 'TASK' in override and override['TASK'] != task:
+        print(f"[{name}] Warning: config.TASK={override['TASK']!r} ignored; "
+              f"routing uses top-level task={task!r}")
+    override = {**override, 'TASK': task}
 
     # 2. Merge config: main -> task defaults -> override
     merged = dict(base_config)
@@ -176,10 +146,8 @@ def run_attention_analysis(name, pth_path, log_path, env):
         f.write("Attention Analysis\n")
         f.write(f"{'='*70}\n")
 
-    analyze_process = _spawn_python(
-        f"from analyze_attention import analyze_model_attention; "
-        f"analyze_model_attention({pth_path!r}, log_path={log_path!r})",
-        env, stderr=subprocess.STDOUT)
+    analyze_process = _spawn_script('analyze_attention.py', [pth_path, log_path],
+                                    env, stderr=subprocess.STDOUT)
 
     with open(log_path, 'a', encoding='utf-8') as f:
         for raw in analyze_process.stdout:
@@ -187,8 +155,12 @@ def run_attention_analysis(name, pth_path, log_path, env):
             f.write(line)
             f.flush()
 
-    analyze_process.wait()
-    print(f"[{datetime.now().strftime('%H:%M:%S')}] Attention analysis completed: {name}")
+    analyze_ret = analyze_process.wait()
+    if analyze_ret != 0:
+        print(f"[{datetime.now().strftime('%H:%M:%S')}] Warning: attention analysis for "
+              f"{name} exited with code {analyze_ret}; see {log_path} for details")
+    else:
+        print(f"[{datetime.now().strftime('%H:%M:%S')}] Attention analysis completed: {name}")
 
 
 def run_single(exp, base_config, dirs, concurrency=1, gpu_id=None):
@@ -198,83 +170,82 @@ def run_single(exp, base_config, dirs, concurrency=1, gpu_id=None):
     tmp_config_path = f"config_tmp_{name}.json"
     save_json(tmp_config_path, merged)
 
-    log_path = os.path.join(dirs['log'], f"{name}.log")
-    start_time = datetime.now()
-    gpu_label = f"cuda:{gpu_id}" if gpu_id is not None else "cpu"
-    print(f"[{start_time.strftime('%H:%M:%S')}] Start experiment: {name} on {gpu_label}")
+    try:
+        log_path = os.path.join(dirs['log'], f"{name}.log")
+        start_time = datetime.now()
+        gpu_label = f"cuda:{gpu_id}" if gpu_id is not None else "cpu"
+        print(f"[{start_time.strftime('%H:%M:%S')}] Start experiment: {name} on {gpu_label}")
 
-    env = {**os.environ, 'PYTHONUNBUFFERED': '1'}
-    if gpu_id is not None:
-        env['CUDA_VISIBLE_DEVICES'] = str(gpu_id)
+        env = {**os.environ, 'PYTHONUNBUFFERED': '1'}
+        if gpu_id is not None:
+            env['CUDA_VISIBLE_DEVICES'] = str(gpu_id)
 
-    # Separate stdout and stderr:
-    # - stdout: training log (clean model output)
-    # - stderr: errors/warnings (PyTorch/CUDA low-level output, may contain null bytes)
-    process = _spawn_python(
-        f"from core import run_experiment; run_experiment({tmp_config_path!r})",
-        env, stderr=subprocess.PIPE)
+        # Separate stdout and stderr:
+        # - stdout: training log (clean model output)
+        # - stderr: errors/warnings (PyTorch/CUDA low-level output, may contain null bytes)
+        process = _spawn_script('core.py', [tmp_config_path], env, stderr=subprocess.PIPE)
 
-    err_log_path = os.path.join(dirs['log'], f"{name}.err")
+        err_log_path = os.path.join(dirs['log'], f"{name}.err")
 
-    def read_stdout():
-        with open(log_path, 'w', encoding='utf-8') as f:
-            f.write(f"=== Experiment: {name} ===\n")
-            f.write(f"Time: {datetime.now().isoformat()}\n")
-            f.write(f"Task type: {task}\n")
-            f.write(f"GPU: {gpu_label}\n")
-            f.write("\n=== Merged Config ===\n")
-            f.write(format_config_table(merged_main))
-            f.write("\n--- output ---\n")
-            f.flush()
-            for raw in process.stdout:
-                line = _decode(raw)
-                f.write(line)
+        def read_stdout():
+            with open(log_path, 'w', encoding='utf-8') as f:
+                f.write(f"=== Experiment: {name} ===\n")
+                f.write(f"Time: {datetime.now().isoformat()}\n")
+                f.write(f"Task type: {task}\n")
+                f.write(f"GPU: {gpu_label}\n")
+                f.write("\n=== Merged Config ===\n")
+                f.write(format_config_table(merged_main))
+                f.write("\n--- output ---\n")
                 f.flush()
-
-    def read_stderr():
-        with open(err_log_path, 'w', encoding='utf-8') as f:
-            for raw in process.stderr:
-                line = _decode(raw)
-                if line.strip():
+                for raw in process.stdout:
+                    line = _decode(raw)
                     f.write(line)
                     f.flush()
 
-    stdout_thread = threading.Thread(target=read_stdout)
-    stderr_thread = threading.Thread(target=read_stderr)
-    stdout_thread.start()
-    stderr_thread.start()
+        def read_stderr():
+            with open(err_log_path, 'w', encoding='utf-8') as f:
+                for raw in process.stderr:
+                    line = _decode(raw)
+                    if line.strip():
+                        f.write(line)
+                        f.flush()
 
-    returncode = process.wait()
-    stdout_thread.join()
-    stderr_thread.join()
+        stdout_thread = threading.Thread(target=read_stdout)
+        stderr_thread = threading.Thread(target=read_stderr)
+        stdout_thread.start()
+        stderr_thread.start()
 
-    with open(log_path, 'a', encoding='utf-8') as f:
-        f.write(f"\n--- Return code: {returncode} ---\n")
+        returncode = process.wait()
+        stdout_thread.join()
+        stderr_thread.join()
 
-    # After experiment succeeds, run attention analysis and append to the same log
-    if returncode == 0:
-        pth_path = merged_main.get('SAVE_PATH', DEFAULT_SAVE_PATH)
-        if os.path.exists(pth_path):
-            run_attention_analysis(name, pth_path, log_path, env)
+        with open(log_path, 'a', encoding='utf-8') as f:
+            f.write(f"\n--- Return code: {returncode} ---\n")
+
+        # After experiment succeeds, run attention analysis and append to the same log
+        if returncode == 0:
+            pth_path = merged_main.get('SAVE_PATH', DEFAULT_SAVE_PATH)
+            if os.path.exists(pth_path):
+                run_attention_analysis(name, pth_path, log_path, env)
+            else:
+                print(f"[{datetime.now().strftime('%H:%M:%S')}] Warning: model file {pth_path} not found, skip attention analysis")
+
+        # Remove empty err log
+        if os.path.exists(err_log_path) and os.path.getsize(err_log_path) == 0:
+            os.remove(err_log_path)
+
+        end_time = datetime.now()
+        duration = (end_time - start_time).total_seconds()
+        if returncode == 0:
+            print(f"[{end_time.strftime('%H:%M:%S')}] Experiment completed: {name} ({duration:.0f}s), log: {log_path}")
         else:
-            print(f"[{datetime.now().strftime('%H:%M:%S')}] Warning: model file {pth_path} not found, skip attention analysis")
+            print(f"[{end_time.strftime('%H:%M:%S')}] Experiment failed: {name} ({duration:.0f}s), return code: {returncode}, log: {log_path}")
 
-    # Remove empty err log
-    if os.path.exists(err_log_path) and os.path.getsize(err_log_path) == 0:
-        os.remove(err_log_path)
-
-    # Clean up temp config files
-    if os.path.exists(tmp_config_path):
-        os.remove(tmp_config_path)
-
-    end_time = datetime.now()
-    duration = (end_time - start_time).total_seconds()
-    if returncode == 0:
-        print(f"[{end_time.strftime('%H:%M:%S')}] Experiment completed: {name} ({duration:.0f}s), log: {log_path}")
-    else:
-        print(f"[{end_time.strftime('%H:%M:%S')}] Experiment failed: {name} ({duration:.0f}s), return code: {returncode}, log: {log_path}")
-
-    return name, returncode == 0, returncode
+        return name, returncode == 0, returncode
+    finally:
+        # Clean up the temp config even on KeyboardInterrupt / spawn failure.
+        if os.path.exists(tmp_config_path):
+            os.remove(tmp_config_path)
 
 
 def main():
@@ -392,46 +363,17 @@ def main():
         else:
             return run_single(exp, base_config, dirs, effective_workers, None)
 
-    resource_stop = False
-
-    def handle_result(name, ok, returncode):
-        nonlocal resource_stop
-        results.append((name, ok))
-        if resource_stop:
-            return
-        if returncode == EXIT_CUDA_OUT_OF_MEMORY:
-            print(f"[{datetime.now().strftime('%H:%M:%S')}] Stopping batch: experiment {name} failed with CUDA out of memory")
-            resource_stop = True
-        elif returncode == EXIT_MEMORY_LIMIT_EXCEEDED:
-            print(f"[{datetime.now().strftime('%H:%M:%S')}] Stopping batch: experiment {name} exceeded CPU memory limit")
-            resource_stop = True
-
-    skip_reason = "due to earlier resource failure (CUDA OOM or memory limit)"
-
-    def skip_exp(exp):
-        print(f"Skipping {exp['name']} {skip_reason}")
-        results.append((exp['name'], False))
-
     if effective_workers == 1:
         # Avoid thread overhead for purely serial execution.
         for exp in experiments:
-            if resource_stop:
-                skip_exp(exp)
-                continue
-            name, ok, returncode = run_with_gpu(exp)
-            handle_result(name, ok, returncode)
+            name, ok, _ = run_with_gpu(exp)
+            results.append((name, ok))
     else:
-        submitted_futures = []
         with ThreadPoolExecutor(max_workers=effective_workers) as executor:
-            for exp in experiments:
-                if resource_stop:
-                    skip_exp(exp)
-                    continue
-                submitted_futures.append(executor.submit(run_with_gpu, exp))
-
-            for future in as_completed(submitted_futures):
-                name, ok, returncode = future.result()
-                handle_result(name, ok, returncode)
+            futures = [executor.submit(run_with_gpu, exp) for exp in experiments]
+            for future in as_completed(futures):
+                name, ok, _ = future.result()
+                results.append((name, ok))
 
     print("\n" + "=" * SEP_WIDTH)
     print("Experiment Summary")
@@ -439,17 +381,12 @@ def main():
     for name, ok in results:
         status = "[OK] Success" if ok else "[NG] Failed"
         print(f"{status}: {name}")
-    if resource_stop:
-        print("\n[Error] Batch stopped early because at least one experiment hit a resource limit (CUDA OOM or CPU memory limit).")
 
     # Run detailed summary
     summarize_experiments(dirs['log'])
 
     # Generate grouped plots (one figure per setting, all seeds overlaid)
     generate_grouped_plots(dirs['log'], dirs['plot'])
-
-    if resource_stop:
-        sys.exit(1)
 
 
 def generate_grouped_plots(log_dir, plot_dir):

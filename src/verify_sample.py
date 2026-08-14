@@ -29,30 +29,22 @@ if SCRIPT_DIR not in sys.path:
     sys.path.insert(0, SCRIPT_DIR)
 
 from analyze_attention import load_model
-from core import RecurrenceDataset
+from core import corrupt_window, missing_token_id
+from rules import LinearRecurrenceRule, single_rule_from_task, task_from_save_config
 
 COL_W = 5  # display width per position column
 MODEL_BASE = '/data/cxm/models'
 
 
 def build_single_rule(task, cfg):
-    """Return (init_len, next_fn, description) for a single-rule task."""
-    p = cfg['P']
-    # configs use uppercase A/B/C; checkpoints save lowercase a/b/c
-    get = lambda k: cfg.get(k.upper(), cfg.get(k.lower(), 1))
-    if task == 'addition':
-        a, b = get('a'), get('b')
-        desc = f"X(k)=({a}*X(k-1)+{b}*X(k-2)) mod {p}"
-        return 2, lambda s: (a * s[-1] + b * s[-2]) % p, desc
-    if task == 'tribonacci':
-        a, b, c = get('a'), get('b'), get('c')
-        desc = f"X(k)=({a}*X(k-1)+{b}*X(k-2)+{c}*X(k-3)) mod {p}"
-        return 3, lambda s: (a * s[-1] + b * s[-2] + c * s[-3]) % p, desc
-    if task == 'multiplication':
-        return 2, lambda s: (s[-1] * s[-2]) % p, f"X(k)=(X(k-1)*X(k-2)) mod {p}"
-    if task == 'nonlinear':
-        return 2, lambda s: (s[-1] * s[-1] + s[-2]) % p, f"X(k)=(X(k-1)^2+X(k-2)) mod {p}"
-    raise ValueError(f"unknown single-rule task: {task}")
+    """Return (init_len, next_fn, description) for a single-rule task.
+
+    Thin wrapper over rules.single_rule_from_task; next_fn closes over p and
+    takes only the sequence.
+    """
+    p = cfg.get('P', cfg.get('p'))
+    init_len, next_fn, desc = single_rule_from_task(task, cfg)
+    return init_len, (lambda s: next_fn(s, p)), desc
 
 
 def find_exp_config(pth_path, json_path):
@@ -118,18 +110,28 @@ def dispatch_and_log(args, script_stem, run_one):
     print(f"\n[output saved to {out_path}]")
 
 
-def run_one(args, exp_cfg, task, exp_name, pth_path):
-    model, checkpoint = load_model(pth_path, device='cpu')
-    ckpt_cfg = checkpoint['config']
+def resolve_experiment_cfg(ckpt_cfg, exp_cfg, task):
+    """Merge checkpoint + experiment configs and resolve the task name.
 
+    Returns (cfg, task, is_mixed). task may be None: the checkpoint fallback
+    applies (task_from_save_config normalizes the checkpoint vocabulary, e.g.
+    'multiplicative' -> 'multiplication').
+    """
     cfg = dict(ckpt_cfg)
-    cfg.update(exp_cfg)
+    if exp_cfg:
+        cfg.update(exp_cfg)
     cfg['P'] = cfg.get('P', cfg.get('p'))  # checkpoints save lowercase 'p'
     if task is None:
-        # checkpoint fallback: single-rule tasks save 'recurrence'; mixed save ab_pairs
-        task = cfg.get('recurrence') or ('mixed_ab' if cfg.get('ab_pairs') else 'addition')
-
+        task = task_from_save_config(cfg)
+        if task is None:  # mixed / dynamic checkpoint
+            task = cfg.get('recurrence') or ('mixed_ab' if cfg.get('ab_pairs') else 'addition')
     is_mixed = task in ('mixed_ab', 'mixed_abc') or (cfg.get('ab_pairs') and 'recurrence' not in cfg)
+    return cfg, task, is_mixed
+
+
+def run_one(args, exp_cfg, task, exp_name, pth_path):
+    model, checkpoint = load_model(pth_path, device='cpu')
+    cfg, task, is_mixed = resolve_experiment_cfg(checkpoint['config'], exp_cfg, task)
 
     # seed first so it also governs the mixed-rule pick
     if args.seed is not None:
@@ -144,8 +146,8 @@ def run_one(args, exp_cfg, task, exp_name, pth_path):
         order = cfg.get('order', len(pairs[0]))
         rule_idx = random.randrange(len(pairs))
         coeffs = pairs[rule_idx]
-        def next_fn(s, c=coeffs, p=p):
-            return sum(ci * si for ci, si in zip(c, reversed(s[-len(c):]))) % p
+        _next = LinearRecurrenceRule(coeffs=tuple(coeffs), p=p).next_fn()
+        next_fn = lambda s: _next(s, p)
         init_len = order
         desc = f"{task} rule {rule_idx}: coeffs={coeffs} mod {p}"
     else:
@@ -160,22 +162,15 @@ def run_one(args, exp_cfg, task, exp_name, pth_path):
     while len(seq) < length:
         seq.append(next_fn(seq))
 
-    # missing corruption (same logic as the dataset)
+    # missing corruption (same rule as the dataset)
     missing_prob = cfg.get('MISSING_PROB', 0.0)
     corrupted = bool(missing_prob > 0 and not args.clean)
     if corrupted:
-        n_rules = len(cfg.get('ab_pairs') or cfg.get('AB_PAIRS') or cfg.get('ABC_PAIRS') or [1])
-        use_ab_tag_cfg = cfg.get('use_ab_tag', cfg.get('USE_AB_TAG', False))
-        missing_token = p + n_rules if (is_mixed and use_ab_tag_cfg) else p
-        helper = RecurrenceDataset(p=p, init_len=init_len, length=length, verbose=False,
-                                   missing_prob=missing_prob,
-                                   miss_len=cfg.get('MISS_LEN', 1),
-                                   miss_second=cfg.get('MISS_SECOND', False),
-                                   missing_token=missing_token,
-                                   num_mask=cfg.get('NUM_MASK', 0) or 0)
-        # _corrupt corrupts the tensor in place and returns the mask (unused here)
         window = torch.tensor(seq, dtype=torch.long)
-        helper._corrupt(window, True)
+        missing_token = corrupt_window(
+            window, True, p=p, init_len=init_len, missing_prob=missing_prob,
+            miss_len=cfg.get('MISS_LEN', 1), miss_second=cfg.get('MISS_SECOND', False),
+            missing_token=missing_token_id(cfg, p, is_mixed))
         view = window.tolist()
     else:
         view = list(seq)

@@ -20,7 +20,6 @@ import argparse
 import glob
 import os
 import re
-import sys
 from collections import defaultdict
 
 MIN_PRINT_VAL = 0.05   # overview table cells below this are omitted

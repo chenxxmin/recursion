@@ -7,5 +7,7 @@ src/nohup.out
 *.pth
 config_tmp_*.json
 .DS_Store
+session_*.zip
+circle.png
 # Experiment outputs under /data/cxm (not in repo)
 /data/

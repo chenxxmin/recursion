@@ -93,37 +93,37 @@ x_k = a * x_{k-2} + b * x_{k-1}  (mod P)
 ## 2. 公共训练设置
 
 以下设置来自 `src/config.json` 中的 `main` 字段，除非被子任务配置或 `experiments.json` 覆盖。
+**默认值一律以 `src/config.json` 为准**（下表只列含义，不再复制数值，避免双源漂移）。
 
-| 配置项 | 默认值 | 说明 |
-|--------|--------|------|
-| `TASK` | `addition` | 当前任务类型 |
-| `P` | `53` | 模数 |
-| `D_MODEL` | `64` | 模型隐藏维度 |
-| `N_HEAD` | `1` | 注意力头数 |
-| `N_LAYER` | `1` | Transformer block 层数 |
-| `BATCH_SIZE` | `128` | 每个 batch 的序列数 |
-| `EPOCHS` | `10000` | 最大训练 epoch 数 |
-| `LR` | `0.0003` | AdamW 学习率 |
-| `WEIGHT_DECAY` | `1` | AdamW weight decay |
-| `TRAIN_LEN` | `16` | 训练序列长度 |
-| `OOD_LEN` | `32` | OOD 测试序列长度 |
-| `DROPOUT` | `0.0` | Dropout 概率 |
-| `USE_LEARNABLE_PE` | `false` | 是否使用可学习位置编码（false 使用 RoPE） |
-| `MLP_RATIO` | `4` | MLP 隐藏层相对 d_model 的倍数 |
-| `USE_GREEDY_GENERATE` | `true` | 生成时是否使用贪心解码（仅对 `MixedABTransformer` 生效） |
-| `MAX_UNIQUE_RATIO` | `0.5` | 暴露给训练的初始状态比例（单任务 / mixed_ab 默认 fallback） |
-| `ENTROPY_PENALTY_WEIGHT` | `0.0` | 注意力熵惩罚权重 |
-| `FIRST_TASK_WEIGHT` | `1.0` | 第一个预测位置的损失权重 |
-| `NUM_MASK` | `null` | `null` 表示使用任务默认的 mask 起始位置。**注意：当前代码中 `0` 是字面值**（首位置也计入损失与评估）；旧代码（≤2026-07-08，如 05fc707）把 `0` 当"未设置"回退到任务默认值。**今后配置不要再写 `NUM_MASK: 0`**——想排除"只看 x0 预测 x1"这个不可预测的首位置时，应显式写 `1`（参考 addition_p127_tr64_ood128 与 addition-p127w64 的口径差异） |
-| `MISSING_PROB` | `0.0` | >0 时启用缺失值污损：train/test 窗口中 index ≥ init_len 的位置按该概率触发污损段，被污损位置的预测损失与正确率均不计入（其后一位仍计入，用于测跨缺口补全能力）。仅单规则与 mixed_ab/mixed_abc 任务支持 |
-| `MISS_LEN` | `1` | 污损段最大长度：命中后污损**随机长度 ∈ [1, MISS_LEN]** 的连续段，段后第一个位置强制干净；若整个窗口没有任何一段达到 MISS_LEN 则重摇直至达到；段尾可在窗口末尾截断 |
-| `MISS_SECOND` | `false` | true 时第 2 项起连续 MISS_LEN 项**必定**缺失，段后第一个位置强制干净（不会与随机段合并），随机扫描从第 MISS_LEN+2 项开始；false 为原逻辑。注意：此模式下训练样本前 init_len 个 token 不再是真实初始状态，post-train 生成测试的 exposed/unexposed 统计不可用 |
-| `PREDICT_MISSING` | `false` | 污损位的指标口径：false = mask 掉不计入；true = 输入污损序列但以**污损前的值**为目标，污损位必须填出原值并计入损失与正确率（单规则与 mixed_ab/mixed_abc 支持） |
-| `EVAL_INTERVAL` | `20` | 每隔多少 epoch 评估一次 |
-| `EARLY_STOP_NO_IMPROVE` | `3000` | 测试准确率多久未提升则早停 |
-| `EARLY_STOP_ACCURACY` | `0.99` | 测试准确率达到该值则早停 |
-| `RANDOM_SEED` | `42` | 随机种子 |
-| `SAVE_PATH` | `fibonacci_transformer.pth` | 模型保存路径；由 `batch_run.py` 自动覆盖为 `/data/cxm/models/{实验名}.pth` |
+| 配置项 | 说明 |
+|--------|------|
+| `TASK` | 当前任务类型 |
+| `P` | 模数 |
+| `D_MODEL` | 模型隐藏维度 |
+| `N_HEAD` | 注意力头数 |
+| `N_LAYER` | Transformer block 层数 |
+| `BATCH_SIZE` | 每个 batch 的序列数 |
+| `EPOCHS` | 最大训练 epoch 数 |
+| `LR` | AdamW 学习率 |
+| `WEIGHT_DECAY` | AdamW weight decay |
+| `TRAIN_LEN` | 训练序列长度 |
+| `OOD_LEN` | OOD 测试序列长度 |
+| `DROPOUT` | Dropout 概率 |
+| `USE_LEARNABLE_PE` | 是否使用可学习位置编码（false 使用 RoPE） |
+| `MLP_RATIO` | MLP 隐藏层相对 d_model 的倍数 |
+| `MAX_UNIQUE_RATIO` | 暴露给训练的初始状态比例（单任务 / mixed_ab 默认 fallback） |
+| `ENTROPY_PENALTY_WEIGHT` | 注意力熵惩罚权重 |
+| `FIRST_TASK_WEIGHT` | 第一个预测位置的损失权重 |
+| `NUM_MASK` | `null` 表示使用任务默认的 mask 起始位置。**注意：当前代码中 `0` 是字面值**（首位置也计入损失与评估）；旧代码（≤2026-07-08，如 05fc707）把 `0` 当"未设置"回退到任务默认值。**今后配置不要再写 `NUM_MASK: 0`**——想排除"只看 x0 预测 x1"这个不可预测的首位置时，应显式写 `1`（参考 addition_p127_tr64_ood128 与 addition-p127w64 的口径差异） |
+| `MISSING_PROB` | >0 时启用缺失值污损：train/test 窗口中 index ≥ init_len 的位置按该概率触发污损段，被污损位置的预测损失与正确率均不计入（其后一位仍计入，用于测跨缺口补全能力）。仅单规则与 mixed_ab/mixed_abc 任务支持 |
+| `MISS_LEN` | 污损段最大长度：命中后污损**随机长度 ∈ [1, MISS_LEN]** 的连续段，段后第一个位置强制干净；若整个窗口没有任何一段达到 MISS_LEN 则重摇直至达到；段尾可在窗口末尾截断 |
+| `MISS_SECOND` | true 时第 2 项起连续 MISS_LEN 项**必定**缺失，段后第一个位置强制干净（不会与随机段合并），随机扫描从第 MISS_LEN+2 项开始；false 为原逻辑。注意：此模式下训练样本前 init_len 个 token 不再是真实初始状态，post-train 生成测试的 exposed/unexposed 统计不可用 |
+| `PREDICT_MISSING` | 污损位的指标口径：false = mask 掉不计入；true = 输入污损序列但以**污损前的值**为目标，污损位必须填出原值并计入损失与正确率（单规则与 mixed_ab/mixed_abc 支持） |
+| `EVAL_INTERVAL` | 每隔多少 epoch 评估一次 |
+| `EARLY_STOP_NO_IMPROVE` | 测试准确率多久未提升则早停 |
+| `EARLY_STOP_ACCURACY` | 测试准确率达到该值则早停 |
+| `RANDOM_SEED` | 随机种子 |
+| `SAVE_PATH` | 模型保存路径；由 `batch_run.py` 自动覆盖为 `{model-base-dir}/{批次名}/{实验名}.pth` |
 
 ### 2.1 各任务对公共配置的覆盖
 
@@ -133,7 +133,7 @@ x_k = a * x_{k-2} + b * x_{k-1}  (mod P)
 | `multiplication` | 无覆盖，使用 `main` 默认配置 |
 | `nonlinear` | 无覆盖，使用 `main` 默认配置 |
 | `tribonacci` | `P: 23`，`A: 1`，`B: 2`，`C: 3` |
-| `mixed_ab` | `USE_AB_TAG: false`，`USE_CONDITIONAL_WTE: false`，`COND_WTE_SHARED_RATIO: 0.0`，`MIXED_AB_MAX_UNIQUE_RATIOS: [0.5, 0.5]` |
+| `mixed_ab` | `USE_AB_TAG: false`，`USE_CONDITIONAL_WTE: false`，`COND_WTE_SHARED_RATIO: 0.0`，`MIXED_AB_MAX_UNIQUE_RATIOS: [0.7, 0.7]` |
 | `dynamic_mixed` | `P: 53`，`AB_PAIRS: [[1,1],[1,2]]`，`NUM_TRAIN_SAMPLES: 10000`，`NUM_TEST_SAMPLES: 2000`，`TRAIN_LEN: 16`，`OOD_LEN: 32` |
 
 ### 2.2 训练流程通用设置
@@ -345,9 +345,9 @@ pad_token_id = P
 3. 对循环做滑动窗口，得到长度为 `TRAIN_LEN` 的序列。
 4. 根据 `MAX_UNIQUE_RATIO` 决定前多少个初始状态进入训练集，其余进入测试集。
 
-### 4.2 多规则数据集（MixedABDataset）
+### 4.2 多规则数据集（MixedRecurrenceDataset）
 
-类：`src/core.py::MixedABDataset`
+类：`src/mixed_dataset.py::MixedRecurrenceDataset`（旧实现 `MixedABDataset` 已从 core.py 移出，保留在 `tests/test_mixed_ab_compat.py` 作为 golden master 对照）
 
 1. 对每条 `(a, b)` 规则分别调用 `RecurrenceDataset` 生成训练/测试样本。
 2. 每条规则的暴露比例由 `MIXED_AB_MAX_UNIQUE_RATIOS` 控制。
@@ -383,13 +383,16 @@ if mixed_ab:
 
 ### 5.2 batch 类型区分
 
-`train_epoch` 与 `evaluate` 使用显式的 `BatchTag` 区分不同 collate 模式：
+`train_epoch` 与 `evaluate` 使用显式的 `BatchTag`（IntEnum）区分不同 collate 模式：
 
 | Tag | 来源 | 额外张量 |
 |-----|------|----------|
-| `BatchTag['plain']` | `collate_fn` | 无 |
-| `BatchTag['mixed_ab']` | `mixed_ab_collate_fn` | `ab_indices` |
-| `BatchTag['dynamic_mixed']` | `dynamic_mixed_collate_fn` | `loss_mask` |
+| `BatchTag.PLAIN` | `collate_fn` | 无 |
+| `BatchTag.DYNAMIC_MIXED` | `collate_fn_masked` / `dynamic_mixed_collate_fn` | `loss_mask` |
+| `BatchTag.PLAIN_TARGET` | `collate_fn_predict` | 干净目标序列（PREDICT_MISSING） |
+| `BatchTag.MIXED_AB` | `mixed_ab_collate_fn` | `ab_indices` |
+| `BatchTag.MIXED_AB_MASKED` | `mixed_ab_collate_fn_masked` | `ab_indices` + `loss_mask` |
+| `BatchTag.MIXED_AB_TARGET` | `mixed_ab_collate_fn_predict` | `ab_indices` + 干净目标序列 |
 
 不再通过张量 `ndim` 推断 batch 类型。
 
@@ -435,13 +438,13 @@ if mixed_ab:
 
 | 功能 | 文件与位置 |
 |------|------------|
-| 数据生成 | `src/core.py::RecurrenceDataset`，`src/core.py::MixedABDataset`，`src/core.py::DynamicMixedDataset` |
+| 数据生成 | `src/core.py::RecurrenceDataset`，`src/mixed_dataset.py::MixedRecurrenceDataset`，`src/core.py::DynamicMixedDataset` |
 | 模型定义 | `src/core.py::FibonacciTransformer`，`src/core.py::MixedABTransformer` |
 | 注意力层 | `src/core.py::CausalSelfAttention` |
 | RoPE 实现 | `src/core.py::RotaryEmbedding`，`src/core.py::apply_rotary_emb` |
 | 训练流程 | `src/core.py::run_training_engine`，`src/core.py::train_epoch`，`src/core.py::evaluate` |
 | 参数冻结 | `src/core.py::freeze_partial` |
-| 配置入口 | `src/core.py::run_experiment`（仅由 `src/batch_run.py` 调用） |
+| 配置入口 | `src/core.py::run_experiment`（由 `src/batch_run.py` 以 `python src/core.py <config>` 子进程方式调用） |
 | 批量运行 | `src/batch_run.py` |
 | 注意力可视化 | `src/analyze_attention.py` |
 | 圆结构验证（傅里叶/单位圆） | `src/verify_circle.py`（独立脚本，不在默认流程中运行） |
@@ -452,10 +455,9 @@ if mixed_ab:
 ## 8. 备注
 
 - 当前所有实验默认使用 **RoPE**（`USE_LEARNABLE_PE=false`），可切换为可学习位置编码。
-- `USE_GREEDY_GENERATE` 配置项仅对 `MixedABTransformer` 生效；单任务 `FibonacciTransformer` 中该属性未参与初始化。
-- `experiments.json` 中定义的实验会覆盖 `config.json` 的对应字段，`batch_run.py` 负责配置合并与批量执行。
+- `experiments.json` 中定义的实验会覆盖 `config.json` 的对应字段，`batch_run.py` 负责配置合并与批量执行；实验路由的唯一来源是每个实验条目的顶层 `task` 字段。
 - `src/main.py` 已删除，所有运行必须通过 `src/batch_run.py`。
 - `.gitignore` 已忽略训练产物：`*.log`、`*.err`、`*.pth`、`src/nohup.out`、`config_tmp_*.json` 等。
-- 模型默认保存路径：`/data/cxm/models/{实验名}/{实验名}.pth`（由 `batch_run.py` 自动设置，可在 `experiments.json` 中通过 `SAVE_PATH` 覆盖）。
-- 日志与绘图输出路径：`/data/cxm/recursion/{实验名}/`（日志和绘图都直接放在该目录下）。
+- 模型默认保存路径：`/data/cxm/models/{批次名}/{实验名}.pth`（由 `batch_run.py` 自动设置，可在 `experiments.json` 中通过 `SAVE_PATH` 覆盖）。
+- 日志与绘图输出路径：`/data/cxm/recursion/{批次名}/logs/` 与 `/data/cxm/recursion/{批次名}/plots/`（批次名 = 实验 JSON 文件名去扩展名）。
 - 可通过 `--base-dir` 和 `--model-base-dir` 参数修改这两个根目录，默认分别为 `/data/cxm/recursion` 和 `/data/cxm/models`。

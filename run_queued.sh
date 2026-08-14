@@ -7,7 +7,7 @@
 # 用法（在仓库根目录）：bash run_queued.sh
 # 建议配合 tmux 或 nohup 使用：nohup bash run_queued.sh > queued_run.log 2>&1 &
 #
-# 说明：等待条件只匹配本用户的训练进程（batch_run.py / core.run_experiment），
+# 说明：等待条件只匹配本用户的训练进程（batch_run.py 主进程 / 它派生的 core.py 子进程），
 # 其他用户的 python 不影响——batch_run.py 会自动挑选空闲 GPU
 # （nvidia-smi 显存 <100MB 视为空闲），别人的进程占着的卡会被自动跳过。
 
@@ -16,8 +16,8 @@ cd "$(dirname "$0")"
 
 PYTHON_BIN="${PYTHON_BIN:-python}"
 POLL_SEC=60
-# 训练进程特征：batch_run 主进程 或 它派生的 core.run_experiment 子进程
-TRAIN_PATTERN='batch_run\.py|from core import run_experiment'
+# 训练进程特征：batch_run 主进程 或 它派生的 core.py 训练子进程
+TRAIN_PATTERN='batch_run\.py|core\.py'
 
 ts() { date '+%F %T'; }
 

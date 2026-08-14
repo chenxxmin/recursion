@@ -41,6 +41,69 @@ class LinearRecurrenceRule:
         return fn
 
 
+def single_rule_from_task(task, cfg):
+    """Resolve a single-rule task to (init_len, next_fn, recurrence_name).
+
+    task: 'addition' | 'multiplication' | 'tribonacci' | 'nonlinear'.
+    cfg accepts merged-config keys (P, A/B/C) or checkpoint keys (p, a/b/c);
+    missing coefficients default to 1. The returned next_fn takes (seq, p),
+    matching RecurrenceDataset's recurrence_fn contract.
+    """
+    p = cfg.get('P', cfg.get('p'))
+    get = lambda k: cfg.get(k.upper(), cfg.get(k.lower(), 1))
+    if task == 'addition':
+        a, b = get('a'), get('b')
+        name = f"X(k)=({a}*X(k-1)+{b}*X(k-2)) mod {p}"
+        return 2, (lambda seq, p: (a * seq[-1] + b * seq[-2]) % p), name
+    if task == 'multiplication':
+        return 2, (lambda seq, p: (seq[-1] * seq[-2]) % p), f"X(k)=(X(k-1)*X(k-2)) mod {p}"
+    if task == 'tribonacci':
+        a, b, c = get('a'), get('b'), get('c')
+        name = f"X(k)=({a}*X(k-1)+{b}*X(k-2)+{c}*X(k-3)) mod {p}"
+        return 3, (lambda seq, p: (a * seq[-1] + b * seq[-2] + c * seq[-3]) % p), name
+    if task == 'nonlinear':
+        # The state map (x,y) -> (y, y^2+x) is bijective for any p
+        # (invert: x = z - y^2), so all states lie on pure cycles.
+        return 2, (lambda seq, p: (seq[-1] * seq[-1] + seq[-2]) % p), f"X(k)=(X(k-1)^2+X(k-2)) mod {p}"
+    raise ValueError(f"unknown single-rule task: {task}")
+
+
+def save_config_extra(task, cfg):
+    """Checkpoint save_config entries for a single-rule task (the checkpoint
+    vocabulary: lowercase a/b/c and the 'recurrence' name)."""
+    get = lambda k: cfg.get(k.upper(), cfg.get(k.lower(), 1))
+    if task == 'addition':
+        return {'a': get('a'), 'b': get('b'), 'recurrence': 'addition'}
+    if task == 'multiplication':
+        return {'recurrence': 'multiplicative'}
+    if task == 'tribonacci':
+        return {'a': get('a'), 'b': get('b'), 'c': get('c'), 'recurrence': 'tribonacci'}
+    if task == 'nonlinear':
+        return {'recurrence': 'nonlinear'}
+    raise ValueError(f"unknown single-rule task: {task}")
+
+
+def task_from_save_config(config):
+    """Map a checkpoint save_config to its single-rule task name.
+
+    Returns None for mixed_ab/mixed_abc/dynamic_mixed checkpoints (those save
+    ab_pairs instead of a single recurrence spec). Defaults to 'addition' for
+    old a/b-only or minimal configs.
+    """
+    recurrence = config.get('recurrence')
+    if recurrence == 'dynamic_mixed':
+        return None
+    if recurrence is None and 'ab_pairs' in config:
+        return None  # mixed_ab/mixed_abc
+    if 'c' in config or recurrence == 'tribonacci':
+        return 'tribonacci'
+    if recurrence == 'multiplicative':
+        return 'multiplication'
+    if recurrence == 'nonlinear':
+        return 'nonlinear'
+    return 'addition'
+
+
 def rules_from_config(cfg, order):
     """Build the rule list for a mixed task from a merged config dict.
 
@@ -61,5 +124,7 @@ def rules_from_config(cfg, order):
         if len(coeffs) != order:
             raise ValueError(
                 f"rule {entry} has {len(coeffs)} coefficients, expected {order}")
+        if any(not 0 <= c < p for c in coeffs):
+            raise ValueError(f"rule {entry} has a coefficient outside [0, {p})")
         rules.append(LinearRecurrenceRule(coeffs=coeffs, p=p))
     return rules
