@@ -14,13 +14,13 @@ import torch
 from torch.utils.data import Dataset
 
 import core
-from mixed_dataset import MixedRecurrenceDataset
+from datasets import MixedRecurrenceDataset
 from rules import LinearRecurrenceRule
 
 
 # Legacy implementation, kept here ONLY as the golden master for the
 # compatibility tests below. Production code uses
-# mixed_dataset.MixedRecurrenceDataset. Do not "improve" or restyle this
+# datasets.MixedRecurrenceDataset. Do not "improve" or restyle this
 # class -- the tests pin sample-for-sample equivalence against it, including
 # the exact global-RNG call sequence.
 class MixedABDataset(Dataset):

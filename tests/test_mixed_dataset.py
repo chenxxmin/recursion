@@ -1,11 +1,11 @@
-"""Unit tests for src/mixed_dataset.py (pure asserts; also pytest-compatible)."""
+"""Unit tests for MixedRecurrenceDataset in src/datasets.py (pure asserts; also pytest-compatible)."""
 import os
 import random
 import sys
 
 sys.path.insert(0, os.path.join(os.path.dirname(os.path.abspath(__file__)), '..', 'src'))
 
-from mixed_dataset import MixedRecurrenceDataset
+from datasets import MixedRecurrenceDataset
 from rules import LinearRecurrenceRule
 
 

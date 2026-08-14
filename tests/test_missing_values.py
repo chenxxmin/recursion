@@ -199,7 +199,7 @@ def test_first_task_weight_passthrough():
 
 def _make_mixed(missing_prob, use_ab_tag, seed=0, p=7, length=8, num_samples=20,
                 num_mask=2, miss_len=1):
-    from mixed_dataset import MixedRecurrenceDataset
+    from datasets import MixedRecurrenceDataset
     rules = [LinearRecurrenceRule(coeffs=(1, 1), p=p),
              LinearRecurrenceRule(coeffs=(1, 2), p=p)]
     random.seed(seed)
@@ -342,7 +342,7 @@ def test_predict_missing_mixed_tag_mode():
     """Tag mode with PREDICT_MISSING: the flag token is prepended to BOTH the
     corrupted view and the clean target sequence."""
     from core import _unpack_batch, mixed_ab_collate_fn_predict
-    from mixed_dataset import MixedRecurrenceDataset
+    from datasets import MixedRecurrenceDataset
     p, n_rules = 7, 2
     miss = p + n_rules
     rules = [LinearRecurrenceRule(coeffs=(1, 1), p=p),
