@@ -438,13 +438,14 @@ if mixed_ab:
 
 | 功能 | 文件与位置 |
 |------|------------|
-| 数据生成 | `src/core.py::RecurrenceDataset`，`src/mixed_dataset.py::MixedRecurrenceDataset`，`src/core.py::DynamicMixedDataset` |
-| 模型定义 | `src/core.py::FibonacciTransformer`，`src/core.py::MixedABTransformer` |
-| 注意力层 | `src/core.py::CausalSelfAttention` |
-| RoPE 实现 | `src/core.py::RotaryEmbedding`，`src/core.py::apply_rotary_emb` |
-| 训练流程 | `src/core.py::run_training_engine`，`src/core.py::train_epoch`，`src/core.py::evaluate` |
-| 参数冻结 | `src/core.py::freeze_partial` |
-| 配置入口 | `src/core.py::run_experiment`（由 `src/batch_run.py` 以 `python src/core.py <config>` 子进程方式调用） |
+| 数据生成 | `src/datasets.py::RecurrenceDataset`，`src/datasets.py::MixedRecurrenceDataset`，`src/datasets.py::DynamicMixedDataset` |
+| 模型定义 | `src/models.py::FibonacciTransformer`，`src/models.py::MixedABTransformer` |
+| 注意力层 | `src/models.py::CausalSelfAttention` |
+| RoPE 实现 | `src/models.py::RotaryEmbedding`，`src/models.py::apply_rotary_emb` |
+| 训练流程 | `src/training.py::run_training_engine`，`src/training.py::train_epoch`，`src/training.py::evaluate` |
+| 参数冻结 | `src/training.py::freeze_partial` |
+| 训练后最终生成测试 | `src/final_eval.py::_run_mixed_ab_final_test`，`src/final_eval.py::_run_single_recurrence_final_test` |
+| 配置入口 | `src/experiment.py::run_experiment`（`src/core.py` 为入口壳并 re-export 该函数；由 `src/batch_run.py` 以 `python src/core.py <config>` 子进程方式调用） |
 | 批量运行 | `src/batch_run.py` |
 | 注意力可视化 | `src/analyze_attention.py` |
 | 圆结构验证（傅里叶/单位圆） | `src/verify_circle.py`（独立脚本，不在默认流程中运行） |

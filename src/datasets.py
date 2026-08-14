@@ -2,9 +2,9 @@
 
 Extracted from core.py (core.py split, step 2). MixedRecurrenceDataset was
 merged in from the legacy mixed-rule dataset module, which eliminated the
-circular import between that module and core. core.py re-exports every
-symbol defined here, so existing `from core import ...` users (training
-entry point, analysis scripts, tests) are unaffected.
+circular import between that module and core. core.py re-exports the
+externally referenced symbols defined here, so existing `from core import
+...` users (analysis scripts, tests) are unaffected.
 """
 import random
 from enum import IntEnum

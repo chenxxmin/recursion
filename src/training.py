@@ -1,9 +1,9 @@
 """Training loop and batch-handling helpers for the recurrence experiments.
 
 Extracted from core.py (core.py split, step 3). Depends on datasets (BatchTag)
-only; never imports core. core.py re-exports every symbol defined here, so
-existing `from core import ...` users (training entry point, tests) are
-unaffected.
+only; never imports core. core.py re-exports the externally referenced
+symbols defined here (_unpack_batch, _sample_seq), so existing
+`from core import ...` users (tests) are unaffected.
 """
 import os
 import sys

@@ -4,8 +4,8 @@ Extracted from core.py (core.py split, step 4). run_experiment is now a slim
 orchestrator: parse config -> branch into _prepare_* -> run_training_engine
 -> stage-3 final generation test (final_eval). Depends on
 models/datasets/training/final_eval/rules/protocol; never imports core.
-core.py re-exports every symbol defined here (incl. run_experiment, which the
-core.py __main__ entry and tests import).
+core.py re-exports run_experiment (used by its __main__ entry and tests)
+and _prepare_mixed_recurrence (used by tests).
 """
 import json
 import os

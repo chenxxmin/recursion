@@ -7,8 +7,8 @@ block moved verbatim into a function, with the formerly enclosing-scope
 variables (P/TRAIN_LEN/OOD_LEN -> p/train_len/ood_len etc.) passed explicitly
 as parameters, so RNG call order and stdout are unchanged. Depends on
 training (_sample_seq, _default_loss_mask); never imports core. core.py
-re-exports every symbol defined here, so existing `from core import ...`
-users are unaffected.
+does not re-export these symbols (no external `core.<name>` references
+exist).
 """
 import itertools
 
