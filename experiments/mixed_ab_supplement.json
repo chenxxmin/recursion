@@ -1,5 +1,5 @@
 {
-  "concurrency": 8,
+  "concurrency": 4,
   "experiments": [
     {
       "name": "mixed_basic_d4096l1r16h4_P53_N2_e0.5_seed0",
