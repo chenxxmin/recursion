@@ -2,6 +2,51 @@
   "concurrency": 8,
   "experiments": [
     {
+      "name": "addition_a2b2_d64l1r4h4_P53_seed0",
+      "task": "addition",
+      "config": {
+        "RANDOM_SEED": 0,
+        "P": 53,
+        "A": 2,
+        "B": 2,
+        "MAX_UNIQUE_RATIO": 0.7,
+        "D_MODEL": 64,
+        "N_HEAD": 4,
+        "N_LAYER": 1,
+        "MLP_RATIO": 4
+      }
+    },
+    {
+      "name": "addition_a2b2_d64l1r4h4_P53_seed999",
+      "task": "addition",
+      "config": {
+        "RANDOM_SEED": 999,
+        "P": 53,
+        "A": 2,
+        "B": 2,
+        "MAX_UNIQUE_RATIO": 0.7,
+        "D_MODEL": 64,
+        "N_HEAD": 4,
+        "N_LAYER": 1,
+        "MLP_RATIO": 4
+      }
+    },
+    {
+      "name": "addition_a2b2_d64l1r4h4_P53_seed12345",
+      "task": "addition",
+      "config": {
+        "RANDOM_SEED": 12345,
+        "P": 53,
+        "A": 2,
+        "B": 2,
+        "MAX_UNIQUE_RATIO": 0.7,
+        "D_MODEL": 64,
+        "N_HEAD": 4,
+        "N_LAYER": 1,
+        "MLP_RATIO": 4
+      }
+    },
+    {
       "name": "addition_a2b2_d64l1r4h1_P53_seed0",
       "task": "addition",
       "config": {
