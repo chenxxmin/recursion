@@ -470,11 +470,11 @@ class MixedRecurrenceDataset(Dataset):
 
     Samples are (seq, rule_idx) pairs; with use_ab_tag=True a leading flag
     token p + rule_idx is prepended to every sequence. The prepare function
-    (core._prepare_mixed_recurrence) selects the collate matching the item
+    (experiment._prepare_mixed_recurrence) selects the collate matching the item
     layout: mixed_ab_collate_fn / _masked / _predict.
 
     With missing_prob > 0 the per-rule RecurrenceDataset corrupts windows
-    (see core.RecurrenceDataset): scanning from position >= order, a hit with
+    (see RecurrenceDataset above): scanning from position >= order, a hit with
     probability missing_prob corrupts a run of miss_len consecutive tokens,
     in train and test splits alike (test-side accuracy then measures bridging
     over gaps). Two metric modes:

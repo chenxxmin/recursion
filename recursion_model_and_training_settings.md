@@ -222,7 +222,7 @@ Input token ids (B, T)
 
 ### 3.2 FibonacciTransformer（单任务 / dynamic_mixed 模型）
 
-类：`src/core.py::FibonacciTransformer`
+类：`src/models.py::FibonacciTransformer`
 
 | 组件 | 定义 | 说明 |
 |------|------|------|
@@ -283,7 +283,7 @@ out = c_proj(out)
 
 ### 3.3 MixedABTransformer（多规则模型）
 
-类：`src/core.py::MixedABTransformer`，继承自 `FibonacciTransformer`，用于 `mixed_ab` 任务。
+类：`src/models.py::MixedABTransformer`，继承自 `FibonacciTransformer`，用于 `mixed_ab` 任务。
 
 #### 3.3.1 三种规则标识方式
 
@@ -338,7 +338,7 @@ pad_token_id = P
 
 ### 4.1 单任务数据集（RecurrenceDataset）
 
-类：`src/core.py::RecurrenceDataset`
+类：`src/datasets.py::RecurrenceDataset`
 
 1. 枚举所有 `P^init_len` 个初始状态。
 2. 随机打乱顺序后遍历每个初始状态，生成完整递推循环。
@@ -347,7 +347,7 @@ pad_token_id = P
 
 ### 4.2 多规则数据集（MixedRecurrenceDataset）
 
-类：`src/mixed_dataset.py::MixedRecurrenceDataset`（旧实现 `MixedABDataset` 已从 core.py 移出，保留在 `tests/test_mixed_ab_compat.py` 作为 golden master 对照）
+类：`src/datasets.py::MixedRecurrenceDataset`（旧实现 `MixedABDataset` 已从 core.py 移出，保留在 `tests/test_mixed_ab_compat.py` 作为 golden master 对照）
 
 1. 对每条 `(a, b)` 规则分别调用 `RecurrenceDataset` 生成训练/测试样本。
 2. 每条规则的暴露比例由 `MIXED_AB_MAX_UNIQUE_RATIOS` 控制。
@@ -356,7 +356,7 @@ pad_token_id = P
 
 ### 4.3 动态混合数据集（DynamicMixedDataset）
 
-类：`src/core.py::DynamicMixedDataset`
+类：`src/datasets.py::DynamicMixedDataset`
 
 1. 使用独立的 `random.Random(seed)` 确定性生成样本。
 2. 每步随机选择一条规则，生成 `x_k` 并在前面插入 `flag_k`。

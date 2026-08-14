@@ -1,4 +1,4 @@
-"""Unit tests for MISSING_PROB corruption in src/core.py RecurrenceDataset.
+"""Unit tests for MISSING_PROB corruption in src/datasets.py RecurrenceDataset.
 
 Covers: legacy path when disabled, run-based corruption (MISS_LEN, MISS_SECOND),
 loss-mask alignment (target index = position - 1), test split corrupted with the
