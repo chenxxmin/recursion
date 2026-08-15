@@ -43,7 +43,7 @@ if SCRIPT_DIR not in sys.path:
     sys.path.insert(0, SCRIPT_DIR)
 
 from analyze_attention import extract_qk_raw_scores, load_model
-from core import corrupt_window
+from datasets import corrupt_window
 from report_front_back_attention import (dump_matrices, parse_log,
                                          segment_by_attention)
 from rules import task_from_save_config

@@ -29,7 +29,7 @@ if SCRIPT_DIR not in sys.path:
     sys.path.insert(0, SCRIPT_DIR)
 
 from analyze_attention import load_model
-from core import corrupt_window, missing_token_id
+from datasets import corrupt_window, missing_token_id
 from rules import LinearRecurrenceRule, single_rule_from_task, task_from_save_config
 
 COL_W = 5  # display width per position column

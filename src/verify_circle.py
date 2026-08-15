@@ -40,7 +40,7 @@ SCRIPT_DIR = os.path.dirname(os.path.abspath(__file__))
 if SCRIPT_DIR not in sys.path:
     sys.path.insert(0, SCRIPT_DIR)
 
-import core
+import models
 from analyze_attention import load_model, _forward_per_layer, HEADER_WIDTH
 
 
@@ -206,7 +206,7 @@ def main():
     config = checkpoint['config']
     p = config['p']
 
-    if isinstance(model, core.MixedABTransformer):
+    if isinstance(model, models.MixedABTransformer):
         print("[Warning] verify_circle targets single-recurrence checkpoints; "
               "mixed_ab models have rule tokens in the input layout and the "
               "results will not be meaningful.")

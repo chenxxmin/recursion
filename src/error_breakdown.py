@@ -32,7 +32,7 @@ if SCRIPT_DIR not in sys.path:
     sys.path.insert(0, SCRIPT_DIR)
 
 from analyze_attention import load_model
-from core import corrupt_window, missing_token_id
+from datasets import corrupt_window, missing_token_id
 from rules import LinearRecurrenceRule
 from verify_sample import (build_single_rule, dispatch_and_log, find_exp_config,
                            resolve_experiment_cfg)

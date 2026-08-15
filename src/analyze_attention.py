@@ -11,7 +11,8 @@ SCRIPT_DIR = os.path.dirname(os.path.abspath(__file__))
 if SCRIPT_DIR not in sys.path:
     sys.path.insert(0, SCRIPT_DIR)
 
-import core
+import datasets
+import models
 from rules import LinearRecurrenceRule, single_rule_from_task, task_from_save_config
 from report_front_back_attention import parse_log, split_k
 
@@ -68,9 +69,9 @@ def load_model(pth_path, device='cpu'):
         mixedab_config['use_conditional_wte'] = config.get('use_conditional_wte', any('cond_wte' in k for k in state_keys))
         mixedab_config['cond_wte_shared_ratio'] = config.get('cond_wte_shared_ratio', 0.0)
         mixedab_config['order'] = config.get('order', 2)
-        model = core.MixedABTransformer(num_ab_pairs=num_ab_pairs, **mixedab_config)
+        model = models.MixedABTransformer(num_ab_pairs=num_ab_pairs, **mixedab_config)
     else:
-        model = core.FibonacciTransformer(**filtered_config)
+        model = models.FibonacciTransformer(**filtered_config)
     model.load_state_dict(checkpoint['model_state_dict'])
     model = model.to(device)
     model.eval()
@@ -158,8 +159,8 @@ def _forward_per_layer(model, input_ids, ab_label=None):
         # RoPE
         if attn_module.rope is not None:
             cos, sin = attn_module.rope(q, seq_len=T)
-            q = core.apply_rotary_emb(q, cos, sin)
-            k = core.apply_rotary_emb(k, cos, sin)
+            q = models.apply_rotary_emb(q, cos, sin)
+            k = models.apply_rotary_emb(k, cos, sin)
 
         # Raw QK scores (before softmax)
         raw_scores = (q @ k.transpose(-2, -1)) * (1.0 / math.sqrt(attn_module.head_size))
@@ -419,8 +420,8 @@ def _resolve_recurrence(config):
 
 def _make_dynamic_seq(p, ab_pairs, flag_start_id, length, seed):
     """Generate one dynamic_mixed sequence: [x1, x2, flag_3, x3, ..., flag_L, x_L]."""
-    return core.generate_dynamic_sample(p, ab_pairs, flag_start_id, length,
-                                        random.Random(seed))
+    return datasets.generate_dynamic_sample(p, ab_pairs, flag_start_id, length,
+                                            random.Random(seed))
 
 
 def _make_dynamic_query_mask(length):
@@ -451,11 +452,11 @@ def _make_mixed_seq(p, coeffs, rule_idx, n_rules, order, use_ab_tag, length, con
         seq.append(next_fn(seq, p))
     if config.get('missing_prob', 0.0) > 0:
         window = torch.tensor(seq, dtype=torch.long)
-        core.corrupt_window(window, True, p=p, init_len=order,
-                            missing_prob=config['missing_prob'],
-                            miss_len=config.get('miss_len', 1),
-                            miss_second=config.get('miss_second', False),
-                            missing_token=core.missing_token_id(config, p, is_mixed=True))
+        datasets.corrupt_window(window, True, p=p, init_len=order,
+                                missing_prob=config['missing_prob'],
+                                miss_len=config.get('miss_len', 1),
+                                miss_second=config.get('miss_second', False),
+                                missing_token=datasets.missing_token_id(config, p, is_mixed=True))
         seq = window.tolist()
     if use_ab_tag:
         seq = [p + rule_idx] + seq
@@ -541,7 +542,7 @@ def analyze_model_attention(pth_path, device=None, log_path=None):
             n_rules = len(config.get('ab_pairs') or [1])
             use_tag = config.get('use_ab_tag', False)
             missing_token = p + n_rules if use_tag else p
-            helper = core.RecurrenceDataset(
+            helper = datasets.RecurrenceDataset(
                 p=p, init_len=rec['init_len'], length=len(test_seq), verbose=False,
                 missing_prob=config['missing_prob'],
                 miss_len=config.get('miss_len', 1),
