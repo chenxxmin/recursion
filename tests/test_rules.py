@@ -80,6 +80,10 @@ def test_single_rule_from_task():
     assert fn([4, 5], p) == 20 % p
     _, fn, _ = single_rule_from_task('nonlinear', {'P': p})
     assert fn([4, 5], p) == (25 + 4) % p
+    _, fn, name = single_rule_from_task('nonlinear_mul', {'P': p})
+    assert fn([4, 5], p) == (4 * 5 * 5) % p and 'X(k-2)*X(k-1)^2' in name
+    # x2=0 collapses to 0 regardless of x1 (non-bijective state map)
+    assert fn([7, 0], p) == 0
     try:
         single_rule_from_task('mixed_ab', {'P': p})
         assert False, "expected ValueError"
@@ -90,7 +94,7 @@ def test_single_rule_from_task():
 def test_save_config_round_trip():
     """save_config_extra (writer) and task_from_save_config (reader) must agree,
     including the multiplication/multiplicative vocabulary split."""
-    for task in ('addition', 'multiplication', 'tribonacci', 'nonlinear'):
+    for task in ('addition', 'multiplication', 'tribonacci', 'nonlinear', 'nonlinear_mul'):
         cfg = {'P': 23, 'A': 2, 'B': 3, 'C': 4}
         extra = save_config_extra(task, cfg)
         assert task_from_save_config(extra) == task, (task, extra)

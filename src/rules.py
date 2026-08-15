@@ -44,7 +44,7 @@ class LinearRecurrenceRule:
 def single_rule_from_task(task, cfg):
     """Resolve a single-rule task to (init_len, next_fn, recurrence_name).
 
-    task: 'addition' | 'multiplication' | 'tribonacci' | 'nonlinear'.
+    task: 'addition' | 'multiplication' | 'tribonacci' | 'nonlinear' | 'nonlinear_mul'.
     cfg accepts merged-config keys (P, A/B/C) or checkpoint keys (p, a/b/c);
     missing coefficients default to 1. The returned next_fn takes (seq, p),
     matching RecurrenceDataset's recurrence_fn contract.
@@ -65,6 +65,12 @@ def single_rule_from_task(task, cfg):
         # The state map (x,y) -> (y, y^2+x) is bijective for any p
         # (invert: x = z - y^2), so all states lie on pure cycles.
         return 2, (lambda seq, p: (seq[-1] * seq[-1] + seq[-2]) % p), f"X(k)=(X(k-1)^2+X(k-2)) mod {p}"
+    if task == 'nonlinear_mul':
+        # The state map (x,y) -> (y, x*y^2) is not bijective (any state with
+        # y=0 flows into the (0,0) fixed point), so transient trajectories
+        # exist; RecurrenceDataset handles them (truncated trajectories get
+        # step-by-step extension in run(), see generate_cycle's comment).
+        return 2, (lambda seq, p: (seq[-2] * seq[-1] * seq[-1]) % p), f"X(k)=(X(k-2)*X(k-1)^2) mod {p}"
     raise ValueError(f"unknown single-rule task: {task}")
 
 
@@ -80,6 +86,8 @@ def save_config_extra(task, cfg):
         return {'a': get('a'), 'b': get('b'), 'c': get('c'), 'recurrence': 'tribonacci'}
     if task == 'nonlinear':
         return {'recurrence': 'nonlinear'}
+    if task == 'nonlinear_mul':
+        return {'recurrence': 'nonlinear_mul'}
     raise ValueError(f"unknown single-rule task: {task}")
 
 
@@ -101,6 +109,8 @@ def task_from_save_config(config):
         return 'multiplication'
     if recurrence == 'nonlinear':
         return 'nonlinear'
+    if recurrence == 'nonlinear_mul':
+        return 'nonlinear_mul'
     return 'addition'
 
 
