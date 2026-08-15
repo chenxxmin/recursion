@@ -1,8 +1,8 @@
 # 非线性规则 randlen predict 污损实验组 — 设计
 
-> 日期：2026-08-14。状态：已获用户批准。
+> 日期：2026-08-14。状态：已获用户批准（含 prob=0 对照组增补）。
 > 目标：在现有 randmisslen predict 污损实验框架下，把递推规则换成两个非线性规则，
-> 新增一组 192-run 实验。
+> 新增一组 224-run 实验（192 主网格 + 32 个 prob=0 对照）。
 
 ## 1. 背景与目标
 
@@ -25,10 +25,21 @@ transformer 对污损输入的重建（predict）能力。
 - `default_num_mask` 新增 `'nonlinear_mul': 1`（与 nonlinear 一致；组内同时显式
   `NUM_MASK: 1`）。
 
-## 3. 实验网格（192 runs，单个组文件）
+## 3. 实验网格（224 runs，单个组文件）
 
-轴：task ∈ {nonlinear, nonlinear_mul} × N_LAYER ∈ {1,2} × MISS_LEN ∈ {1,2}
-× MISSING_PROB ∈ {0.1, 0.3, 0.5} × 8 seeds = 2×2×2×3×8 = **192 runs**。
+**主网格（192 runs）**：task ∈ {nonlinear, nonlinear_mul} × N_LAYER ∈ {1,2}
+× MISS_LEN ∈ {1,2} × MISSING_PROB ∈ {0.1, 0.3, 0.5} × 8 seeds
+= 2×2×2×3×8 = **192 runs**。
+
+**prob=0 对照（32 runs）**：task ∈ {nonlinear, nonlinear_mul} × N_LAYER ∈ {1,2}
+× MISSING_PROB = 0 × 8 seeds = 2×2×8 = **32 runs**。
+
+对照组**不带 MISS_LEN 轴**：prob=0 时污损整体关闭（datasets.py:145-153 的
+`missing_prob > 0` 门控——`_corrupt` 不调用、零 RNG 消耗、样本为纯窗口，
+experiment.py:333-338 走 collate_fn 纯序列路径），MISS_LEN/PREDICT_MISSING
+均惰性，保留该轴只会产生逐字节重复的运行。对照 run 的 config 仍写
+`MISS_LEN: 1, PREDICT_MISSING: true`（惰性占位，保持配置形状一致），
+run 名段为 `randmiss0len1`。
 
 Seed 列表沿用 randmisslen 组：17996, 18318, 34789, 44536, 62513, 64154, 72814, 82585。
 
@@ -54,8 +65,9 @@ EARLY_STOP_ACCURACY: 0.99, EARLY_STOP_NO_IMPROVE: 1000, PREDICT_MISSING: true
   - new format：`{"concurrency": 8, "experiments": [...]}`（与 randmisslen 组一致）
   - basename 决定输出目录（/data/cxm/recursion/<name>/{logs,plots} 等，batch_run.py:23-24）
 - run 名：`{task}_d256l{L}r4h4_P127_tr64ood128_randmiss{prob}len{ml}_seed{seed}`
-  例：`nonlinear_mul_d256l2r4h4_P127_tr64ood128_randmiss0.3len2_seed44536`
-- JSON 由一次性脚本生成并校验（192 条、网格轴笛卡尔积完整、名称唯一、每条含
+  例：`nonlinear_mul_d256l2r4h4_P127_tr64ood128_randmiss0.3len2_seed44536`，
+  对照例：`nonlinear_d256l1r4h4_P127_tr64ood128_randmiss0len1_seed17996`
+- JSON 由一次性脚本生成并校验（224 条、网格轴笛卡尔积完整、名称唯一、每条含
   name/task/config 三字段）；生成脚本留在 scratch 不入库，遵循"网格 JSON 直接
   提交、无生成器"的仓库惯例。
 
