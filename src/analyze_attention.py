@@ -409,8 +409,9 @@ def _resolve_recurrence(config):
         print(f"Model config: mixed order-{order}, rules={rules}, p={p}, use_ab_tag={use_tag}")
         return {'init_len': order, 'is_dynamic_mixed': False, 'is_mixed': True,
                 'next_val': None, 'rules': rules, 'order': order, 'use_ab_tag': use_tag}
-    # Single-rule checkpoint (addition/multiplication/tribonacci/nonlinear,
-    # including old a/b-only or minimal configs defaulting to addition).
+    # Single-rule checkpoint (addition/multiplication/tribonacci/nonlinear/
+    # nonlinear_mul, including old a/b-only or minimal configs defaulting to
+    # addition).
     task = task_from_save_config(config)
     init_len, next_fn, name = single_rule_from_task(task, config)
     print(f"Model config: {name}")
