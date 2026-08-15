@@ -64,7 +64,15 @@ def test_run_experiment_mixed_ab():
         assert 'Rule 1' in out and 'Rule 2' in out, "per-rule final test missing"
 
 
+def test_run_experiment_nonlinear_mul():
+    with tempfile.TemporaryDirectory() as tmpdir:
+        out, save_path = _run(tmpdir, {'TASK': 'nonlinear_mul'})
+        _check_common(out, save_path)
+        assert 'X(k)=(X(k-2)*X(k-1)^2) mod 7' in out
+
+
 if __name__ == '__main__':
     test_run_experiment_addition()
     test_run_experiment_mixed_ab()
+    test_run_experiment_nonlinear_mul()
     print("ALL TESTS PASSED: test_training_smoke.py")

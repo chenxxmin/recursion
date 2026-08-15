@@ -279,7 +279,7 @@ def _prepare_dynamic_mixed(config):
 
 
 def _prepare_single_recurrence(config, task):
-    """Prepare dataset, model, loaders and training params for addition/multiplication/tribonacci/nonlinear."""
+    """Prepare dataset, model, loaders and training params for addition/multiplication/tribonacci/nonlinear/nonlinear_mul."""
     cfg = dict(config.get('main', {}))
     P = cfg['P']
     D_MODEL = cfg['D_MODEL']
@@ -295,7 +295,7 @@ def _prepare_single_recurrence(config, task):
 
     BLOCK_SIZE = _round_up_pow2(max(TRAIN_LEN, OOD_LEN))
 
-    default_num_mask = {'addition': 1, 'multiplication': 1, 'tribonacci': 2, 'nonlinear': 1}[task]
+    default_num_mask = {'addition': 1, 'multiplication': 1, 'tribonacci': 2, 'nonlinear': 1, 'nonlinear_mul': 1}[task]
     init_len, recurrence_fn, recurrence_name = single_rule_from_task(task, cfg)
     save_extra_config = save_config_extra(task, cfg)
 
@@ -415,7 +415,7 @@ def run_experiment(config_path=None):
         ctx = _prepare_mixed_recurrence(config, device, order)
     elif TASK == 'dynamic_mixed':
         ctx = _prepare_dynamic_mixed(config)
-    elif TASK in ('addition', 'multiplication', 'tribonacci', 'nonlinear'):
+    elif TASK in ('addition', 'multiplication', 'tribonacci', 'nonlinear', 'nonlinear_mul'):
         ctx = _prepare_single_recurrence(config, TASK)
     else:
         print(f"Unknown task: {TASK}")
