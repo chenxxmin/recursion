@@ -313,7 +313,7 @@ import collections
 print(collections.Counter((e['task'], e['config']['MISSING_PROB']) for e in exps))
 "
 ```
-预期：224 runs；主网格每 (task, prob) 组合 16 条（2 layers × 2 misslens × 8 seeds），prob=0 每 task 16 条（2 layers × 8 seeds，MISS_LEN 恒 1）。
+预期：224 runs；主网格每 (task, prob) 组合 32 条（2 layers × 2 misslens × 8 seeds），prob=0 每 task 16 条（2 layers × 8 seeds，MISS_LEN 恒 1）。
 
 - [ ] **Step 4: 提交（只提交 JSON，不提交脚本）**
 
