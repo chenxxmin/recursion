@@ -722,3 +722,13 @@
 3. **同数据投影的角度相干性存在系统性正偏**：投影方向由数据自身主频构造时，Gram 矩阵对角项会注入目标相位，纯随机矩阵也能得到 0.86 的"假阳性"相干性——改为留出式（偶数位置拟合方向、奇数位置检验，双向平均），随机基线从 0.86 降到 0.13。
 
 **验证**：合成完美圆/带噪圆/随机矩阵三组单测（完美圆 top1=1.0、CV≈0、coh=1.0；随机矩阵 coh=0.13）；小 checkpoint 两种模式端到端跑通并出图。
+
+---
+
+## 53. 【行为变更】rule_fit missing 模式改队列驱动分析，消除 on-manifold 秩亏失明
+
+**问题**：旧 missing 模式在真实递推序列（on-manifold）上拟合 k 个距离的系数。递推阶数为 2 的序列任意窗口在 F_p 上最多张成 2 维，k>2 的设计矩阵必然秩亏——`solve_mod_p` 整体解与全部 300 轮 RANSAC 都返回 None，输出 `no linear fit (best agreement -100.0%)`（-100% 是未更新的 sentinel）。后果：model-vs-truth 99.9% 的 pattern（如 (x,x,x,x,M)）给不出公式，set A 退化时只剩 1.3% 的噪音拟合。
+
+**修改**：`run_missing_categories` 重写为队列驱动 BFS——根为 (x,)*init_len，每 pattern 用随机探针（off-manifold，只强制窗口内 mask，特征满秩）在注意力显著可见距离（set C）上拟合；拟合公式的非零系数距离作为前提，其非空子集被污损生成的子 pattern 入队（长度上限 --depth=miss_len+2）。新增 `visible_distance/child_patterns/aggregate_buckets/select_C/rule_coeffs/probe_equations`；删除 cat4 顶层四类分组、set_A/dists_C_full 与 pass 1 的 fits 累计。root pattern 增加与训练规则系数的 MATCH/MISMATCH 校验。多层模型打印 warning（off-manifold 解读仅限单层）。
+
+**验证**：`tests/test_rule_fit_missing.py`（纯函数单测 + stub 模型端到端拟合恢复 2x_{t-1}+x_{t-2} + 小模型冒烟）；真实批次端到端需在服务器复跑确认。
