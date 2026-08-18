@@ -1,15 +1,19 @@
 """Unit tests for the queue-driven missing-pattern analysis in rule_fit.py."""
+import contextlib
+import io
 import os
 import random
 import sys
+from types import SimpleNamespace
 
 import torch
 
 sys.path.insert(0, os.path.join(os.path.dirname(os.path.abspath(__file__)), '..', 'src'))
 
+from models import FibonacciTransformer
 from rule_fit import (aggregate_buckets, child_patterns, fit_and_score,
-                      patt_label, probe_equations, rule_coeffs, select_C,
-                      visible_distance)
+                      patt_label, probe_equations, rule_coeffs,
+                      run_missing_categories, select_C, visible_distance)
 
 
 def test_visible_distance():
@@ -118,6 +122,25 @@ def test_probe_equations_neighbour_window_masks_do_not_leak():
     assert all(v != 127 for row in X for v in row)
 
 
+def test_run_missing_categories_smoke():
+    """Untrained tiny model: the BFS machinery must run end-to-end and report
+    the root pattern. Fit content is meaningless for an untrained model."""
+    random.seed(0)
+    torch.manual_seed(0)
+    model = FibonacciTransformer(p=7, d_model=32, n_head=2, n_layer=1, block_size=16)
+    model.eval()
+    args = SimpleNamespace(length=12, min_n=5, samples=30, depth=None)
+    cfg = {'MISSING_PROB': 0.3, 'MISS_LEN': 2, 'TRAIN_LEN': 12}
+    next_fn = lambda s: (s[-1] + s[-2]) % 7
+    buf = io.StringIO()
+    with contextlib.redirect_stdout(buf):
+        run_missing_categories(args, model, cfg, next_fn, 2, 7, 'smoke', 'X(k)=(1*X(k-1)+1*X(k-2)) mod 7')
+    out = buf.getvalue()
+    assert 'Model: smoke' in out
+    assert '== pattern (x,x)' in out, out
+    assert 'model-vs-truth' in out
+
+
 if __name__ == '__main__':
     test_visible_distance()
     test_patt_label()
@@ -128,4 +151,5 @@ if __name__ == '__main__':
     test_rule_coeffs()
     test_probe_equations_recovers_stub_formulas()
     test_probe_equations_neighbour_window_masks_do_not_leak()
+    test_run_missing_categories_smoke()
     print("ALL TESTS PASSED: test_rule_fit_missing.py")
