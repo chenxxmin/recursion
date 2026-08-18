@@ -31,6 +31,7 @@ Output is teed to rule_fit_output.log.
 """
 import argparse
 import contextlib
+import itertools
 import json
 import os
 import random
@@ -102,6 +103,89 @@ def fit_and_score(X, y, p, rounds=300):
         if acc > best_acc:
             best_c, best_acc = c, acc
     return best_c, best_acc, False
+
+
+EXPAND_MIN_AGREEMENT = 0.9   # only expand BFS children from a fit at least this good
+FIT_MAX_ROWS = 2000          # cap equations fed to fit_and_score (RANSAC scoring cost)
+
+
+def visible_distance(P, d):
+    """True if distance d (0 = last token) is visible in pattern P (oldest-first
+    mask tuple). Distances beyond the window are always visible: probes only
+    force masks inside the window."""
+    L = len(P)
+    return d >= L or not P[L - 1 - d]
+
+
+def patt_label(P):
+    return '(' + ','.join('M' if m else 'x' for m in P) + ')'
+
+
+def child_patterns(P, deps, d_max):
+    """Patterns obtained by additionally masking any non-empty subset of deps
+    (dependency distances of P's fitted formula). The window extends left (new
+    positions default to visible) when a dependency lies outside it; children
+    longer than d_max are dropped."""
+    L = len(P)
+    children = []
+    for r in range(1, len(deps) + 1):
+        for S in itertools.combinations(sorted(deps), r):
+            new_len = max(L, max(S) + 1)
+            if new_len > d_max:
+                continue
+            child = [False] * new_len
+            for d in range(L):
+                child[new_len - 1 - d] = P[L - 1 - d]
+            for d in S:
+                child[new_len - 1 - d] = True
+            children.append(tuple(child))
+    return children
+
+
+def aggregate_buckets(buckets, P, d_max):
+    """Merge depth-d_max bucket records whose length-len(P) suffix equals P.
+    Returns (n, agree, attn) with attn {(li,h): {d: [sum, cnt]}}."""
+    L = len(P)
+    n, agree = 0, 0
+    attn = {}
+    for B, rec in buckets.items():
+        if B[d_max - L:] != P:
+            continue
+        n += rec['n']
+        agree += rec['agree']
+        for key, dd in rec['attn'].items():
+            acc = attn.setdefault(key, {})
+            for d, (s, c) in dd.items():
+                if d in acc:
+                    acc[d][0] += s
+                    acc[d][1] += c
+                else:
+                    acc[d] = [s, c]
+    return n, agree, attn
+
+
+def select_C(attn, P, threshold=SIG_THRESHOLD):
+    """Hypothesis set: distances whose merged mean attention reaches `threshold`
+    in any (layer, head), restricted to distances visible in P, sorted."""
+    sig = set()
+    for dd in attn.values():
+        for d, (s, c) in dd.items():
+            if s / c >= threshold:
+                sig.add(d)
+    return sorted(d for d in sig if visible_distance(P, d))
+
+
+def rule_coeffs(next_fn, init_len, p):
+    """Extract a linear rule's coefficients by probing next_fn with one-hot
+    histories. Returns ([c_d0, c_d1, ...], base); meaningful for linear rules
+    (addition/tribonacci) only."""
+    base = next_fn([0] * init_len)
+    coeffs = []
+    for d in range(init_len):
+        v = [0] * init_len
+        v[init_len - 1 - d] = 1
+        coeffs.append((next_fn(v) - base) % p)
+    return coeffs, base
 
 
 def fmt_equation(dists, coeffs, p):
