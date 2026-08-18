@@ -124,6 +124,8 @@ x_k = a * x_{k-2} + b * x_{k-1}  (mod P)
 | `EARLY_STOP_ACCURACY` | 测试准确率达到该值则早停 |
 | `RANDOM_SEED` | 随机种子 |
 | `SAVE_PATH` | 模型保存路径；由 `batch_run.py` 自动覆盖为 `{model-base-dir}/{批次名}/{实验名}.pth` |
+| `INIT_FROM` | 课程/迁移学习：从指定 checkpoint 初始化权重（仅拷贝名字与形状都匹配的张量，其余保持随机初始化，日志打印加载/跳过报告）；`null` 为不启用。优化器与调度器始终全新开始 |
+| `COND_FIX` / `COND_FIX_START` | 部分参数冻结：`COND_FIX: "WTE"` 冻结 embedding 相关参数（注意 lm_head 与 wte 权重共享，实际同时冻结输出投影；`"LINEAR"` 冻结 transformer 主干+rule_head）。`COND_FIX_START` 为准确率阈值（该 eval 达标后冻结）；**`0` 表示训练前就冻结**（首个梯度步之前生效） |
 
 ### 2.1 各任务对公共配置的覆盖
 

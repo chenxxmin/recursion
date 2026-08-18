@@ -13,6 +13,7 @@
     "EPOCHS": 6000,
     "LR": 0.0003,
     "SAVE_PATH": "fibonacci_transformer.pth",
+    "INIT_FROM": null,
     "USE_LEARNABLE_PE": false,
     "MLP_RATIO": 4,
     "TRAIN_LEN": 16,

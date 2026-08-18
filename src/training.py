@@ -271,6 +271,14 @@ def run_training_engine(model, train_loader, test_loader, optimizer, scheduler, 
     extra_epochs_after_high_acc = 200
     high_acc_epoch = None
 
+    # cond_fix_start == 0: freeze BEFORE the first gradient step. (Any other
+    # start value keeps the threshold semantics: freeze at the first eval
+    # whose accuracy reaches it.)
+    if cond_fix is not None and cond_fix_start == 0:
+        frozen_param_states = freeze_partial(model, cond_fix)
+        cond_fix_triggered = True
+        print(f"[CondFix] frozen from start (cond_fix_start=0): {cond_fix}")
+
     for epoch in range(epochs):
         train_loss, train_acc, train_pos_acc = train_epoch(
             model, train_loader, optimizer, device,

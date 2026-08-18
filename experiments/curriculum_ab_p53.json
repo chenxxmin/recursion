@@ -1,0 +1,56 @@
+{
+  "stages": [
+    {
+      "name": "phase1_A",
+      "gate": {"min_best_accuracy": 0.99},
+      "experiments": [
+        {"name": "curr_A_seed0", "task": "addition",
+         "config": {"A": 1, "B": 1, "RANDOM_SEED": 0, "EARLY_STOP_ACCURACY": 0.99}},
+        {"name": "curr_A_seed1", "task": "addition",
+         "config": {"A": 1, "B": 1, "RANDOM_SEED": 1, "EARLY_STOP_ACCURACY": 0.99}},
+        {"name": "curr_A_seed2", "task": "addition",
+         "config": {"A": 1, "B": 1, "RANDOM_SEED": 2, "EARLY_STOP_ACCURACY": 0.99}},
+        {"name": "curr_A_seed3", "task": "addition",
+         "config": {"A": 1, "B": 1, "RANDOM_SEED": 3, "EARLY_STOP_ACCURACY": 0.99}}
+      ]
+    },
+    {
+      "name": "phase2_AB",
+      "experiments": [
+        {"name": "curr_AB_seed0", "task": "mixed_ab",
+         "config": {"AB_PAIRS": [[1, 1], [1, 2]], "USE_AB_TAG": false,
+                    "MIXED_AB_MAX_UNIQUE_RATIOS": [0.7, 0.7],
+                    "RANDOM_SEED": 0, "INIT_FROM": "@prev"}},
+        {"name": "curr_AB_seed1", "task": "mixed_ab",
+         "config": {"AB_PAIRS": [[1, 1], [1, 2]], "USE_AB_TAG": false,
+                    "MIXED_AB_MAX_UNIQUE_RATIOS": [0.7, 0.7],
+                    "RANDOM_SEED": 1, "INIT_FROM": "@prev"}},
+        {"name": "curr_AB_seed2", "task": "mixed_ab",
+         "config": {"AB_PAIRS": [[1, 1], [1, 2]], "USE_AB_TAG": false,
+                    "MIXED_AB_MAX_UNIQUE_RATIOS": [0.7, 0.7],
+                    "RANDOM_SEED": 2, "INIT_FROM": "@prev"}},
+        {"name": "curr_AB_seed3", "task": "mixed_ab",
+         "config": {"AB_PAIRS": [[1, 1], [1, 2]], "USE_AB_TAG": false,
+                    "MIXED_AB_MAX_UNIQUE_RATIOS": [0.7, 0.7],
+                    "RANDOM_SEED": 3, "INIT_FROM": "@prev"}}
+      ]
+    },
+    {
+      "name": "control_AB",
+      "experiments": [
+        {"name": "ctrl_AB_seed0", "task": "mixed_ab",
+         "config": {"AB_PAIRS": [[1, 1], [1, 2]], "USE_AB_TAG": false,
+                    "MIXED_AB_MAX_UNIQUE_RATIOS": [0.7, 0.7], "RANDOM_SEED": 0}},
+        {"name": "ctrl_AB_seed1", "task": "mixed_ab",
+         "config": {"AB_PAIRS": [[1, 1], [1, 2]], "USE_AB_TAG": false,
+                    "MIXED_AB_MAX_UNIQUE_RATIOS": [0.7, 0.7], "RANDOM_SEED": 1}},
+        {"name": "ctrl_AB_seed2", "task": "mixed_ab",
+         "config": {"AB_PAIRS": [[1, 1], [1, 2]], "USE_AB_TAG": false,
+                    "MIXED_AB_MAX_UNIQUE_RATIOS": [0.7, 0.7], "RANDOM_SEED": 2}},
+        {"name": "ctrl_AB_seed3", "task": "mixed_ab",
+         "config": {"AB_PAIRS": [[1, 1], [1, 2]], "USE_AB_TAG": false,
+                    "MIXED_AB_MAX_UNIQUE_RATIOS": [0.7, 0.7], "RANDOM_SEED": 3}}
+      ]
+    }
+  ]
+}

@@ -1,0 +1,265 @@
+{
+  "stages": [
+    {
+      "name": "phase1",
+      "gate": {
+        "min_best_accuracy": 0.99
+      },
+      "experiments": [
+        {
+          "name": "p1_d512l1r8h4_P251_singleB_e0.3_seed0",
+          "task": "addition",
+          "config": {
+            "P": 251,
+            "D_MODEL": 512,
+            "N_HEAD": 4,
+            "N_LAYER": 1,
+            "MLP_RATIO": 8,
+            "NUM_MASK": 2,
+            "USE_AB_TAG": false,
+            "USE_CONDITIONAL_WTE": false,
+            "A": 1,
+            "B": 2,
+            "MAX_UNIQUE_RATIO": 0.3,
+            "RANDOM_SEED": 0,
+            "EARLY_STOP_ACCURACY": 0.99
+          }
+        },
+        {
+          "name": "p1_d512l1r8h4_P251_singleB_e0.3_seed12345",
+          "task": "addition",
+          "config": {
+            "P": 251,
+            "D_MODEL": 512,
+            "N_HEAD": 4,
+            "N_LAYER": 1,
+            "MLP_RATIO": 8,
+            "NUM_MASK": 2,
+            "USE_AB_TAG": false,
+            "USE_CONDITIONAL_WTE": false,
+            "A": 1,
+            "B": 2,
+            "MAX_UNIQUE_RATIO": 0.3,
+            "RANDOM_SEED": 12345,
+            "EARLY_STOP_ACCURACY": 0.99
+          }
+        },
+        {
+          "name": "p1_d512l1r8h4_P251_singleB_e0.3_seed999",
+          "task": "addition",
+          "config": {
+            "P": 251,
+            "D_MODEL": 512,
+            "N_HEAD": 4,
+            "N_LAYER": 1,
+            "MLP_RATIO": 8,
+            "NUM_MASK": 2,
+            "USE_AB_TAG": false,
+            "USE_CONDITIONAL_WTE": false,
+            "A": 1,
+            "B": 2,
+            "MAX_UNIQUE_RATIO": 0.3,
+            "RANDOM_SEED": 999,
+            "EARLY_STOP_ACCURACY": 0.99
+          }
+        }
+      ]
+    },
+    {
+      "name": "T1",
+      "experiments": [
+        {
+          "name": "t1_d512l1r8h4_P251_N2_e0.1_0.3_seed0",
+          "task": "mixed_ab",
+          "config": {
+            "P": 251,
+            "D_MODEL": 512,
+            "N_HEAD": 4,
+            "N_LAYER": 1,
+            "MLP_RATIO": 8,
+            "NUM_MASK": 2,
+            "USE_AB_TAG": false,
+            "USE_CONDITIONAL_WTE": false,
+            "AB_PAIRS": [
+              [
+                1,
+                1
+              ],
+              [
+                1,
+                2
+              ]
+            ],
+            "MIXED_AB_MAX_UNIQUE_RATIOS": [
+              0.1,
+              0.3
+            ],
+            "RANDOM_SEED": 0,
+            "INIT_FROM": "@phase1"
+          }
+        },
+        {
+          "name": "t1_d512l1r8h4_P251_N2_e0.1_0.3_seed12345",
+          "task": "mixed_ab",
+          "config": {
+            "P": 251,
+            "D_MODEL": 512,
+            "N_HEAD": 4,
+            "N_LAYER": 1,
+            "MLP_RATIO": 8,
+            "NUM_MASK": 2,
+            "USE_AB_TAG": false,
+            "USE_CONDITIONAL_WTE": false,
+            "AB_PAIRS": [
+              [
+                1,
+                1
+              ],
+              [
+                1,
+                2
+              ]
+            ],
+            "MIXED_AB_MAX_UNIQUE_RATIOS": [
+              0.1,
+              0.3
+            ],
+            "RANDOM_SEED": 12345,
+            "INIT_FROM": "@phase1"
+          }
+        },
+        {
+          "name": "t1_d512l1r8h4_P251_N2_e0.1_0.3_seed999",
+          "task": "mixed_ab",
+          "config": {
+            "P": 251,
+            "D_MODEL": 512,
+            "N_HEAD": 4,
+            "N_LAYER": 1,
+            "MLP_RATIO": 8,
+            "NUM_MASK": 2,
+            "USE_AB_TAG": false,
+            "USE_CONDITIONAL_WTE": false,
+            "AB_PAIRS": [
+              [
+                1,
+                1
+              ],
+              [
+                1,
+                2
+              ]
+            ],
+            "MIXED_AB_MAX_UNIQUE_RATIOS": [
+              0.1,
+              0.3
+            ],
+            "RANDOM_SEED": 999,
+            "INIT_FROM": "@phase1"
+          }
+        }
+      ]
+    },
+    {
+      "name": "T2",
+      "experiments": [
+        {
+          "name": "t2_d512l1r8h4_P251_N2_e0.1_0.3_frzWTE_seed0",
+          "task": "mixed_ab",
+          "config": {
+            "P": 251,
+            "D_MODEL": 512,
+            "N_HEAD": 4,
+            "N_LAYER": 1,
+            "MLP_RATIO": 8,
+            "NUM_MASK": 2,
+            "USE_AB_TAG": false,
+            "USE_CONDITIONAL_WTE": false,
+            "AB_PAIRS": [
+              [
+                1,
+                1
+              ],
+              [
+                1,
+                2
+              ]
+            ],
+            "MIXED_AB_MAX_UNIQUE_RATIOS": [
+              0.1,
+              0.3
+            ],
+            "RANDOM_SEED": 0,
+            "INIT_FROM": "@phase1",
+            "COND_FIX": "WTE",
+            "COND_FIX_START": 0
+          }
+        },
+        {
+          "name": "t2_d512l1r8h4_P251_N2_e0.1_0.3_frzWTE_seed12345",
+          "task": "mixed_ab",
+          "config": {
+            "P": 251,
+            "D_MODEL": 512,
+            "N_HEAD": 4,
+            "N_LAYER": 1,
+            "MLP_RATIO": 8,
+            "NUM_MASK": 2,
+            "USE_AB_TAG": false,
+            "USE_CONDITIONAL_WTE": false,
+            "AB_PAIRS": [
+              [
+                1,
+                1
+              ],
+              [
+                1,
+                2
+              ]
+            ],
+            "MIXED_AB_MAX_UNIQUE_RATIOS": [
+              0.1,
+              0.3
+            ],
+            "RANDOM_SEED": 12345,
+            "INIT_FROM": "@phase1",
+            "COND_FIX": "WTE",
+            "COND_FIX_START": 0
+          }
+        },
+        {
+          "name": "t2_d512l1r8h4_P251_N2_e0.1_0.3_frzWTE_seed999",
+          "task": "mixed_ab",
+          "config": {
+            "P": 251,
+            "D_MODEL": 512,
+            "N_HEAD": 4,
+            "N_LAYER": 1,
+            "MLP_RATIO": 8,
+            "NUM_MASK": 2,
+            "USE_AB_TAG": false,
+            "USE_CONDITIONAL_WTE": false,
+            "AB_PAIRS": [
+              [
+                1,
+                1
+              ],
+              [
+                1,
+                2
+              ]
+            ],
+            "MIXED_AB_MAX_UNIQUE_RATIOS": [
+              0.1,
+              0.3
+            ],
+            "RANDOM_SEED": 999,
+            "INIT_FROM": "@phase1",
+            "COND_FIX": "WTE",
+            "COND_FIX_START": 0
+          }
+        }
+      ]
+    }
+  ]
+}

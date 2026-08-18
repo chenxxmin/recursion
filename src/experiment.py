@@ -34,6 +34,29 @@ from final_eval import (_run_mixed_ab_final_test,
 # batch_run.py); run_experiment refuses to run on an unmerged config.
 
 
+def _load_partial_checkpoint(model, path, device):
+    """Resume/transfer weights from a checkpoint (INIT_FROM).
+
+    Only tensors whose name AND shape match are copied; the rest keep their
+    fresh init (e.g. rule_head when the source is a single-rule model, or wte
+    when vocab sizes differ). Prints a load/skip report so the transfer is
+    visible in the log.
+    """
+    checkpoint = torch.load(path, map_location=device)
+    state = checkpoint.get('model_state_dict', checkpoint)
+    own = model.state_dict()
+    loaded, skipped = [], []
+    for k, v in state.items():
+        if k in own and own[k].shape == v.shape:
+            own[k] = v
+            loaded.append(k)
+        else:
+            skipped.append(k)
+    model.load_state_dict(own)
+    print(f"[INIT_FROM] {path}")
+    print(f"[INIT_FROM] loaded {len(loaded)} tensors; skipped {len(skipped)}: {skipped}")
+
+
 def _round_up_pow2(n):
     """Smallest power of two >= n (used for block_size)."""
     return 2 ** (n - 1).bit_length()
@@ -451,6 +474,13 @@ def run_experiment(config_path=None):
 
     model = model.to(device)
     print(f"Model parameters: {sum(p.numel() for p in model.parameters())/1e6:.2f}M")
+
+    # Curriculum/transfer: optionally initialize weights from a previous run's
+    # checkpoint (e.g. train on rule A first, then continue on mixed A+B).
+    # Optimizer/scheduler below always start fresh.
+    init_from = cfg_main.get('INIT_FROM')
+    if init_from:
+        _load_partial_checkpoint(model, init_from, device)
 
     optimizer = torch.optim.AdamW(model.parameters(), lr=LR, weight_decay=cfg['WEIGHT_DECAY'])
     scheduler = torch.optim.lr_scheduler.CosineAnnealingLR(optimizer, T_max=EPOCHS)

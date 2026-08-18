@@ -6,6 +6,7 @@ src/nohup.out
 *.err
 *.pth
 config_tmp_*.json
+.chain_tmp/
 .DS_Store
 session_*.zip
 circle.png
