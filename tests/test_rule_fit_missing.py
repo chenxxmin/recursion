@@ -1,11 +1,15 @@
 """Unit tests for the queue-driven missing-pattern analysis in rule_fit.py."""
 import os
+import random
 import sys
+
+import torch
 
 sys.path.insert(0, os.path.join(os.path.dirname(os.path.abspath(__file__)), '..', 'src'))
 
-from rule_fit import (aggregate_buckets, child_patterns, patt_label,
-                      rule_coeffs, select_C, visible_distance)
+from rule_fit import (aggregate_buckets, child_patterns, fit_and_score,
+                      patt_label, probe_equations, rule_coeffs, select_C,
+                      visible_distance)
 
 
 def test_visible_distance():
@@ -69,6 +73,51 @@ def test_rule_coeffs():
     assert coeffs3 == [3, 1, 2]
 
 
+class _StubModel:
+    """A perfect textbook model: x_{t+1} = x_t + x_{t-1} when x_t is visible,
+    else the unrolled 2*x_{t-1} + x_{t-2}. Mimics the (logits, loss) return."""
+
+    def __init__(self, p):
+        self.p = p
+
+    def __call__(self, x):
+        view = x[0].tolist()
+        T = len(view)
+        logits = torch.zeros(1, T, self.p + 1)
+        for t in range(1, T):
+            if view[t] == self.p:
+                pred = (2 * view[t - 1] + view[t - 2]) % self.p
+            else:
+                pred = (view[t] + view[t - 1]) % self.p
+            logits[0, t, pred] = 1.0
+        return (logits, None)
+
+
+def test_probe_equations_recovers_stub_formulas():
+    random.seed(0)
+    model = _StubModel(127)
+    # (x,M): fit on d1,d2 must recover the unrolled 2*x_{t-1} + x_{t-2}
+    X, y = probe_equations(model, (False, True), [1, 2], 32, 50, 127)
+    assert len(X) > 100
+    assert all(v != 127 for row in X for v in row), "masked token leaked into features"
+    coeffs, acc, exact = fit_and_score(X, y, 127)
+    assert exact and coeffs == [2, 1], (coeffs, acc)
+    # (x,x): fit on d0,d1 recovers the base rule
+    X, y = probe_equations(model, (False, False), [0, 1], 32, 50, 127)
+    coeffs, acc, exact = fit_and_score(X, y, 127)
+    assert exact and coeffs == [1, 1], (coeffs, acc)
+
+
+def test_probe_equations_neighbour_window_masks_do_not_leak():
+    # C includes distances beyond the window: neighbours' forced masks must not
+    # land inside [t - max(C), t]
+    random.seed(0)
+    model = _StubModel(127)
+    X, y = probe_equations(model, (False, True), [1, 2, 3, 4, 5], 32, 20, 127)
+    assert len(X) > 0
+    assert all(v != 127 for row in X for v in row)
+
+
 if __name__ == '__main__':
     test_visible_distance()
     test_patt_label()
@@ -77,4 +126,6 @@ if __name__ == '__main__':
     test_child_patterns_depth_cap()
     test_aggregate_buckets_and_select_C()
     test_rule_coeffs()
+    test_probe_equations_recovers_stub_formulas()
+    test_probe_equations_neighbour_window_masks_do_not_leak()
     print("ALL TESTS PASSED: test_rule_fit_missing.py")

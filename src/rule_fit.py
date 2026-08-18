@@ -188,6 +188,35 @@ def rule_coeffs(next_fn, init_len, p):
     return coeffs, base
 
 
+def probe_equations(model, P, C, length, n_probes, p):
+    """Random off-manifold probes for pattern P: iid uniform sequences with only
+    P's own window positions forced to the missing token; everything else stays
+    visible. Random features are full-rank, so fitting C's coefficients is
+    always solvable (unlike on-manifold windows, which are rank-deficient for
+    k > recurrence order). Returns (X, y): features at distances C, target =
+    model prediction at each window end."""
+    L = len(P)
+    c_max = max(C)
+    # window ends are spaced so other windows' forced masks can never land
+    # within [t - c_max, t] of a sampled window end
+    t0 = max(L - 1, c_max)
+    ts = list(range(t0, length - 1, L + c_max))
+    X, y = [], []
+    for _ in range(n_probes):
+        view = [random.randrange(p) for _ in range(length)]
+        for t in ts:
+            for k in range(L):
+                if P[k]:
+                    view[t - L + 1 + k] = p
+        x = torch.tensor([view], dtype=torch.long)
+        with torch.no_grad():
+            preds = model(x)[0][0].argmax(dim=-1).tolist()
+        for t in ts:
+            X.append([view[t - d] for d in C])
+            y.append(preds[t])
+    return X, y
+
+
 def fmt_equation(dists, coeffs, p):
     terms = ' + '.join(f'{c}*x_{{t-{d}}}' if d else f'{c}*x_t'
                        for d, c in zip(dists, coeffs))
