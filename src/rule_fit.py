@@ -27,6 +27,7 @@ Usage (repo root):
     python src/rule_fit.py <model.pth> <cfg.json> # single-model mode: match the
                                                   # experiment by pth filename stem
     [--samples N] [--seed N] [--length L] [--min-seg N] [--depth N] [--min-n N]
+    [--exp NAME]   # batch mode: only the experiment with this name
 
 Output is teed to rule_fit_output.log.
 """
@@ -525,6 +526,8 @@ def main():
                                  'or a .pth path for single-model mode')
     ap.add_argument('json', nargs='?', default=None,
                     help='single-model mode: experiments JSON to match the pth filename stem')
+    ap.add_argument('--exp', default=None,
+                    help='batch mode: only analyze this one experiment (by its name in the JSON)')
     ap.add_argument('--samples', type=int, default=500,
                     help='random probe sequences per model (each position contributes one equation per sequence)')
     ap.add_argument('--seed', type=int, default=0)
@@ -543,6 +546,8 @@ def main():
 
     # ---- single-model mode: rule_fit model.pth config.json
     if args.name.endswith('.pth'):
+        if args.exp:
+            ap.error('--exp only applies to batch mode')
         pth = args.name
         if not args.json:
             ap.error('single-model mode needs the experiments JSON as second argument')
@@ -571,6 +576,11 @@ def main():
     exp_path = f'experiments/{args.name}.json'
     with open(exp_path, encoding='utf-8') as f:
         experiments = json.load(f)['experiments']
+    if args.exp:
+        experiments = [e for e in experiments if e['name'] == args.exp]
+        if not experiments:
+            print(f'[error] {args.exp} not found in {exp_path}')
+            return
 
     out_path = 'rule_fit_output.log'
     missing = []
