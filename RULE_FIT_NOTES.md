@@ -14,9 +14,9 @@
   0.10）把预测位置分段，每段用**完全随机**的探针序列（off-manifold 设计）拟合系数；
   最后把拟合公式相同的相邻段合并成组输出。
 - **missing 实验**（MISSING_PROB>0，且未加 --clean）：走**队列驱动 BFS**——根为
-  全可见 pattern (x,)*init_len，每个 pattern 报告 model-vs-truth 一致率与实时
-  注意力（真实污损序列），再用随机探针（off-manifold，只强制窗口内 mask）拟合
-  注意力显著可见距离的系数；子 pattern 由依赖距离被污损生成并入队：拟合可靠
+  全可见 pattern (x,)*init_len，每个 pattern 报告 model-vs-truth 一致率（真实
+  污损序列），实时注意力用于构建假设集 C（不逐模式打印），再用随机探针
+  （off-manifold，只强制窗口内 mask）拟合 C 的系数（0 系数项不打印）；子 pattern 由依赖距离被污损生成并入队：拟合可靠
   （agreement≥0.9）时依赖集 = 公式的非零系数距离，不可靠时回退为整个注意力
   集合 C（`expansion_deps`）——低 agreement 往往意味着 pattern 是更深子情形的
   混合，应细化而不是剪枝。pattern 长度上限 --depth（默认 miss_len+2）。

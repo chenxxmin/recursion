@@ -12,8 +12,16 @@ sys.path.insert(0, os.path.join(os.path.dirname(os.path.abspath(__file__)), '..'
 
 from models import FibonacciTransformer
 from rule_fit import (aggregate_buckets, child_patterns, expansion_deps,
-                      fit_and_score, patt_label, probe_equations, rule_coeffs,
-                      run_missing_categories, select_C, visible_distance)
+                      fit_and_score, fmt_equation, patt_label, probe_equations,
+                      rule_coeffs, run_missing_categories, select_C,
+                      visible_distance)
+
+
+def test_fmt_equation_drops_zero_coeffs():
+    assert (fmt_equation([1, 2, 3, 4, 5], [0, 3, 2, 0, 0], 127)
+            == 'x_{t+1} = 3*x_{t-2} + 2*x_{t-3}  (mod 127)')
+    assert fmt_equation([0, 1], [1, 1], 127) == 'x_{t+1} = 1*x_t + 1*x_{t-1}  (mod 127)'
+    assert fmt_equation([0, 1], [0, 0], 127) == 'x_{t+1} = 0  (mod 127)'
 
 
 def test_expansion_deps():
@@ -154,6 +162,7 @@ def test_run_missing_categories_smoke():
 
 if __name__ == '__main__':
     test_expansion_deps()
+    test_fmt_equation_drops_zero_coeffs()
     test_visible_distance()
     test_patt_label()
     test_child_patterns_root()

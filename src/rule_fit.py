@@ -237,9 +237,10 @@ def probe_equations(model, P, C, length, n_probes, p):
 
 
 def fmt_equation(dists, coeffs, p):
+    """Format the fitted formula, dropping zero-coefficient terms."""
     terms = ' + '.join(f'{c}*x_{{t-{d}}}' if d else f'{c}*x_t'
-                       for d, c in zip(dists, coeffs))
-    return f'x_{{t+1}} = {terms}  (mod {p})'
+                       for d, c in zip(dists, coeffs) if c % p != 0)
+    return f'x_{{t+1}} = {terms or "0"}  (mod {p})'
 
 
 def run_missing_categories(args, model, cfg, next_fn, init_len, p, exp_name, desc):
@@ -333,13 +334,6 @@ def run_missing_categories(args, model, cfg, next_fn, init_len, p, exp_name, des
             print(f'\n== pattern {label}  n={n} (< --min-n {min_n}), skipped')
             continue
         print(f'\n== pattern {label}  n={n}, model-vs-truth {agree / n:.1%}')
-        attn_parts = []
-        for (li, h), acc in sorted(attn.items()):
-            sig = [(d, s / c) for d, (s, c) in sorted(acc.items()) if s / c >= SIG_THRESHOLD]
-            if sig:
-                attn_parts.append(f'L{li}H{h} ' + ' '.join(f'd{d}:{v:.2f}' for d, v in sig))
-        if attn_parts:
-            print('  attn: ' + ' | '.join(attn_parts))
 
         C = select_C(attn, P)
         if not C:
