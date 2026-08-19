@@ -4,6 +4,8 @@
 #      （misslen predict 扩展：miss_len 3/4/5 x l1/l2，144 runs）
 #   2. experiments/addition_p127_tr64_ood128_miss2nd_d256h4_predict_ml2345.json
 #      （miss2nd predict 扩展：miss_len 2/3/4/5 x l1/l2，NUM_MASK=miss_len+1，192 runs）
+#   3. experiments/action_p127_tr64_ood128_misslen_d256h4_predict.json
+#      （action + 污损 predict：miss_len 1/2 x missprob 0.1/0.3 x l1/l2 x 8 seeds，64 runs）
 # 用法（在仓库根目录）：bash run_queued.sh
 # 建议配合 tmux 或 nohup 使用：nohup bash run_queued.sh > queued_run.log 2>&1 &
 #
@@ -37,5 +39,9 @@ echo "[$(ts)] 批次 1/2 结束（batch_run 退出码 $?）"
 echo "[$(ts)] 开始批次 2/2: addition_p127_tr64_ood128_miss2nd_d256h4_predict_ml2345.json"
 "$PYTHON_BIN" src/batch_run.py experiments/addition_p127_tr64_ood128_miss2nd_d256h4_predict_ml2345.json
 echo "[$(ts)] 批次 2/2 结束（batch_run 退出码 $?）"
+
+echo "[$(ts)] 开始批次 3/3: action_p127_tr64_ood128_misslen_d256h4_predict.json"
+"$PYTHON_BIN" src/batch_run.py experiments/action_p127_tr64_ood128_misslen_d256h4_predict.json
+echo "[$(ts)] 批次 3/3 结束（batch_run 退出码 $?）"
 
 echo "[$(ts)] 全部完成。"
