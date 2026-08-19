@@ -110,7 +110,7 @@ def fit_and_score(X, y, p, rounds=300):
     return best_c, best_acc, False
 
 
-EXPAND_MIN_AGREEMENT = 0.9   # at least this agreement for the fit to drive BFS expansion
+EXPAND_MIN_AGREEMENT = 0.8   # at least this agreement for the fit to print and to drive expansion
 FIT_MAX_ROWS = 2000          # cap equations fed to fit_and_score (RANSAC scoring cost)
 PROBE_ATTN_SAMPLES = 100     # probes used to measure per-distance attention for set C
 
@@ -361,11 +361,8 @@ def run_missing_categories(args, model, cfg, next_fn, init_len, p, exp_name, des
         # pattern is likely a mixture — refine one position deeper, both states.
         if coeffs is not None and acc_fit >= EXPAND_MIN_AGREEMENT:
             deps = {d for d, c in zip(C, coeffs) if c != 0}
-            dep_src = 'fit'
             children = mask_children(P, deps, d_max)
         else:
-            deps = set()
-            dep_src = 'refine'
             children = refine_children(P, d_max)
         children = [c for c in children if c not in visited and c not in queue]
         queue.extend(children)
@@ -385,10 +382,6 @@ def run_missing_categories(args, model, cfg, next_fn, init_len, p, exp_name, des
                   and all(fit_map.get(d, 0) == rc[d] for d in range(init_len))
                   and all(c % p == 0 for d, c in fit_map.items() if d >= init_len))
             print(f'  root check: training rule coeffs {rc} -> {"MATCH" if ok else "MISMATCH"}')
-
-        if children and dep_src == 'fit':
-            print(f'  deps {sorted(deps)} (fit) -> enqueue '
-                  + ', '.join(patt_label(c) for c in children))
     print()
 
 
