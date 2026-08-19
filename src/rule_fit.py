@@ -109,7 +109,7 @@ def fit_and_score(X, y, p, rounds=300):
     return best_c, best_acc, False
 
 
-EXPAND_MIN_AGREEMENT = 0.9   # only expand BFS children from a fit at least this good
+EXPAND_MIN_AGREEMENT = 0.9   # at least this agreement for the fit to drive BFS expansion
 FIT_MAX_ROWS = 2000          # cap equations fed to fit_and_score (RANSAC scoring cost)
 
 
@@ -144,6 +144,21 @@ def child_patterns(P, deps, d_max):
                 child[new_len - 1 - d] = True
             children.append(tuple(child))
     return children
+
+
+def expansion_deps(C, coeffs, acc):
+    """Dependency distances driving BFS expansion, plus a source tag.
+
+    Reliable fit (agreement >= EXPAND_MIN_AGREEMENT): the formula's nonzero
+    coefficient distances ('fit'). Otherwise the whole attention hypothesis
+    set C ('attn') — a low-agreement or unfittable pattern is likely a
+    mixture of deeper sub-patterns (or off-manifold attention shift), so
+    refine it by the positions the model attends to instead of trusting a
+    garbage fit. coeffs entries are already reduced mod p.
+    """
+    if coeffs is not None and acc >= EXPAND_MIN_AGREEMENT:
+        return {d for d, c in zip(C, coeffs) if c != 0}, 'fit'
+    return set(C), 'attn'
 
 
 def aggregate_buckets(buckets, P, d_max):
@@ -239,7 +254,11 @@ def run_missing_categories(args, model, cfg, next_fn, init_len, p, exp_name, des
         (set C), done on RANDOM off-manifold probes (probe_equations)
     A fitted formula's nonzero-coefficient distances are its premises: every
     pattern obtained by masking some of them (child_patterns) is enqueued, up
-    to pattern length d_max (default miss_len + 2; --depth overrides).
+    to pattern length d_max (default miss_len + 2; --depth overrides). When
+    the fit is unreliable (agreement < EXPAND_MIN_AGREEMENT or no fit), the
+    whole attention set C drives expansion instead (expansion_deps) — a
+    low-agreement pattern is likely a mixture of deeper sub-patterns, so it
+    is refined rather than pruned.
     Probe fitting targets single-layer models (a warning is printed otherwise).
     """
     length = args.length or cfg.get('TRAIN_LEN', 16)
@@ -299,8 +318,8 @@ def run_missing_categories(args, model, cfg, next_fn, init_len, p, exp_name, des
 
     # --- pass 2: BFS over patterns
     root = (False,) * init_len
-    print(f'Queue-driven analysis: root {patt_label(root)}; '
-          f'children = patterns masking the fitted formula\'s dependency distances')
+    print(f'Queue-driven analysis: root {patt_label(root)}; children = patterns '
+          f'masking the dependency distances (fit if reliable, else attention set)')
     visited = set()
     queue = [root]
     while queue:
@@ -335,11 +354,11 @@ def run_missing_categories(args, model, cfg, next_fn, init_len, p, exp_name, des
         if coeffs is None:
             print(f'  set C {C}: no linear fit on random probes '
                   f'(best agreement {acc_fit:.1%}, n={len(X)})')
-            continue
-        tag = 'EXACT' if exact else f'agreement {acc_fit:.1%}'
-        print(f'  set C {C}: {fmt_equation(C, coeffs, p)}  [{tag}, probe n={len(X)}]')
+        else:
+            tag = 'EXACT' if exact else f'agreement {acc_fit:.1%}'
+            print(f'  set C {C}: {fmt_equation(C, coeffs, p)}  [{tag}, probe n={len(X)}]')
 
-        if P == root:
+        if P == root and coeffs is not None:
             rc, base = rule_coeffs(next_fn, init_len, p)
             fit_map = {d: c % p for d, c in zip(C, coeffs)}
             ok = (base % p == 0
@@ -347,14 +366,13 @@ def run_missing_categories(args, model, cfg, next_fn, init_len, p, exp_name, des
                   and all(c % p == 0 for d, c in fit_map.items() if d >= init_len))
             print(f'  root check: training rule coeffs {rc} -> {"MATCH" if ok else "MISMATCH"}')
 
-        if acc_fit < EXPAND_MIN_AGREEMENT:
-            print(f'  agreement < {EXPAND_MIN_AGREEMENT:.0%}; not expanding')
-            continue
-        deps = {d for d, c in zip(C, coeffs) if c % p != 0}
+        # always expand: unreliable fits fall back to the attention set (a
+        # low-agreement pattern is likely a mixture of deeper sub-patterns)
+        deps, dep_src = expansion_deps(C, coeffs, acc_fit)
         children = [c for c in child_patterns(P, deps, d_max)
                     if c not in visited and c not in queue]
         if children:
-            print(f'  deps {sorted(deps)} -> enqueue '
+            print(f'  deps {sorted(deps)} ({dep_src}) -> enqueue '
                   + ', '.join(patt_label(c) for c in children))
             queue.extend(children)
     print()

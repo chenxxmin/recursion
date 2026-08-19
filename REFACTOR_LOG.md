@@ -747,3 +747,13 @@
 - 设计文档：docs/superpowers/specs/2026-08-18-dynamic-missing-design.md。
 
 **验证**：tests/test_dynamic_missing.py（污损位置 / run 约束与间隔 / seed 可复现 / 无污损格式不变 / collate / unpack / run_experiment 端到端冒烟）；全量测试回归通过。
+
+---
+
+## 55. 【行为变更】rule_fit missing 模式 BFS 不再因低 agreement 剪枝，回退注意力集合展开
+
+**问题**：#53 的队列分析里，pattern 拟合 agreement < 0.9 时直接不展开子 pattern。服务器实测（randmiss0.3len2）：`(x,M)` 真实数据 model-vs-truth 99.0%，但随机探针拟合仅 16.4% —— 探针只强制窗口内 mask、深文干净，拟合失败并非子 pattern 混合，而是注意力权重内容相关导致 off-manifold 漂移。无论何种原因，不展开都会丢失更深 pattern 的真实数据统计（子 pattern 各自的一致率恰恰能揭示混合效应）。
+
+**修改**：新增 `expansion_deps(C, coeffs, acc)`——拟合可靠（agreement ≥ EXPAND_MIN_AGREEMENT）时依赖集 = 公式非零系数距离；不可靠（低 agreement 或无解）时回退为整个注意力假设集 C。展开永远发生（C 非空时），输出标注依赖来源 `(fit)`/`(attn)`。`child_patterns` 不变。
+
+**验证**：tests/test_rule_fit_missing.py 新增 `test_expansion_deps`（可靠拟合/低 agreement/无解/常数公式四情形）；全量测试通过。真实批次行为需在服务器复跑确认。

@@ -11,9 +11,20 @@ import torch
 sys.path.insert(0, os.path.join(os.path.dirname(os.path.abspath(__file__)), '..', 'src'))
 
 from models import FibonacciTransformer
-from rule_fit import (aggregate_buckets, child_patterns, fit_and_score,
-                      patt_label, probe_equations, rule_coeffs,
+from rule_fit import (aggregate_buckets, child_patterns, expansion_deps,
+                      fit_and_score, patt_label, probe_equations, rule_coeffs,
                       run_missing_categories, select_C, visible_distance)
+
+
+def test_expansion_deps():
+    # reliable fit -> nonzero coefficient distances drive expansion
+    assert expansion_deps([1, 2, 3], [2, 1, 0], 0.99) == ({1, 2}, 'fit')
+    # low agreement -> fall back to the whole attention hypothesis set
+    assert expansion_deps([1, 2, 3], [0, 3, 2], 0.16) == ({1, 2, 3}, 'attn')
+    # no fit at all -> attention set as well
+    assert expansion_deps([1, 2], None, -1.0) == ({1, 2}, 'attn')
+    # reliable constant fit -> no dependencies, no children
+    assert expansion_deps([1, 2], [0, 0], 1.0) == (set(), 'fit')
 
 
 def test_visible_distance():
@@ -142,6 +153,7 @@ def test_run_missing_categories_smoke():
 
 
 if __name__ == '__main__':
+    test_expansion_deps()
     test_visible_distance()
     test_patt_label()
     test_child_patterns_root()
