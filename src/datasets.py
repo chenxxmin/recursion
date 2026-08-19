@@ -317,6 +317,7 @@ class BatchTag(IntEnum):
     MIXED_AB_MASKED = 3  # payload: (ab_indices, loss_mask) -- rule index + per-position loss mask
     PLAIN_TARGET = 4     # payload: (clean_seqs,) -- clean sequences; targets = clean[:, 1:]
     MIXED_AB_TARGET = 5  # payload: (ab_indices, clean_seqs) -- rule index + clean sequences
+    ACTION_MISS = 6    # payload: (clean_seqs, loss_mask) -- dynamic_mixed + missing (predict mode)
 
 
 def collate_fn(batch):
@@ -407,9 +408,16 @@ class DynamicMixedDataset(Dataset):
     Input format: [x1, x2, flag_3, x3, flag_4, x4, ..., flag_L, x_L]
     where flag_k indicates which rule is used to generate x_k.
     Loss is computed only on x3..x_L; x1, x2 and all flags are masked.
+
+    With missing_prob > 0, value positions x3..x_L are corrupted with the
+    missing token p (runs of 1..miss_len consecutive values; flags stay clean)
+    and items become (view, clean, loss_mask) triples routed through
+    BatchTag.ACTION_MISS (predict mode: loss/accuracy targets are the clean
+    values). train and test splits are corrupted alike.
     """
 
-    def __init__(self, p, ab_pairs, num_samples, length, seed=0):
+    def __init__(self, p, ab_pairs, num_samples, length, seed=0,
+                 missing_prob=0.0, miss_len=1):
         super().__init__()
         self.p = p
         self.ab_pairs = [tuple(pair) for pair in ab_pairs]
@@ -418,11 +426,23 @@ class DynamicMixedDataset(Dataset):
         self.length = length
         self.pad_token_id = p
         self.flag_start_id = p + 1
+        self.missing_prob = missing_prob
+        self.miss_len = miss_len
         self.rng = random.Random(seed)
         self.samples = [self._generate_sample() for _ in range(num_samples)]
 
     def _generate_sample(self):
-        """Generate one sequence with per-step random rules."""
+        """Generate one sequence with per-step random rules.
+
+        Input format: [x1, x2, f3, x3, flag_4, x4, ..., f_L, x_L]
+        where flag_k indicates which rule is used to generate x_k.
+        Loss is computed only on x3..x_L; x1, x2 and all flags are masked.
+
+        With missing_prob > 0 the item is (view, clean, loss_mask): view has
+        some value positions replaced by the missing token p (predict mode —
+        loss targets stay the clean values), clean is the untouched sequence.
+        Otherwise the item is (seq, loss_mask) as before.
+        """
         seq = generate_dynamic_sample(self.p, self.ab_pairs, self.flag_start_id,
                                       self.length, self.rng)
 
@@ -438,7 +458,46 @@ class DynamicMixedDataset(Dataset):
             loss_mask[target_idx] = 1.0
 
         seq_tensor = torch.tensor(seq, dtype=torch.long)
-        return seq_tensor, loss_mask
+        if self.missing_prob <= 0:
+            return seq_tensor, loss_mask
+        view = seq_tensor.clone()
+        self._corrupt_values(view)
+        return view, seq_tensor, loss_mask
+
+    def _corrupt_values(self, view):
+        """Corrupt value positions x3..x_L (odd seq indices >= 3) in place with
+        the missing token p. Mirrors RecurrenceDataset._corrupt's run model on
+        the VALUE subsequence (flags are never corrupted): scan from x3; each
+        value independently hits with probability missing_prob and corrupts a
+        run of random length in [1, miss_len] consecutive values; the value
+        right after a run stays clean; a run may be truncated at the end.
+        The whole scan is redone until the longest run equals miss_len (an
+        all-clean trial is also accepted, matching `max_run in (0, miss_len)`).
+        Uses self.rng, so dataset seeding fully determines corruption.
+        """
+        L = self.length
+        retries = 0
+        while True:
+            trial = view.clone()
+            max_run = 0
+            k = 3
+            while k <= L:
+                if self.rng.random() < self.missing_prob:
+                    run = self.rng.randint(1, self.miss_len)
+                    end = min(k + run, L + 1)  # exclusive value index
+                    for q in range(k, end):
+                        trial[2 * q - 3] = self.p
+                    max_run = max(max_run, end - k)
+                    k = end + 1  # the value right after a run stays clean
+                else:
+                    k += 1
+            if max_run in (0, self.miss_len) or retries >= 1000:
+                view.copy_(trial)
+                if retries >= 1000:
+                    print(f"WARNING: _corrupt_values gave up matching max run length "
+                          f"{self.miss_len} after {retries} retries")
+                break
+            retries += 1
 
     def __len__(self):
         return len(self.samples)
@@ -451,6 +510,15 @@ def dynamic_mixed_collate_fn(batch):
     sequences = [item[0] for item in batch]
     loss_masks = [item[1] for item in batch]
     return torch.stack(sequences, dim=0), BatchTag.DYNAMIC_MIXED, torch.stack(loss_masks, dim=0)
+
+
+def dynamic_missing_collate_fn(batch):
+    """(view, clean, loss_mask) samples (dynamic_mixed + MISSING_PROB) -> ACTION_MISS."""
+    views = [item[0] for item in batch]
+    cleans = [item[1] for item in batch]
+    loss_masks = [item[2] for item in batch]
+    return (torch.stack(views, dim=0), BatchTag.ACTION_MISS,
+            torch.stack(cleans, dim=0), torch.stack(loss_masks, dim=0))
 
 
 # ==================== MixedRecurrenceDataset (merged from the legacy
