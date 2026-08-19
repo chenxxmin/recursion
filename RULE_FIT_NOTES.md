@@ -19,7 +19,7 @@
   （off-manifold，只强制窗口内 mask）拟合 C 的系数（0 系数项不打印）；子 pattern 由依赖距离被污损生成并入队：拟合可靠
   （agreement≥0.9）时依赖集 = 公式的非零系数距离，不可靠时回退为整个注意力
   集合 C（`expansion_deps`）——低 agreement 往往意味着 pattern 是更深子情形的
-  混合，应细化而不是剪枝。pattern 长度上限 --depth（默认 miss_len+2）。
+  混合，应细化而不是剪枝。pattern 长度上限 --depth（默认 8）。
 
 **只支持单规则任务**（addition/multiplication/tribonacci/nonlinear）；mixed_ab/mixed_abc
 在 `run_one` 里直接跳过（`rule_fit.py:371`），dynamic_mixed 会走 build_single_rule 报错路径。
@@ -59,7 +59,7 @@ python src/rule_fit.py <name> <exp_name>      # 单实验模式：<name> 是模�
                                               # <exp_name> 是 .pth 文件名也是 json 条目名
 python src/rule_fit.py <model.pth> <cfg.json> # 单模型模式：按 pth 文件名 stem 匹配实验
   [--samples N=500] [--seed 0] [--length L] [--min-seg N=1]
-  [--depth D=miss_len+2] [--min-n N=20] [--clean]
+  [--depth D=8] [--min-n N=20] [--clean]
 ```
 
 输出 tee 到 `rule_fit_output.log`（CWD）。

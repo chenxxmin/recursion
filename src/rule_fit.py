@@ -11,7 +11,7 @@ Given an experiment batch NAME, this script:
      coefficient fit on attention-significant visible distances using RANDOM
      off-manifold probes (only the pattern's own window is forced masked).
      Children = patterns masking the fitted formula's dependency distances,
-     up to pattern length --depth (default miss_len + 2)
+     up to pattern length --depth (default 8)
   5. otherwise positions are segmented by ATTENTION SIGNATURE (unchanged)
   6. PROBE DATA: fully random sequences in both modes (missing mode forces
      the pattern's window masks; attention mode is uncorrupted)
@@ -255,7 +255,7 @@ def run_missing_categories(args, model, cfg, next_fn, init_len, p, exp_name, des
         (set C), done on RANDOM off-manifold probes (probe_equations)
     A fitted formula's nonzero-coefficient distances are its premises: every
     pattern obtained by masking some of them (child_patterns) is enqueued, up
-    to pattern length d_max (default miss_len + 2; --depth overrides). When
+    to pattern length d_max (default 8; --depth overrides). When
     the fit is unreliable (agreement < EXPAND_MIN_AGREEMENT or no fit), the
     whole attention set C drives expansion instead (expansion_deps) — a
     low-agreement pattern is likely a mixture of deeper sub-patterns, so it
@@ -266,7 +266,7 @@ def run_missing_categories(args, model, cfg, next_fn, init_len, p, exp_name, des
     num_mask = cfg.get('NUM_MASK') or 0
     missing_prob = cfg['MISSING_PROB']
     miss_len = cfg.get('MISS_LEN', 1)
-    d_max = args.depth or (miss_len + 2)
+    d_max = args.depth or 8
     min_n = args.min_n
     start = max(max(num_mask, 1), d_max - 1)
 
@@ -548,7 +548,7 @@ def main():
     ap.add_argument('--min-seg', type=int, default=1,
                     help='merge segments shorter than this into neighbours (default 1 = literal rule)')
     ap.add_argument('--depth', type=int, default=None,
-                    help='missing mode: max pattern length (default miss_len + 2)')
+                    help='missing mode: max pattern length (default 8)')
     ap.add_argument('--min-n', type=int, default=20,
                     help='missing mode: only print patterns with at least this many positions')
     ap.add_argument('--clean', action='store_true',
