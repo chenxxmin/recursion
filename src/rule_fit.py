@@ -24,10 +24,12 @@ Paths:
 
 Usage (repo root):
     python src/rule_fit.py <name>                 # batch mode: iterate experiments/<name>.json
+    python src/rule_fit.py <name> <exp_name>      # single experiment of the batch:
+                                                  # <name> = model dir + JSON name,
+                                                  # <exp_name> = .pth stem + JSON entry name
     python src/rule_fit.py <model.pth> <cfg.json> # single-model mode: match the
                                                   # experiment by pth filename stem
     [--samples N] [--seed N] [--length L] [--min-seg N] [--depth N] [--min-n N]
-    [--exp NAME]   # batch mode: only the experiment with this name
 
 Output is teed to rule_fit_output.log.
 """
@@ -524,10 +526,9 @@ def main():
     ap = argparse.ArgumentParser(description='Fit linear formulas to model predictions over F_p.')
     ap.add_argument('name', help='experiment batch name (experiments/<name>.json), '
                                  'or a .pth path for single-model mode')
-    ap.add_argument('json', nargs='?', default=None,
-                    help='single-model mode: experiments JSON to match the pth filename stem')
-    ap.add_argument('--exp', default=None,
-                    help='batch mode: only analyze this one experiment (by its name in the JSON)')
+    ap.add_argument('arg2', nargs='?', default=None,
+                    help='batch mode: experiment name — analyze only this one; '
+                         'single-model mode: experiments JSON to match the pth filename stem')
     ap.add_argument('--samples', type=int, default=500,
                     help='random probe sequences per model (each position contributes one equation per sequence)')
     ap.add_argument('--seed', type=int, default=0)
@@ -546,19 +547,17 @@ def main():
 
     # ---- single-model mode: rule_fit model.pth config.json
     if args.name.endswith('.pth'):
-        if args.exp:
-            ap.error('--exp only applies to batch mode')
         pth = args.name
-        if not args.json:
+        if not args.arg2:
             ap.error('single-model mode needs the experiments JSON as second argument')
-        with open(args.json, encoding='utf-8') as f:
+        with open(args.arg2, encoding='utf-8') as f:
             experiments = json.load(f)['experiments']
         stem = os.path.splitext(os.path.basename(pth))[0]
         match = next((e for e in experiments if e['name'] == stem), None)
         if match is None:
-            print(f'[error] {stem} not found in {args.json}')
+            print(f'[error] {stem} not found in {args.arg2}')
             return
-        batch = os.path.splitext(os.path.basename(args.json))[0]
+        batch = os.path.splitext(os.path.basename(args.arg2))[0]
         log = next((cand for cand in
                     (os.path.join(base.format(name=batch), f'{stem}.log')
                      for base in LOG_BASE_CANDIDATES)
@@ -572,14 +571,21 @@ def main():
         print(f'\n[output saved to {out_path}]')
         return
 
-    # ---- batch mode
+    # ---- batch mode: rule_fit <batch> [exp_name]
+    # <batch> is both the models/logs directory name and experiments/<batch>.json;
+    # [exp_name] (optional) is both the .pth filename stem and the JSON entry name
     exp_path = f'experiments/{args.name}.json'
+    batch = args.name
+    only_exp = args.arg2
+    if not os.path.exists(exp_path):
+        print(f'[error] batch not found: {exp_path}')
+        return
     with open(exp_path, encoding='utf-8') as f:
         experiments = json.load(f)['experiments']
-    if args.exp:
-        experiments = [e for e in experiments if e['name'] == args.exp]
+    if only_exp:
+        experiments = [e for e in experiments if e['name'] == only_exp]
         if not experiments:
-            print(f'[error] {args.exp} not found in {exp_path}')
+            print(f'[error] {only_exp} not found in {exp_path}')
             return
 
     out_path = 'rule_fit_output.log'
@@ -591,9 +597,9 @@ def main():
                 print('=' * 78)
                 print(f'# {exp_name}')
                 print('=' * 78)
-                pth = os.path.join(MODEL_BASE, args.name, f'{exp_name}.pth')
+                pth = os.path.join(MODEL_BASE, batch, f'{exp_name}.pth')
                 log = next((cand for cand in
-                            (os.path.join(base.format(name=args.name), f'{exp_name}.log')
+                            (os.path.join(base.format(name=batch), f'{exp_name}.log')
                              for base in LOG_BASE_CANDIDATES)
                             if os.path.exists(cand)), None)
                 if not os.path.exists(pth):

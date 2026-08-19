@@ -53,12 +53,12 @@ src/
 
 ```
 python src/rule_fit.py <name>                 # 批次模式：迭代 experiments/<name>.json
+python src/rule_fit.py <name> <exp_name>      # 单实验模式：<name> 是模型目录名也是 json 名，
+                                              # <exp_name> 是 .pth 文件名也是 json 条目名
 python src/rule_fit.py <model.pth> <cfg.json> # 单模型模式：按 pth 文件名 stem 匹配实验
   [--samples N=500] [--seed 0] [--length L] [--min-seg N=1]
-  [--depth D=miss_len+2] [--min-n N=20] [--clean] [--exp NAME=该实验名]
+  [--depth D=miss_len+2] [--min-n N=20] [--clean]
 ```
-
-`--exp` 只在批次模式生效：只分析 JSON 里 name 匹配的单个实验（模型/日志路径推导与批次模式相同）。
 
 输出 tee 到 `rule_fit_output.log`（CWD）。
 
