@@ -11,10 +11,10 @@ import torch
 sys.path.insert(0, os.path.join(os.path.dirname(os.path.abspath(__file__)), '..', 'src'))
 
 from models import FibonacciTransformer
-from rule_fit import (aggregate_buckets, child_patterns, expansion_deps,
-                      fit_and_score, fmt_equation, patt_label, probe_equations,
-                      rule_coeffs, run_missing_categories, select_C,
-                      visible_distance)
+from rule_fit import (aggregate_buckets, fit_and_score, fmt_equation,
+                      mask_children, patt_label, probe_equations,
+                      refine_children, rule_coeffs, run_missing_categories,
+                      select_C, visible_distance)
 
 
 def test_fmt_equation_drops_zero_coeffs():
@@ -24,15 +24,23 @@ def test_fmt_equation_drops_zero_coeffs():
     assert fmt_equation([0, 1], [0, 0], 127) == 'x_{t+1} = 0  (mod 127)'
 
 
-def test_expansion_deps():
-    # reliable fit -> nonzero coefficient distances drive expansion
-    assert expansion_deps([1, 2, 3], [2, 1, 0], 0.99) == ({1, 2}, 'fit')
-    # low agreement -> fall back to the whole attention hypothesis set
-    assert expansion_deps([1, 2, 3], [0, 3, 2], 0.16) == ({1, 2, 3}, 'attn')
-    # no fit at all -> attention set as well
-    assert expansion_deps([1, 2], None, -1.0) == ({1, 2}, 'attn')
-    # reliable constant fit -> no dependencies, no children
-    assert expansion_deps([1, 2], [0, 0], 1.0) == (set(), 'fit')
+def test_mask_children():
+    # (x,x) with deps {0,1}: one child per used position
+    assert set(mask_children((False, False), {0, 1}, 8)) == {(False, True), (True, False)}
+    # (x,M) dep d1 -> (M,M); dep d2 outside window -> extend to (M,x,M)
+    assert set(mask_children((False, True), {1, 2}, 8)) == {(True, True), (True, False, True)}
+    # depth cap: d8 needs a length-9 child -> dropped; d7 fits exactly in 8
+    assert mask_children((False, True), {8}, 8) == []
+    assert mask_children((False, True), {7}, 8) == [(True, False, False, False, False, False, False, True)]
+    # no deps -> no children
+    assert mask_children((False, False), set(), 8) == []
+
+
+def test_refine_children():
+    # both states of the next-deeper position, prepended
+    assert refine_children((False, True), 8) == [(False, False, True), (True, False, True)]
+    # at the depth cap -> nothing
+    assert refine_children((False,) * 8, 8) == []
 
 
 def test_visible_distance():
@@ -45,27 +53,6 @@ def test_visible_distance():
 def test_patt_label():
     assert patt_label((False, True)) == '(x,M)'
     assert patt_label((True, False, True)) == '(M,x,M)'
-
-
-def test_child_patterns_root():
-    # (x,x) with deps {0,1} -> mask any non-empty subset
-    ch = set(child_patterns((False, False), {0, 1}, 5))
-    assert ch == {(False, True), (True, False), (True, True)}, ch
-
-
-def test_child_patterns_extends_window():
-    # (x,M) with deps {1,2}: d1 -> (M,M); d2 outside window -> extend to (M,x,M);
-    # both -> (M,M,M)
-    ch = set(child_patterns((False, True), {1, 2}, 5))
-    assert ch == {(True, True), (True, False, True), (True, True, True)}, ch
-
-
-def test_child_patterns_depth_cap():
-    # dep at d5 needs a length-6 pattern -> dropped when d_max=5
-    assert child_patterns((False, True), {5}, 5) == []
-    # dep at d4 fits exactly in length 5
-    ch = child_patterns((False, True), {4}, 5)
-    assert ch == [(True, False, False, False, True)], ch
 
 
 def test_aggregate_buckets_and_select_C():
@@ -164,13 +151,11 @@ def test_run_missing_categories_smoke():
 
 
 if __name__ == '__main__':
-    test_expansion_deps()
+    test_mask_children()
+    test_refine_children()
     test_fmt_equation_drops_zero_coeffs()
     test_visible_distance()
     test_patt_label()
-    test_child_patterns_root()
-    test_child_patterns_extends_window()
-    test_child_patterns_depth_cap()
     test_aggregate_buckets_and_select_C()
     test_rule_coeffs()
     test_probe_equations_recovers_stub_formulas()

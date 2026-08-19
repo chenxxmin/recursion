@@ -757,3 +757,17 @@
 **修改**：新增 `expansion_deps(C, coeffs, acc)`——拟合可靠（agreement ≥ EXPAND_MIN_AGREEMENT）时依赖集 = 公式非零系数距离；不可靠（低 agreement 或无解）时回退为整个注意力假设集 C。展开永远发生（C 非空时），输出标注依赖来源 `(fit)`/`(attn)`。`child_patterns` 不变。
 
 **验证**：tests/test_rule_fit_missing.py 新增 `test_expansion_deps`（可靠拟合/低 agreement/无解/常数公式四情形）；全量测试通过。真实批次行为需在服务器复跑确认。
+
+---
+
+## 56. 【行为变更】rule_fit missing BFS 展开规则重做：四根 + 单位置 mask + 加深细化
+
+**问题**：#55 的"低 agreement 用整个注意力集合展开"会从 (x,M) 一次铺出 30+ 个子 pattern（deps 全子集组合），其中大部分因 miss_len 限制零样本空转；"按 deps 全子集 mask"也不符合"倒推规则树"的目标结构。
+
+**修改**（按用户重新整理的规则）：
+- 根从单个 (x,)*init_len 改为全部 2^init_len 个长度 init_len 的 pattern（order-2 即 (x,x)/(x,M)/(M,x)/(M,M) 四个）。
+- 拟合可信（agreement≥0.9）：非零系数距离 = 规则用到的位置，每个位置**单独**入队一个"该位置也被 M"的子 pattern（`mask_children`，窗口不够长时左扩、新位默认可见，查重）——取代原来的非空子集组合。
+- 拟合不可信/无解：视为更深子情形的混合，窗口加深一位，(x,) 与 (M,) 两态分别入队（`refine_children`），d_max 封顶。
+- 删除 `child_patterns`/`expansion_deps`；假设集 C 的选取维持现状（留作 TODO）；静默打印规则不变（仅拟合可信的 pattern 打整个条目）。
+
+**验证**：tests/test_rule_fit_missing.py 更新（mask_children/refine_children 单测替换原 child_patterns/expansion_deps 测试）；全量测试通过。真实批次行为需服务器复跑确认。

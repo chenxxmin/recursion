@@ -6,12 +6,13 @@ Given an experiment batch NAME, this script:
   3. dumps the attention matrix from the log as a symbol grid
      (　<0.05, · 0.05~0.1, ○ 0.1~0.25, × 0.25~0.5, ※ 0.5~1)
   4. MISSING-MODE (experiments with MISSING_PROB > 0): queue-driven BFS over
-     corruption patterns rooted at (x,)*init_len. Per pattern: model-vs-truth
-     agreement + live attention (real corrupted sequences), then a
-     coefficient fit on attention-significant visible distances using RANDOM
-     off-manifold probes (only the pattern's own window is forced masked).
-     Children = patterns masking the fitted formula's dependency distances,
-     up to pattern length --depth (default 8)
+     corruption patterns, rooted at ALL length-init_len patterns. Per pattern:
+     model-vs-truth agreement + live attention (real corrupted sequences),
+     then a coefficient fit on attention-significant visible distances using
+     RANDOM off-manifold probes (only the pattern's own window is forced
+     masked). Reliable fit (agreement >= 0.9): enqueue the pattern with each
+     used position masked; unreliable: refine one position deeper (both
+     states). Pattern length cap --depth (default 8)
   5. otherwise positions are segmented by ATTENTION SIGNATURE (unchanged)
   6. PROBE DATA: fully random sequences in both modes (missing mode forces
      the pattern's window masks; attention mode is uncorrupted)
@@ -125,40 +126,31 @@ def patt_label(P):
     return '(' + ','.join('M' if m else 'x' for m in P) + ')'
 
 
-def child_patterns(P, deps, d_max):
-    """Patterns obtained by additionally masking any non-empty subset of deps
-    (dependency distances of P's fitted formula). The window extends left (new
-    positions default to visible) when a dependency lies outside it; children
-    longer than d_max are dropped."""
+def mask_children(P, deps, d_max):
+    """One child per dependency distance: that distance additionally masked.
+    The window extends left (new positions default to visible) when the
+    dependency lies outside it; children longer than d_max are dropped."""
     L = len(P)
     children = []
-    for r in range(1, len(deps) + 1):
-        for S in itertools.combinations(sorted(deps), r):
-            new_len = max(L, max(S) + 1)
-            if new_len > d_max:
-                continue
-            child = [False] * new_len
-            for d in range(L):
-                child[new_len - 1 - d] = P[L - 1 - d]
-            for d in S:
-                child[new_len - 1 - d] = True
-            children.append(tuple(child))
+    for d in sorted(deps):
+        new_len = max(L, d + 1)
+        if new_len > d_max:
+            continue
+        child = [False] * new_len
+        for k in range(L):
+            child[new_len - L + k] = P[k]
+        child[new_len - 1 - d] = True
+        children.append(tuple(child))
     return children
 
 
-def expansion_deps(C, coeffs, acc):
-    """Dependency distances driving BFS expansion, plus a source tag.
-
-    Reliable fit (agreement >= EXPAND_MIN_AGREEMENT): the formula's nonzero
-    coefficient distances ('fit'). Otherwise the whole attention hypothesis
-    set C ('attn') — a low-agreement or unfittable pattern is likely a
-    mixture of deeper sub-patterns (or off-manifold attention shift), so
-    refine it by the positions the model attends to instead of trusting a
-    garbage fit. coeffs entries are already reduced mod p.
-    """
-    if coeffs is not None and acc >= EXPAND_MIN_AGREEMENT:
-        return {d for d, c in zip(C, coeffs) if c != 0}, 'fit'
-    return set(C), 'attn'
+def refine_children(P, d_max):
+    """Both states (visible, masked) of the next-deeper position, prepended to
+    the window — used when the fit is unreliable, i.e. the pattern is likely a
+    mixture of deeper sub-patterns. Empty when the window is at d_max."""
+    if len(P) + 1 > d_max:
+        return []
+    return [(False,) + P, (True,) + P]
 
 
 def aggregate_buckets(buckets, P, d_max):
@@ -249,17 +241,21 @@ def run_missing_categories(args, model, cfg, next_fn, init_len, p, exp_name, des
     BFS over corruption patterns rooted at the all-visible pattern
     (x,)*init_len. Pass 1 buckets positions of real corrupted recurrence
     sequences by the depth-d_max pattern (shorter patterns are derived by
-    suffix merges). Each queued pattern with n >= min-n reports:
+    suffix merges). The queue starts from ALL length-init_len patterns
+    ((x,x), (x,M), (M,x), (M,M) for order-2 rules). Each queued pattern with
+    n >= min-n reports:
       - model-vs-truth agreement and live per-distance attention (real data)
       - a coefficient fit over the attention-significant visible distances
         (set C), done on RANDOM off-manifold probes (probe_equations)
-    A fitted formula's nonzero-coefficient distances are its premises: every
-    pattern obtained by masking some of them (child_patterns) is enqueued, up
-    to pattern length d_max (default 8; --depth overrides). When
-    the fit is unreliable (agreement < EXPAND_MIN_AGREEMENT or no fit), the
-    whole attention set C drives expansion instead (expansion_deps) — a
-    low-agreement pattern is likely a mixture of deeper sub-patterns, so it
-    is refined rather than pruned.
+    Expansion (expansion itself is always attempted, up to pattern length
+    d_max (default 8; --depth overrides)):
+      - reliable fit (agreement >= EXPAND_MIN_AGREEMENT): the formula's
+        nonzero-coefficient distances are the rule's inputs; for each one,
+        the pattern with that distance additionally masked is enqueued
+        (mask_children, dedup via visited/queue)
+      - unreliable or no fit: the pattern is likely a mixture of deeper
+        sub-patterns, so both states of the next-deeper position are
+        enqueued (refine_children)
     Probe fitting targets single-layer models (a warning is printed otherwise).
     """
     length = args.length or cfg.get('TRAIN_LEN', 16)
@@ -317,12 +313,13 @@ def run_missing_categories(args, model, cfg, next_fn, init_len, p, exp_name, des
           f'miss_len={miss_len}, miss_second={cfg.get("MISS_SECOND", False)}, '
           f'max pattern depth={d_max}')
 
-    # --- pass 2: BFS over patterns
+    # --- pass 2: BFS over patterns, starting from all length-init_len patterns
     root = (False,) * init_len
-    print(f'Queue-driven analysis: root {patt_label(root)}; children = patterns '
-          f'masking the dependency distances (fit if reliable, else attention set)')
+    roots = list(itertools.product((False, True), repeat=init_len))
+    print(f'Queue-driven analysis: roots {", ".join(patt_label(r) for r in roots)}; '
+          f'reliable fit -> mask each used position, unreliable -> refine one deeper')
     visited = set()
-    queue = [root]
+    queue = list(roots)
     while queue:
         P = queue.pop(0)
         if P in visited or len(P) > d_max:
@@ -342,11 +339,19 @@ def run_missing_categories(args, model, cfg, next_fn, init_len, p, exp_name, des
             y = [y[i] for i in idx]
         coeffs, acc_fit, exact = fit_and_score(X, y, p)
 
-        # always expand: unreliable fits fall back to the attention set (a
-        # low-agreement pattern is likely a mixture of deeper sub-patterns)
-        deps, dep_src = expansion_deps(C, coeffs, acc_fit)
-        children = [c for c in child_patterns(P, deps, d_max)
-                    if c not in visited and c not in queue]
+        # expansion: a reliable fit's nonzero coefficients are the positions
+        # the rule reads — enqueue the pattern with each of them masked
+        # (single-position children). An unreliable or failed fit means the
+        # pattern is likely a mixture — refine one position deeper, both states.
+        if coeffs is not None and acc_fit >= EXPAND_MIN_AGREEMENT:
+            deps = {d for d, c in zip(C, coeffs) if c != 0}
+            dep_src = 'fit'
+            children = mask_children(P, deps, d_max)
+        else:
+            deps = set()
+            dep_src = 'refine'
+            children = refine_children(P, d_max)
+        children = [c for c in children if c not in visited and c not in queue]
         queue.extend(children)
 
         # only trustworthy fits (EXACT or agreement >= EXPAND_MIN_AGREEMENT)
@@ -365,8 +370,8 @@ def run_missing_categories(args, model, cfg, next_fn, init_len, p, exp_name, des
                   and all(c % p == 0 for d, c in fit_map.items() if d >= init_len))
             print(f'  root check: training rule coeffs {rc} -> {"MATCH" if ok else "MISMATCH"}')
 
-        if children:
-            print(f'  deps {sorted(deps)} ({dep_src}) -> enqueue '
+        if children and dep_src == 'fit':
+            print(f'  deps {sorted(deps)} (fit) -> enqueue '
                   + ', '.join(patt_label(c) for c in children))
     print()
 
