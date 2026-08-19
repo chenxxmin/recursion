@@ -388,11 +388,14 @@ def run_missing_categories(args, model, cfg, next_fn, init_len, p, exp_name, des
         coeffs, acc_fit, exact = fit_and_score(X, y, p)
         probe_ok = coeffs is not None and (exact or acc_fit >= EXPAND_MIN_AGREEMENT)
 
-        # probe fit unreliable: measure per-distance influence instead — which
-        # positions the model reads is meaningful even when no stable linear
-        # formula exists (e.g. content-dependent attention drift)
+        # probe fit unreliable: with --influence, measure per-distance
+        # influence — which positions the model reads is meaningful even when
+        # no stable linear formula exists (e.g. content-dependent attention
+        # drift). Off by default: on real models the flip-rate noise floor is
+        # high (perturbing a position also shifts attention), which made the
+        # output muddier than formula-only reporting.
         influence = None
-        if not probe_ok:
+        if not probe_ok and args.influence:
             influence = position_influence(model, P, C, length, INFLUENCE_PROBES, p)
         sig = {d for d, r in (influence or {}).items() if r >= INFLUENCE_MIN}
 
@@ -612,6 +615,9 @@ def main():
                     help='missing mode: max pattern length (default 8)')
     ap.add_argument('--min-n', type=int, default=20,
                     help='missing mode: only print patterns with at least this many positions')
+    ap.add_argument('--influence', action='store_true',
+                    help='missing mode: when the probe fit fails, report per-position '
+                         'influence (counterfactual perturbation) and let it drive expansion')
     ap.add_argument('--clean', action='store_true',
                     help='attention mode: do not corrupt; also forces attention mode for missing experiments')
     args = ap.parse_args()

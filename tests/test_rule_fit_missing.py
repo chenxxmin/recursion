@@ -165,7 +165,7 @@ def test_run_missing_categories_smoke():
     torch.manual_seed(0)
     model = FibonacciTransformer(p=7, d_model=32, n_head=2, n_layer=1, block_size=16)
     model.eval()
-    args = SimpleNamespace(length=12, min_n=5, samples=30, depth=None)
+    args = SimpleNamespace(length=12, min_n=5, samples=30, depth=None, influence=False)
     cfg = {'MISSING_PROB': 0.3, 'MISS_LEN': 2, 'TRAIN_LEN': 12}
     next_fn = lambda s: (s[-1] + s[-2]) % 7
     buf = io.StringIO()
