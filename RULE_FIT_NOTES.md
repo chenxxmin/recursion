@@ -15,14 +15,15 @@
   最后把拟合公式相同的相邻段合并成组输出。
 - **missing 实验**（MISSING_PROB>0，且未加 --clean）：走**队列驱动 BFS**——根为
   全部 2^init_len 个长度 init_len 的 pattern（order-2 即 (x,x)/(x,M)/(M,x)/(M,M)）。
-  每个 pattern 报告 model-vs-truth 一致率（真实污损序列），实时注意力用于构建
-  假设集 C（不逐模式打印），再用随机探针（off-manifold，只强制窗口内 mask）
-  拟合 C 的系数。展开规则（`mask_children`/`refine_children`，查重，长度上限
+  每个 pattern 报告 model-vs-truth 一致率（真实污损序列，不再量真实注意力），
+  假设集 C 从**探针分布本身**量注意力得到（`probe_attention`：单窗口强制 mask、
+  深文干净随机，与拟合同分布，避免子 pattern 混合污染），再用随机探针
+  （off-manifold，只强制窗口内 mask）拟合 C 的系数。展开规则（`mask_children`/`refine_children`，查重，长度上限
   --depth 默认 8）：拟合可信（agreement≥0.9）→ 公式非零系数距离是规则用到的
   位置，每个位置单独入队一个"该位置也被 M"的子 pattern；不可信 → 该 pattern
   可能是更深子情形的混合，窗口加深一位，(x,) 与 (M,) 两种状态分别入队。
   打印：只有拟合可信的 pattern 才打整个条目（头行/公式/enqueue 行，0 系数项
-  不打），其余静默展开。假设集 C 的选取策略留作 TODO。
+  不打），其余静默展开。
 
 **只支持单规则任务**（addition/multiplication/tribonacci/nonlinear）；mixed_ab/mixed_abc
 在 `run_one` 里直接跳过（`rule_fit.py:371`），dynamic_mixed 会走 build_single_rule 报错路径。

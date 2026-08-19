@@ -12,9 +12,9 @@ sys.path.insert(0, os.path.join(os.path.dirname(os.path.abspath(__file__)), '..'
 
 from models import FibonacciTransformer
 from rule_fit import (aggregate_buckets, fit_and_score, fmt_equation,
-                      mask_children, patt_label, probe_equations,
-                      refine_children, rule_coeffs, run_missing_categories,
-                      select_C, visible_distance)
+                      mask_children, patt_label, probe_attention,
+                      probe_equations, refine_children, rule_coeffs,
+                      run_missing_categories, select_C, visible_distance)
 
 
 def test_fmt_equation_drops_zero_coeffs():
@@ -55,23 +55,39 @@ def test_patt_label():
     assert patt_label((True, False, True)) == '(M,x,M)'
 
 
-def test_aggregate_buckets_and_select_C():
+def test_aggregate_buckets():
     buckets = {
-        (False, False, False, False, True): {'n': 100, 'agree': 99,
-            'attn': {(0, 0): {0: [90.0, 100], 1: [80.0, 100], 2: [5.0, 100]}}},
-        (True, False, False, False, True): {'n': 50, 'agree': 40,
-            'attn': {(0, 0): {1: [45.0, 50], 3: [20.0, 50]}}},
-        (False, False, False, True, False): {'n': 70, 'agree': 70,
-            'attn': {(0, 0): {0: [70.0, 70]}}},
+        (False, False, False, False, True): {'n': 100, 'agree': 99},
+        (True, False, False, False, True): {'n': 50, 'agree': 40},
+        (False, False, False, True, False): {'n': 70, 'agree': 70},
     }
-    n, agree, attn = aggregate_buckets(buckets, (False, True), 5)
-    assert (n, agree) == (150, 139)
-    # merged means: d0 = 90/150 = 0.60 (but masked in (x,M) -> excluded),
-    # d1 = 125/150 >= 0.10, d2 = 5/150 < 0.10, d3 = 20/150 = 0.133 >= 0.10
+    # suffix merge over the two buckets ending (x,M)
+    assert aggregate_buckets(buckets, (False, True), 5) == (150, 139)
+    # full-depth pattern matches only its own bucket
+    assert aggregate_buckets(buckets, (False, False, False, True, False), 5) == (70, 70)
+
+
+def test_select_C():
+    attn = {(0, 0): {0: [6.0, 10], 1: [8.0, 10], 2: [0.5, 10], 3: [1.5, 10]},
+            (0, 1): {4: [0.9, 10]}}
+    # (x,M): d0 masked -> excluded; d2 below 0.10 -> excluded; d4 below -> excluded
     assert select_C(attn, (False, True)) == [1, 3]
-    # suffix match works for full-depth pattern too
-    n2, agree2, _ = aggregate_buckets(buckets, (False, False, False, True, False), 5)
-    assert (n2, agree2) == (70, 70)
+    # (x,x): d0 visible now
+    assert select_C(attn, (False, False)) == [0, 1, 3]
+
+
+def test_probe_attention_structure():
+    random.seed(0)
+    torch.manual_seed(0)
+    model = FibonacciTransformer(p=7, d_model=32, n_head=2, n_layer=1, block_size=16)
+    model.eval()
+    attn = probe_attention(model, (False, True), 12, 10, 7)
+    assert set(attn) == {(0, 0), (0, 1)}
+    for dd in attn.values():
+        # window forced at t = length-2 = 10 -> distances 0..10
+        assert max(dd) == 10
+        for d, (s, c) in dd.items():
+            assert c == 10 and 0.0 <= s <= 10.0
 
 
 def test_rule_coeffs():
@@ -156,7 +172,9 @@ if __name__ == '__main__':
     test_fmt_equation_drops_zero_coeffs()
     test_visible_distance()
     test_patt_label()
-    test_aggregate_buckets_and_select_C()
+    test_aggregate_buckets()
+    test_select_C()
+    test_probe_attention_structure()
     test_rule_coeffs()
     test_probe_equations_recovers_stub_formulas()
     test_probe_equations_neighbour_window_masks_do_not_leak()

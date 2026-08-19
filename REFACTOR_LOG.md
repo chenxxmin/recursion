@@ -771,3 +771,13 @@
 - 删除 `child_patterns`/`expansion_deps`；假设集 C 的选取维持现状（留作 TODO）；静默打印规则不变（仅拟合可信的 pattern 打整个条目）。
 
 **验证**：tests/test_rule_fit_missing.py 更新（mask_children/refine_children 单测替换原 child_patterns/expansion_deps 测试）；全量测试通过。真实批次行为需服务器复跑确认。
+
+---
+
+## 57. 【行为变更】假设集 C 改从探针分布量注意力；pass 1 不再量真实注意力
+
+**问题**：C 此前从真实污损序列的后缀合并均值注意力构建——父 pattern（如 (M,x)）的注意力是各子 pattern（(x,M,x)/(M,M,x)…）按频率的混合，而注意力不看 M 位置，混合后的 C 与探针拟合的数据分布（深文干净）不匹配：可能漏掉模型在探针上实际读的位置，或多带只在深文有 mask 时才用的位置。
+
+**修改**：新增 `probe_attention`——每个探针在最后一个可预测位置单窗口强制该 pattern 的 mask、其余位置干净随机，量逐距离注意力（`PROBE_ATTN_SAMPLES=100` 个探针）；`select_C` 改用它，C 与拟合严格同分布，子 pattern 混合交给 BFS 的细化节点各自承担。pass 1 删除逐距离注意力累计（`extract_qk_raw_scores` 调用和最贵的内层循环），只留 n/agree；`aggregate_buckets` 相应瘦身返回 (n, agree)。
+
+**验证**：tests/test_rule_fit_missing.py 更新（aggregate/select_C 拆分，新增 probe_attention 结构测试）；全量测试通过。真实批次行为需服务器复跑确认。

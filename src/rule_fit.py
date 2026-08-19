@@ -112,6 +112,7 @@ def fit_and_score(X, y, p, rounds=300):
 
 EXPAND_MIN_AGREEMENT = 0.9   # at least this agreement for the fit to drive BFS expansion
 FIT_MAX_ROWS = 2000          # cap equations fed to fit_and_score (RANSAC scoring cost)
+PROBE_ATTN_SAMPLES = 100     # probes used to measure per-distance attention for set C
 
 
 def visible_distance(P, d):
@@ -154,25 +155,16 @@ def refine_children(P, d_max):
 
 
 def aggregate_buckets(buckets, P, d_max):
-    """Merge depth-d_max bucket records whose length-len(P) suffix equals P.
-    Returns (n, agree, attn) with attn {(li,h): {d: [sum, cnt]}}."""
+    """Sum (n, agree) over the depth-d_max bucket records whose length-len(P)
+    suffix equals P."""
     L = len(P)
     n, agree = 0, 0
-    attn = {}
     for B, rec in buckets.items():
         if B[d_max - L:] != P:
             continue
         n += rec['n']
         agree += rec['agree']
-        for key, dd in rec['attn'].items():
-            acc = attn.setdefault(key, {})
-            for d, (s, c) in dd.items():
-                if d in acc:
-                    acc[d][0] += s
-                    acc[d][1] += c
-                else:
-                    acc[d] = [s, c]
-    return n, agree, attn
+    return n, agree
 
 
 def select_C(attn, P, threshold=SIG_THRESHOLD):
@@ -228,6 +220,40 @@ def probe_equations(model, P, C, length, n_probes, p):
     return X, y
 
 
+def probe_attention(model, P, length, n_probes, p):
+    """Per-distance attention measured on random probes for pattern P: one
+    window per probe (P's masks forced at the last predictable position,
+    everything else clean and random), so no neighbouring forced mask can
+    pollute the measurement. Returns {(li,h): {d: [sum, cnt]}} — the same
+    structure select_C consumes. Measuring on the probe distribution (not the
+    real-data mixture) keeps C matched to the data the fit actually sees:
+    sub-pattern mixing is handled by the BFS refining deeper nodes."""
+    L = len(P)
+    t = length - 2  # last predictable position
+    attn = {}
+    for _ in range(n_probes):
+        view = [random.randrange(p) for _ in range(length)]
+        for k in range(L):
+            if P[k]:
+                view[t - L + 1 + k] = p
+        x = torch.tensor([view], dtype=torch.long)
+        with torch.no_grad():
+            attn_layers = [lo_['attn_weights'] for lo_ in extract_qk_raw_scores(model, x)]
+        for li, att in enumerate(attn_layers):
+            row_all = att[:, t, :]  # (H, T)
+            for h in range(att.shape[0]):
+                acc = attn.setdefault((li, h), {})
+                row = row_all[h]
+                for d in range(t + 1):
+                    v = row[t - d].item()
+                    if d in acc:
+                        acc[d][0] += v
+                        acc[d][1] += 1
+                    else:
+                        acc[d] = [v, 1]
+    return attn
+
+
 def fmt_equation(dists, coeffs, p):
     """Format the fitted formula, dropping zero-coefficient terms."""
     terms = ' + '.join(f'{c}*x_{{t-{d}}}' if d else f'{c}*x_t'
@@ -244,9 +270,11 @@ def run_missing_categories(args, model, cfg, next_fn, init_len, p, exp_name, des
     suffix merges). The queue starts from ALL length-init_len patterns
     ((x,x), (x,M), (M,x), (M,M) for order-2 rules). Each queued pattern with
     n >= min-n reports:
-      - model-vs-truth agreement and live per-distance attention (real data)
+      - model-vs-truth agreement (real corrupted sequences)
       - a coefficient fit over the attention-significant visible distances
-        (set C), done on RANDOM off-manifold probes (probe_equations)
+        (set C), done on RANDOM off-manifold probes (probe_equations); C
+        itself is measured on the SAME probe distribution (probe_attention),
+        so sub-pattern mixing never contaminates it
     Expansion (expansion itself is always attempted, up to pattern length
     d_max (default 8; --depth overrides)):
       - reliable fit (agreement >= EXPAND_MIN_AGREEMENT): the formula's
@@ -272,7 +300,7 @@ def run_missing_categories(args, model, cfg, next_fn, init_len, p, exp_name, des
 
     # --- pass 1: real recurrence sequences, naturally corrupted; bucket every
     # position by the corruption pattern of its last d_max tokens
-    buckets = {}  # pattern tuple (len d_max) -> {'n','agree','attn'}
+    buckets = {}  # pattern tuple (len d_max) -> {'n','agree'}
     for _ in range(args.samples):
         seq = [random.randrange(p) for _ in range(init_len)]
         while len(seq) < length:
@@ -285,28 +313,15 @@ def run_missing_categories(args, model, cfg, next_fn, init_len, p, exp_name, des
         x = torch.tensor([view], dtype=torch.long)
         with torch.no_grad():
             preds = model(x)[0][0].argmax(dim=-1).tolist()
-            attn_layers = [lo_['attn_weights'] for lo_ in extract_qk_raw_scores(model, x)]
 
         for t in range(start, length - 1):
             patt = tuple(view[t - d_max + 1 + k] == p for k in range(d_max))
             rec = buckets.get(patt)
             if rec is None:
-                rec = buckets[patt] = {'n': 0, 'agree': 0, 'attn': {}}
+                rec = buckets[patt] = {'n': 0, 'agree': 0}
             rec['n'] += 1
             if preds[t] == seq[t + 1]:
                 rec['agree'] += 1
-            for li, att in enumerate(attn_layers):
-                row_all = att[:, t, :]  # (H, T)
-                for h in range(att.shape[0]):
-                    acc = rec['attn'].setdefault((li, h), {})
-                    row = row_all[h]
-                    for d in range(t + 1):
-                        v = row[t - d].item()
-                        if d in acc:
-                            acc[d][0] += v
-                            acc[d][1] += 1
-                        else:
-                            acc[d] = [v, 1]
 
     print(f'Model: {exp_name}')
     print(f'Rule : {desc} | length={length}, missing prob={missing_prob}, '
@@ -325,11 +340,12 @@ def run_missing_categories(args, model, cfg, next_fn, init_len, p, exp_name, des
         if P in visited or len(P) > d_max:
             continue
         visited.add(P)
-        n, agree, attn = aggregate_buckets(buckets, P, d_max)
+        n, agree = aggregate_buckets(buckets, P, d_max)
         if n < min_n:
             continue
 
-        C = select_C(attn, P)
+        # set C comes from attention measured on the probe distribution itself
+        C = select_C(probe_attention(model, P, length, PROBE_ATTN_SAMPLES, p), P)
         if not C:
             continue
         X, y = probe_equations(model, P, C, length, args.samples, p)
