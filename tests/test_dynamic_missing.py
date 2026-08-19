@@ -101,6 +101,48 @@ def test_unpack_action_miss():
         pass
 
 
+def test_run_experiment_dynamic_missing_smoke():
+    import contextlib
+    import io
+    import json
+    import tempfile
+    from core import run_experiment
+    main = {
+        'P': 7, 'D_MODEL': 32, 'N_HEAD': 1, 'N_LAYER': 1,
+        'BATCH_SIZE': 32, 'EPOCHS': 2, 'LR': 0.001, 'RANDOM_SEED': 42,
+        'TRAIN_LEN': 8, 'OOD_LEN': 10, 'DROPOUT': 0.0,
+        'WEIGHT_DECAY': 0.1, 'ENTROPY_PENALTY_WEIGHT': 0.0,
+        'EVAL_INTERVAL': 1, 'EARLY_STOP_ACCURACY': 2.0,
+        'EARLY_STOP_NO_IMPROVE': 3000,
+        'USE_LEARNABLE_PE': False, 'MLP_RATIO': 4,
+        'TASK': 'dynamic_mixed', 'AB_PAIRS': [[1, 1], [1, 2]],
+        'NUM_TRAIN_SAMPLES': 200, 'NUM_TEST_SAMPLES': 50,
+        'MISSING_PROB': 0.3, 'MISS_LEN': 2,
+    }
+    # Direct assertion: the prepared dataset must produce corrupted 3-tuples
+    # when MISSING_PROB > 0 (old code warned and ignored it -> 2-tuples).
+    from experiment import _prepare_dynamic_mixed
+    prep = _prepare_dynamic_mixed({'main': dict(main), '_BATCH_RUN_MERGED': True})
+    sample = prep['train_dataset'].samples[0]
+    assert isinstance(sample, tuple) and len(sample) == 3, (
+        f"MISSING_PROB not wired: sample is a {len(sample)}-tuple, expected 3-tuple")
+    assert prep['save_config']['missing_prob'] == 0.3
+    assert prep['save_config']['miss_len'] == 2
+    with tempfile.TemporaryDirectory() as tmpdir:
+        main['SAVE_PATH'] = os.path.join(tmpdir, 'model.pth')
+        cfg = {'main': main, '_BATCH_RUN_MERGED': True}
+        cfg_path = os.path.join(tmpdir, 'config.json')
+        with open(cfg_path, 'w') as f:
+            json.dump(cfg, f)
+        buf = io.StringIO()
+        with contextlib.redirect_stdout(buf):
+            run_experiment(cfg_path)
+        out = buf.getvalue()
+        assert os.path.exists(main['SAVE_PATH']), "checkpoint was not saved"
+        assert 'Train: Loss=' in out, "training loop output missing"
+        assert 'nan' not in out.lower(), "NaN appeared in training"
+
+
 if __name__ == '__main__':
     test_missing_only_on_value_positions()
     test_run_lengths_and_spacing()
@@ -108,4 +150,5 @@ if __name__ == '__main__':
     test_no_missing_format_unchanged()
     test_collate_action_miss()
     test_unpack_action_miss()
+    test_run_experiment_dynamic_missing_smoke()
     print("ALL TESTS PASSED: test_dynamic_missing.py")

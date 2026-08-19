@@ -23,7 +23,8 @@ from datasets import (RecurrenceDataset, MixedRecurrenceDataset,
                       DynamicMixedDataset, BucketBatchSampler,
                       collate_fn, collate_fn_masked, collate_fn_predict,
                       mixed_ab_collate_fn, mixed_ab_collate_fn_masked,
-                      mixed_ab_collate_fn_predict, dynamic_mixed_collate_fn)
+                      mixed_ab_collate_fn_predict, dynamic_mixed_collate_fn,
+                      dynamic_missing_collate_fn)
 from training import run_training_engine
 from final_eval import (_run_mixed_ab_final_test,
                         _run_single_recurrence_final_test)
@@ -208,10 +209,10 @@ def _prepare_dynamic_mixed(config):
     # overrides (e.g. every N-variant's AB_PAIRS silently reverted to base).
     cfg = dict(cfg_main)
 
-    if cfg.get('MISSING_PROB', 0.0) > 0:
-        print("WARNING: MISSING_PROB > 0 is only supported for single-rule tasks; ignoring it for dynamic_mixed.")
-    if cfg.get('PREDICT_MISSING', False):
-        print("WARNING: PREDICT_MISSING is only supported for single-rule and mixed_ab/mixed_abc tasks; ignoring it for dynamic_mixed.")
+    missing_prob = cfg.get('MISSING_PROB', 0.0)
+    miss_len = cfg.get('MISS_LEN', 1)
+    if missing_prob > 0 and cfg.get('MISS_SECOND', False):
+        print("WARNING: MISS_SECOND is not supported for dynamic_mixed; ignoring it.")
     P = cfg['P']
     D_MODEL = cfg_main['D_MODEL']
     N_HEAD = cfg_main['N_HEAD']
@@ -236,16 +237,19 @@ def _prepare_dynamic_mixed(config):
 
     train_dataset = DynamicMixedDataset(
         p=P, ab_pairs=AB_PAIRS, num_samples=NUM_TRAIN_SAMPLES,
-        length=TRAIN_LEN, seed=cfg.get('RANDOM_SEED', 42)
+        length=TRAIN_LEN, seed=cfg.get('RANDOM_SEED', 42),
+        missing_prob=missing_prob, miss_len=miss_len
     )
     test_dataset = DynamicMixedDataset(
         p=P, ab_pairs=AB_PAIRS, num_samples=NUM_TEST_SAMPLES,
-        length=OOD_LEN, seed=cfg.get('RANDOM_SEED', 42) + 1
+        length=OOD_LEN, seed=cfg.get('RANDOM_SEED', 42) + 1,
+        missing_prob=missing_prob, miss_len=miss_len
     )
 
     _print_task_banner(BLOCK_SIZE, TRAIN_LEN, f"Dynamic mixed rules: {AB_PAIRS}")
 
-    train_loader, test_loader = _make_loaders(train_dataset, test_dataset, BATCH_SIZE, dynamic_mixed_collate_fn)
+    collate = dynamic_missing_collate_fn if missing_prob > 0 else dynamic_mixed_collate_fn
+    train_loader, test_loader = _make_loaders(train_dataset, test_dataset, BATCH_SIZE, collate)
 
     model = FibonacciTransformer(
         p=P, d_model=D_MODEL, n_head=N_HEAD, n_layer=N_LAYER,
@@ -283,6 +287,8 @@ def _prepare_dynamic_mixed(config):
         'recurrence': 'dynamic_mixed',
         'train_len': TRAIN_LEN,
         'ood_len': OOD_LEN,
+        'missing_prob': missing_prob,
+        'miss_len': miss_len,
     }
     return {
         'post_train_mode': 'dynamic_mixed',
