@@ -260,6 +260,107 @@
           }
         }
       ]
+    },
+    {
+      "name": "T3",
+      "experiments": [
+        {
+          "name": "t3_d512l1r8h4_P251_N2_e0.1_0.3_frzLIN_seed0",
+          "task": "mixed_ab",
+          "config": {
+            "P": 251,
+            "D_MODEL": 512,
+            "N_HEAD": 4,
+            "N_LAYER": 1,
+            "MLP_RATIO": 8,
+            "NUM_MASK": 2,
+            "USE_AB_TAG": false,
+            "USE_CONDITIONAL_WTE": false,
+            "AB_PAIRS": [
+              [
+                1,
+                1
+              ],
+              [
+                1,
+                2
+              ]
+            ],
+            "MIXED_AB_MAX_UNIQUE_RATIOS": [
+              0.1,
+              0.3
+            ],
+            "RANDOM_SEED": 0,
+            "INIT_FROM": "@phase1",
+            "COND_FIX": "LINEAR",
+            "COND_FIX_START": 0
+          }
+        },
+        {
+          "name": "t3_d512l1r8h4_P251_N2_e0.1_0.3_frzLIN_seed12345",
+          "task": "mixed_ab",
+          "config": {
+            "P": 251,
+            "D_MODEL": 512,
+            "N_HEAD": 4,
+            "N_LAYER": 1,
+            "MLP_RATIO": 8,
+            "NUM_MASK": 2,
+            "USE_AB_TAG": false,
+            "USE_CONDITIONAL_WTE": false,
+            "AB_PAIRS": [
+              [
+                1,
+                1
+              ],
+              [
+                1,
+                2
+              ]
+            ],
+            "MIXED_AB_MAX_UNIQUE_RATIOS": [
+              0.1,
+              0.3
+            ],
+            "RANDOM_SEED": 12345,
+            "INIT_FROM": "@phase1",
+            "COND_FIX": "LINEAR",
+            "COND_FIX_START": 0
+          }
+        },
+        {
+          "name": "t3_d512l1r8h4_P251_N2_e0.1_0.3_frzLIN_seed999",
+          "task": "mixed_ab",
+          "config": {
+            "P": 251,
+            "D_MODEL": 512,
+            "N_HEAD": 4,
+            "N_LAYER": 1,
+            "MLP_RATIO": 8,
+            "NUM_MASK": 2,
+            "USE_AB_TAG": false,
+            "USE_CONDITIONAL_WTE": false,
+            "AB_PAIRS": [
+              [
+                1,
+                1
+              ],
+              [
+                1,
+                2
+              ]
+            ],
+            "MIXED_AB_MAX_UNIQUE_RATIOS": [
+              0.1,
+              0.3
+            ],
+            "RANDOM_SEED": 999,
+            "INIT_FROM": "@phase1",
+            "COND_FIX": "LINEAR",
+            "COND_FIX_START": 0
+          }
+        }
+      ]
     }
   ]
 }

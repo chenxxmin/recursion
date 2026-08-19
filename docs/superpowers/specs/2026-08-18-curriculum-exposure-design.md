@@ -103,3 +103,43 @@ chain 阶段间严格串行；P1 某 seed 达不到 0.99 时该 seed 的链中�
   层数本身成为结果变量，如实报告。
 - baselines 与 P1 若并行跑，注意 GPU 显存（d512 r8 l2 模型本身的训练显存；
   stage-3 全状态评估 63001 条序列按 EVAL_BATCH_SIZE=1024 分批，张量仅数十 MB，可承受）。
+
+---
+
+## 9. 增补：T3 对偶实验（首轮结果后追加，2026-08-18）
+
+### 9.1 首轮结果（Unexposed In-dist，3 seeds 范围）
+
+| 组 | l1 | l2 |
+|---|---|---|
+| C1 单 A@0.1 | 0.3-0.6% 全败 | 0.4-0.5% 全败 |
+| C3 混合 0.1+0.1 从头 | 0.8% 全败 | 0.3-0.7% 全败 |
+| C2 混合 0.1+0.3 从头 | 99.6-99.7% 全成功 | 88-96%（OOD 长尾位置崩塌） |
+| P1 单 B@0.3 | 100% ID（OOD 仅 ~13%） | 同左 |
+| T1 B→混合，不冻 | 99.6-99.7% ≈ C2 | 79-94% |
+| T2 B→混合，冻 WTE | **A 崩到 54-78%**（OOD 47-59%） | A 77-92% |
+
+判决：H1——0.1 曝光低于单规则可学阈值；H2——先后顺序对终点几乎无影响；
+H3——冻结 WTE(+lm_head) 杀死 A 的泛化，B 抬 A 的机制必须经过 embedding 可塑性。
+
+### 9.2 T3 设计（对偶变体）
+
+`COND_FIX: "LINEAR", COND_FIX_START: 0`：**冻结主干**（transformer blocks + ln_f +
+rule_head），**只放 embedding（WTE，含共享 lm_head）可训**，其余与 T1/T2 完全相同
+（同 phase-1 checkpoint、同混合配比 0.1A+0.3B、同 seeds）。
+
+- 若 T3 能学会 A → 机制几乎全在 embedding 层；
+- 若 T3 学不会 → 主干也必须参与（机制需要 embedding × 主干协同）。
+- 注意：rule_head 被冻结在随机初始化，其 rule_loss 梯度仍会经 trunk 流入 WTE
+  （trunk 参数本身被恢复），属该变体的固有噪声，接受。
+
+### 9.3 工程改动
+
+- `chain_run.py` 新增 `--from-stage <名>`：从指定阶段续跑，早前阶段不重跑但校验其
+  checkpoint 存在（@-引用的锚点）。T3 作为第 4 个 stage 追加进两条 chain JSON，
+  服务器上执行：
+  ```bash
+  python src/chain_run.py experiments/curriculum_exposure_p251_l1.json --from-stage T3
+  python src/chain_run.py experiments/curriculum_exposure_p251_l2.json --from-stage T3
+  ```
+- 测试：`tests/test_chain_run.py::test_chain_from_stage_resume`。

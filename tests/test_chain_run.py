@@ -170,10 +170,57 @@ def test_chain_named_stage_ref():
         assert out.count('INIT_FROM <- s1/c_A_seed0') == 2, out
 
 
+def test_chain_from_stage_resume():
+    """--from-stage skips earlier stages (verifying their checkpoints exist)
+    and resolves @refs against them without re-running them."""
+    main_cfg = {'P': 7, 'A': 1, 'B': 1, 'D_MODEL': 32, 'N_HEAD': 1, 'N_LAYER': 1,
+                'BATCH_SIZE': 32, 'EPOCHS': 2, 'LR': 0.001, 'TRAIN_LEN': 8,
+                'OOD_LEN': 10, 'EVAL_INTERVAL': 1, 'EARLY_STOP_ACCURACY': 2.0}
+    mixed = {**main_cfg, 'AB_PAIRS': [[1, 1], [1, 2]], 'USE_AB_TAG': False,
+             'MIXED_AB_MAX_UNIQUE_RATIOS': [0.7, 0.7]}
+    chain = {'stages': [
+        {'name': 's1', 'experiments': [{'name': 'r_A_seed0', 'task': 'addition',
+                                        'config': dict(main_cfg)}]},
+        {'name': 's2', 'experiments': [{'name': 'r_AB_seed0', 'task': 'mixed_ab',
+                                        'config': {**mixed, 'INIT_FROM': '@s1'}}]},
+    ]}
+    with tempfile.TemporaryDirectory() as tmpdir:
+        path = os.path.join(tmpdir, 'resume_chain.json')
+        with open(path, 'w') as f:
+            json.dump(chain, f)
+        stem = 'resume_chain'
+        # fake a completed s1: an empty state dict loads as "0 tensors" but is
+        # a valid INIT_FROM source
+        s1_dir = os.path.join(tmpdir, 'models', f'{stem}_s1')
+        os.makedirs(s1_dir)
+        torch.save({'model_state_dict': {}}, os.path.join(s1_dir, 'r_A_seed0.pth'))
+
+        import chain_run
+        argv = sys.argv
+        sys.argv = ['chain_run.py', path,
+                    '--base-dir', os.path.join(tmpdir, 'out'),
+                    '--model-base-dir', os.path.join(tmpdir, 'models'),
+                    '--from-stage', 's2']
+        try:
+            buf = io.StringIO()
+            with contextlib.redirect_stdout(buf):
+                chain_run.main()
+            out = buf.getvalue()
+        finally:
+            sys.argv = argv
+
+        assert 'resuming at stage' in out
+        assert os.path.exists(os.path.join(tmpdir, 'models', f'{stem}_s2',
+                                           'r_AB_seed0.pth'))
+        # s1 must NOT have been re-run (no log dir for its batch)
+        assert not os.path.exists(os.path.join(tmpdir, 'out', f'{stem}_s1'))
+
+
 if __name__ == '__main__':
     test_load_partial_checkpoint()
     test_chain_end_to_end()
     test_chain_gate_aborts()
     test_freeze_from_start()
     test_chain_named_stage_ref()
+    test_chain_from_stage_resume()
     print('ALL TESTS PASSED: test_chain_run.py')

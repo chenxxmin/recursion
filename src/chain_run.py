@@ -27,6 +27,9 @@ Semantics:
 Usage (repo root):
     python src/chain_run.py experiments/curriculum_ab_p53.json \
         [--base-dir /data/cxm/recursion] [--model-base-dir /data/cxm/models]
+    python src/chain_run.py <chain.json> --from-stage T3
+        # resume at a named stage: earlier stages are not re-run, but their
+        # checkpoints are verified (they anchor the @-references)
 """
 import argparse
 import json
@@ -120,6 +123,10 @@ def main():
                     help=f'log/plot base dir (default: {DEFAULT_BASE_DIR})')
     ap.add_argument('--model-base-dir', default=DEFAULT_MODEL_BASE_DIR,
                     help=f'model base dir (default: {DEFAULT_MODEL_BASE_DIR})')
+    ap.add_argument('--from-stage', default=None, metavar='STAGE',
+                    help='resume the chain at the named stage: earlier stages are not '
+                         're-run, but their checkpoints must already exist (they are '
+                         'verified, since @-references resolve to them)')
     args = ap.parse_args()
 
     with open(args.chain_json, encoding='utf-8') as f:
@@ -129,10 +136,25 @@ def main():
         raise ValueError('chain JSON has no stages')
     chain_stem = os.path.splitext(os.path.basename(args.chain_json))[0]
 
+    start_idx = 0
+    if args.from_stage is not None:
+        names = [s['name'] for s in stages]
+        if args.from_stage not in names:
+            raise ValueError(f"--from-stage {args.from_stage!r} not in stage names {names}")
+        start_idx = names.index(args.from_stage)
+        # Skipped stages are resume anchors for @-references; their checkpoints
+        # must already exist.
+        for s in stages[:start_idx]:
+            _check_stage_outputs(s, f"{chain_stem}_{s['name']}",
+                                 args.base_dir, args.model_base_dir)
+        print(f"[chain] resuming at stage {args.from_stage!r} "
+              f"({start_idx} earlier stage(s) verified, not re-run)")
+
     tmp_dir = os.path.join(REPO_ROOT, '.chain_tmp')
     os.makedirs(tmp_dir, exist_ok=True)
 
-    for idx, stage in enumerate(stages):
+    for idx in range(start_idx, len(stages)):
+        stage = stages[idx]
         batch_name = f"{chain_stem}_{stage['name']}"
         print(f"\n[chain] ===== stage {idx + 1}/{len(stages)}: {stage['name']} "
               f"({len(stage['experiments'])} experiments, batch dir {batch_name}) =====")
