@@ -88,6 +88,8 @@ x_k = a * x_{k-2} + b * x_{k-1}  (mod P)
 - 模型：`FibonacciTransformer`（词表扩展以容纳 flag token）
 - loss 只计算 `x3, x4, ..., x_L`，flag token 与 `x2` 被 mask。
 
+**缺失值污损（predict 模式）**：`MISSING_PROB > 0` 时启用（参考 `experiments/dynamic_missing.json`）。值子序列 `x3..x_L` 按单规则同款 run 模型污损——每个值位置独立以 `MISSING_PROB` 概率命中并污损随机长度 ∈ [1, `MISS_LEN`] 的连续段，段后第一个值强制干净；若整段扫描没有任何 run 达到 `MISS_LEN` 则重摇（全净样本也接受）；train/test 都污损。flag token 永不污损，缺失 token 为 `M = P`（词表已含，模型零改动）。样本变为 `(view, clean, loss_mask)`，经 `BatchTag.ACTION_MISS` / `dynamic_missing_collate_fn` 路由，`_unpack_batch` 以 clean 序列为目标（predict 语义隐含，无 `PREDICT_MISSING` 开关）。`MISS_SECOND` 不支持（打 warning 并忽略）。
+
 ---
 
 ## 2. 公共训练设置
@@ -115,7 +117,7 @@ x_k = a * x_{k-2} + b * x_{k-1}  (mod P)
 | `ENTROPY_PENALTY_WEIGHT` | 注意力熵惩罚权重 |
 | `FIRST_TASK_WEIGHT` | 第一个预测位置的损失权重 |
 | `NUM_MASK` | `null` 表示使用任务默认的 mask 起始位置。**注意：当前代码中 `0` 是字面值**（首位置也计入损失与评估）；旧代码（≤2026-07-08，如 05fc707）把 `0` 当"未设置"回退到任务默认值。**今后配置不要再写 `NUM_MASK: 0`**——想排除"只看 x0 预测 x1"这个不可预测的首位置时，应显式写 `1`（参考 addition_p127_tr64_ood128 与 addition-p127w64 的口径差异） |
-| `MISSING_PROB` | >0 时启用缺失值污损：train/test 窗口中 index ≥ init_len 的位置按该概率触发污损段，被污损位置的预测损失与正确率均不计入（其后一位仍计入，用于测跨缺口补全能力）。仅单规则与 mixed_ab/mixed_abc 任务支持 |
+| `MISSING_PROB` | >0 时启用缺失值污损：train/test 窗口中 index ≥ init_len 的位置按该概率触发污损段，被污损位置的预测损失与正确率均不计入（其后一位仍计入，用于测跨缺口补全能力）。单规则、mixed_ab/mixed_abc 与 dynamic_mixed 任务支持（dynamic_mixed 固定为 predict 模式，见 §1.6） |
 | `MISS_LEN` | 污损段最大长度：命中后污损**随机长度 ∈ [1, MISS_LEN]** 的连续段，段后第一个位置强制干净；若整个窗口没有任何一段达到 MISS_LEN 则重摇直至达到；段尾可在窗口末尾截断 |
 | `MISS_SECOND` | true 时第 2 项起连续 MISS_LEN 项**必定**缺失，段后第一个位置强制干净（不会与随机段合并），随机扫描从第 MISS_LEN+2 项开始；false 为原逻辑。注意：此模式下训练样本前 init_len 个 token 不再是真实初始状态，post-train 生成测试的 exposed/unexposed 统计不可用 |
 | `PREDICT_MISSING` | 污损位的指标口径：false = mask 掉不计入；true = 输入污损序列但以**污损前的值**为目标，污损位必须填出原值并计入损失与正确率（单规则与 mixed_ab/mixed_abc 支持） |

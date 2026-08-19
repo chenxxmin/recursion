@@ -732,3 +732,18 @@
 **修改**：`run_missing_categories` 重写为队列驱动 BFS——根为 (x,)*init_len，每 pattern 用随机探针（off-manifold，只强制窗口内 mask，特征满秩）在注意力显著可见距离（set C）上拟合；拟合公式的非零系数距离作为前提，其非空子集被污损生成的子 pattern 入队（长度上限 --depth=miss_len+2）。新增 `visible_distance/child_patterns/aggregate_buckets/select_C/rule_coeffs/probe_equations`；删除 cat4 顶层四类分组、set_A/dists_C_full 与 pass 1 的 fits 累计。root pattern 增加与训练规则系数的 MATCH/MISMATCH 校验。多层模型打印 warning（off-manifold 解读仅限单层）。
 
 **验证**：`tests/test_rule_fit_missing.py`（纯函数单测 + stub 模型端到端拟合恢复 2x_{t-1}+x_{t-2} + 小模型冒烟）；真实批次端到端需在服务器复跑确认。
+
+---
+
+## 54. 【新功能】dynamic_mixed 支持缺失值污损（predict 模式）
+
+**背景**：dynamic_mixed（每步规则可变、flag 交错布局）此前 MISSING_PROB 只打 warning 并忽略。实验需要"flag 完好、部分值位置被 M 替换"的样本。
+
+**修改**：
+- `DynamicMixedDataset` 新增 missing_prob/miss_len：>0 时对值子序列 x3..x_L 做单规则同款 run 污损（连续值位置、最长 run==miss_len 否则重采、全净接受），样本变为 (view, clean, loss_mask)；predict 语义隐含（loss 对干净真值，无 PREDICT_MISSING 开关）；flag 位永不污损；M=p（vocab 已含，模型零改动）。
+- 新 `BatchTag.ACTION_MISS`（payload (clean, loss_mask)）+ `dynamic_missing_collate_fn`；`_unpack_batch` 新分支同时返回 loss_mask 与 targets_override=clean。
+- `_prepare_dynamic_mixed` 接线（删除两条旧 warning；MISS_SECOND 打 warning 忽略）；save_config 增加 missing_prob/miss_len。
+- 新增 `experiments/dynamic_missing.json` 示例。
+- 设计文档：docs/superpowers/specs/2026-08-18-dynamic-missing-design.md。
+
+**验证**：tests/test_dynamic_missing.py（污损位置 / run 约束与间隔 / seed 可复现 / 无污损格式不变 / collate / unpack / run_experiment 端到端冒烟）；全量测试回归通过。
