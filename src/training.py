@@ -50,7 +50,7 @@ def _unpack_batch(batch, device, extra_kwargs_fn):
     BatchTag) selects the payload layout:
       PLAIN          -> no payload
       MIXED_AB       -> (ab_indices,)
-      DYNAMIC_MIXED  -> (loss_mask,)
+      LOSS_MASK      -> (loss_mask,)
       ACTION_MISS    -> (clean_seqs, loss_mask); targets_override = clean_seqs
       MIXED_AB_MASKED -> (ab_indices, loss_mask)
       PLAIN_TARGET   -> (clean_seqs,); targets_override = clean_seqs
@@ -76,9 +76,9 @@ def _unpack_batch(batch, device, extra_kwargs_fn):
         ab_labels = batch[2].to(device)
         kwargs = extra_kwargs_fn(ab_labels) if extra_kwargs_fn is not None else {}
         return x, None, kwargs, ab_labels, None
-    if tag == BatchTag.DYNAMIC_MIXED:
+    if tag == BatchTag.LOSS_MASK:
         if len(batch) != 3:
-            raise ValueError(f"DYNAMIC_MIXED batch must carry exactly (loss_mask,), got {len(batch) - 2} payload item(s)")
+            raise ValueError(f"LOSS_MASK batch must carry exactly (loss_mask,), got {len(batch) - 2} payload item(s)")
         return x, batch[2].to(device), {}, None, None
     if tag == BatchTag.MIXED_AB_MASKED:
         if len(batch) != 4:

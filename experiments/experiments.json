@@ -32,7 +32,7 @@
     },
     {
       "name": "dynamic_mixed_d256l1r8h4_N2_seed0",
-      "task": "dynamic_mixed",
+      "task": "action",
       "config": {
         "D_MODEL": 256,
         "N_HEAD": 4,
@@ -57,7 +57,7 @@
     },
     {
       "name": "dynamic_mixed_d256l1r8h4_N3_seed0",
-      "task": "dynamic_mixed",
+      "task": "action",
       "config": {
         "D_MODEL": 256,
         "N_HEAD": 4,
@@ -86,7 +86,7 @@
     },
     {
       "name": "dynamic_mixed_d256l1r8h4_N4_seed0",
-      "task": "dynamic_mixed",
+      "task": "action",
       "config": {
         "D_MODEL": 256,
         "N_HEAD": 4,
@@ -119,7 +119,7 @@
     },
     {
       "name": "dynamic_mixed_d256l1r8h4_N5_seed0",
-      "task": "dynamic_mixed",
+      "task": "action",
       "config": {
         "D_MODEL": 256,
         "N_HEAD": 4,
@@ -156,7 +156,7 @@
     },
     {
       "name": "dynamic_mixed_d256l1r8h4_N6_seed0",
-      "task": "dynamic_mixed",
+      "task": "action",
       "config": {
         "D_MODEL": 256,
         "N_HEAD": 4,
@@ -197,7 +197,7 @@
     },
     {
       "name": "dynamic_mixed_d256l1r8h4_N7_seed0",
-      "task": "dynamic_mixed",
+      "task": "action",
       "config": {
         "D_MODEL": 256,
         "N_HEAD": 4,
@@ -242,7 +242,7 @@
     },
     {
       "name": "dynamic_mixed_d256l1r8h4_N8_seed0",
-      "task": "dynamic_mixed",
+      "task": "action",
       "config": {
         "D_MODEL": 256,
         "N_HEAD": 4,
@@ -291,7 +291,7 @@
     },
     {
       "name": "dynamic_mixed_d256l1r8h4_N9_seed0",
-      "task": "dynamic_mixed",
+      "task": "action",
       "config": {
         "D_MODEL": 256,
         "N_HEAD": 4,
@@ -344,7 +344,7 @@
     },
     {
       "name": "dynamic_mixed_d256l1r8h4_N10_seed0",
-      "task": "dynamic_mixed",
+      "task": "action",
       "config": {
         "D_MODEL": 256,
         "N_HEAD": 4,

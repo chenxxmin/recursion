@@ -312,12 +312,12 @@ class BucketBatchSampler(Sampler):
 # collates never guess from item types.
 class BatchTag(IntEnum):
     MIXED_AB = 0       # payload: (ab_indices,)  -- per-sample rule index
-    DYNAMIC_MIXED = 1  # payload: (loss_mask,)   -- per-position loss mask
+    LOSS_MASK = 1      # payload: (loss_mask,)   -- per-position loss mask
     PLAIN = 2          # payload: ()             -- sequences only
     MIXED_AB_MASKED = 3  # payload: (ab_indices, loss_mask) -- rule index + per-position loss mask
     PLAIN_TARGET = 4     # payload: (clean_seqs,) -- clean sequences; targets = clean[:, 1:]
     MIXED_AB_TARGET = 5  # payload: (ab_indices, clean_seqs) -- rule index + clean sequences
-    ACTION_MISS = 6    # payload: (clean_seqs, loss_mask) -- dynamic_mixed + missing (predict mode)
+    ACTION_MISS = 6    # payload: (clean_seqs, loss_mask) -- action + missing (predict mode)
 
 
 def collate_fn(batch):
@@ -326,10 +326,10 @@ def collate_fn(batch):
 
 
 def collate_fn_masked(batch):
-    """(seq, loss_mask) samples (MISSING_PROB, mask mode) -> DYNAMIC_MIXED."""
+    """(seq, loss_mask) samples (MISSING_PROB, mask mode) -> LOSS_MASK."""
     seqs = torch.stack([item[0] for item in batch], dim=0)
     masks = torch.stack([item[1] for item in batch], dim=0)
-    return seqs, BatchTag.DYNAMIC_MIXED, masks
+    return seqs, BatchTag.LOSS_MASK, masks
 
 
 def collate_fn_predict(batch):
@@ -373,11 +373,11 @@ def mixed_ab_collate_fn_predict(batch):
             ab_indices, cleans)
 
 
-def generate_dynamic_sample(p, ab_pairs, flag_start_id, length, rng):
-    """Generate one dynamic_mixed sequence [x1, x2, flag_3, x3, ..., flag_L, x_L].
+def generate_action_sample(p, ab_pairs, flag_start_id, length, rng):
+    """Generate one action sequence [x1, x2, flag_3, x3, ..., flag_L, x_L].
 
     rng: a random.Random instance owned by the caller (seeding decides the
-    sequence). Shared by DynamicMixedDataset and the attention analysis.
+    sequence). Shared by ActionDataset and the attention analysis.
     """
     x1 = rng.randrange(p)
     x2 = rng.randrange(p)
@@ -402,7 +402,7 @@ def generate_dynamic_sample(p, ab_pairs, flag_start_id, length, rng):
     return seq
 
 
-class DynamicMixedDataset(Dataset):
+class ActionDataset(Dataset):
     """Dataset where the recurrence rule can change at every step.
 
     Input format: [x1, x2, flag_3, x3, flag_4, x4, ..., flag_L, x_L]
@@ -443,7 +443,7 @@ class DynamicMixedDataset(Dataset):
         loss targets stay the clean values), clean is the untouched sequence.
         Otherwise the item is (seq, loss_mask) as before.
         """
-        seq = generate_dynamic_sample(self.p, self.ab_pairs, self.flag_start_id,
+        seq = generate_action_sample(self.p, self.ab_pairs, self.flag_start_id,
                                       self.length, self.rng)
 
         # Build loss mask aligned to targets = seq[1:]
@@ -506,14 +506,14 @@ class DynamicMixedDataset(Dataset):
         return self.samples[idx]
 
 
-def dynamic_mixed_collate_fn(batch):
+def action_collate_fn(batch):
     sequences = [item[0] for item in batch]
     loss_masks = [item[1] for item in batch]
-    return torch.stack(sequences, dim=0), BatchTag.DYNAMIC_MIXED, torch.stack(loss_masks, dim=0)
+    return torch.stack(sequences, dim=0), BatchTag.LOSS_MASK, torch.stack(loss_masks, dim=0)
 
 
-def dynamic_missing_collate_fn(batch):
-    """(view, clean, loss_mask) samples (dynamic_mixed + MISSING_PROB) -> ACTION_MISS."""
+def action_missing_collate_fn(batch):
+    """(view, clean, loss_mask) samples (action + MISSING_PROB) -> ACTION_MISS."""
     views = [item[0] for item in batch]
     cleans = [item[1] for item in batch]
     loss_masks = [item[2] for item in batch]

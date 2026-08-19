@@ -3,7 +3,7 @@
   "experiments": [
     {
       "name": "dynamic_mixed_d128l1r8_N2_seed0",
-      "task": "dynamic_mixed",
+      "task": "action",
       "config": {
         "D_MODEL": 128,
         "N_LAYER": 1,
@@ -27,7 +27,7 @@
     },
     {
       "name": "dynamic_mixed_d128l1r8_N3_seed0",
-      "task": "dynamic_mixed",
+      "task": "action",
       "config": {
         "D_MODEL": 128,
         "N_LAYER": 1,
@@ -55,7 +55,7 @@
     },
     {
       "name": "dynamic_mixed_d128l1r8_N4_seed0",
-      "task": "dynamic_mixed",
+      "task": "action",
       "config": {
         "D_MODEL": 128,
         "N_LAYER": 1,
@@ -87,7 +87,7 @@
     },
     {
       "name": "dynamic_mixed_d128l1r8_N5_seed0",
-      "task": "dynamic_mixed",
+      "task": "action",
       "config": {
         "D_MODEL": 128,
         "N_LAYER": 1,
@@ -123,7 +123,7 @@
     },
     {
       "name": "dynamic_mixed_d128l1r8_N6_seed0",
-      "task": "dynamic_mixed",
+      "task": "action",
       "config": {
         "D_MODEL": 128,
         "N_LAYER": 1,
@@ -163,7 +163,7 @@
     },
     {
       "name": "dynamic_mixed_d128l1r8_N7_seed0",
-      "task": "dynamic_mixed",
+      "task": "action",
       "config": {
         "D_MODEL": 128,
         "N_LAYER": 1,
@@ -207,7 +207,7 @@
     },
     {
       "name": "dynamic_mixed_d128l1r8_N8_seed0",
-      "task": "dynamic_mixed",
+      "task": "action",
       "config": {
         "D_MODEL": 128,
         "N_LAYER": 1,
@@ -255,7 +255,7 @@
     },
     {
       "name": "dynamic_mixed_d128l1r8_N9_seed0",
-      "task": "dynamic_mixed",
+      "task": "action",
       "config": {
         "D_MODEL": 128,
         "N_LAYER": 1,
@@ -307,7 +307,7 @@
     },
     {
       "name": "dynamic_mixed_d128l1r8_N10_seed0",
-      "task": "dynamic_mixed",
+      "task": "action",
       "config": {
         "D_MODEL": 128,
         "N_LAYER": 1,
@@ -363,7 +363,7 @@
     },
     {
       "name": "dynamic_mixed_d256l1r8_N2_seed0",
-      "task": "dynamic_mixed",
+      "task": "action",
       "config": {
         "D_MODEL": 256,
         "N_LAYER": 1,
@@ -387,7 +387,7 @@
     },
     {
       "name": "dynamic_mixed_d256l1r8_N3_seed0",
-      "task": "dynamic_mixed",
+      "task": "action",
       "config": {
         "D_MODEL": 256,
         "N_LAYER": 1,
@@ -415,7 +415,7 @@
     },
     {
       "name": "dynamic_mixed_d256l1r8_N4_seed0",
-      "task": "dynamic_mixed",
+      "task": "action",
       "config": {
         "D_MODEL": 256,
         "N_LAYER": 1,
@@ -447,7 +447,7 @@
     },
     {
       "name": "dynamic_mixed_d256l1r8_N5_seed0",
-      "task": "dynamic_mixed",
+      "task": "action",
       "config": {
         "D_MODEL": 256,
         "N_LAYER": 1,
@@ -483,7 +483,7 @@
     },
     {
       "name": "dynamic_mixed_d256l1r8_N6_seed0",
-      "task": "dynamic_mixed",
+      "task": "action",
       "config": {
         "D_MODEL": 256,
         "N_LAYER": 1,
@@ -523,7 +523,7 @@
     },
     {
       "name": "dynamic_mixed_d256l1r8_N7_seed0",
-      "task": "dynamic_mixed",
+      "task": "action",
       "config": {
         "D_MODEL": 256,
         "N_LAYER": 1,
@@ -567,7 +567,7 @@
     },
     {
       "name": "dynamic_mixed_d256l1r8_N8_seed0",
-      "task": "dynamic_mixed",
+      "task": "action",
       "config": {
         "D_MODEL": 256,
         "N_LAYER": 1,
@@ -615,7 +615,7 @@
     },
     {
       "name": "dynamic_mixed_d256l1r8_N9_seed0",
-      "task": "dynamic_mixed",
+      "task": "action",
       "config": {
         "D_MODEL": 256,
         "N_LAYER": 1,
@@ -667,7 +667,7 @@
     },
     {
       "name": "dynamic_mixed_d256l1r8_N10_seed0",
-      "task": "dynamic_mixed",
+      "task": "action",
       "config": {
         "D_MODEL": 256,
         "N_LAYER": 1,

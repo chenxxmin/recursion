@@ -1,6 +1,6 @@
 # Recursion 训练任务：模型结构与训练设置说明
 
-本文档汇总 `src/` 中 `addition`、`tribonacci`、`multiplication`、`nonlinear`、`mixed_ab`、`dynamic_mixed` 六种递归训练任务的**模型结构**与**训练设置**。所有任务共享同一套 Transformer 主干，仅在递推规则、状态空间大小、输入格式以及多规则扩展上有所区别。
+本文档汇总 `src/` 中 `addition`、`tribonacci`、`multiplication`、`nonlinear`、`mixed_ab`、`action` 六种递归训练任务的**模型结构**与**训练设置**。所有任务共享同一套 Transformer 主干，仅在递推规则、状态空间大小、输入格式以及多规则扩展上有所区别。
 
 ---
 
@@ -68,7 +68,7 @@ X(k) = a * X(k-1) + b * X(k-2)  (mod P)
 - 每组规则状态空间：`P^2 = 2809`
 - 模型：`MixedABTransformer`（在 `FibonacciTransformer` 基础上扩展多规则能力）
 
-### 1.6 dynamic_mixed
+### 1.6 action
 每步规则可变的二阶线性递推。序列格式：
 
 ```
@@ -88,7 +88,7 @@ x_k = a * x_{k-2} + b * x_{k-1}  (mod P)
 - 模型：`FibonacciTransformer`（词表扩展以容纳 flag token）
 - loss 只计算 `x3, x4, ..., x_L`，flag token 与 `x2` 被 mask。
 
-**缺失值污损（predict 模式）**：`MISSING_PROB > 0` 时启用（参考 `experiments/dynamic_missing.json`）。值子序列 `x3..x_L` 按单规则同款 run 模型污损——每个值位置独立以 `MISSING_PROB` 概率命中并污损随机长度 ∈ [1, `MISS_LEN`] 的连续段，段后第一个值强制干净；若整段扫描没有任何 run 达到 `MISS_LEN` 则重摇（全净样本也接受）；train/test 都污损。flag token 永不污损，缺失 token 为 `M = P`（词表已含，模型零改动）。样本变为 `(view, clean, loss_mask)`，经 `BatchTag.ACTION_MISS` / `dynamic_missing_collate_fn` 路由，`_unpack_batch` 以 clean 序列为目标（predict 语义隐含，无 `PREDICT_MISSING` 开关）。`MISS_SECOND` 不支持（打 warning 并忽略）。
+**缺失值污损（predict 模式）**：`MISSING_PROB > 0` 时启用（参考 `experiments/dynamic_missing.json`）。值子序列 `x3..x_L` 按单规则同款 run 模型污损——每个值位置独立以 `MISSING_PROB` 概率命中并污损随机长度 ∈ [1, `MISS_LEN`] 的连续段，段后第一个值强制干净；若整段扫描没有任何 run 达到 `MISS_LEN` 则重摇（全净样本也接受）；train/test 都污损。flag token 永不污损，缺失 token 为 `M = P`（词表已含，模型零改动）。样本变为 `(view, clean, loss_mask)`，经 `BatchTag.ACTION_MISS` / `action_missing_collate_fn` 路由，`_unpack_batch` 以 clean 序列为目标（predict 语义隐含，无 `PREDICT_MISSING` 开关）。`MISS_SECOND` 不支持（打 warning 并忽略）。
 
 ---
 
@@ -117,7 +117,7 @@ x_k = a * x_{k-2} + b * x_{k-1}  (mod P)
 | `ENTROPY_PENALTY_WEIGHT` | 注意力熵惩罚权重 |
 | `FIRST_TASK_WEIGHT` | 第一个预测位置的损失权重 |
 | `NUM_MASK` | `null` 表示使用任务默认的 mask 起始位置。**注意：当前代码中 `0` 是字面值**（首位置也计入损失与评估）；旧代码（≤2026-07-08，如 05fc707）把 `0` 当"未设置"回退到任务默认值。**今后配置不要再写 `NUM_MASK: 0`**——想排除"只看 x0 预测 x1"这个不可预测的首位置时，应显式写 `1`（参考 addition_p127_tr64_ood128 与 addition-p127w64 的口径差异） |
-| `MISSING_PROB` | >0 时启用缺失值污损：train/test 窗口中 index ≥ init_len 的位置按该概率触发污损段，被污损位置的预测损失与正确率均不计入（其后一位仍计入，用于测跨缺口补全能力）。单规则、mixed_ab/mixed_abc 与 dynamic_mixed 任务支持（dynamic_mixed 固定为 predict 模式，见 §1.6） |
+| `MISSING_PROB` | >0 时启用缺失值污损：train/test 窗口中 index ≥ init_len 的位置按该概率触发污损段，被污损位置的预测损失与正确率均不计入（其后一位仍计入，用于测跨缺口补全能力）。单规则、mixed_ab/mixed_abc 与 action 任务支持（action 固定为 predict 模式，见 §1.6） |
 | `MISS_LEN` | 污损段最大长度：命中后污损**随机长度 ∈ [1, MISS_LEN]** 的连续段，段后第一个位置强制干净；若整个窗口没有任何一段达到 MISS_LEN 则重摇直至达到；段尾可在窗口末尾截断 |
 | `MISS_SECOND` | true 时第 2 项起连续 MISS_LEN 项**必定**缺失，段后第一个位置强制干净（不会与随机段合并），随机扫描从第 MISS_LEN+2 项开始；false 为原逻辑。注意：此模式下训练样本前 init_len 个 token 不再是真实初始状态，post-train 生成测试的 exposed/unexposed 统计不可用 |
 | `PREDICT_MISSING` | 污损位的指标口径：false = mask 掉不计入；true = 输入污损序列但以**污损前的值**为目标，污损位必须填出原值并计入损失与正确率（单规则与 mixed_ab/mixed_abc 支持） |
@@ -138,7 +138,7 @@ x_k = a * x_{k-2} + b * x_{k-1}  (mod P)
 | `nonlinear` | 无覆盖，使用 `main` 默认配置 |
 | `tribonacci` | `P: 23`，`A: 1`，`B: 2`，`C: 3` |
 | `mixed_ab` | `USE_AB_TAG: false`，`USE_CONDITIONAL_WTE: false`，`COND_WTE_SHARED_RATIO: 0.0`，`MIXED_AB_MAX_UNIQUE_RATIOS: [0.7, 0.7]` |
-| `dynamic_mixed` | `P: 53`，`AB_PAIRS: [[1,1],[1,2]]`，`NUM_TRAIN_SAMPLES: 10000`，`NUM_TEST_SAMPLES: 2000`，`TRAIN_LEN: 16`，`OOD_LEN: 32` |
+| `action` | `P: 53`，`AB_PAIRS: [[1,1],[1,2]]`，`NUM_TRAIN_SAMPLES: 10000`，`NUM_TEST_SAMPLES: 2000`，`TRAIN_LEN: 16`，`OOD_LEN: 32` |
 
 ### 2.2 训练流程通用设置
 
@@ -151,8 +151,8 @@ x_k = a * x_{k-2} + b * x_{k-1}  (mod P)
   - `addition` / `multiplication` / `nonlinear`：默认屏蔽前 `1` 个位置（从预测第 3 项开始）
   - `tribonacci`：默认屏蔽前 `2` 个位置（从预测第 4 项开始）
   - `mixed_ab`：默认屏蔽前 `2` 个位置（从预测第 3 项开始，受 rule token 影响）
-  - `dynamic_mixed`：由数据集生成 2D loss_mask，只计算 `x3, x4, ...`
-- **block_size 计算**：`max(TRAIN_LEN, OOD_LEN)` 向上取整到最近的 2 的幂；`dynamic_mixed` 按 `2*L - 2` 计算。
+  - `action`：由数据集生成 2D loss_mask，只计算 `x3, x4, ...`
+- **block_size 计算**：`max(TRAIN_LEN, OOD_LEN)` 向上取整到最近的 2 的幂；`action` 按 `2*L - 2` 计算。
 
 ---
 
@@ -224,7 +224,7 @@ Input token ids (B, T)
 隐藏状态 ──▶ rule_head ──▶ 规则分类 logits ──▶ rule_loss (weight=0.5)
 ```
 
-### 3.2 FibonacciTransformer（单任务 / dynamic_mixed 模型）
+### 3.2 FibonacciTransformer（单任务 / action 模型）
 
 类：`src/models.py::FibonacciTransformer`
 
@@ -320,9 +320,9 @@ restricted_token_ids = range(P, P + num_ab_pairs)  # 生成时禁止输出 rule 
 - 规则专属 token：`idx >= shared_size`，按 `ab_labels` 选择对应规则段
 - 输出 logits 也按共享段 / 规则段分别计算，`cond_wte` 同时作为输入嵌入和输出分类权重
 
-### 3.4 dynamic_mixed 的词表扩展
+### 3.4 action 的词表扩展
 
-`dynamic_mixed` 使用基础 `FibonacciTransformer`，但在 `run_experiment` 中扩展词表以容纳 flag token：
+`action` 使用基础 `FibonacciTransformer`，但在 `run_experiment` 中扩展词表以容纳 flag token：
 
 ```python
 vocab_size = P + 1 + len(AB_PAIRS)
@@ -358,9 +358,9 @@ pad_token_id = P
 3. 合并所有规则样本后打乱训练顺序。
 4. 若启用 `USE_AB_TAG`，在序列开头拼接 rule token。
 
-### 4.3 动态混合数据集（DynamicMixedDataset）
+### 4.3 动态混合数据集（ActionDataset）
 
-类：`src/datasets.py::DynamicMixedDataset`
+类：`src/datasets.py::ActionDataset`
 
 1. 使用独立的 `random.Random(seed)` 确定性生成样本。
 2. 每步随机选择一条规则，生成 `x_k` 并在前面插入 `flag_k`。
@@ -392,7 +392,7 @@ if mixed_ab:
 | Tag | 来源 | 额外张量 |
 |-----|------|----------|
 | `BatchTag.PLAIN` | `collate_fn` | 无 |
-| `BatchTag.DYNAMIC_MIXED` | `collate_fn_masked` / `dynamic_mixed_collate_fn` | `loss_mask` |
+| `BatchTag.LOSS_MASK` | `collate_fn_masked` / `action_collate_fn` | `loss_mask` |
 | `BatchTag.PLAIN_TARGET` | `collate_fn_predict` | 干净目标序列（PREDICT_MISSING） |
 | `BatchTag.MIXED_AB` | `mixed_ab_collate_fn` | `ab_indices` |
 | `BatchTag.MIXED_AB_MASKED` | `mixed_ab_collate_fn_masked` | `ab_indices` + `loss_mask` |
@@ -416,13 +416,13 @@ if mixed_ab:
 - 区分 **Exposed**（训练集中见过的初始状态）和 **Unexposed**
 - 区分 **In-distribution**（位置 `< TRAIN_LEN`）和 **OOD**（位置 `>= TRAIN_LEN`）
 - 输出四组准确率：Exposed-ID、Exposed-OOD、Unexposed-ID、Unexposed-OOD
-- `dynamic_mixed` 没有 final generation test。
+- `action` 没有 final generation test。
 
 ---
 
 ## 6. 各任务模型与设置对比
 
-| 项目 | addition | multiplication | nonlinear | tribonacci | mixed_ab | dynamic_mixed |
+| 项目 | addition | multiplication | nonlinear | tribonacci | mixed_ab | action |
 |------|----------|----------------|-----------|------------|----------|---------------|
 | 递推公式 | `a*x1 + b*x0 mod P` | `x1 * x0 mod P` | `x1^2 + x0 mod P` | `a*x2 + b*x1 + c*x0 mod P` | 多组 `(a,b)` 二阶线性递推 | 每步随机 `(a,b)` 二阶线性递推 |
 | 默认 `P` | 53 | 53 | 53 | 23 | 53 | 53 |
@@ -442,7 +442,7 @@ if mixed_ab:
 
 | 功能 | 文件与位置 |
 |------|------------|
-| 数据生成 | `src/datasets.py::RecurrenceDataset`，`src/datasets.py::MixedRecurrenceDataset`，`src/datasets.py::DynamicMixedDataset` |
+| 数据生成 | `src/datasets.py::RecurrenceDataset`，`src/datasets.py::MixedRecurrenceDataset`，`src/datasets.py::ActionDataset` |
 | 模型定义 | `src/models.py::FibonacciTransformer`，`src/models.py::MixedABTransformer` |
 | 注意力层 | `src/models.py::CausalSelfAttention` |
 | RoPE 实现 | `src/models.py::RotaryEmbedding`，`src/models.py::apply_rotary_emb` |

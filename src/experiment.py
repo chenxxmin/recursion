@@ -20,11 +20,11 @@ from rules import rules_from_config, single_rule_from_task, save_config_extra
 from protocol import BATCH_RUN_MERGED_FLAG
 from models import FibonacciTransformer, MixedABTransformer
 from datasets import (RecurrenceDataset, MixedRecurrenceDataset,
-                      DynamicMixedDataset, BucketBatchSampler,
+                      ActionDataset, BucketBatchSampler,
                       collate_fn, collate_fn_masked, collate_fn_predict,
                       mixed_ab_collate_fn, mixed_ab_collate_fn_masked,
-                      mixed_ab_collate_fn_predict, dynamic_mixed_collate_fn,
-                      dynamic_missing_collate_fn)
+                      mixed_ab_collate_fn_predict, action_collate_fn,
+                      action_missing_collate_fn)
 from training import run_training_engine
 from final_eval import (_run_mixed_ab_final_test,
                         _run_single_recurrence_final_test)
@@ -199,10 +199,10 @@ def _prepare_mixed_recurrence(config, device, order):
     }
 
 
-def _prepare_dynamic_mixed(config):
-    """Prepare dataset, model, loaders and training params for the dynamic_mixed task."""
+def _prepare_action(config):
+    """Prepare dataset, model, loaders and training params for the action task."""
     cfg_main = config.get('main', {})
-    # batch_run already merges the dynamic_mixed section into main with the
+    # batch_run already merges the action section into main with the
     # correct precedence (main -> task defaults -> experiment override).
     # Do NOT re-apply the section here: merged configs still carry the base
     # section at top level, and re-applying it would clobber experiment
@@ -212,7 +212,7 @@ def _prepare_dynamic_mixed(config):
     missing_prob = cfg.get('MISSING_PROB', 0.0)
     miss_len = cfg.get('MISS_LEN', 1)
     if missing_prob > 0 and cfg.get('MISS_SECOND', False):
-        print("WARNING: MISS_SECOND is not supported for dynamic_mixed; ignoring it.")
+        print("WARNING: MISS_SECOND is not supported for action; ignoring it.")
     P = cfg['P']
     D_MODEL = cfg_main['D_MODEL']
     N_HEAD = cfg_main['N_HEAD']
@@ -230,17 +230,17 @@ def _prepare_dynamic_mixed(config):
     TRAIN_LEN = cfg.get('TRAIN_LEN', 16)
     OOD_LEN = cfg.get('OOD_LEN', 32)
 
-    # In dynamic_mixed, each generated token is preceded by a flag token,
+    # In action, each generated token is preceded by a flag token,
     # so the actual sequence length is 2*length - 2.
     max_seq_len = 2 * max(TRAIN_LEN, OOD_LEN) - 2
     BLOCK_SIZE = _round_up_pow2(max_seq_len)
 
-    train_dataset = DynamicMixedDataset(
+    train_dataset = ActionDataset(
         p=P, ab_pairs=AB_PAIRS, num_samples=NUM_TRAIN_SAMPLES,
         length=TRAIN_LEN, seed=cfg.get('RANDOM_SEED', 42),
         missing_prob=missing_prob, miss_len=miss_len
     )
-    test_dataset = DynamicMixedDataset(
+    test_dataset = ActionDataset(
         p=P, ab_pairs=AB_PAIRS, num_samples=NUM_TEST_SAMPLES,
         length=OOD_LEN, seed=cfg.get('RANDOM_SEED', 42) + 1,
         missing_prob=missing_prob, miss_len=miss_len
@@ -248,7 +248,7 @@ def _prepare_dynamic_mixed(config):
 
     _print_task_banner(BLOCK_SIZE, TRAIN_LEN, f"Dynamic mixed rules: {AB_PAIRS}")
 
-    collate = dynamic_missing_collate_fn if missing_prob > 0 else dynamic_mixed_collate_fn
+    collate = action_missing_collate_fn if missing_prob > 0 else action_collate_fn
     train_loader, test_loader = _make_loaders(train_dataset, test_dataset, BATCH_SIZE, collate)
 
     model = FibonacciTransformer(
@@ -284,14 +284,14 @@ def _prepare_dynamic_mixed(config):
         'mlp_ratio': cfg.get('MLP_RATIO', 4),
         'vocab_size': model.vocab_size,
         'pad_token_id': model.pad_token_id,
-        'recurrence': 'dynamic_mixed',
+        'recurrence': 'action',
         'train_len': TRAIN_LEN,
         'ood_len': OOD_LEN,
         'missing_prob': missing_prob,
         'miss_len': miss_len,
     }
     return {
-        'post_train_mode': 'dynamic_mixed',
+        'post_train_mode': 'action',
         'model': model,
         'train_dataset': train_dataset,
         'test_dataset': test_dataset,
@@ -362,7 +362,7 @@ def _prepare_single_recurrence(config, task):
     if missing_prob > 0 and predict_missing:
         collate = collate_fn_predict      # (view, clean) -> PLAIN_TARGET
     elif missing_prob > 0:
-        collate = collate_fn_masked       # (seq, mask) -> DYNAMIC_MIXED
+        collate = collate_fn_masked       # (seq, mask) -> LOSS_MASK
     else:
         collate = collate_fn              # plain tensors -> PLAIN
     train_loader, test_loader = _make_loaders(train_dataset, test_dataset, BATCH_SIZE, collate)
@@ -442,8 +442,8 @@ def run_experiment(config_path=None):
     if TASK in ('mixed_ab', 'mixed_abc'):
         order = 2 if TASK == 'mixed_ab' else 3
         ctx = _prepare_mixed_recurrence(config, device, order)
-    elif TASK == 'dynamic_mixed':
-        ctx = _prepare_dynamic_mixed(config)
+    elif TASK == 'action':
+        ctx = _prepare_action(config)
     elif TASK in ('addition', 'multiplication', 'tribonacci', 'nonlinear', 'nonlinear_mul'):
         ctx = _prepare_single_recurrence(config, TASK)
     else:

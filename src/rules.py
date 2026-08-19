@@ -94,12 +94,13 @@ def save_config_extra(task, cfg):
 def task_from_save_config(config):
     """Map a checkpoint save_config to its single-rule task name.
 
-    Returns None for mixed_ab/mixed_abc/dynamic_mixed checkpoints (those save
-    ab_pairs instead of a single recurrence spec). Defaults to 'addition' for
-    old a/b-only or minimal configs.
+    Returns None for mixed_ab/mixed_abc/action checkpoints (those save
+    ab_pairs instead of a single recurrence spec). The old name
+    'dynamic_mixed' (pre-rename checkpoints) is accepted for compatibility.
+    Defaults to 'addition' for old a/b-only or minimal configs.
     """
     recurrence = config.get('recurrence')
-    if recurrence == 'dynamic_mixed':
+    if recurrence in ('action', 'dynamic_mixed'):
         return None
     if recurrence is None and 'ab_pairs' in config:
         return None  # mixed_ab/mixed_abc

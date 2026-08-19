@@ -1,4 +1,4 @@
-"""Tests for DynamicMixedDataset missing-value corruption (predict mode)."""
+"""Tests for ActionDataset missing-value corruption (predict mode)."""
 import os
 import sys
 
@@ -6,14 +6,14 @@ import torch
 
 sys.path.insert(0, os.path.join(os.path.dirname(os.path.abspath(__file__)), '..', 'src'))
 
-from datasets import BatchTag, DynamicMixedDataset, dynamic_missing_collate_fn
+from datasets import BatchTag, ActionDataset, action_missing_collate_fn
 from training import _unpack_batch
 
 P, PAIRS, L = 7, [(1, 1), (1, 2)], 12
 
 
 def _make(missing_prob=0.5, miss_len=3, seed=42, n=200, length=L):
-    return DynamicMixedDataset(p=P, ab_pairs=PAIRS, num_samples=n,
+    return ActionDataset(p=P, ab_pairs=PAIRS, num_samples=n,
                                length=length, seed=seed,
                                missing_prob=missing_prob, miss_len=miss_len)
 
@@ -68,7 +68,7 @@ def test_seed_reproducibility():
 
 
 def test_no_missing_format_unchanged():
-    ds = DynamicMixedDataset(p=P, ab_pairs=PAIRS, num_samples=20, length=L, seed=3)
+    ds = ActionDataset(p=P, ab_pairs=PAIRS, num_samples=20, length=L, seed=3)
     for item in ds.samples:
         assert isinstance(item, tuple) and len(item) == 2
         seq, mask = item
@@ -80,7 +80,7 @@ def test_no_missing_format_unchanged():
 
 def test_collate_action_miss():
     ds = _make(n=4)
-    x, tag, clean, mask = dynamic_missing_collate_fn(ds.samples[:4])
+    x, tag, clean, mask = action_missing_collate_fn(ds.samples[:4])
     assert tag == BatchTag.ACTION_MISS
     assert x.shape == clean.shape == (4, 2 * L - 2)
     assert mask.shape == (4, 2 * L - 3)
@@ -88,7 +88,7 @@ def test_collate_action_miss():
 
 def test_unpack_action_miss():
     ds = _make(n=4)
-    batch = dynamic_missing_collate_fn(ds.samples[:4])
+    batch = action_missing_collate_fn(ds.samples[:4])
     x, loss_mask, kwargs, ab_labels, targets_override = _unpack_batch(list(batch), 'cpu', None)
     assert torch.equal(x, batch[0])
     assert torch.equal(loss_mask, batch[3])
@@ -101,7 +101,7 @@ def test_unpack_action_miss():
         pass
 
 
-def test_run_experiment_dynamic_missing_smoke():
+def test_run_experiment_action_missing_smoke():
     import contextlib
     import io
     import json
@@ -115,14 +115,14 @@ def test_run_experiment_dynamic_missing_smoke():
         'EVAL_INTERVAL': 1, 'EARLY_STOP_ACCURACY': 2.0,
         'EARLY_STOP_NO_IMPROVE': 3000,
         'USE_LEARNABLE_PE': False, 'MLP_RATIO': 4,
-        'TASK': 'dynamic_mixed', 'AB_PAIRS': [[1, 1], [1, 2]],
+        'TASK': 'action', 'AB_PAIRS': [[1, 1], [1, 2]],
         'NUM_TRAIN_SAMPLES': 200, 'NUM_TEST_SAMPLES': 50,
         'MISSING_PROB': 0.3, 'MISS_LEN': 2,
     }
     # Direct assertion: the prepared dataset must produce corrupted 3-tuples
     # when MISSING_PROB > 0 (old code warned and ignored it -> 2-tuples).
-    from experiment import _prepare_dynamic_mixed
-    prep = _prepare_dynamic_mixed({'main': dict(main), '_BATCH_RUN_MERGED': True})
+    from experiment import _prepare_action
+    prep = _prepare_action({'main': dict(main), '_BATCH_RUN_MERGED': True})
     sample = prep['train_dataset'].samples[0]
     assert isinstance(sample, tuple) and len(sample) == 3, (
         f"MISSING_PROB not wired: sample is a {len(sample)}-tuple, expected 3-tuple")
@@ -150,5 +150,5 @@ if __name__ == '__main__':
     test_no_missing_format_unchanged()
     test_collate_action_miss()
     test_unpack_action_miss()
-    test_run_experiment_dynamic_missing_smoke()
-    print("ALL TESTS PASSED: test_dynamic_missing.py")
+    test_run_experiment_action_missing_smoke()
+    print("ALL TESTS PASSED: test_action_missing.py")

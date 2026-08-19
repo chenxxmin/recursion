@@ -3,7 +3,7 @@
 Covers: legacy path when disabled, run-based corruption (MISS_LEN, MISS_SECOND),
 loss-mask alignment (target index = position - 1), test split corrupted with the
 same rule as train, PREDICT_MISSING mode (input = corrupted view, targets =
-clean sequence), explicit collate routing (PLAIN / DYNAMIC_MIXED / PLAIN_TARGET
+clean sequence), explicit collate routing (PLAIN / LOSS_MASK / PLAIN_TARGET
 / MIXED_AB_*), seed determinism, first_task_weight passthrough, and the
 mixed-rule equivalents.
 
@@ -168,11 +168,11 @@ def test_test_split_corrupted_with_mask():
         assert torch.equal(mask, expected_mask)
 
 
-def test_collate_routes_tuples_to_dynamic_mixed():
+def test_collate_routes_tuples_to_loss_mask():
     from core import collate_fn_masked
     ds = _make_ds(0.3)
     seqs, tag, masks = collate_fn_masked(ds.train_samples[:4])
-    assert tag == BatchTag.DYNAMIC_MIXED
+    assert tag == BatchTag.LOSS_MASK
     assert seqs.shape == (4, ds.length)
     assert masks.shape == (4, ds.length - 1)
 

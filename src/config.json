@@ -41,7 +41,7 @@
   "multiplication": {},
   "nonlinear": {},
   "nonlinear_mul": {},
-  "dynamic_mixed": {
+  "action": {
     "P": 53,
     "AB_PAIRS": [[1, 1], [1, 2]],
     "NUM_TRAIN_SAMPLES": 10000,

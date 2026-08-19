@@ -117,6 +117,11 @@ def build_merged_config(exp, base_config, model_dir):
     # source; a divergent TASK inside the experiment's config override is
     # ignored (with a warning) so the two can never silently disagree.
     task = exp.get('task', 'addition')
+    if task == 'dynamic_mixed':
+        print(f"[{name}] Warning: task 'dynamic_mixed' is deprecated, use 'action'")
+        task = 'action'
+    if override.get('TASK') == 'dynamic_mixed':
+        override = {**override, 'TASK': 'action'}
     if 'TASK' in override and override['TASK'] != task:
         print(f"[{name}] Warning: config.TASK={override['TASK']!r} ignored; "
               f"routing uses top-level task={task!r}")

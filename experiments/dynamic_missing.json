@@ -2,7 +2,7 @@
   "experiments": [
     {
       "name": "dynamic_a11a12_P53_miss0.1len3_seed42",
-      "task": "dynamic_mixed",
+      "task": "action",
       "config": {
         "AB_PAIRS": [[1, 1], [1, 2]],
         "P": 53,

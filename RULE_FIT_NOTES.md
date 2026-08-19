@@ -29,7 +29,7 @@
   偏糊，故默认关闭。
 
 **只支持单规则任务**（addition/multiplication/tribonacci/nonlinear）；mixed_ab/mixed_abc
-在 `run_one` 里直接跳过（`rule_fit.py:371`），dynamic_mixed 会走 build_single_rule 报错路径。
+在 `run_one` 里直接跳过（`rule_fit.py:371`），action 会走 build_single_rule 报错路径。
 
 ## 2. 仓库现状（先读这个，和旧认知不同）
 
@@ -39,7 +39,7 @@ core.py 已拆分完毕（CORE_SPLIT_PLAN.md 步骤 1-4 已执行）：
 src/
   models.py     (337)  RotaryEmbedding/CausalSelfAttention/TransformerBlock/_lm_loss/
                        FibonacciTransformer/MixedABTransformer
-  datasets.py   (623)  RecurrenceDataset/MixedRecurrenceDataset/DynamicMixedDataset/
+  datasets.py   (623)  RecurrenceDataset/MixedRecurrenceDataset/ActionDataset/
                        BatchTag+collates/BucketBatchSampler/corrupt_window/missing_token_id
   training.py   (371)  train_epoch/evaluate/run_training_engine/_unpack_batch/_sample_seq 等
   final_eval.py (220)  stage-3 曝光统计/_teacher_forced_correct

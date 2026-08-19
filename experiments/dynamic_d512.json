@@ -3,7 +3,7 @@
   "experiments": [
     {
       "name": "dynamic_mixed_d512l1r8_N2_seed25349",
-      "task": "dynamic_mixed",
+      "task": "action",
       "config": {
         "D_MODEL": 512,
         "N_LAYER": 1,
@@ -27,7 +27,7 @@
     },
     {
       "name": "dynamic_mixed_d512l1r8_N2_seed28149",
-      "task": "dynamic_mixed",
+      "task": "action",
       "config": {
         "D_MODEL": 512,
         "N_LAYER": 1,
@@ -51,7 +51,7 @@
     },
     {
       "name": "dynamic_mixed_d512l1r8_N2_seed33007",
-      "task": "dynamic_mixed",
+      "task": "action",
       "config": {
         "D_MODEL": 512,
         "N_LAYER": 1,
@@ -75,7 +75,7 @@
     },
     {
       "name": "dynamic_mixed_d512l1r8_N2_seed60953",
-      "task": "dynamic_mixed",
+      "task": "action",
       "config": {
         "D_MODEL": 512,
         "N_LAYER": 1,
@@ -99,7 +99,7 @@
     },
     {
       "name": "dynamic_mixed_d512l1r8_N2_seed67893",
-      "task": "dynamic_mixed",
+      "task": "action",
       "config": {
         "D_MODEL": 512,
         "N_LAYER": 1,
@@ -123,7 +123,7 @@
     },
     {
       "name": "dynamic_mixed_d512l1r8_N2_seed68484",
-      "task": "dynamic_mixed",
+      "task": "action",
       "config": {
         "D_MODEL": 512,
         "N_LAYER": 1,
@@ -147,7 +147,7 @@
     },
     {
       "name": "dynamic_mixed_d512l1r8_N2_seed81767",
-      "task": "dynamic_mixed",
+      "task": "action",
       "config": {
         "D_MODEL": 512,
         "N_LAYER": 1,
@@ -171,7 +171,7 @@
     },
     {
       "name": "dynamic_mixed_d512l1r8_N2_seed98817",
-      "task": "dynamic_mixed",
+      "task": "action",
       "config": {
         "D_MODEL": 512,
         "N_LAYER": 1,
@@ -195,7 +195,7 @@
     },
     {
       "name": "dynamic_mixed_d512l1r8_N3_seed25349",
-      "task": "dynamic_mixed",
+      "task": "action",
       "config": {
         "D_MODEL": 512,
         "N_LAYER": 1,
@@ -223,7 +223,7 @@
     },
     {
       "name": "dynamic_mixed_d512l1r8_N3_seed28149",
-      "task": "dynamic_mixed",
+      "task": "action",
       "config": {
         "D_MODEL": 512,
         "N_LAYER": 1,
@@ -251,7 +251,7 @@
     },
     {
       "name": "dynamic_mixed_d512l1r8_N3_seed33007",
-      "task": "dynamic_mixed",
+      "task": "action",
       "config": {
         "D_MODEL": 512,
         "N_LAYER": 1,
@@ -279,7 +279,7 @@
     },
     {
       "name": "dynamic_mixed_d512l1r8_N3_seed60953",
-      "task": "dynamic_mixed",
+      "task": "action",
       "config": {
         "D_MODEL": 512,
         "N_LAYER": 1,
@@ -307,7 +307,7 @@
     },
     {
       "name": "dynamic_mixed_d512l1r8_N3_seed67893",
-      "task": "dynamic_mixed",
+      "task": "action",
       "config": {
         "D_MODEL": 512,
         "N_LAYER": 1,
@@ -335,7 +335,7 @@
     },
     {
       "name": "dynamic_mixed_d512l1r8_N3_seed68484",
-      "task": "dynamic_mixed",
+      "task": "action",
       "config": {
         "D_MODEL": 512,
         "N_LAYER": 1,
@@ -363,7 +363,7 @@
     },
     {
       "name": "dynamic_mixed_d512l1r8_N3_seed81767",
-      "task": "dynamic_mixed",
+      "task": "action",
       "config": {
         "D_MODEL": 512,
         "N_LAYER": 1,
@@ -391,7 +391,7 @@
     },
     {
       "name": "dynamic_mixed_d512l1r8_N3_seed98817",
-      "task": "dynamic_mixed",
+      "task": "action",
       "config": {
         "D_MODEL": 512,
         "N_LAYER": 1,
@@ -419,7 +419,7 @@
     },
     {
       "name": "dynamic_mixed_d512l1r8_N4_seed25349",
-      "task": "dynamic_mixed",
+      "task": "action",
       "config": {
         "D_MODEL": 512,
         "N_LAYER": 1,
@@ -451,7 +451,7 @@
     },
     {
       "name": "dynamic_mixed_d512l1r8_N4_seed28149",
-      "task": "dynamic_mixed",
+      "task": "action",
       "config": {
         "D_MODEL": 512,
         "N_LAYER": 1,
@@ -483,7 +483,7 @@
     },
     {
       "name": "dynamic_mixed_d512l1r8_N4_seed33007",
-      "task": "dynamic_mixed",
+      "task": "action",
       "config": {
         "D_MODEL": 512,
         "N_LAYER": 1,
@@ -515,7 +515,7 @@
     },
     {
       "name": "dynamic_mixed_d512l1r8_N4_seed60953",
-      "task": "dynamic_mixed",
+      "task": "action",
       "config": {
         "D_MODEL": 512,
         "N_LAYER": 1,
@@ -547,7 +547,7 @@
     },
     {
       "name": "dynamic_mixed_d512l1r8_N4_seed67893",
-      "task": "dynamic_mixed",
+      "task": "action",
       "config": {
         "D_MODEL": 512,
         "N_LAYER": 1,
@@ -579,7 +579,7 @@
     },
     {
       "name": "dynamic_mixed_d512l1r8_N4_seed68484",
-      "task": "dynamic_mixed",
+      "task": "action",
       "config": {
         "D_MODEL": 512,
         "N_LAYER": 1,
@@ -611,7 +611,7 @@
     },
     {
       "name": "dynamic_mixed_d512l1r8_N4_seed81767",
-      "task": "dynamic_mixed",
+      "task": "action",
       "config": {
         "D_MODEL": 512,
         "N_LAYER": 1,
@@ -643,7 +643,7 @@
     },
     {
       "name": "dynamic_mixed_d512l1r8_N4_seed98817",
-      "task": "dynamic_mixed",
+      "task": "action",
       "config": {
         "D_MODEL": 512,
         "N_LAYER": 1,
@@ -675,7 +675,7 @@
     },
     {
       "name": "dynamic_mixed_d512l1r8_N5_seed25349",
-      "task": "dynamic_mixed",
+      "task": "action",
       "config": {
         "D_MODEL": 512,
         "N_LAYER": 1,
@@ -711,7 +711,7 @@
     },
     {
       "name": "dynamic_mixed_d512l1r8_N5_seed28149",
-      "task": "dynamic_mixed",
+      "task": "action",
       "config": {
         "D_MODEL": 512,
         "N_LAYER": 1,
@@ -747,7 +747,7 @@
     },
     {
       "name": "dynamic_mixed_d512l1r8_N5_seed33007",
-      "task": "dynamic_mixed",
+      "task": "action",
       "config": {
         "D_MODEL": 512,
         "N_LAYER": 1,
@@ -783,7 +783,7 @@
     },
     {
       "name": "dynamic_mixed_d512l1r8_N5_seed60953",
-      "task": "dynamic_mixed",
+      "task": "action",
       "config": {
         "D_MODEL": 512,
         "N_LAYER": 1,
@@ -819,7 +819,7 @@
     },
     {
       "name": "dynamic_mixed_d512l1r8_N5_seed67893",
-      "task": "dynamic_mixed",
+      "task": "action",
       "config": {
         "D_MODEL": 512,
         "N_LAYER": 1,
@@ -855,7 +855,7 @@
     },
     {
       "name": "dynamic_mixed_d512l1r8_N5_seed68484",
-      "task": "dynamic_mixed",
+      "task": "action",
       "config": {
         "D_MODEL": 512,
         "N_LAYER": 1,
@@ -891,7 +891,7 @@
     },
     {
       "name": "dynamic_mixed_d512l1r8_N5_seed81767",
-      "task": "dynamic_mixed",
+      "task": "action",
       "config": {
         "D_MODEL": 512,
         "N_LAYER": 1,
@@ -927,7 +927,7 @@
     },
     {
       "name": "dynamic_mixed_d512l1r8_N5_seed98817",
-      "task": "dynamic_mixed",
+      "task": "action",
       "config": {
         "D_MODEL": 512,
         "N_LAYER": 1,
@@ -963,7 +963,7 @@
     },
     {
       "name": "dynamic_mixed_d512l1r8_N6_seed25349",
-      "task": "dynamic_mixed",
+      "task": "action",
       "config": {
         "D_MODEL": 512,
         "N_LAYER": 1,
@@ -1003,7 +1003,7 @@
     },
     {
       "name": "dynamic_mixed_d512l1r8_N6_seed28149",
-      "task": "dynamic_mixed",
+      "task": "action",
       "config": {
         "D_MODEL": 512,
         "N_LAYER": 1,
@@ -1043,7 +1043,7 @@
     },
     {
       "name": "dynamic_mixed_d512l1r8_N6_seed33007",
-      "task": "dynamic_mixed",
+      "task": "action",
       "config": {
         "D_MODEL": 512,
         "N_LAYER": 1,
@@ -1083,7 +1083,7 @@
     },
     {
       "name": "dynamic_mixed_d512l1r8_N6_seed60953",
-      "task": "dynamic_mixed",
+      "task": "action",
       "config": {
         "D_MODEL": 512,
         "N_LAYER": 1,
@@ -1123,7 +1123,7 @@
     },
     {
       "name": "dynamic_mixed_d512l1r8_N6_seed67893",
-      "task": "dynamic_mixed",
+      "task": "action",
       "config": {
         "D_MODEL": 512,
         "N_LAYER": 1,
@@ -1163,7 +1163,7 @@
     },
     {
       "name": "dynamic_mixed_d512l1r8_N6_seed68484",
-      "task": "dynamic_mixed",
+      "task": "action",
       "config": {
         "D_MODEL": 512,
         "N_LAYER": 1,
@@ -1203,7 +1203,7 @@
     },
     {
       "name": "dynamic_mixed_d512l1r8_N6_seed81767",
-      "task": "dynamic_mixed",
+      "task": "action",
       "config": {
         "D_MODEL": 512,
         "N_LAYER": 1,
@@ -1243,7 +1243,7 @@
     },
     {
       "name": "dynamic_mixed_d512l1r8_N6_seed98817",
-      "task": "dynamic_mixed",
+      "task": "action",
       "config": {
         "D_MODEL": 512,
         "N_LAYER": 1,
@@ -1283,7 +1283,7 @@
     },
     {
       "name": "dynamic_mixed_d512l1r8_N7_seed25349",
-      "task": "dynamic_mixed",
+      "task": "action",
       "config": {
         "D_MODEL": 512,
         "N_LAYER": 1,
@@ -1327,7 +1327,7 @@
     },
     {
       "name": "dynamic_mixed_d512l1r8_N7_seed28149",
-      "task": "dynamic_mixed",
+      "task": "action",
       "config": {
         "D_MODEL": 512,
         "N_LAYER": 1,
@@ -1371,7 +1371,7 @@
     },
     {
       "name": "dynamic_mixed_d512l1r8_N7_seed33007",
-      "task": "dynamic_mixed",
+      "task": "action",
       "config": {
         "D_MODEL": 512,
         "N_LAYER": 1,
@@ -1415,7 +1415,7 @@
     },
     {
       "name": "dynamic_mixed_d512l1r8_N7_seed60953",
-      "task": "dynamic_mixed",
+      "task": "action",
       "config": {
         "D_MODEL": 512,
         "N_LAYER": 1,
@@ -1459,7 +1459,7 @@
     },
     {
       "name": "dynamic_mixed_d512l1r8_N7_seed67893",
-      "task": "dynamic_mixed",
+      "task": "action",
       "config": {
         "D_MODEL": 512,
         "N_LAYER": 1,
@@ -1503,7 +1503,7 @@
     },
     {
       "name": "dynamic_mixed_d512l1r8_N7_seed68484",
-      "task": "dynamic_mixed",
+      "task": "action",
       "config": {
         "D_MODEL": 512,
         "N_LAYER": 1,
@@ -1547,7 +1547,7 @@
     },
     {
       "name": "dynamic_mixed_d512l1r8_N7_seed81767",
-      "task": "dynamic_mixed",
+      "task": "action",
       "config": {
         "D_MODEL": 512,
         "N_LAYER": 1,
@@ -1591,7 +1591,7 @@
     },
     {
       "name": "dynamic_mixed_d512l1r8_N7_seed98817",
-      "task": "dynamic_mixed",
+      "task": "action",
       "config": {
         "D_MODEL": 512,
         "N_LAYER": 1,
@@ -1635,7 +1635,7 @@
     },
     {
       "name": "dynamic_mixed_d512l1r8_N8_seed25349",
-      "task": "dynamic_mixed",
+      "task": "action",
       "config": {
         "D_MODEL": 512,
         "N_LAYER": 1,
@@ -1683,7 +1683,7 @@
     },
     {
       "name": "dynamic_mixed_d512l1r8_N8_seed28149",
-      "task": "dynamic_mixed",
+      "task": "action",
       "config": {
         "D_MODEL": 512,
         "N_LAYER": 1,
@@ -1731,7 +1731,7 @@
     },
     {
       "name": "dynamic_mixed_d512l1r8_N8_seed33007",
-      "task": "dynamic_mixed",
+      "task": "action",
       "config": {
         "D_MODEL": 512,
         "N_LAYER": 1,
@@ -1779,7 +1779,7 @@
     },
     {
       "name": "dynamic_mixed_d512l1r8_N8_seed60953",
-      "task": "dynamic_mixed",
+      "task": "action",
       "config": {
         "D_MODEL": 512,
         "N_LAYER": 1,
@@ -1827,7 +1827,7 @@
     },
     {
       "name": "dynamic_mixed_d512l1r8_N8_seed67893",
-      "task": "dynamic_mixed",
+      "task": "action",
       "config": {
         "D_MODEL": 512,
         "N_LAYER": 1,
@@ -1875,7 +1875,7 @@
     },
     {
       "name": "dynamic_mixed_d512l1r8_N8_seed68484",
-      "task": "dynamic_mixed",
+      "task": "action",
       "config": {
         "D_MODEL": 512,
         "N_LAYER": 1,
@@ -1923,7 +1923,7 @@
     },
     {
       "name": "dynamic_mixed_d512l1r8_N8_seed81767",
-      "task": "dynamic_mixed",
+      "task": "action",
       "config": {
         "D_MODEL": 512,
         "N_LAYER": 1,
@@ -1971,7 +1971,7 @@
     },
     {
       "name": "dynamic_mixed_d512l1r8_N8_seed98817",
-      "task": "dynamic_mixed",
+      "task": "action",
       "config": {
         "D_MODEL": 512,
         "N_LAYER": 1,
@@ -2019,7 +2019,7 @@
     },
     {
       "name": "dynamic_mixed_d512l1r8_N9_seed25349",
-      "task": "dynamic_mixed",
+      "task": "action",
       "config": {
         "D_MODEL": 512,
         "N_LAYER": 1,
@@ -2071,7 +2071,7 @@
     },
     {
       "name": "dynamic_mixed_d512l1r8_N9_seed28149",
-      "task": "dynamic_mixed",
+      "task": "action",
       "config": {
         "D_MODEL": 512,
         "N_LAYER": 1,
@@ -2123,7 +2123,7 @@
     },
     {
       "name": "dynamic_mixed_d512l1r8_N9_seed33007",
-      "task": "dynamic_mixed",
+      "task": "action",
       "config": {
         "D_MODEL": 512,
         "N_LAYER": 1,
@@ -2175,7 +2175,7 @@
     },
     {
       "name": "dynamic_mixed_d512l1r8_N9_seed60953",
-      "task": "dynamic_mixed",
+      "task": "action",
       "config": {
         "D_MODEL": 512,
         "N_LAYER": 1,
@@ -2227,7 +2227,7 @@
     },
     {
       "name": "dynamic_mixed_d512l1r8_N9_seed67893",
-      "task": "dynamic_mixed",
+      "task": "action",
       "config": {
         "D_MODEL": 512,
         "N_LAYER": 1,
@@ -2279,7 +2279,7 @@
     },
     {
       "name": "dynamic_mixed_d512l1r8_N9_seed68484",
-      "task": "dynamic_mixed",
+      "task": "action",
       "config": {
         "D_MODEL": 512,
         "N_LAYER": 1,
@@ -2331,7 +2331,7 @@
     },
     {
       "name": "dynamic_mixed_d512l1r8_N9_seed81767",
-      "task": "dynamic_mixed",
+      "task": "action",
       "config": {
         "D_MODEL": 512,
         "N_LAYER": 1,
@@ -2383,7 +2383,7 @@
     },
     {
       "name": "dynamic_mixed_d512l1r8_N9_seed98817",
-      "task": "dynamic_mixed",
+      "task": "action",
       "config": {
         "D_MODEL": 512,
         "N_LAYER": 1,
@@ -2435,7 +2435,7 @@
     },
     {
       "name": "dynamic_mixed_d512l1r8_N10_seed25349",
-      "task": "dynamic_mixed",
+      "task": "action",
       "config": {
         "D_MODEL": 512,
         "N_LAYER": 1,
@@ -2491,7 +2491,7 @@
     },
     {
       "name": "dynamic_mixed_d512l1r8_N10_seed28149",
-      "task": "dynamic_mixed",
+      "task": "action",
       "config": {
         "D_MODEL": 512,
         "N_LAYER": 1,
@@ -2547,7 +2547,7 @@
     },
     {
       "name": "dynamic_mixed_d512l1r8_N10_seed33007",
-      "task": "dynamic_mixed",
+      "task": "action",
       "config": {
         "D_MODEL": 512,
         "N_LAYER": 1,
@@ -2603,7 +2603,7 @@
     },
     {
       "name": "dynamic_mixed_d512l1r8_N10_seed60953",
-      "task": "dynamic_mixed",
+      "task": "action",
       "config": {
         "D_MODEL": 512,
         "N_LAYER": 1,
@@ -2659,7 +2659,7 @@
     },
     {
       "name": "dynamic_mixed_d512l1r8_N10_seed67893",
-      "task": "dynamic_mixed",
+      "task": "action",
       "config": {
         "D_MODEL": 512,
         "N_LAYER": 1,
@@ -2715,7 +2715,7 @@
     },
     {
       "name": "dynamic_mixed_d512l1r8_N10_seed68484",
-      "task": "dynamic_mixed",
+      "task": "action",
       "config": {
         "D_MODEL": 512,
         "N_LAYER": 1,
@@ -2771,7 +2771,7 @@
     },
     {
       "name": "dynamic_mixed_d512l1r8_N10_seed81767",
-      "task": "dynamic_mixed",
+      "task": "action",
       "config": {
         "D_MODEL": 512,
         "N_LAYER": 1,
@@ -2827,7 +2827,7 @@
     },
     {
       "name": "dynamic_mixed_d512l1r8_N10_seed98817",
-      "task": "dynamic_mixed",
+      "task": "action",
       "config": {
         "D_MODEL": 512,
         "N_LAYER": 1,

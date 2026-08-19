@@ -386,20 +386,20 @@ def _resolve_recurrence(config):
 
     Returns a dict with:
       init_len:         number of initial values the recurrence needs
-      next_val:         callable seq -> next value (None for dynamic_mixed/mixed)
-      is_dynamic_mixed: whether the rule can change at every step
-      ab_pairs, flag_start_id, dynamic_seq_len: only for dynamic_mixed
+      next_val:         callable seq -> next value (None for action/mixed)
+      is_action:        whether the rule can change at every step
+      ab_pairs, flag_start_id, action_seq_len: only for action
       is_mixed, rules, order, use_ab_tag: only for mixed_ab/mixed_abc
         (mixed checkpoints save ab_pairs + order and no 'recurrence' key)
     """
     p = config['p']
     recurrence = config.get('recurrence', 'addition')
 
-    if recurrence == 'dynamic_mixed':
-        print(f"Model config: dynamic_mixed, ab_pairs={config['ab_pairs']}, p={p}")
-        return {'init_len': 2, 'is_dynamic_mixed': True, 'next_val': None,
+    if recurrence in ('action', 'dynamic_mixed'):
+        print(f"Model config: action, ab_pairs={config['ab_pairs']}, p={p}")
+        return {'init_len': 2, 'is_action': True, 'next_val': None,
                 'ab_pairs': config['ab_pairs'], 'flag_start_id': p + 1,
-                'dynamic_seq_len': config.get('train_len') or config.get('ood_len', 32)}
+                'action_seq_len': config.get('train_len') or config.get('ood_len', 32)}
     if 'ab_pairs' in config and 'order' in config:
         # mixed_ab / mixed_abc checkpoint: one analysis per rule (see
         # _analyze_mixed_rules); there is no single next_val.
@@ -407,7 +407,7 @@ def _resolve_recurrence(config):
         rules = [tuple(pair) for pair in config['ab_pairs']]
         use_tag = config.get('use_ab_tag', False)
         print(f"Model config: mixed order-{order}, rules={rules}, p={p}, use_ab_tag={use_tag}")
-        return {'init_len': order, 'is_dynamic_mixed': False, 'is_mixed': True,
+        return {'init_len': order, 'is_action': False, 'is_mixed': True,
                 'next_val': None, 'rules': rules, 'order': order, 'use_ab_tag': use_tag}
     # Single-rule checkpoint (addition/multiplication/tribonacci/nonlinear/
     # nonlinear_mul, including old a/b-only or minimal configs defaulting to
@@ -415,17 +415,17 @@ def _resolve_recurrence(config):
     task = task_from_save_config(config)
     init_len, next_fn, name = single_rule_from_task(task, config)
     print(f"Model config: {name}")
-    return {'init_len': init_len, 'is_dynamic_mixed': False,
+    return {'init_len': init_len, 'is_action': False,
             'next_val': lambda seq: next_fn(seq, p)}
 
 
-def _make_dynamic_seq(p, ab_pairs, flag_start_id, length, seed):
-    """Generate one dynamic_mixed sequence: [x1, x2, flag_3, x3, ..., flag_L, x_L]."""
-    return datasets.generate_dynamic_sample(p, ab_pairs, flag_start_id, length,
-                                            random.Random(seed))
+def _make_action_seq(p, ab_pairs, flag_start_id, length, seed):
+    """Generate one action sequence: [x1, x2, flag_3, x3, ..., flag_L, x_L]."""
+    return datasets.generate_action_sample(p, ab_pairs, flag_start_id, length,
+                                           random.Random(seed))
 
 
-def _make_dynamic_query_mask(length):
+def _make_action_query_mask(length):
     # Attention matrix is over the input sequence, which has length 2*length - 2.
     # Valid prediction queries for x_k are the input positions of x_{k-1} and flag_k
     # immediately preceding x_k. For x3 (k=3), x3 is at input index 3 (0-based),
@@ -514,7 +514,7 @@ def analyze_model_attention(pth_path, device=None, log_path=None):
 
     # Front/back split from the training log (single-rule tasks only).
     start_x, k = (None, None)
-    if log_path and os.path.exists(log_path) and not rec['is_dynamic_mixed']:
+    if log_path and os.path.exists(log_path) and not rec['is_action']:
         start_x, k = compute_front_split(log_path)
         if k:
             print(f"Front/back split from log: front = first {k} prediction position(s) "
@@ -526,10 +526,10 @@ def analyze_model_attention(pth_path, device=None, log_path=None):
 
     # Randomly generate one test sequence for attention visualization.
     # (QK property verification was removed; use verify_circle.py instead.)
-    if rec['is_dynamic_mixed']:
-        test_seq = _make_dynamic_seq(p, rec['ab_pairs'], rec['flag_start_id'],
-                                     rec['dynamic_seq_len'], seed=0)
-        query_mask = _make_dynamic_query_mask(rec['dynamic_seq_len'])
+    if rec['is_action']:
+        test_seq = _make_action_seq(p, rec['ab_pairs'], rec['flag_start_id'],
+                                    rec['action_seq_len'], seed=0)
+        query_mask = _make_action_query_mask(rec['action_seq_len'])
     else:
         # In-distribution length only (train_len); old checkpoints without it
         # fall back to block_size.

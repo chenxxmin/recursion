@@ -98,8 +98,9 @@ def test_save_config_round_trip():
         cfg = {'P': 23, 'A': 2, 'B': 3, 'C': 4}
         extra = save_config_extra(task, cfg)
         assert task_from_save_config(extra) == task, (task, extra)
-    # mixed / dynamic checkpoints are not single-rule
+    # mixed / action checkpoints are not single-rule (old name kept for compat)
     assert task_from_save_config({'ab_pairs': [[1, 1]], 'order': 2}) is None
+    assert task_from_save_config({'recurrence': 'action', 'ab_pairs': [[1, 1]]}) is None
     assert task_from_save_config({'recurrence': 'dynamic_mixed', 'ab_pairs': [[1, 1]]}) is None
     # old minimal config defaults to addition
     assert task_from_save_config({'p': 23}) == 'addition'
