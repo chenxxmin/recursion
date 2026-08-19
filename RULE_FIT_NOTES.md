@@ -16,8 +16,9 @@
 - **missing 实验**（MISSING_PROB>0，且未加 --clean）：走**队列驱动 BFS**——根为
   全可见 pattern (x,)*init_len，每个 pattern 报告 model-vs-truth 一致率（真实
   污损序列），实时注意力用于构建假设集 C（不逐模式打印），再用随机探针
-  （off-manifold，只强制窗口内 mask）拟合 C 的系数（0 系数项不打印；只打印
-  EXACT 或 agreement≥0.9 的拟合，弱拟合只能从 deps 来源标注 (fit)/(attn) 看出）；子 pattern 由依赖距离被污损生成并入队：拟合可靠
+  （off-manifold，只强制窗口内 mask）拟合 C 的系数（0 系数项不打印；只有拟合
+  可信的 pattern——EXACT 或 agreement≥0.9——才打印整个条目（头行/公式/enqueue
+  行），其余条目静默展开）；子 pattern 由依赖距离被污损生成并入队：拟合可靠
   （agreement≥0.9）时依赖集 = 公式的非零系数距离，不可靠时回退为整个注意力
   集合 C（`expansion_deps`）——低 agreement 往往意味着 pattern 是更深子情形的
   混合，应细化而不是剪枝。pattern 长度上限 --depth（默认 8）。

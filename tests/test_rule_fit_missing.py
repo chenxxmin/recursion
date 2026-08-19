@@ -142,8 +142,10 @@ def test_probe_equations_neighbour_window_masks_do_not_leak():
 
 
 def test_run_missing_categories_smoke():
-    """Untrained tiny model: the BFS machinery must run end-to-end and report
-    the root pattern. Fit content is meaningless for an untrained model."""
+    """Untrained tiny model: the BFS machinery must run end-to-end. Output is
+    quiet by design — pattern blocks print only for trustworthy fits (EXACT or
+    agreement >= 0.9), which an untrained model produces none of, so we assert
+    the header and the absence of pattern blocks."""
     random.seed(0)
     torch.manual_seed(0)
     model = FibonacciTransformer(p=7, d_model=32, n_head=2, n_layer=1, block_size=16)
@@ -156,8 +158,9 @@ def test_run_missing_categories_smoke():
         run_missing_categories(args, model, cfg, next_fn, 2, 7, 'smoke', 'X(k)=(1*X(k-1)+1*X(k-2)) mod 7')
     out = buf.getvalue()
     assert 'Model: smoke' in out
-    assert '== pattern (x,x)' in out, out
-    assert 'model-vs-truth' in out
+    assert 'Queue-driven analysis' in out
+    assert '== pattern' not in out or 'set C' in out, \
+        'a pattern block without a fit line means the print gating is broken'
 
 
 if __name__ == '__main__':

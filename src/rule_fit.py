@@ -328,16 +328,12 @@ def run_missing_categories(args, model, cfg, next_fn, init_len, p, exp_name, des
         if P in visited or len(P) > d_max:
             continue
         visited.add(P)
-        label = patt_label(P)
         n, agree, attn = aggregate_buckets(buckets, P, d_max)
         if n < min_n:
-            print(f'\n== pattern {label}  n={n} (< --min-n {min_n}), skipped')
             continue
-        print(f'\n== pattern {label}  n={n}, model-vs-truth {agree / n:.1%}')
 
         C = select_C(attn, P)
         if not C:
-            print('  no significant attention on visible distances; no fit, not expanding')
             continue
         X, y = probe_equations(model, P, C, length, args.samples, p)
         if len(X) > FIT_MAX_ROWS:
@@ -345,14 +341,23 @@ def run_missing_categories(args, model, cfg, next_fn, init_len, p, exp_name, des
             X = [X[i] for i in idx]
             y = [y[i] for i in idx]
         coeffs, acc_fit, exact = fit_and_score(X, y, p)
-        # only report fits good enough to mean something; weak or failed fits
-        # stay visible only through the deps source tag below
-        show_fit = coeffs is not None and (exact or acc_fit >= EXPAND_MIN_AGREEMENT)
-        if show_fit:
-            tag = 'EXACT' if exact else f'agreement {acc_fit:.1%}'
-            print(f'  set C {C}: {fmt_equation(C, coeffs, p)}  [{tag}, probe n={len(X)}]')
 
-        if P == root and show_fit:
+        # always expand: unreliable fits fall back to the attention set (a
+        # low-agreement pattern is likely a mixture of deeper sub-patterns)
+        deps, dep_src = expansion_deps(C, coeffs, acc_fit)
+        children = [c for c in child_patterns(P, deps, d_max)
+                    if c not in visited and c not in queue]
+        queue.extend(children)
+
+        # only trustworthy fits (EXACT or agreement >= EXPAND_MIN_AGREEMENT)
+        # get printed at all — header, formula, and enqueue line alike
+        if coeffs is None or not (exact or acc_fit >= EXPAND_MIN_AGREEMENT):
+            continue
+        print(f'\n== pattern {patt_label(P)}  n={n}, model-vs-truth {agree / n:.1%}')
+        tag = 'EXACT' if exact else f'agreement {acc_fit:.1%}'
+        print(f'  set C {C}: {fmt_equation(C, coeffs, p)}  [{tag}, probe n={len(X)}]')
+
+        if P == root:
             rc, base = rule_coeffs(next_fn, init_len, p)
             fit_map = {d: c % p for d, c in zip(C, coeffs)}
             ok = (base % p == 0
@@ -360,15 +365,9 @@ def run_missing_categories(args, model, cfg, next_fn, init_len, p, exp_name, des
                   and all(c % p == 0 for d, c in fit_map.items() if d >= init_len))
             print(f'  root check: training rule coeffs {rc} -> {"MATCH" if ok else "MISMATCH"}')
 
-        # always expand: unreliable fits fall back to the attention set (a
-        # low-agreement pattern is likely a mixture of deeper sub-patterns)
-        deps, dep_src = expansion_deps(C, coeffs, acc_fit)
-        children = [c for c in child_patterns(P, deps, d_max)
-                    if c not in visited and c not in queue]
         if children:
             print(f'  deps {sorted(deps)} ({dep_src}) -> enqueue '
                   + ', '.join(patt_label(c) for c in children))
-            queue.extend(children)
     print()
 
 
