@@ -7,6 +7,7 @@ import torch
 sys.path.insert(0, os.path.join(os.path.dirname(os.path.abspath(__file__)), '..', 'src'))
 
 from datasets import BatchTag, DynamicMixedDataset, dynamic_missing_collate_fn
+from training import _unpack_batch
 
 P, PAIRS, L = 7, [(1, 1), (1, 2)], 12
 
@@ -85,10 +86,26 @@ def test_collate_action_miss():
     assert mask.shape == (4, 2 * L - 3)
 
 
+def test_unpack_action_miss():
+    ds = _make(n=4)
+    batch = dynamic_missing_collate_fn(ds.samples[:4])
+    x, loss_mask, kwargs, ab_labels, targets_override = _unpack_batch(list(batch), 'cpu', None)
+    assert torch.equal(x, batch[0])
+    assert torch.equal(loss_mask, batch[3])
+    assert torch.equal(targets_override, batch[2])
+    assert kwargs == {} and ab_labels is None
+    try:
+        _unpack_batch([batch[0], BatchTag.ACTION_MISS, batch[2]], 'cpu', None)
+        assert False, "expected ValueError for malformed payload"
+    except ValueError:
+        pass
+
+
 if __name__ == '__main__':
     test_missing_only_on_value_positions()
     test_run_lengths_and_spacing()
     test_seed_reproducibility()
     test_no_missing_format_unchanged()
     test_collate_action_miss()
+    test_unpack_action_miss()
     print("ALL TESTS PASSED: test_dynamic_missing.py")
