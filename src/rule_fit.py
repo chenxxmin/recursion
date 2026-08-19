@@ -113,6 +113,8 @@ def fit_and_score(X, y, p, rounds=300):
 EXPAND_MIN_AGREEMENT = 0.8   # at least this agreement for the fit to print and to drive expansion
 FIT_MAX_ROWS = 2000          # cap equations fed to fit_and_score (RANSAC scoring cost)
 PROBE_ATTN_SAMPLES = 100     # probes used to measure per-distance attention for set C
+INFLUENCE_PROBES = 100       # probes per pattern for counterfactual influence
+INFLUENCE_MIN = 0.5          # change rate at which a distance counts as "read"
 
 
 def visible_distance(P, d):
@@ -254,6 +256,36 @@ def probe_attention(model, P, length, n_probes, p):
     return attn
 
 
+def position_influence(model, P, C, length, n_probes, p):
+    """Counterfactual per-distance influence for pattern P: on random probes
+    with P's window forced at the last predictable position, resample each
+    hypothesis position in turn (to a different random value) and measure how
+    often the prediction at the window end changes. No linearity assumption —
+    this answers "which positions does the model actually read" even when no
+    stable linear formula exists (e.g. content-dependent attention drift).
+    Returns {d: change rate}."""
+    L = len(P)
+    t = length - 2  # last predictable position
+    changed = {d: 0 for d in C}
+    for _ in range(n_probes):
+        view = [random.randrange(p) for _ in range(length)]
+        for k in range(L):
+            if P[k]:
+                view[t - L + 1 + k] = p
+        with torch.no_grad():
+            base = model(torch.tensor([view], dtype=torch.long))[0][0].argmax(dim=-1)[t].item()
+        for d in C:
+            new = random.randrange(p - 1)
+            if new >= view[t - d]:
+                new += 1  # resample to a DIFFERENT value
+            perturbed = list(view)
+            perturbed[t - d] = new
+            with torch.no_grad():
+                pred = model(torch.tensor([perturbed], dtype=torch.long))[0][0].argmax(dim=-1)[t].item()
+            changed[d] += (pred != base)
+    return {d: c / n_probes for d, c in changed.items()}
+
+
 def fmt_equation(dists, coeffs, p):
     """Format the fitted formula, dropping zero-coefficient terms."""
     terms = ' + '.join(f'{c}*x_{{t-{d}}}' if d else f'{c}*x_t'
@@ -354,26 +386,42 @@ def run_missing_categories(args, model, cfg, next_fn, init_len, p, exp_name, des
             X = [X[i] for i in idx]
             y = [y[i] for i in idx]
         coeffs, acc_fit, exact = fit_and_score(X, y, p)
+        probe_ok = coeffs is not None and (exact or acc_fit >= EXPAND_MIN_AGREEMENT)
 
-        # expansion: a reliable fit's nonzero coefficients are the positions
-        # the rule reads — enqueue the pattern with each of them masked
-        # (single-position children). An unreliable or failed fit means the
-        # pattern is likely a mixture — refine one position deeper, both states.
-        if coeffs is not None and acc_fit >= EXPAND_MIN_AGREEMENT:
+        # probe fit unreliable: measure per-distance influence instead — which
+        # positions the model reads is meaningful even when no stable linear
+        # formula exists (e.g. content-dependent attention drift)
+        influence = None
+        if not probe_ok:
+            influence = position_influence(model, P, C, length, INFLUENCE_PROBES, p)
+        sig = {d for d, r in (influence or {}).items() if r >= INFLUENCE_MIN}
+
+        # expansion: a trustworthy fit's nonzero coefficients (or, failing
+        # that, the influence-significant distances) are the positions the
+        # model reads — enqueue the pattern with each of them masked. Nothing
+        # readable means a likely mixture — refine one position deeper.
+        if probe_ok:
             deps = {d for d, c in zip(C, coeffs) if c != 0}
             children = mask_children(P, deps, d_max)
+        elif sig:
+            children = mask_children(P, sig, d_max)
         else:
             children = refine_children(P, d_max)
         children = [c for c in children if c not in visited and c not in queue]
         queue.extend(children)
 
-        # only trustworthy fits (EXACT or agreement >= EXPAND_MIN_AGREEMENT)
-        # get printed at all — header, formula, and enqueue line alike
-        if coeffs is None or not (exact or acc_fit >= EXPAND_MIN_AGREEMENT):
+        # print only nodes with something trustworthy to say: a good formula,
+        # or at least significant per-position influence
+        if probe_ok:
+            print(f'\n== pattern {patt_label(P)}  n={n}, model-vs-truth {agree / n:.1%}')
+            tag = 'EXACT' if exact else f'agreement {acc_fit:.1%}'
+            print(f'  set C {C}: {fmt_equation(C, coeffs, p)}  [{tag}, probe n={len(X)}]')
+        elif sig:
+            print(f'\n== pattern {patt_label(P)}  n={n}, model-vs-truth {agree / n:.1%}')
+            print('  influence: ' + ' '.join(
+                f'd{d}:{r:.2f}' for d, r in sorted(influence.items()) if r >= SIG_THRESHOLD))
+        else:
             continue
-        print(f'\n== pattern {patt_label(P)}  n={n}, model-vs-truth {agree / n:.1%}')
-        tag = 'EXACT' if exact else f'agreement {acc_fit:.1%}'
-        print(f'  set C {C}: {fmt_equation(C, coeffs, p)}  [{tag}, probe n={len(X)}]')
 
         if P == root:
             rc, base = rule_coeffs(next_fn, init_len, p)

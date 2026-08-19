@@ -12,9 +12,10 @@ sys.path.insert(0, os.path.join(os.path.dirname(os.path.abspath(__file__)), '..'
 
 from models import FibonacciTransformer
 from rule_fit import (aggregate_buckets, fit_and_score, fmt_equation,
-                      mask_children, patt_label, probe_attention,
-                      probe_equations, refine_children, rule_coeffs,
-                      run_missing_categories, select_C, visible_distance)
+                      mask_children, patt_label, position_influence,
+                      probe_attention, probe_equations, refine_children,
+                      rule_coeffs, run_missing_categories, select_C,
+                      visible_distance)
 
 
 def test_fmt_equation_drops_zero_coeffs():
@@ -119,6 +120,17 @@ class _StubModel:
         return (logits, None)
 
 
+def test_position_influence_stub():
+    random.seed(0)
+    model = _StubModel(127)
+    # (x,M): stub computes 2*x_{t-1} + x_{t-2} -> d1,d2 always matter, d3 never
+    inf = position_influence(model, (False, True), [1, 2, 3], 32, 50, 127)
+    assert inf[1] == 1.0 and inf[2] == 1.0 and inf[3] == 0.0, inf
+    # (x,x): stub computes x_t + x_{t-1} -> d0,d1 always matter, d2 never
+    inf = position_influence(model, (False, False), [0, 1, 2], 32, 50, 127)
+    assert inf[0] == 1.0 and inf[1] == 1.0 and inf[2] == 0.0, inf
+
+
 def test_probe_equations_recovers_stub_formulas():
     random.seed(0)
     model = _StubModel(127)
@@ -145,10 +157,10 @@ def test_probe_equations_neighbour_window_masks_do_not_leak():
 
 
 def test_run_missing_categories_smoke():
-    """Untrained tiny model: the BFS machinery must run end-to-end. Output is
-    quiet by design — pattern blocks print only for trustworthy fits (EXACT or
-    agreement >= 0.9), which an untrained model produces none of, so we assert
-    the header and the absence of pattern blocks."""
+    """Untrained tiny model: the BFS machinery must run end-to-end. Pattern
+    blocks print only when there is something trustworthy (a good fit or
+    significant influence); assert the headers and that no bare header prints
+    without a content line."""
     random.seed(0)
     torch.manual_seed(0)
     model = FibonacciTransformer(p=7, d_model=32, n_head=2, n_layer=1, block_size=16)
@@ -162,8 +174,8 @@ def test_run_missing_categories_smoke():
     out = buf.getvalue()
     assert 'Model: smoke' in out
     assert 'Queue-driven analysis' in out
-    assert '== pattern' not in out or 'set C' in out, \
-        'a pattern block without a fit line means the print gating is broken'
+    assert '== pattern' not in out or ('set C' in out or 'influence' in out), \
+        'a pattern block without a fit/influence line means the print gating is broken'
 
 
 if __name__ == '__main__':
@@ -176,6 +188,7 @@ if __name__ == '__main__':
     test_select_C()
     test_probe_attention_structure()
     test_rule_coeffs()
+    test_position_influence_stub()
     test_probe_equations_recovers_stub_formulas()
     test_probe_equations_neighbour_window_masks_do_not_leak()
     test_run_missing_categories_smoke()

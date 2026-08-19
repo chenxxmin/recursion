@@ -781,3 +781,13 @@
 **修改**：新增 `probe_attention`——每个探针在最后一个可预测位置单窗口强制该 pattern 的 mask、其余位置干净随机，量逐距离注意力（`PROBE_ATTN_SAMPLES=100` 个探针）；`select_C` 改用它，C 与拟合严格同分布，子 pattern 混合交给 BFS 的细化节点各自承担。pass 1 删除逐距离注意力累计（`extract_qk_raw_scores` 调用和最贵的内层循环），只留 n/agree；`aggregate_buckets` 相应瘦身返回 (n, agree)。
 
 **验证**：tests/test_rule_fit_missing.py 更新（aggregate/select_C 拆分，新增 probe_attention 结构测试）；全量测试通过。真实批次行为需服务器复跑确认。
+
+---
+
+## 58. 【行为变更】探针拟合失败的 pattern 改报逐位置影响率；撤回 on-manifold 基底拟合方案
+
+**背景**：#57 后仍有不少 pattern（如 (M,M,x,x,M)，真实数据 99.8% 正确）探针拟合达不到 0.8 被静默。曾考虑用真实数据在最小可见基底上拟合作为回退，但用户指出这在认识论上是空的：on-manifold 上任何"模递推等价"的公式都恒等于真值，其 agreement 恒等于 model-vs-truth，不提供机制信息（与 #53 秩亏诊断同源）。
+
+**修改**：新增 `position_influence`——探针上把各假设位置的值换成另一个随机值，统计窗口末端预测的改变率（不假设线性，能捕捉内容相关注意力下的"读哪些位置"）。探针拟合失败的 pattern 改打 `influence: d2:1.00 d3:0.99 ...` 行（显示 ≥0.1 的）；展开依赖集相应改为：拟合可信→非零系数距离；否则→影响率 ≥0.5 的距离（INFLUENCE_MIN）；两者都无→加深细化。已写好的基底拟合代码在提交前丢弃（git checkout 还原）。
+
+**验证**：tests/test_rule_fit_missing.py 新增 test_position_influence_stub（stub 模型：d1/d2 影响率 1.0、d3 为 0）；全量测试通过。真实批次行为需服务器复跑确认。

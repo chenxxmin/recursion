@@ -20,10 +20,12 @@
   深文干净随机，与拟合同分布，避免子 pattern 混合污染），再用随机探针
   （off-manifold，只强制窗口内 mask）拟合 C 的系数。展开规则（`mask_children`/`refine_children`，查重，长度上限
   --depth 默认 8）：拟合可信（agreement≥0.8）→ 公式非零系数距离是规则用到的
-  位置，每个位置单独入队一个"该位置也被 M"的子 pattern；不可信 → 该 pattern
-  可能是更深子情形的混合，窗口加深一位，(x,) 与 (M,) 两种状态分别入队。
-  打印：只有拟合可信的 pattern 才打整个条目（头行 + 公式行，0 系数项不打），
-  其余静默展开。
+  位置，每个位置单独入队一个"该位置也被 M"的子 pattern；拟合不可信 → 改测
+  **逐位置影响率**（`position_influence`：反事实扰动，不假设线性），影响率≥0.5
+  的位置入队 mask 子 pattern；什么都读不到 → 该 pattern 可能是更深子情形的
+  混合，窗口加深一位，(x,) 与 (M,) 两种状态分别入队。
+  打印：拟合可信的 pattern 打公式条目（0 系数项不打）；拟合失败但有显著影响的
+  pattern 打 `influence:` 行；其余静默展开。
 
 **只支持单规则任务**（addition/multiplication/tribonacci/nonlinear）；mixed_ab/mixed_abc
 在 `run_one` 里直接跳过（`rule_fit.py:371`），dynamic_mixed 会走 build_single_rule 报错路径。
