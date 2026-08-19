@@ -345,14 +345,14 @@ def run_missing_categories(args, model, cfg, next_fn, init_len, p, exp_name, des
             X = [X[i] for i in idx]
             y = [y[i] for i in idx]
         coeffs, acc_fit, exact = fit_and_score(X, y, p)
-        if coeffs is None:
-            print(f'  set C {C}: no linear fit on random probes '
-                  f'(best agreement {acc_fit:.1%}, n={len(X)})')
-        else:
+        # only report fits good enough to mean something; weak or failed fits
+        # stay visible only through the deps source tag below
+        show_fit = coeffs is not None and (exact or acc_fit >= EXPAND_MIN_AGREEMENT)
+        if show_fit:
             tag = 'EXACT' if exact else f'agreement {acc_fit:.1%}'
             print(f'  set C {C}: {fmt_equation(C, coeffs, p)}  [{tag}, probe n={len(X)}]')
 
-        if P == root and coeffs is not None:
+        if P == root and show_fit:
             rc, base = rule_coeffs(next_fn, init_len, p)
             fit_map = {d: c % p for d, c in zip(C, coeffs)}
             ok = (base % p == 0
