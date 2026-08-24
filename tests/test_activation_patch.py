@@ -25,8 +25,8 @@ def test_paired_samples_share_init_and_follow_rules():
     assert a.shape == b.shape == (8, 10)
     assert torch.equal(a[:, :2], b[:, :2])  # shared initials
     for k in range(2, 10):
-        assert torch.equal(a[:, k], (a[:, k - 2] + a[:, k - 1]) % p)
-        assert torch.equal(b[:, k], (b[:, k - 2] + 2 * b[:, k - 1]) % p)
+        assert torch.equal(a[:, k], (a[:, k - 1] + a[:, k - 2]) % p)
+        assert torch.equal(b[:, k], (b[:, k - 1] + 2 * b[:, k - 2]) % p)
 
 
 def test_rule_targets():
@@ -34,7 +34,7 @@ def test_rule_targets():
     seqs, _ = generate_paired_samples(p, (1, 1), (1, 2), 4, 8, seed=2)
     v = rule_targets(seqs, (2, 3), p)
     assert (v[:, :2] == -1).all()
-    assert torch.equal(v[:, 2:], (2 * seqs[:, :-2] + 3 * seqs[:, 1:-1]) % p)
+    assert torch.equal(v[:, 2:], (2 * seqs[:, 1:-1] + 3 * seqs[:, :-2]) % p)
 
 
 def test_capture_shapes():

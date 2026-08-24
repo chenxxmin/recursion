@@ -11,6 +11,9 @@ one continued by rule A, one by rule B. Cache the hidden states of both runs
   - MLP hidden activations: the post-GELU (B, T, mlp_ratio*d_model) input of
     the second MLP linear.
 
+Rule tuples follow the same convention as LinearRecurrenceRule: for order-2,
+rule (c1, c2) means X(k) = (c1*X(k-1) + c2*X(k-2)) % p.
+
 Then, for each site x each token position, patch one direction's activation
 into the other run (both directions: A->B input and B->A input) and check how
 the model's next-token predictions change.
@@ -38,16 +41,19 @@ from analyze_attention import load_model  # noqa: E402
 def generate_paired_samples(p, rule_a, rule_b, num_pairs, length, seed=0):
     """Paired sequences sharing initial values; A follows rule_a, B rule_b.
 
+    Rule tuples are interpreted like LinearRecurrenceRule.coeffs: for order-2,
+    (c1, c2) means X(k) = (c1*X(k-1) + c2*X(k-2)) % p.
+
     Returns (seqs_a, seqs_b): LongTensors (num_pairs, length).
     """
     gen = torch.Generator().manual_seed(seed)
     inits = torch.randint(0, p, (num_pairs, 2), generator=gen)
 
     def continue_rule(rule, x):
-        a, b = rule
+        c1, c2 = rule
         seq = x.clone()
         for _ in range(2, length):
-            nxt = (a * seq[:, -2] + b * seq[:, -1]) % p
+            nxt = (c1 * seq[:, -1] + c2 * seq[:, -2]) % p
             seq = torch.cat([seq, nxt.unsqueeze(1)], dim=1)
         return seq
 
@@ -56,10 +62,11 @@ def generate_paired_samples(p, rule_a, rule_b, num_pairs, length, seed=0):
 
 def rule_targets(seqs, rule, p):
     """v[k] = rule continuation at position k (k >= 2), from the sample's own
-    history. Returns LongTensor (N, length) with v[:2] = -1 (unused)."""
-    a, b = rule
+    history. Rule tuple (c1, c2) means c1*X(k-1) + c2*X(k-2).
+    Returns LongTensor (N, length) with v[:2] = -1 (unused)."""
+    c1, c2 = rule
     v = torch.full_like(seqs, -1)
-    v[:, 2:] = (a * seqs[:, :-2] + b * seqs[:, 1:-1]) % p
+    v[:, 2:] = (c1 * seqs[:, 1:-1] + c2 * seqs[:, :-2]) % p
     return v
 
 
