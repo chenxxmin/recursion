@@ -77,50 +77,80 @@ def _forward_logits(model, idx):
 
 def capture_hidden(model, idx):
     """One forward pass; cache per-layer attention c_proj input and MLP
-    post-GELU activation. Returns dict {('attn', li): (B,T,C),
-    ('mlp', li): (B,T,rC)} and the logits."""
+    post-GELU activation, plus the residual stream: ('emb',) is the input
+    of the first block (embedding output), ('resid', li) is the output of
+    block li (input of block li+1, or of ln_f for the last block).
+    Returns dict and the logits."""
     cache = {}
     handles = []
-    for li, block in enumerate(model.transformer.h):
-        def make_hook(key):
-            def hook(module, args):
-                cache[key] = args[0].detach().clone()
-            return hook
+
+    def make_hook(key):
+        def hook(module, args):
+            cache[key] = args[0].detach().clone()
+        return hook
+
+    h = model.transformer.h
+    handles.append(h[0].register_forward_pre_hook(make_hook(('emb',))))
+    for li, block in enumerate(h):
         handles.append(block.attn.c_proj.register_forward_pre_hook(make_hook(('attn', li))))
         handles.append(block.mlp[2].register_forward_pre_hook(make_hook(('mlp', li))))
+        # output of block li == input of block li+1 (or of ln_f if last)
+        nxt = h[li + 1] if li + 1 < len(h) else model.transformer.ln_f
+        handles.append(nxt.register_forward_pre_hook(make_hook(('resid', li))))
     with torch.no_grad():
         logits = _forward_logits(model, idx)
-    for h in handles:
-        h.remove()
+    for hd in handles:
+        hd.remove()
     return cache, logits
 
 
 def patched_logits(model, idx, site, pos, source_cache):
-    """Forward `idx`, overwriting the activation at `site` = (kind, layer)
-    [and head] at token position `pos` with values from source_cache.
+    """Forward `idx`, overwriting the activation at `site` at token
+    position(s) `pos` (int or list of ints) with values from source_cache.
 
-    site = ('attn', layer, head) patches only that head's columns of the
-    c_proj input; site = ('mlp', layer) patches the whole hidden vector.
+    Sites:
+      ('attn', layer, head) -- that head's columns of the c_proj input
+      ('attn_all', layer)   -- the whole c_proj input (all heads)
+      ('mlp', layer)        -- the whole MLP hidden (post-GELU) vector
+      ('emb',)              -- embedding output (input of block 0)
+      ('resid', layer)      -- residual stream at the output of block `layer`
     """
-    kind, layer = site[0], site[1]
-    block = model.transformer.h[layer]
+    kind = site[0]
+    positions = [pos] if isinstance(pos, int) else list(pos)
+    h = model.transformer.h
 
-    if kind == 'attn':
-        head = site[2]
+    def make_patch_hook(module_hook_target, src, sl=None):
+        def hook(module, args):
+            y = args[0].clone()
+            if sl is None:
+                y[:, positions, :] = src[:, positions, :]
+            else:
+                y[:, positions, sl] = src[:, positions, sl]
+            return (y,)
+        return module_hook_target.register_forward_pre_hook(hook)
+
+    if kind == 'emb':
+        handle = make_patch_hook(h[0], source_cache[('emb',)])
+    elif kind == 'resid':
+        layer = site[1]
+        nxt = h[layer + 1] if layer + 1 < len(h) else model.transformer.ln_f
+        handle = make_patch_hook(nxt, source_cache[('resid', layer)])
+    elif kind == 'attn_all':
+        layer = site[1]
+        handle = make_patch_hook(h[layer].attn.c_proj,
+                                 source_cache[('attn', layer)])
+    elif kind == 'attn':
+        layer, head = site[1], site[2]
+        block = h[layer]
         hs = block.attn.head_size
         sl = slice(head * hs, (head + 1) * hs)
-
-        def hook(module, args):
-            y = args[0].clone()
-            y[:, pos, sl] = source_cache[('attn', layer)][:, pos, sl]
-            return (y,)
-        handle = block.attn.c_proj.register_forward_pre_hook(hook)
+        handle = make_patch_hook(block.attn.c_proj,
+                                 source_cache[('attn', layer)], sl)
+    elif kind == 'mlp':
+        layer = site[1]
+        handle = make_patch_hook(h[layer].mlp[2], source_cache[('mlp', layer)])
     else:
-        def hook(module, args):
-            y = args[0].clone()
-            y[:, pos, :] = source_cache[('mlp', layer)][:, pos, :]
-            return (y,)
-        handle = block.mlp[2].register_forward_pre_hook(hook)
+        raise ValueError(f"unknown site {site}")
 
     with torch.no_grad():
         logits = _forward_logits(model, idx)

@@ -42,9 +42,52 @@ def test_capture_shapes():
     idx = torch.randint(0, 11, (4, 12))
     cache, logits = capture_hidden(model, idx)
     assert logits.shape == (4, 12, model.vocab_size)
+    assert cache[('emb',)].shape == (4, 12, 32)
     for li in range(2):
         assert cache[('attn', li)].shape == (4, 12, 32)
         assert cache[('mlp', li)].shape == (4, 12, 128)
+        assert cache[('resid', li)].shape == (4, 12, 32)
+
+
+def test_multi_pos_and_new_sites_identity():
+    """Patching with the run's own cache (int or list pos, all site kinds)
+    must leave logits untouched."""
+    model = make_model()
+    idx = torch.randint(0, 11, (4, 12))
+    cache, logits = capture_hidden(model, idx)
+    sites = [('attn', 0, 0), ('attn_all', 0), ('mlp', 1),
+             ('emb',), ('resid', 0), ('resid', 1)]
+    for site in sites:
+        for pos in (5, [2, 5, 7]):
+            patched = patched_logits(model, idx, site, pos, cache)
+            assert torch.equal(patched, logits), f"self-patch changed logits at {site} pos={pos}"
+
+
+def test_multi_pos_patch_changes_and_causality():
+    model = make_model()
+    a = torch.randint(0, 11, (4, 12))
+    b = torch.randint(0, 11, (4, 12))
+    cache_a, _ = capture_hidden(model, a)
+    _, logits_b = capture_hidden(model, b)
+    patched = patched_logits(model, b, ('resid', 0), [3, 5], cache_a)
+    assert not torch.equal(patched, logits_b)
+    # positions before the earliest patch point are causally unaffected
+    assert torch.equal(patched[:, :3], logits_b[:, :3])
+
+
+def test_last_resid_patch_reproduces_source_logits():
+    """Patching the pre-ln_f residual at position t with the source run's
+    vector must make the logits at t identical to the source run's
+    (ln_f + lm_head are per-position and deterministic)."""
+    model = make_model()
+    a = torch.randint(0, 11, (4, 12))
+    b = torch.randint(0, 11, (4, 12))
+    cache_a, logits_a = capture_hidden(model, a)
+    n_layer = len(model.transformer.h)
+    for pos in (2, 7):
+        patched = patched_logits(model, b, ('resid', n_layer - 1), pos, cache_a)
+        assert torch.allclose(patched[:, pos], logits_a[:, pos], atol=1e-5), \
+            f"last-resid patch at pos {pos} did not reproduce source logits"
 
 
 def test_patch_with_own_cache_is_identity():
