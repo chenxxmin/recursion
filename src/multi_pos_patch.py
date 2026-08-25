@@ -81,24 +81,38 @@ def run(model, config, num_pairs=128, length=12, max_k=9, seed=0,
     va_a, vb_a = targets(seqs_a)  # rule-A / rule-B continuation on A history
     va_b, vb_b = targets(seqs_b)  # ... on B history
 
-    def rates(logits, va_own, vb_own, va_src, k):
-        """Three-target classification at prediction position k.
+    def hybrid_targets(idx_seq, src_seq):
+        """For single-position patch at query q=k-1: the model's effective
+        hybrid operands are the SOURCE token at q (patched position) and
+        the INPUT token at q-1 (unpatched). v_hX[:, k] = rule X applied to
+        that hybrid pair. Valid only for @q (single-position) conditions."""
+        (c1a, c2a), (c1b, c2b) = rule_a, rule_b
+        vha = torch.full_like(idx_seq, -1)
+        vhb = torch.full_like(idx_seq, -1)
+        vha[:, 2:] = (c1a * src_seq[:, 1:-1] + c2a * idx_seq[:, :-2]) % p
+        vhb[:, 2:] = (c1b * src_seq[:, 1:-1] + c2b * idx_seq[:, :-2]) % p
+        return vha, vhb
+
+    def rates(logits, va_own, vb_own, va_src, vha, vhb, k):
+        """Five-target classification at prediction position k.
 
         va_own/vb_own: rule-A / rule-B continuation of the INPUT's own
             history (rule flip = matching va_own after AtoB patch);
-        va_src: the SOURCE run's actual continuation (state transfer =
-            matching va_src means the patch transferred A's specific
-            history, not just rule identity).
+        va_src: the SOURCE run's actual continuation (state transfer);
+        vha/vhb: rule-A / rule-B applied to the HYBRID operand pair
+            (source token at q, input token at q-1) -- detects consistent
+            computation on a mixed history rather than true breakdown.
         """
-        pred = logits[:, :-1, :].argmax(dim=-1)  # pred[:, k-1] -> x_k
-        N = logits.shape[0]
-        ma = (pred[:, k - 1] == va_own[:, k]).float().mean().item()
-        mb = (pred[:, k - 1] == vb_own[:, k]).float().mean().item()
-        ms = (pred[:, k - 1] == va_src[:, k]).float().mean().item()
+        pred = logits[:, :-1, :].argmax(dim=-1)[:, k - 1]  # predicts x_k
+        ma = (pred == va_own[:, k]).float().mean().item()
+        mb = (pred == vb_own[:, k]).float().mean().item()
+        ms = (pred == va_src[:, k]).float().mean().item()
+        mha = (pred == vha[:, k]).float().mean().item()
+        mhb = (pred == vhb[:, k]).float().mean().item()
         both = (va_own[:, k] == vb_own[:, k]).float().mean().item()
         nei = 1 - ma - mb + both
         return {'match_a': ma, 'match_b': mb, 'match_src': ms,
-                'neither': nei}
+                'match_hyb_a': mha, 'match_hyb_b': mhb, 'neither': nei}
 
     # k=2 (predicting x3) is skipped: rule is not identifiable there yet.
     ks = list(range(3, min(max_k, length - 1) + 1))
@@ -107,19 +121,21 @@ def run(model, config, num_pairs=128, length=12, max_k=9, seed=0,
         'length': length, 'n_layer': n_layer, 'n_head': n_head,
         'seed': seed, 'ks': ks}}
 
-    for direction, idx, src, va_own, vb_own, va_src, logits_base in (
-            ('AtoB', seqs_b, cache_a, va_b, vb_b, va_a, logits_b),
-            ('BtoA', seqs_a, cache_b, va_a, vb_a, vb_b, logits_a)):
+    for direction, idx, src, src_seq, va_own, vb_own, va_src, logits_base in (
+            ('AtoB', seqs_b, cache_a, seqs_a, va_b, vb_b, va_a, logits_b),
+            ('BtoA', seqs_a, cache_b, seqs_b, va_a, vb_a, vb_b, logits_a)):
         # va_own/vb_own: rule-A/rule-B continuation of the INPUT's history;
         # va_src: the SOURCE run's continuation of ITS OWN history
         # (AtoB: rule A on A history = va_a; BtoA: rule B on B history = vb_b)
-        base = {k: rates(logits_base, va_own, vb_own, va_src, k) for k in ks}
+        vha, vhb = hybrid_targets(idx, src_seq)
+        base = {k: rates(logits_base, va_own, vb_own, va_src, vha, vhb, k)
+                for k in ks}
         entries = []
         for k in ks:
             q = k - 1
             for label, site, positions in build_conditions(n_layer, n_head, q):
                 logits = patched_logits(model, idx, site, positions, src)
-                r = rates(logits, va_own, vb_own, va_src, k)
+                r = rates(logits, va_own, vb_own, va_src, vha, vhb, k)
                 entries.append({'k': k, 'cond': label,
                                 'positions': positions, **r})
             if verbose:
