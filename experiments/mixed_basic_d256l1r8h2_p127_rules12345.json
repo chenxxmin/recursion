@@ -1,0 +1,589 @@
+{
+ "concurrency": 7,
+ "experiments": [
+  {
+   "name": "mixed_basic_d256l1r8h2_P127_N2_e0.7_seed17996",
+   "task": "mixed_ab",
+   "config": {
+    "RANDOM_SEED": 17996,
+    "P": 127,
+    "D_MODEL": 256,
+    "N_HEAD": 2,
+    "N_LAYER": 1,
+    "MLP_RATIO": 8,
+    "AB_PAIRS": [
+     [
+      1,
+      1
+     ],
+     [
+      2,
+      3
+     ]
+    ],
+    "MIXED_AB_MAX_UNIQUE_RATIOS": [
+     0.7,
+     0.7
+    ],
+    "USE_AB_TAG": false,
+    "USE_CONDITIONAL_WTE": false,
+    "NUM_MASK": 2
+   }
+  },
+  {
+   "name": "mixed_basic_d256l1r8h2_P127_N2_e0.7_seed18318",
+   "task": "mixed_ab",
+   "config": {
+    "RANDOM_SEED": 18318,
+    "P": 127,
+    "D_MODEL": 256,
+    "N_HEAD": 2,
+    "N_LAYER": 1,
+    "MLP_RATIO": 8,
+    "AB_PAIRS": [
+     [
+      1,
+      1
+     ],
+     [
+      2,
+      3
+     ]
+    ],
+    "MIXED_AB_MAX_UNIQUE_RATIOS": [
+     0.7,
+     0.7
+    ],
+    "USE_AB_TAG": false,
+    "USE_CONDITIONAL_WTE": false,
+    "NUM_MASK": 2
+   }
+  },
+  {
+   "name": "mixed_basic_d256l1r8h2_P127_N2_e0.7_seed34789",
+   "task": "mixed_ab",
+   "config": {
+    "RANDOM_SEED": 34789,
+    "P": 127,
+    "D_MODEL": 256,
+    "N_HEAD": 2,
+    "N_LAYER": 1,
+    "MLP_RATIO": 8,
+    "AB_PAIRS": [
+     [
+      1,
+      1
+     ],
+     [
+      2,
+      3
+     ]
+    ],
+    "MIXED_AB_MAX_UNIQUE_RATIOS": [
+     0.7,
+     0.7
+    ],
+    "USE_AB_TAG": false,
+    "USE_CONDITIONAL_WTE": false,
+    "NUM_MASK": 2
+   }
+  },
+  {
+   "name": "mixed_basic_d256l1r8h2_P127_N2_e0.7_seed44536",
+   "task": "mixed_ab",
+   "config": {
+    "RANDOM_SEED": 44536,
+    "P": 127,
+    "D_MODEL": 256,
+    "N_HEAD": 2,
+    "N_LAYER": 1,
+    "MLP_RATIO": 8,
+    "AB_PAIRS": [
+     [
+      1,
+      1
+     ],
+     [
+      2,
+      3
+     ]
+    ],
+    "MIXED_AB_MAX_UNIQUE_RATIOS": [
+     0.7,
+     0.7
+    ],
+    "USE_AB_TAG": false,
+    "USE_CONDITIONAL_WTE": false,
+    "NUM_MASK": 2
+   }
+  },
+  {
+   "name": "mixed_basic_d256l1r8h2_P127_N3_e0.7_seed17996",
+   "task": "mixed_ab",
+   "config": {
+    "RANDOM_SEED": 17996,
+    "P": 127,
+    "D_MODEL": 256,
+    "N_HEAD": 2,
+    "N_LAYER": 1,
+    "MLP_RATIO": 8,
+    "AB_PAIRS": [
+     [
+      1,
+      1
+     ],
+     [
+      2,
+      3
+     ],
+     [
+      3,
+      5
+     ]
+    ],
+    "MIXED_AB_MAX_UNIQUE_RATIOS": [
+     0.7,
+     0.7,
+     0.7
+    ],
+    "USE_AB_TAG": false,
+    "USE_CONDITIONAL_WTE": false,
+    "NUM_MASK": 2
+   }
+  },
+  {
+   "name": "mixed_basic_d256l1r8h2_P127_N3_e0.7_seed18318",
+   "task": "mixed_ab",
+   "config": {
+    "RANDOM_SEED": 18318,
+    "P": 127,
+    "D_MODEL": 256,
+    "N_HEAD": 2,
+    "N_LAYER": 1,
+    "MLP_RATIO": 8,
+    "AB_PAIRS": [
+     [
+      1,
+      1
+     ],
+     [
+      2,
+      3
+     ],
+     [
+      3,
+      5
+     ]
+    ],
+    "MIXED_AB_MAX_UNIQUE_RATIOS": [
+     0.7,
+     0.7,
+     0.7
+    ],
+    "USE_AB_TAG": false,
+    "USE_CONDITIONAL_WTE": false,
+    "NUM_MASK": 2
+   }
+  },
+  {
+   "name": "mixed_basic_d256l1r8h2_P127_N3_e0.7_seed34789",
+   "task": "mixed_ab",
+   "config": {
+    "RANDOM_SEED": 34789,
+    "P": 127,
+    "D_MODEL": 256,
+    "N_HEAD": 2,
+    "N_LAYER": 1,
+    "MLP_RATIO": 8,
+    "AB_PAIRS": [
+     [
+      1,
+      1
+     ],
+     [
+      2,
+      3
+     ],
+     [
+      3,
+      5
+     ]
+    ],
+    "MIXED_AB_MAX_UNIQUE_RATIOS": [
+     0.7,
+     0.7,
+     0.7
+    ],
+    "USE_AB_TAG": false,
+    "USE_CONDITIONAL_WTE": false,
+    "NUM_MASK": 2
+   }
+  },
+  {
+   "name": "mixed_basic_d256l1r8h2_P127_N3_e0.7_seed44536",
+   "task": "mixed_ab",
+   "config": {
+    "RANDOM_SEED": 44536,
+    "P": 127,
+    "D_MODEL": 256,
+    "N_HEAD": 2,
+    "N_LAYER": 1,
+    "MLP_RATIO": 8,
+    "AB_PAIRS": [
+     [
+      1,
+      1
+     ],
+     [
+      2,
+      3
+     ],
+     [
+      3,
+      5
+     ]
+    ],
+    "MIXED_AB_MAX_UNIQUE_RATIOS": [
+     0.7,
+     0.7,
+     0.7
+    ],
+    "USE_AB_TAG": false,
+    "USE_CONDITIONAL_WTE": false,
+    "NUM_MASK": 2
+   }
+  },
+  {
+   "name": "mixed_basic_d256l1r8h2_P127_N4_e0.7_seed17996",
+   "task": "mixed_ab",
+   "config": {
+    "RANDOM_SEED": 17996,
+    "P": 127,
+    "D_MODEL": 256,
+    "N_HEAD": 2,
+    "N_LAYER": 1,
+    "MLP_RATIO": 8,
+    "AB_PAIRS": [
+     [
+      1,
+      1
+     ],
+     [
+      2,
+      3
+     ],
+     [
+      3,
+      5
+     ],
+     [
+      4,
+      7
+     ]
+    ],
+    "MIXED_AB_MAX_UNIQUE_RATIOS": [
+     0.7,
+     0.7,
+     0.7,
+     0.7
+    ],
+    "USE_AB_TAG": false,
+    "USE_CONDITIONAL_WTE": false,
+    "NUM_MASK": 2
+   }
+  },
+  {
+   "name": "mixed_basic_d256l1r8h2_P127_N4_e0.7_seed18318",
+   "task": "mixed_ab",
+   "config": {
+    "RANDOM_SEED": 18318,
+    "P": 127,
+    "D_MODEL": 256,
+    "N_HEAD": 2,
+    "N_LAYER": 1,
+    "MLP_RATIO": 8,
+    "AB_PAIRS": [
+     [
+      1,
+      1
+     ],
+     [
+      2,
+      3
+     ],
+     [
+      3,
+      5
+     ],
+     [
+      4,
+      7
+     ]
+    ],
+    "MIXED_AB_MAX_UNIQUE_RATIOS": [
+     0.7,
+     0.7,
+     0.7,
+     0.7
+    ],
+    "USE_AB_TAG": false,
+    "USE_CONDITIONAL_WTE": false,
+    "NUM_MASK": 2
+   }
+  },
+  {
+   "name": "mixed_basic_d256l1r8h2_P127_N4_e0.7_seed34789",
+   "task": "mixed_ab",
+   "config": {
+    "RANDOM_SEED": 34789,
+    "P": 127,
+    "D_MODEL": 256,
+    "N_HEAD": 2,
+    "N_LAYER": 1,
+    "MLP_RATIO": 8,
+    "AB_PAIRS": [
+     [
+      1,
+      1
+     ],
+     [
+      2,
+      3
+     ],
+     [
+      3,
+      5
+     ],
+     [
+      4,
+      7
+     ]
+    ],
+    "MIXED_AB_MAX_UNIQUE_RATIOS": [
+     0.7,
+     0.7,
+     0.7,
+     0.7
+    ],
+    "USE_AB_TAG": false,
+    "USE_CONDITIONAL_WTE": false,
+    "NUM_MASK": 2
+   }
+  },
+  {
+   "name": "mixed_basic_d256l1r8h2_P127_N4_e0.7_seed44536",
+   "task": "mixed_ab",
+   "config": {
+    "RANDOM_SEED": 44536,
+    "P": 127,
+    "D_MODEL": 256,
+    "N_HEAD": 2,
+    "N_LAYER": 1,
+    "MLP_RATIO": 8,
+    "AB_PAIRS": [
+     [
+      1,
+      1
+     ],
+     [
+      2,
+      3
+     ],
+     [
+      3,
+      5
+     ],
+     [
+      4,
+      7
+     ]
+    ],
+    "MIXED_AB_MAX_UNIQUE_RATIOS": [
+     0.7,
+     0.7,
+     0.7,
+     0.7
+    ],
+    "USE_AB_TAG": false,
+    "USE_CONDITIONAL_WTE": false,
+    "NUM_MASK": 2
+   }
+  },
+  {
+   "name": "mixed_basic_d256l1r8h2_P127_N5_e0.7_seed17996",
+   "task": "mixed_ab",
+   "config": {
+    "RANDOM_SEED": 17996,
+    "P": 127,
+    "D_MODEL": 256,
+    "N_HEAD": 2,
+    "N_LAYER": 1,
+    "MLP_RATIO": 8,
+    "AB_PAIRS": [
+     [
+      1,
+      1
+     ],
+     [
+      2,
+      3
+     ],
+     [
+      3,
+      5
+     ],
+     [
+      4,
+      7
+     ],
+     [
+      5,
+      11
+     ]
+    ],
+    "MIXED_AB_MAX_UNIQUE_RATIOS": [
+     0.7,
+     0.7,
+     0.7,
+     0.7,
+     0.7
+    ],
+    "USE_AB_TAG": false,
+    "USE_CONDITIONAL_WTE": false,
+    "NUM_MASK": 2
+   }
+  },
+  {
+   "name": "mixed_basic_d256l1r8h2_P127_N5_e0.7_seed18318",
+   "task": "mixed_ab",
+   "config": {
+    "RANDOM_SEED": 18318,
+    "P": 127,
+    "D_MODEL": 256,
+    "N_HEAD": 2,
+    "N_LAYER": 1,
+    "MLP_RATIO": 8,
+    "AB_PAIRS": [
+     [
+      1,
+      1
+     ],
+     [
+      2,
+      3
+     ],
+     [
+      3,
+      5
+     ],
+     [
+      4,
+      7
+     ],
+     [
+      5,
+      11
+     ]
+    ],
+    "MIXED_AB_MAX_UNIQUE_RATIOS": [
+     0.7,
+     0.7,
+     0.7,
+     0.7,
+     0.7
+    ],
+    "USE_AB_TAG": false,
+    "USE_CONDITIONAL_WTE": false,
+    "NUM_MASK": 2
+   }
+  },
+  {
+   "name": "mixed_basic_d256l1r8h2_P127_N5_e0.7_seed34789",
+   "task": "mixed_ab",
+   "config": {
+    "RANDOM_SEED": 34789,
+    "P": 127,
+    "D_MODEL": 256,
+    "N_HEAD": 2,
+    "N_LAYER": 1,
+    "MLP_RATIO": 8,
+    "AB_PAIRS": [
+     [
+      1,
+      1
+     ],
+     [
+      2,
+      3
+     ],
+     [
+      3,
+      5
+     ],
+     [
+      4,
+      7
+     ],
+     [
+      5,
+      11
+     ]
+    ],
+    "MIXED_AB_MAX_UNIQUE_RATIOS": [
+     0.7,
+     0.7,
+     0.7,
+     0.7,
+     0.7
+    ],
+    "USE_AB_TAG": false,
+    "USE_CONDITIONAL_WTE": false,
+    "NUM_MASK": 2
+   }
+  },
+  {
+   "name": "mixed_basic_d256l1r8h2_P127_N5_e0.7_seed44536",
+   "task": "mixed_ab",
+   "config": {
+    "RANDOM_SEED": 44536,
+    "P": 127,
+    "D_MODEL": 256,
+    "N_HEAD": 2,
+    "N_LAYER": 1,
+    "MLP_RATIO": 8,
+    "AB_PAIRS": [
+     [
+      1,
+      1
+     ],
+     [
+      2,
+      3
+     ],
+     [
+      3,
+      5
+     ],
+     [
+      4,
+      7
+     ],
+     [
+      5,
+      11
+     ]
+    ],
+    "MIXED_AB_MAX_UNIQUE_RATIOS": [
+     0.7,
+     0.7,
+     0.7,
+     0.7,
+     0.7
+    ],
+    "USE_AB_TAG": false,
+    "USE_CONDITIONAL_WTE": false,
+    "NUM_MASK": 2
+   }
+  }
+ ]
+}

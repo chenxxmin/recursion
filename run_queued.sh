@@ -1,7 +1,7 @@
 #!/bin/bash
 # 等自己的训练进程结束后，运行：
-#   experiments/action_p127_tr64_ood128_misslen_d256h4_predict.json
-#   （action + 污损 predict：miss_len 1/2 x missprob 0.1/0.3 x l1/l2 x 8 seeds，64 runs）
+#   experiments/mixed_basic_d256l1r8h2_p127_rules12345.json
+#   （mixed basic 无 tag：N=2..5 规则 [(1,1),(2,3),(3,5),(4,7),(5,11)] x 4 seeds，16 runs，7 并发）
 # 用法（在仓库根目录）：bash run_queued.sh
 # 建议配合 tmux 或 nohup 使用：nohup bash run_queued.sh > queued_run.log 2>&1 &
 #
@@ -28,8 +28,8 @@ done
 echo "[$(ts)] 已无自己的训练进程。拉取最新代码..."
 git pull || { echo "[$(ts)] git pull 失败，终止"; exit 1; }
 
-echo "[$(ts)] 开始: action_p127_tr64_ood128_misslen_d256h4_predict.json"
-"$PYTHON_BIN" src/batch_run.py experiments/action_p127_tr64_ood128_misslen_d256h4_predict.json
+echo "[$(ts)] 开始: mixed_basic_d256l1r8h2_p127_rules12345.json"
+"$PYTHON_BIN" src/batch_run.py experiments/mixed_basic_d256l1r8h2_p127_rules12345.json
 echo "[$(ts)] 结束（batch_run 退出码 $?）"
 
 echo "[$(ts)] 全部完成。"
