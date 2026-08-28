@@ -1,5 +1,11 @@
 # Activation Patching Probe 交接文档
 
+> **【已取代 2026-08-28】** 本文档是 2026-08-19 的首次交接，仅作历史记录。
+> 当前状态见 `PATCH_PIPELINE_NOTES.md`（工具、架构、坑清单）和
+> `reports/multi_pos_patch_summary.md`（全部结论）。
+> 本文 §3 的任务已完成；§4 的"已知限制"已被后续工作突破，
+> 见文末【2026-08-28 附注】。
+
 **日期**：2026-08-19
 **目的**：在 mixed basic（mixed_ab，**无 ab_tag**）已训练到 100% 正确率的 checkpoint 上，定位"模型用哪个 hidden state 区分当前规则"。
 
@@ -52,9 +58,20 @@ paired 样本：共享初始值 x1, x2，A 样本按规则 A 递推、B 样本�
 
 - **只支持无 tag 的 mixed_ab**（`use_ab_tag=false`）。带 tag 或 conditional_wte 的 checkpoint 没测过；若要支持，注意输入首 token 是 flag、位置偏移 +1，且 forward 需传 ab_labels。
 - `load_model` 复用自 `src/analyze_attention.py`，能识别 MixedABTransformer checkpoint。
-- 现在 patch 的是"单组件单位置"。若结果太弱（单点 patch 被残差流旁路绕过），自然的下一步是：同层所有头一起 patch、或相邻位置窗口 patch——改 `patched_logits` 的 slice 即可。
+- ~~现在 patch 的是"单组件单位置"~~ 【已解决】`patched_logits` 现支持
+  多位置同时 patch 和新 site 类型（emb/resid/attn_all）；但注意单位置
+  patch 的结论必须用 k=q+1 对齐口径评估（聚合稀释坑，见
+  PATCH_PIPELINE_NOTES.md §3）。
 - 样本对生成 seed 固定（--seed），A/B 共享初始值；如需"同初始值但历史不同"之外的配对方式（如完全独立样本），改 `generate_paired_samples`。
 - 分类口径若想看 per-position 细分（如"x3 位置最依赖哪个组件"），report.json 的逐位置数据已够，直接聚合即可。
+
+### 【2026-08-28 附注】
+
+当时预期的"单点 patch 太弱则逐步加强"的路线已经走完，结果：
+翻转位点存在（l1: lag2 证据头@query；l2: layer-1 头），需用
+multi_pos_patch.py 的五目标分类口径（区分规则翻转/状态转移/崩坏）；
+回声抵消伪影（B1）会制造幻影状态转移，分析前先排除。详见
+reports/multi_pos_patch_summary.md。
 
 ## 5. 验收标准
 
