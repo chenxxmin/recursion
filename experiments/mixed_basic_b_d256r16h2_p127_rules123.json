@@ -1,0 +1,73 @@
+{
+ "concurrency": 1,
+ "experiments": [
+  {
+   "name": "mixed_basic_B_d256r16h2_P127_rules123_N3_e0.7_seed17996",
+   "task": "mixed_ab",
+   "config": {
+    "P": 127,
+    "N_LAYER": 1,
+    "AB_PAIRS": [
+     [
+      1,
+      1
+     ],
+     [
+      2,
+      3
+     ],
+     [
+      3,
+      5
+     ]
+    ],
+    "MIXED_AB_MAX_UNIQUE_RATIOS": [
+     0.7,
+     0.7,
+     0.7
+    ],
+    "USE_AB_TAG": false,
+    "USE_CONDITIONAL_WTE": false,
+    "NUM_MASK": 2,
+    "RANDOM_SEED": 17996,
+    "D_MODEL": 256,
+    "N_HEAD": 2,
+    "MLP_RATIO": 16
+   }
+  },
+  {
+   "name": "mixed_basic_B_d256r16h2_P127_rules123_N3_e0.7_seed44536",
+   "task": "mixed_ab",
+   "config": {
+    "P": 127,
+    "N_LAYER": 1,
+    "AB_PAIRS": [
+     [
+      1,
+      1
+     ],
+     [
+      2,
+      3
+     ],
+     [
+      3,
+      5
+     ]
+    ],
+    "MIXED_AB_MAX_UNIQUE_RATIOS": [
+     0.7,
+     0.7,
+     0.7
+    ],
+    "USE_AB_TAG": false,
+    "USE_CONDITIONAL_WTE": false,
+    "NUM_MASK": 2,
+    "RANDOM_SEED": 44536,
+    "D_MODEL": 256,
+    "N_HEAD": 2,
+    "MLP_RATIO": 16
+   }
+  }
+ ]
+}
