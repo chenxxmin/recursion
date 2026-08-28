@@ -115,7 +115,100 @@ python src/head_ablation.py model.pth --pairs 256
 执行环节的模乘精度是大系数规则的短板；规模/深度决定能装几条规则
 （l1 最多 2 条，l2d512 可到 5 条需课程，l4 最优）。
 
-## 5. 待办 / 开放问题
+## 5. 代码架构（pipeline 涉及的模块）
+
+### 5.1 分层总览
+
+```
+模型层    models.py
+规则层    rules.py
+数据层    datasets.py
+训练编排  experiment.py ← training.py ← final_eval.py
+批运行    batch_run.py（experiments/*.json → config_tmp_*.json → core.py）
+分析工具  analyze_attention.py（基础设施）
+          activation_patch.py / multi_pos_patch.py /
+          evidence_sweep.py / head_ablation.py / rule_generalization.py
+测试      tests/
+```
+
+### 5.2 模型层 `models.py`
+
+- `FibonacciTransformer`：基类。结构：`wte`（与 `lm_head` **权重绑定**——
+  回声现象的根源）→（可选 `wpe`，默认 RoPE）→ `transformer.h`（block 列表）
+  → `ln_f` → `lm_head`；
+- `TransformerBlock`：pre-norm。`x += attn(ln_1(x))`，`x += mlp(ln_2(x))`；
+  `mlp = Sequential(Linear, GELU, Linear, Dropout)`——patch 点 `mlp[2]` 是
+  第二层 Linear 的输入（post-GELU 隐藏层）；
+- `CausalSelfAttention`：`c_attn`（d→3d，按 q,k,v 切分）→ RoPE（只作用 q,k）
+  → causal mask → softmax → `att @ v` → `c_proj`（d→d）。
+  **patch 点 `c_proj` 的输入** = 各头 att@v 拼接，按 head_size 切列；
+- `MixedABTransformer(FibonacciTransformer)`：多规则变体，`rule_head`
+  （规则分类头，尺寸随规则数变，INIT_FROM 时会跳过）+ 可选 `ab_emb`/
+  `cond_wte`。`use_ab_tag=False` 时 forward 与基类相同；
+- 输出协议：`model(idx)` 返回 `(logits, ...)`，分析代码统一取 `out[0]`。
+
+### 5.3 规则层 `rules.py`
+
+- `LinearRecurrenceRule(coeffs, p)`：**约定 (c1,c2) ⇒ X(k)=c1·X(k-1)+c2·X(k-2)**
+  （曾在此搞反过，activation_patch 的 bug 之源）；`next_fn()` 供数据集用；
+- `rules_from_config(cfg, order)`：order=2 读 `AB_PAIRS`，order=3 读
+  `ABC_PAIRS`。
+
+### 5.4 数据层 `datasets.py`
+
+- `RecurrenceDataset`（单规则）：环遍历 + 滑动窗口；**曝光拆分**按初始状态
+  ——`num_samples` 之前（shuffle 后顺序）的初始态进 train（曝光），其余进
+  test（未曝光）。`MAX_UNIQUE_RATIO`/per-rule ratios 控制曝光率；
+- `MixedRecurrenceDataset`：多规则混合；每条规则独立跑一个
+  RecurrenceDataset 再拼接。**重建曝光集**：`random.seed(RANDOM_SEED)` →
+  逐规则构造（顺序敏感），见 `.chain_tmp/b2_exposure.py`；
+- collate 族：普通 / masked（缺失值不计 loss）/ predict（缺失值要预测）；
+  `BatchTag` 路由；
+- 退化样本注意：x_1=0（证据不可识别）、x_2=0（x_4 不可区分规则）。
+
+### 5.5 训练编排
+
+- `core.py`：**兼容壳**（实际实现已拆到 experiment/training/final_eval）；
+- `experiment.py`：`run_experiment(config_path)` 主入口。设种子 →
+  `_prepare_mixed_recurrence`（建数据集）→ 建模型 → **`INIT_FROM` 暖启动**
+  （`_load_partial_checkpoint`：按 name+shape 匹配拷贝，rule_head 等不匹配的
+  自动跳过）→ 训练；
+- `training.py`：训练循环。早停双规则：`EARLY_STOP_ACCURACY=0.99`（到线再跑
+  200 epoch 收尾）+ `EARLY_STOP_NO_IMPROVE=3000`；
+- `final_eval.py`：最终教师强制评估，按位置 × 曝光/未曝光拆分
+  （"Exposed-ID / Unexposed-ID" 表格的出处）。
+
+### 5.6 批运行 `batch_run.py`
+
+- 输入：`experiments/*.json`（`{"concurrency": N, "experiments": [...]}`，
+  每条含 name/task/config 覆盖）；
+- `build_merged_config`：main → task 默认段 → 实验覆盖，自动填 SAVE_PATH，
+  打 `_BATCH_RUN_MERGED` 标记（`protocol.py`）；写出 `config_tmp_<name>.json`
+  后 spawn `core.py`；
+- GPU：`get_idle_gpus()`（nvidia-smi 探测）+ 队列分配，**会覆盖外层
+  CUDA_VISIBLE_DEVICES**——要钉卡需直接 spawn core.py（curriculum_chain.py
+  就是这么做的）；
+- 输出：`/data/cxm/recursion/<批次名>/logs|plots`，`/data/cxm/models/<批次名>/`
+  （PATH_CONVENTIONS.md）；
+- **长任务务必 `setsid nohup ... &`**，会话关闭会杀后台任务。
+
+### 5.7 分析工具层
+
+| 模块 | 提供 | 关键接口 |
+|---|---|---|
+| `analyze_attention.py` | 基础设施 | `load_model`（checkpoint→模型，自动识别 MixedAB/PE 方案）、`get_attention_weights`（手动重放前向算 pattern） |
+| `activation_patch.py` | HSS 原语 | `generate_paired_samples`、`rule_targets`、`capture_hidden`（缓存 attn/mlp/emb/resid）、`patched_logits`（多位置、多 site 类型）、`classify` |
+| `multi_pos_patch.py` | 翻转猎手 | 条件梯子 + 5 目标分类（match_a/b、match_src、match_hyb、neither） |
+| `evidence_sweep.py` | 判定函数测绘 | 合成 V 内容 patch，证据值全扫描 + 盆地捕获率 |
+| `head_ablation.py` | 必要性测试 | 逐头清零消融，按规则拆分准确率 |
+| `rule_generalization.py` | 行为泛化 | 新 b 值续写归属测试（b=1/b=2/真值/随机） |
+
+### 5.8 测试
+
+`tests/test_activation_patch.py`（10 个，含强不变量：末层 resid patch 必须
+复现源 logits）等；直接 `python tests/xxx.py` 运行，无需 pytest。
+
+## 6. 待办 / 开放问题
 
 - h2 矩阵批（40 run）收尾后的 h2 vs h4 对照图；
 - B4：lag2/lag3 混合头为何惰性（组合 patch 判别）；
