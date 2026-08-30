@@ -1,0 +1,22 @@
+{
+ "concurrency": 1,
+ "experiments": [
+  {
+   "name": "mixed_basic_d512l1r8h4_P127_rules123_N3_e0.7_seed34789",
+   "task": "mixed_ab",
+   "config": {
+    "RANDOM_SEED": 34789,
+    "P": 127,
+    "D_MODEL": 512,
+    "N_HEAD": 4,
+    "N_LAYER": 1,
+    "MLP_RATIO": 8,
+    "AB_PAIRS": [[1, 1], [2, 3], [3, 5]],
+    "MIXED_AB_MAX_UNIQUE_RATIOS": [0.7, 0.7, 0.7],
+    "USE_AB_TAG": false,
+    "USE_CONDITIONAL_WTE": false,
+    "NUM_MASK": 2
+   }
+  }
+ ]
+}
