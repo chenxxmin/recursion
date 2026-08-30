@@ -6,7 +6,10 @@ symbols defined here (_unpack_batch, _sample_seq), so existing
 `from core import ...` users (tests) are unaffected.
 """
 import os
+import random
 import sys
+import time
+from contextlib import nullcontext
 
 import torch
 
@@ -260,21 +263,70 @@ def evaluate(model, dataloader, device, num_mask=1, extra_kwargs_fn=None):
     return total_loss / len(dataloader), overall_acc, per_pos_acc, group_acc
 
 
+def resume_checkpoint_path(save_path):
+    """Path of the wall-clock-timeout resume checkpoint for a given SAVE_PATH."""
+    return os.path.splitext(save_path)[0] + '_resume.pth'
+
+
+def save_resume_checkpoint(path, model, optimizer, scheduler, next_epoch,
+                           best_acc, best_epoch, no_improve, high_acc_epoch,
+                           save_config):
+    """Save full training state so a timed-out run can be resumed later.
+
+    Unlike the final model checkpoint (weights only), this captures
+    optimizer/scheduler state and RNG states so training continues as
+    uninterrupted as possible.
+    """
+    state = {
+        'model_state_dict': model.state_dict(),
+        'optimizer_state_dict': optimizer.state_dict(),
+        'scheduler_state_dict': scheduler.state_dict(),
+        'next_epoch': next_epoch,
+        'best_acc': best_acc,
+        'best_epoch': best_epoch,
+        'no_improve': no_improve,
+        'high_acc_epoch': high_acc_epoch,
+        'rng_python': random.getstate(),
+        'rng_torch': torch.get_rng_state(),
+        'config': save_config,
+    }
+    if torch.cuda.is_available():
+        state['rng_cuda'] = torch.cuda.get_rng_state_all()
+    torch.save(state, path)
+
+
 def run_training_engine(model, train_loader, test_loader, optimizer, scheduler, device,
                         epochs, eval_interval, early_stop_accuracy, early_stop_no_improve,
                         save_path, save_config, num_mask=1, extra_kwargs_fn=None, first_task_weight=1.0,
                         cond_fix=None, cond_fix_start=None,
-                        cond_fix_start_a1=None, cond_fix_start_a2=None):
+                        cond_fix_start_a1=None, cond_fix_start_a2=None,
+                        max_train_hours=None, resume_state=None, use_amp=False):
     print(f"\nStart training...")
+    # bf16 autocast for the forward pass (weights/optimizer stay fp32; no
+    # GradScaler needed for bf16). Only meaningful on CUDA.
+    amp_ctx = (lambda: torch.autocast('cuda', dtype=torch.bfloat16)) \
+        if (use_amp and device == 'cuda') else nullcontext
+    if use_amp and device == 'cuda':
+        print("[Config] USE_AMP enabled: bf16 autocast for train/eval forward")
     best_acc = 0.0
     best_epoch = 0
     no_improve = 0
+    start_epoch = 0
+    high_acc_epoch = None
+    if resume_state is not None:
+        best_acc = resume_state['best_acc']
+        best_epoch = resume_state['best_epoch']
+        no_improve = resume_state['no_improve']
+        high_acc_epoch = resume_state['high_acc_epoch']
+        start_epoch = resume_state['next_epoch']
+        print(f"[RESUME] continue from epoch {start_epoch}, "
+              f"best={best_acc:.2%}(@{best_epoch})")
+    train_t0 = time.time()
     frozen_param_states = None
     cond_fix_triggered = False
     # After test acc first reaches early_stop_accuracy, keep training for this
     # many extra epochs before stopping (instead of stopping immediately).
     extra_epochs_after_high_acc = 200
-    high_acc_epoch = None
 
     # cond_fix_start == 0: freeze BEFORE the first gradient step. (Any other
     # start value keeps the threshold semantics: freeze at the first eval
@@ -284,18 +336,21 @@ def run_training_engine(model, train_loader, test_loader, optimizer, scheduler, 
         cond_fix_triggered = True
         print(f"[CondFix] frozen from start (cond_fix_start=0): {cond_fix}")
 
-    for epoch in range(epochs):
-        train_loss, train_acc, train_pos_acc = train_epoch(
-            model, train_loader, optimizer, device,
-            num_mask=num_mask, extra_kwargs_fn=extra_kwargs_fn,
-            first_task_weight=first_task_weight,
-            frozen_param_states=frozen_param_states)
+    epoch = start_epoch
+    for epoch in range(start_epoch, epochs):
+        with amp_ctx():
+            train_loss, train_acc, train_pos_acc = train_epoch(
+                model, train_loader, optimizer, device,
+                num_mask=num_mask, extra_kwargs_fn=extra_kwargs_fn,
+                first_task_weight=first_task_weight,
+                frozen_param_states=frozen_param_states)
         scheduler.step()
         
         if epoch % eval_interval == 0 or epoch == epochs - 1:
-            _, test_acc, test_pos_acc, test_group_acc = evaluate(
-                model, test_loader, device,
-                num_mask=num_mask, extra_kwargs_fn=extra_kwargs_fn)
+            with amp_ctx():
+                _, test_acc, test_pos_acc, test_group_acc = evaluate(
+                    model, test_loader, device,
+                    num_mask=num_mask, extra_kwargs_fn=extra_kwargs_fn)
 
             # Conditional freeze: freeze cond_fix params when the start condition is met.
             # New behavior: max per-rule acc >= a1 AND min per-rule acc >= a2.
@@ -366,6 +421,18 @@ def run_training_engine(model, train_loader, test_loader, optimizer, scheduler, 
             if no_improve >= early_stop_no_improve:
                 print(f"[Early stop] No improvement for {early_stop_no_improve} consecutive epochs")
                 break
+
+            # Wall-clock limit: save a full resume checkpoint and bail out.
+            # Checked at eval points so best_acc/no_improve are up to date.
+            if max_train_hours is not None and \
+                    (time.time() - train_t0) >= max_train_hours * 3600:
+                resume_path = resume_checkpoint_path(save_path)
+                save_resume_checkpoint(resume_path, model, optimizer, scheduler,
+                                       epoch + 1, best_acc, best_epoch, no_improve,
+                                       high_acc_epoch, save_config)
+                print(f"[TIMEOUT] Reached MAX_TRAIN_HOURS={max_train_hours} at epoch {epoch}; "
+                      f"resume checkpoint saved to: {os.path.abspath(resume_path)}")
+                return best_acc, epoch, True
     
     print(f"\n{'='*50}")
     print("Saving model...")
@@ -381,4 +448,4 @@ def run_training_engine(model, train_loader, test_loader, optimizer, scheduler, 
     print(f"  File size: {os.path.getsize(save_path)/1024:.1f} KB")
     print(f"  Best test accuracy: {best_acc:.2%}")
     
-    return best_acc, epoch
+    return best_acc, epoch, False

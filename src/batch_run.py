@@ -243,6 +243,9 @@ def run_single(exp, base_config, dirs, concurrency=1, gpu_id=None):
         duration = (end_time - start_time).total_seconds()
         if returncode == 0:
             print(f"[{end_time.strftime('%H:%M:%S')}] Experiment completed: {name} ({duration:.0f}s), log: {log_path}")
+        elif returncode == 42:
+            print(f"[{end_time.strftime('%H:%M:%S')}] Experiment timed out (resume checkpoint saved): {name} ({duration:.0f}s), "
+                  f"resume later with RESUME_FROM, log: {log_path}")
         else:
             print(f"[{end_time.strftime('%H:%M:%S')}] Experiment failed: {name} ({duration:.0f}s), return code: {returncode}, log: {log_path}")
 
@@ -341,6 +344,16 @@ def main():
         detection_msg = "No GPUs detected"
 
     print("=" * SEP_WIDTH)
+
+    # Optional GPU whitelist: BATCH_RUN_GPUS="0,1,2,3" restricts which
+    # (physical) GPU ids this batch may use, so two batch_run instances can
+    # partition the machine without landing on the same card.
+    env_gpus = os.environ.get('BATCH_RUN_GPUS')
+    if env_gpus:
+        allowed = {int(x) for x in env_gpus.split(',') if x.strip()}
+        gpu_ids = [g for g in gpu_ids if g in allowed]
+        print(f"BATCH_RUN_GPUS whitelist: {sorted(allowed)} -> usable: {gpu_ids}")
+
     if gpu_ids:
         effective_workers = min(concurrency, len(gpu_ids))
         gpu_queue = queue.Queue()

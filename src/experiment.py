@@ -25,7 +25,7 @@ from datasets import (RecurrenceDataset, MixedRecurrenceDataset,
                       mixed_ab_collate_fn, mixed_ab_collate_fn_masked,
                       mixed_ab_collate_fn_predict, action_collate_fn,
                       action_missing_collate_fn)
-from training import run_training_engine
+from training import run_training_engine, resume_checkpoint_path
 from final_eval import (_run_mixed_ab_final_test,
                         _run_single_recurrence_final_test)
 
@@ -56,6 +56,29 @@ def _load_partial_checkpoint(model, path, device):
     model.load_state_dict(own)
     print(f"[INIT_FROM] {path}")
     print(f"[INIT_FROM] loaded {len(loaded)} tensors; skipped {len(skipped)}: {skipped}")
+
+
+def _load_resume_checkpoint(path, model, optimizer, scheduler, device):
+    """Load full training state saved by a wall-clock timeout (RESUME_FROM).
+
+    Restores model/optimizer/scheduler state plus RNG states, and returns the
+    raw checkpoint dict (run_training_engine reads next_epoch/best_acc/etc).
+    """
+    ckpt = torch.load(path, map_location=device, weights_only=False)
+    model.load_state_dict(ckpt['model_state_dict'])
+    optimizer.load_state_dict(ckpt['optimizer_state_dict'])
+    scheduler.load_state_dict(ckpt['scheduler_state_dict'])
+    random.setstate(ckpt['rng_python'])
+    # map_location may have moved RNG ByteTensors off CPU; move them back.
+    torch.set_rng_state(ckpt['rng_torch'].cpu())
+    if torch.cuda.is_available() and 'rng_cuda' in ckpt:
+        for i, s in enumerate(ckpt['rng_cuda']):
+            if i < torch.cuda.device_count():
+                torch.cuda.set_rng_state(s.cpu(), device=i)
+    print(f"[RESUME_FROM] {path}")
+    print(f"[RESUME_FROM] next_epoch={ckpt['next_epoch']}, "
+          f"best={ckpt['best_acc']:.2%}(@{ckpt['best_epoch']})")
+    return ckpt
 
 
 def _round_up_pow2(n):
@@ -432,6 +455,13 @@ def run_experiment(config_path=None):
     device = 'cuda' if torch.cuda.is_available() else 'cpu'
     print(f"Using device: {device}\n")
 
+    # TF32: enable tensor-core fp32 matmul acceleration (negligible numeric
+    # difference for training; ~1.3x on L20). Config key ALLOW_TF32.
+    if cfg_main.get('ALLOW_TF32', False) and device == 'cuda':
+        torch.backends.cuda.matmul.allow_tf32 = True
+        torch.backends.cudnn.allow_tf32 = True
+        print("[Config] TF32 enabled (matmul + cudnn)")
+
     if not config.get(BATCH_RUN_MERGED_FLAG):
         print("[Error] Config not merged. Please run via batch_run.py or merge config manually.")
         sys.exit(2)  # non-zero so batch_run records failure instead of a silent "success"
@@ -491,7 +521,14 @@ def run_experiment(config_path=None):
     optimizer = torch.optim.AdamW(model.parameters(), lr=LR, weight_decay=cfg['WEIGHT_DECAY'])
     scheduler = torch.optim.lr_scheduler.CosineAnnealingLR(optimizer, T_max=EPOCHS)
 
-    best_acc, epoch = run_training_engine(
+    # Wall-clock-timeout resume: load full training state (weights, optimizer,
+    # scheduler, RNG). Applied after INIT_FROM; if both are set, RESUME_FROM wins.
+    resume_state = None
+    resume_from = cfg_main.get('RESUME_FROM')
+    if resume_from:
+        resume_state = _load_resume_checkpoint(resume_from, model, optimizer, scheduler, device)
+
+    best_acc, epoch, timed_out = run_training_engine(
         model, train_loader, test_loader, optimizer, scheduler, device,
         epochs=EPOCHS, eval_interval=cfg['EVAL_INTERVAL'],
         early_stop_accuracy=cfg.get('EARLY_STOP_ACCURACY', 0.99),
@@ -502,8 +539,18 @@ def run_experiment(config_path=None):
         cond_fix=cfg.get('COND_FIX', None),
         cond_fix_start=cfg.get('COND_FIX_START', None),
         cond_fix_start_a1=cfg.get('COND_FIX_START_A1', None),
-        cond_fix_start_a2=cfg.get('COND_FIX_START_A2', None)
+        cond_fix_start_a2=cfg.get('COND_FIX_START_A2', None),
+        max_train_hours=cfg.get('MAX_TRAIN_HOURS'),
+        resume_state=resume_state,
+        use_amp=cfg.get('USE_AMP', False)
     )
+
+    if timed_out:
+        # Wall-clock limit hit: resume checkpoint already saved by the engine.
+        # Exit 42 so batch_run reports it as timeout (not success, not crash).
+        print(f"[TIMEOUT] Resume later with RESUME_FROM="
+              f"{resume_checkpoint_path(SAVE_PATH)}")
+        sys.exit(42)
 
     # ========================================================================
     # Stage 3: Post-processing (mixed_ab final generation test with exposure split)
