@@ -542,7 +542,8 @@ def run_experiment(config_path=None):
         cond_fix_start_a2=cfg.get('COND_FIX_START_A2', None),
         max_train_hours=cfg.get('MAX_TRAIN_HOURS'),
         resume_state=resume_state,
-        use_amp=cfg.get('USE_AMP', False)
+        use_amp=cfg.get('USE_AMP', False),
+        amp_dtype=cfg.get('AMP_DTYPE', 'bfloat16')
     )
 
     if timed_out:

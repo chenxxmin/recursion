@@ -130,7 +130,8 @@ x_k = a * x_{k-2} + b * x_{k-1}  (mod P)
 | `MAX_TRAIN_HOURS` | 墙钟时间上限（小时），`null` 为不限。在每个 eval 点检查，超时则把完整训练状态（模型+优化器+调度器+RNG）存到 `{SAVE_PATH去后缀}_resume.pth` 并以退出码 42 退出（batch_run 记为 timed out，不写最终模型、不跑 post-train 测试） |
 | `RESUME_FROM` | 续跑：从 `MAX_TRAIN_HOURS` 超时保存的 resume checkpoint 恢复完整训练状态（模型/优化器/调度器/RNG/当前 epoch/best 等），`null` 为不启用。与 `INIT_FROM` 同时设置时 `RESUME_FROM` 后生效 |
 | `ALLOW_TF32` | true 时开启张量核 TF32 matmul 加速（`src/config.json` 默认 true；仅 CUDA 生效）。数值差异极小（尾数 23→10 位），L20 上约 1.3x |
-| `USE_AMP` | true 时 train/eval 前向使用 bf16 autocast（权重与优化器保持 fp32，无需 GradScaler；仅 CUDA 生效），L20 上约 2x。**`src/config.json` 默认 true（2026-08-30 起，探索期默认加速）**；需要与历史 fp32 实验严格对齐时显式设 `false` 复跑 |
+| `USE_AMP` | true 时 train/eval 前向使用 autocast（权重与优化器保持 fp32；仅 CUDA 生效），L20 上约 2x。**`src/config.json` 默认 true（2026-08-30 起，探索期默认加速）**；需要与历史 fp32 实验严格对齐时显式设 `false` 复跑。**警告（2026-08-31 实证）：16-bit autocast 会摧毁接近收敛的模型**——低 loss 区训练 1 epoch 掉 6 个点，20 epoch 归零；**bf16 与 fp16 表现几乎相同（89.4% vs 89.3%），多 3 位尾数无济于事**，说明破坏机制不是单纯的尾数噪声。**续跑（RESUME_FROM）已接近收敛的实验必须设 `false`**；从零训练可用于扫点，但 bf16 的假阴性（未 grok）不可作为“不可行”证据 |
+| `AMP_DTYPE` | autocast 精度：`bfloat16`（默认，无需 scaler）或 `float16`（自动启用 GradScaler）。2026-08-31 实证二者对收敛模型的破坏相同，fp16 不构成有效的中间档 |
 | `COND_FIX` / `COND_FIX_START` | 部分参数冻结：`COND_FIX: "WTE"` 冻结 embedding 相关参数（注意 lm_head 与 wte 权重共享，实际同时冻结输出投影；`"LINEAR"` 冻结 transformer 主干+rule_head）。`COND_FIX_START` 为准确率阈值（该 eval 达标后冻结）；**`0` 表示训练前就冻结**（首个梯度步之前生效） |
 
 ### 2.1 各任务对公共配置的覆盖

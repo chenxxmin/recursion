@@ -34,7 +34,8 @@
     "MAX_TRAIN_HOURS": null,
     "RESUME_FROM": null,
     "ALLOW_TF32": true,
-    "USE_AMP": true
+    "USE_AMP": true,
+    "AMP_DTYPE": "bfloat16"
   },
   "tribonacci": {
     "P": 23,

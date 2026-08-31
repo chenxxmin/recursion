@@ -74,7 +74,10 @@ class CausalSelfAttention(nn.Module):
             k = apply_rotary_emb(k, cos, sin)
         
         att = (q @ k.transpose(-2, -1)) * (1.0 / math.sqrt(self.head_size))
-        att = att.masked_fill(self.causal_mask[:, :, :T, :T] == 0, ATTN_MASK_NEG)
+        # Clamp the mask value to the dtype's range so fp16 autocast does not
+        # overflow (max(-1e9, finfo.min) is a no-op for fp32/bf16).
+        neg = max(ATTN_MASK_NEG, torch.finfo(att.dtype).min)
+        att = att.masked_fill(self.causal_mask[:, :, :T, :T] == 0, neg)
         att = F.softmax(att, dim=-1)
         
         penalty = torch.tensor(0.0, device=x.device)

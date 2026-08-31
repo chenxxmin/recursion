@@ -167,7 +167,7 @@ def _default_loss_mask(batch_size, target_len, num_mask, first_task_weight=1.0, 
     return mask
 
 
-def train_epoch(model, dataloader, optimizer, device, num_mask=1, extra_kwargs_fn=None, first_task_weight=1.0, frozen_param_states=None):
+def train_epoch(model, dataloader, optimizer, device, num_mask=1, extra_kwargs_fn=None, first_task_weight=1.0, frozen_param_states=None, grad_scaler=None):
     model.train()
     total_loss = 0
     total_correct = 0
@@ -194,9 +194,18 @@ def train_epoch(model, dataloader, optimizer, device, num_mask=1, extra_kwargs_f
             _print_nan_diagnostics(x, logits, loss_mask, targets)
         
         if loss is not None and not torch.isnan(loss):
-            loss.backward()
-            torch.nn.utils.clip_grad_norm_(model.parameters(), 1.0)
-            optimizer.step()
+            if grad_scaler is not None:
+                # fp16 path: scale loss to keep gradients in fp16 range,
+                # unscale before clipping, scaler skips the step on inf/NaN.
+                grad_scaler.scale(loss).backward()
+                grad_scaler.unscale_(optimizer)
+                torch.nn.utils.clip_grad_norm_(model.parameters(), 1.0)
+                grad_scaler.step(optimizer)
+                grad_scaler.update()
+            else:
+                loss.backward()
+                torch.nn.utils.clip_grad_norm_(model.parameters(), 1.0)
+                optimizer.step()
             # Restore frozen parameters (AdamW weight decay would otherwise drift them)
             if frozen_param_states:
                 with torch.no_grad():
@@ -300,14 +309,21 @@ def run_training_engine(model, train_loader, test_loader, optimizer, scheduler, 
                         save_path, save_config, num_mask=1, extra_kwargs_fn=None, first_task_weight=1.0,
                         cond_fix=None, cond_fix_start=None,
                         cond_fix_start_a1=None, cond_fix_start_a2=None,
-                        max_train_hours=None, resume_state=None, use_amp=False):
+                        max_train_hours=None, resume_state=None, use_amp=False,
+                        amp_dtype='bfloat16'):
     print(f"\nStart training...")
-    # bf16 autocast for the forward pass (weights/optimizer stay fp32; no
-    # GradScaler needed for bf16). Only meaningful on CUDA.
-    amp_ctx = (lambda: torch.autocast('cuda', dtype=torch.bfloat16)) \
-        if (use_amp and device == 'cuda') else nullcontext
+    # Autocast for the forward pass (weights/optimizer stay fp32). bf16 needs
+    # no scaler (fp32-range exponent); fp16 needs GradScaler (5-bit exponent).
+    use_fp16 = use_amp and amp_dtype == 'float16' and device == 'cuda'
+    amp_ctx = nullcontext
+    grad_scaler = None
     if use_amp and device == 'cuda':
-        print("[Config] USE_AMP enabled: bf16 autocast for train/eval forward")
+        torch_dtype = torch.float16 if use_fp16 else torch.bfloat16
+        amp_ctx = lambda: torch.autocast('cuda', dtype=torch_dtype)
+        if use_fp16:
+            grad_scaler = torch.amp.GradScaler('cuda')
+        print(f"[Config] USE_AMP enabled: {amp_dtype} autocast for train/eval forward"
+              f"{' (GradScaler on)' if use_fp16 else ''}")
     best_acc = 0.0
     best_epoch = 0
     no_improve = 0
@@ -343,7 +359,8 @@ def run_training_engine(model, train_loader, test_loader, optimizer, scheduler, 
                 model, train_loader, optimizer, device,
                 num_mask=num_mask, extra_kwargs_fn=extra_kwargs_fn,
                 first_task_weight=first_task_weight,
-                frozen_param_states=frozen_param_states)
+                frozen_param_states=frozen_param_states,
+                grad_scaler=grad_scaler)
         scheduler.step()
         
         if epoch % eval_interval == 0 or epoch == epochs - 1:
