@@ -59,9 +59,9 @@ SCALES = {
                        donor_logs='/data/cxm/recursion/mixed_basic_n2_ladder_rules12/logs',
                        donor_log_pat='mixed_basic_d512l2r8h4_P127_rules12_N2_e0.7_seed{s}.log'),
     'l4d512r8h4': dict(d=512, l=4, h=4,
-                       donor_dir='/data/cxm/models/mixed_basic_scale_matrix_rules12',
+                       donor_dir='/data/cxm/models/mixed_basic_scale_matrix_h4_rules12',
                        donor_pat='mixed_basic_d512l4r8h4_P127_rules12_N2_e0.7_seed{s}.pth',
-                       donor_logs='/data/cxm/recursion/mixed_basic_scale_matrix_rules12/logs',
+                       donor_logs='/data/cxm/recursion/mixed_basic_scale_matrix_h4_rules12/logs',
                        donor_log_pat='mixed_basic_d512l4r8h4_P127_rules12_N2_e0.7_seed{s}.log'),
 }
 SEEDS = [17996, 18318, 34789, 44536]

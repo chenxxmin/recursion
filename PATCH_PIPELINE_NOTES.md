@@ -18,7 +18,7 @@
 常用模型组：
 - `mixed_ab_downscale_l1h4/`：[(1,1),(1,2)]，d256l1r8h2/h4 等，3 seeds；
 - `mixed_basic_d256l1r8h2_p127_rules12345/`：[(1,1),(2,3)] N=2..5；
-- `mixed_basic_n2_ladder_rules12/`、`mixed_basic_scale_matrix_rules12/`：规模阶梯；
+- `mixed_basic_n2_ladder_rules12/`、`mixed_basic_scale_matrix_h4_rules12/`：规模阶梯；
 - `curriculum_chains/`：课程链各阶段模型。
 
 ## 1. 管线总览（按分析顺序）
