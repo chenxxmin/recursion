@@ -1,0 +1,195 @@
+======================================================================
+实验 JSON 条目 name 全局存在性检查
+======================================================================
+说明：对于每个 JSON 的每个 name，全局搜索 /data/cxm/models 和 /data/cxm/recursion，
+      不限于同名目录。
+
+
+  action_p127_tr64_ood128_misslen_d256h4_predict.json
+    条目数: 96
+    模型文件全局存在: 96/96, 缺失: 0
+    日志文件全局存在: 96/96, 缺失: 0
+
+  addition_p127_tr64_ood128_miss2nd_d256h4.json
+    条目数: 96
+    模型文件全局存在: 96/96, 缺失: 0
+    日志文件全局存在: 96/96, 缺失: 0
+
+  addition_p127_tr64_ood128_miss2nd_d256h4_predict.json
+    条目数: 240
+    模型文件全局存在: 240/240, 缺失: 0
+    日志文件全局存在: 240/240, 缺失: 0
+
+  addition_p127_tr64_ood128_misslen_d128h4.json
+    条目数: 120
+    模型文件全局存在: 120/120, 缺失: 0
+    日志文件全局存在: 120/120, 缺失: 0
+
+  addition_p127_tr64_ood128_misslen_d256h4.json
+    条目数: 120
+    模型文件全局存在: 120/120, 缺失: 0
+    日志文件全局存在: 120/120, 缺失: 0
+
+  addition_p127_tr64_ood128_misslen_d256h4_predict.json
+    条目数: 264
+    模型文件全局存在: 264/264, 缺失: 0
+    日志文件全局存在: 264/264, 缺失: 0
+
+  addition_p127_tr64_ood128_randmisslen_d256h4_predict.json
+    条目数: 216
+    模型文件全局存在: 216/216, 缺失: 0
+    日志文件全局存在: 216/216, 缺失: 0
+
+  addition_p53.json
+    条目数: 39
+    模型文件全局存在: 39/39, 缺失: 0
+    日志文件全局存在: 39/39, 缺失: 0
+
+  curriculum_ab_p53.json: [无 experiments 条目]
+
+  curriculum_exposure_p251_baselines.json
+    条目数: 18
+    模型文件全局存在: 18/18, 缺失: 0
+    日志文件全局存在: 18/18, 缺失: 0
+
+  curriculum_exposure_p251_l1.json: [无 experiments 条目]
+
+  curriculum_exposure_p251_l2.json: [无 experiments 条目]
+
+  dynamic_d512.json
+    条目数: 72
+    模型文件全局存在: 72/72, 缺失: 0
+    日志文件全局存在: 72/72, 缺失: 0
+
+  dynamic_missing.json
+    条目数: 1
+    模型文件全局存在: 0/1, 缺失: 1
+    日志文件全局存在: 0/1, 缺失: 1
+    缺模型: dynamic_a11a12_P53_miss0.1len3_seed42
+    缺日志: dynamic_a11a12_P53_miss0.1len3_seed42
+
+  dynamic_mixed.json
+    条目数: 72
+    模型文件全局存在: 72/72, 缺失: 0
+    日志文件全局存在: 64/72, 缺失: 8
+    缺日志: dynamic_mixed_d64l1r4_N2_seed0, dynamic_mixed_d64l1r4_N2_seed1, dynamic_mixed_d64l1r4_N2_seed2, dynamic_mixed_d64l1r4_N2_seed3, dynamic_mixed_d64l1r4_N2_seed4, dynamic_mixed_d64l1r4_N2_seed5, dynamic_mixed_d64l1r4_N2_seed6, dynamic_mixed_d64l1r4_N2_seed7
+
+  dynamic_mixed_large.json
+    条目数: 18
+    模型文件全局存在: 18/18, 缺失: 0
+    日志文件全局存在: 18/18, 缺失: 0
+
+  experiments.json
+    条目数: 23
+    模型文件全局存在: 23/23, 缺失: 0
+    日志文件全局存在: 23/23, 缺失: 0
+
+  mixed_ab_basic_bigP.json
+    条目数: 72
+    模型文件全局存在: 39/72, 缺失: 33
+    日志文件全局存在: 44/72, 缺失: 28
+
+  mixed_ab_downscale_l1h4.json
+    条目数: 6
+    模型文件全局存在: 6/6, 缺失: 0
+    日志文件全局存在: 6/6, 缺失: 0
+
+  mixed_ab_exposure_p251.json
+    条目数: 72
+    模型文件全局存在: 72/72, 缺失: 0
+    日志文件全局存在: 72/72, 缺失: 0
+
+  mixed_ab_exposure_p251_supplement.json
+    条目数: 30
+    模型文件全局存在: 30/30, 缺失: 0
+    日志文件全局存在: 30/30, 缺失: 0
+
+  mixed_ab_exposure_p509.json
+    条目数: 72
+    模型文件全局存在: 72/72, 缺失: 0
+    日志文件全局存在: 72/72, 缺失: 0
+
+  mixed_ab_p127_tr64_ood128_missing.json
+    条目数: 15
+    模型文件全局存在: 15/15, 缺失: 0
+    日志文件全局存在: 15/15, 缺失: 0
+
+  mixed_ab_p127_tr64_ood128_missing_l2.json
+    条目数: 15
+    模型文件全局存在: 14/15, 缺失: 1
+    日志文件全局存在: 15/15, 缺失: 0
+    缺模型: mixed_basic_d256l2r8h2_P127_N2_e0.7_tr64ood128_miss0.4_seed7955
+
+  mixed_ab_supplement.json
+    条目数: 9
+    模型文件全局存在: 8/9, 缺失: 1
+    日志文件全局存在: 9/9, 缺失: 0
+    缺模型: mixed_basic_d4096l1r16h4_P127_N2_e0.5_seed12345
+
+  mixed_abc_basic.json
+    条目数: 36
+    模型文件全局存在: 34/36, 缺失: 2
+    日志文件全局存在: 36/36, 缺失: 0
+    缺模型: mixed_abc_d1024l1r8h4_P31_N2_e0.7_seed0, mixed_abc_d1024l1r8h4_P31_N2_e0.7_seed12345
+
+  mixed_abc_smoke.json
+    条目数: 1
+    模型文件全局存在: 0/1, 缺失: 1
+    日志文件全局存在: 0/1, 缺失: 1
+    缺模型: mixed_abc_smoke_p23
+    缺日志: mixed_abc_smoke_p23
+
+  mixed_basic_d256l1r8h2_p127_rules12345.json
+    条目数: 16
+    模型文件全局存在: 4/16, 缺失: 12
+    日志文件全局存在: 11/16, 缺失: 5
+    缺日志: mixed_basic_d256l1r8h2_P127_N4_e0.7_seed44536, mixed_basic_d256l1r8h2_P127_N5_e0.7_seed17996, mixed_basic_d256l1r8h2_P127_N5_e0.7_seed18318, mixed_basic_d256l1r8h2_P127_N5_e0.7_seed34789, mixed_basic_d256l1r8h2_P127_N5_e0.7_seed44536
+
+  mixed_n5.json
+    条目数: 24
+    模型文件全局存在: 20/24, 缺失: 4
+    日志文件全局存在: 24/24, 缺失: 0
+    缺模型: mixed_basic_d2048l2r8_N5_e0.7_seed3, mixed_basic_d2048l2r8_N5_e0.7_seed5, mixed_basic_d2048l2r8_N5_e0.7_seed6, mixed_basic_d2048l2r8_N5_e0.7_seed7
+
+  nonlinear.json
+    条目数: 32
+    模型文件全局存在: 31/32, 缺失: 1
+    日志文件全局存在: 32/32, 缺失: 0
+    缺模型: nonlinear_d64l1r4_P1009_seed4
+
+  nonlinear_p127_tr64_ood128_randmiss0.1len1_d512r8_predict.json
+    条目数: 24
+    模型文件全局存在: 8/24, 缺失: 16
+    日志文件全局存在: 14/24, 缺失: 10
+    缺日志: nonlinear_d512l3r8h4_P127_tr64ood128_randmiss0.1len1_seed72814, nonlinear_d512l3r8h4_P127_tr64ood128_randmiss0.1len1_seed82585, nonlinear_d512l4r8h4_P127_tr64ood128_randmiss0.1len1_seed17996, nonlinear_d512l4r8h4_P127_tr64ood128_randmiss0.1len1_seed18318, nonlinear_d512l4r8h4_P127_tr64ood128_randmiss0.1len1_seed34789, nonlinear_d512l4r8h4_P127_tr64ood128_randmiss0.1len1_seed44536, nonlinear_d512l4r8h4_P127_tr64ood128_randmiss0.1len1_seed62513, nonlinear_d512l4r8h4_P127_tr64ood128_randmiss0.1len1_seed64154, nonlinear_d512l4r8h4_P127_tr64ood128_randmiss0.1len1_seed72814, nonlinear_d512l4r8h4_P127_tr64ood128_randmiss0.1len1_seed82585
+
+  nonlinear_p127_tr64_ood128_randmisslen_d256h4_predict.json
+    条目数: 224
+    模型文件全局存在: 224/224, 缺失: 0
+    日志文件全局存在: 224/224, 缺失: 0
+
+  tribonacci.json
+    条目数: 32
+    模型文件全局存在: 0/32, 缺失: 32
+    日志文件全局存在: 32/32, 缺失: 0
+
+  tribonacci_investigate.json
+    条目数: 72
+    模型文件全局存在: 72/72, 缺失: 0
+    日志文件全局存在: 72/72, 缺失: 0
+
+  tribonacci_shortcut_robustness.json
+    条目数: 96
+    模型文件全局存在: 96/96, 缺失: 0
+    日志文件全局存在: 96/96, 缺失: 0
+
+  tribonacci_w30.json
+    条目数: 8
+    模型文件全局存在: 8/8, 缺失: 0
+    日志文件全局存在: 8/8, 缺失: 0
+
+======================================================================
+全局缺失统计
+======================================================================
+所有 JSON 中全局缺失的模型文件总数: 104
+所有 JSON 中全局缺失的日志文件总数: 53

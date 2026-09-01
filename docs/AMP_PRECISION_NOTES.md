@@ -18,7 +18,7 @@
 
 ## 2. 已做的对比实验与结果
 
-### 2.1 速度探针（`probe_speed.py`，2026-08-30）
+### 2.1 速度探针（`scripts/probe_speed.py`，2026-08-30）
 
 | 档位 | s/epoch（共享卡） | 加速比 |
 |---|---|---|
@@ -118,4 +118,4 @@ fp32 续跑健康上涨（如 d2048l2 miss0.1 seed18318：90.1@800ep → 91.2@19
   （scale→unscale→clip→step→update）；评估同精度 autocast。
 - `src/models.py`：attention mask 常数改为 `max(-1e9, finfo(dtype).min)`（修 fp16 溢出；对 fp32/bf16 为 no-op）。
 - `src/experiment.py`：`ALLOW_TF32` 在 `run_experiment` 入口生效；`AMP_DTYPE` 透传。
-- 探针脚本：`probe_speed.py`（速度）、破坏性测试见 §2.2 方法（load full resume state → 1 train_epoch → eval）。
+- 探针脚本：`scripts/probe_speed.py`（速度）、破坏性测试见 §2.2 方法（load full resume state → 1 train_epoch → eval）。

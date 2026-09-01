@@ -1,7 +1,7 @@
 # Action misslen hierarchy：有效实验结论盘点（持续更新）
 
 > 建立：2026-09-01。**口径**：仅收录 fp32 / fp32+TF32（已实证等价，见
-> `AMP_PRECISION_NOTES.md` §2.2）的结果；bf16/16-bit autocast 的结果一律不计入
+> `../docs/AMP_PRECISION_NOTES.md` §2.2）的结果；bf16/16-bit autocast 的结果一律不计入
 > （噪声税实证高达 ~50 个点，见同文档 §2.5）。
 > 每次相关批次结束后更新本文档并推送。
 
@@ -64,4 +64,4 @@
 ## 更新记录
 
 - 2026-09-01：初版。收录 A1 基线、历史 len2 数据、fp32 vs bf16 对照结论；
-  精度讨论归档（见 AMP_PRECISION_NOTES.md）；默认精度回退 fp32+TF32。
+  精度讨论归档（见 ../docs/AMP_PRECISION_NOTES.md）；默认精度回退 fp32+TF32。

@@ -2,7 +2,7 @@
 # 等线B (action_misslen2_n2_scaleup) 的 batch_run 结束后，
 # 在 GPU 6-7 上跑 A2b（N3 d1024l4 大实验，与 B 续跑的 4-5 互不冲突）。
 set -u
-cd "$(dirname "$0")"
+cd "$(dirname "$0")/.."
 
 ts() { date '+%F %T'; }
 

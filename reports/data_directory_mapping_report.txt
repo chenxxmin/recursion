@@ -1,0 +1,164 @@
+======================================================================
+实验日志与模型目录对应关系整理报告
+======================================================================
+日志根目录: /data/cxm/recursion
+模型根目录: /data/cxm/models
+日志目录数（排除 .git）: 57
+模型目录数: 40
+
+======================================================================
+一、目录名严格完美对应（34 组）
+======================================================================
+  ✓ action_p127_tr64_ood128_misslen_d256h4_predict  (日志 160, 模型 160) 
+  ✓ addition_p127_tr64_ood128_miss2nd_d256h4  (日志 96, 模型 96) 
+  ✓ addition_p127_tr64_ood128_miss2nd_d256h4_predict  (日志 240, 模型 240) 
+  ✓ addition_p127_tr64_ood128_misslen_d128h4  (日志 120, 模型 120) 
+  ✓ addition_p127_tr64_ood128_misslen_d256h4  (日志 120, 模型 120) 
+  ✓ addition_p127_tr64_ood128_misslen_d256h4_predict  (日志 264, 模型 264) 
+  ✓ addition_p127_tr64_ood128_randmisslen_d256h4_predict  (日志 237, 模型 216) 
+  ✓ addition_p127_tr64_ood128_randmisslen_d256h4_predict_ml2345  (日志 0, 模型 0) [空对空]
+  ✓ addition_p53  (日志 39, 模型 39) 
+  ✓ curriculum_exposure_p251_baselines  (日志 18, 模型 18) 
+  ✓ curriculum_exposure_p251_l1_T1  (日志 3, 模型 3) 
+  ✓ curriculum_exposure_p251_l1_T2  (日志 3, 模型 3) 
+  ✓ curriculum_exposure_p251_l1_T3  (日志 3, 模型 3) 
+  ✓ curriculum_exposure_p251_l1_phase1  (日志 3, 模型 3) 
+  ✓ curriculum_exposure_p251_l2_T1  (日志 3, 模型 3) 
+  ✓ curriculum_exposure_p251_l2_T2  (日志 3, 模型 3) 
+  ✓ curriculum_exposure_p251_l2_T3  (日志 3, 模型 2) 
+  ✓ curriculum_exposure_p251_l2_phase1  (日志 3, 模型 3) 
+  ✓ dynamic_d512  (日志 72, 模型 72) 
+  ✓ mixed_ab_basic_bigP  (日志 48, 模型 39) 
+  ✓ mixed_ab_downscale_l1h4  (日志 18, 模型 36) 
+  ✓ mixed_ab_exposure_p251  (日志 72, 模型 72) 
+  ✓ mixed_ab_exposure_p251_supplement  (日志 30, 模型 30) 
+  ✓ mixed_ab_exposure_p509  (日志 72, 模型 72) 
+  ✓ mixed_ab_p127_tr64_ood128_missing  (日志 15, 模型 15) 
+  ✓ mixed_ab_p127_tr64_ood128_missing_l2  (日志 15, 模型 14) 
+  ✓ mixed_abc_basic  (日志 48, 模型 46) 
+  ✓ mixed_basic_d256l1r8h2_p127_rules12345  (日志 17, 模型 3) 
+  ✓ nonlinear_p127_tr64_ood128_randmiss0.1len1_d512r8_predict  (日志 20, 模型 8) 
+  ✓ nonlinear_p127_tr64_ood128_randmisslen_d256h4_predict  (日志 224, 模型 224) 
+  ✓ test  (日志 1, 模型 1) 
+  ✓ tribonacci_investigate  (日志 76, 模型 72) 
+  ✓ tribonacci_shortcut_robustness  (日志 96, 模型 96) 
+  ✓ tribonacci_w30  (日志 8, 模型 8) 
+
+======================================================================
+二、有日志目录但缺同名模型目录（23 组）
+======================================================================
+说明：这些目录在 /data/cxm/recursion 中存在，但在 /data/cxm/models 中没有同名目录。
+      部分可能在其他模型目录（如 experiments）中找到了内容对应。
+
+  ⚠ addition-p1009w64  (日志 8)  [无内容对应]
+  ⚠ addition-p127w128  (日志 8)  [无内容对应]
+  ⚠ addition-p127w64  (日志 8)  [无内容对应]
+  ⚠ addition-p53w64  (日志 8)  [无内容对应]
+  ⚠ dynamic_mixed_d128  (日志 9)
+      -> 内容可能对应: experiments(9核)
+  ⚠ dynamic_mixed_d256  (日志 9)
+      -> 内容可能对应: experiments(9核)
+  ⚠ dynamic_mixed_d256h4  (日志 9)
+      -> 内容可能对应: experiments(9核)
+  ⚠ dynamic_mixed_d64l1r4  (日志 72)
+      -> 内容可能对应: dynamic_mixed(1核), dynamic_mixed_2(1核), experiments(8核)
+  ⚠ mixed_basic_d512l2r8  (日志 128)  [无内容对应]
+  ⚠ mixed_basic_large  (日志 8)
+      -> 内容可能对应: experiments(4核)
+  ⚠ mixed_basic_supplement  (日志 36)
+      -> 内容可能对应: mixed_ab_downscale_l1h4(6核), mixed_ab_supplement(3核)
+  ⚠ mixed_cond_d512l2r8  (日志 128)  [无内容对应]
+  ⚠ mixed_cond_d64l1r4  (日志 128)
+      -> 内容可能对应: mixed_label_expo_2(16核)
+  ⚠ mixed_cond_d64l1r4h4  (日志 3)
+      -> 内容可能对应: experiments(3核)
+  ⚠ mixed_label_d512l2r8  (日志 128)  [无内容对应]
+  ⚠ mixed_label_d64l1r4  (日志 128)
+      -> 内容可能对应: mixed_label_expo_2(16核)
+  ⚠ mixed_label_d64l1r4h4  (日志 3)
+      -> 内容可能对应: experiments(3核)
+  ⚠ mixed_multi_tasks  (日志 72)
+      -> 内容可能对应: experiments(6核), mixed_n5(3核)
+  ⚠ nonlinear_d256r8  (日志 16)
+      -> 内容可能对应: experiments(2核)
+  ⚠ nonlinear_d64r4  (日志 17)
+      -> 内容可能对应: experiments(2核)
+  ⚠ tribonacci_d256  (日志 32)  [无内容对应]
+  ⚠ tribonacci_d256r4_w30  (日志 16)
+      -> 内容可能对应: experiments(2核)
+  ⚠ tribonacci_d64  (日志 32)  [无内容对应]
+
+======================================================================
+三、有模型目录但缺同名日志目录（6 组）
+======================================================================
+说明：这些目录在 /data/cxm/models 中存在，但在 /data/cxm/recursion 中没有同名目录。
+      部分可能在其他日志目录中找到了内容对应。
+
+  ⚠ dynamic_mixed  (模型 8)
+      -> 内容可能对应: dynamic_mixed_d64l1r4(1核)
+  ⚠ dynamic_mixed_2  (模型 8)
+      -> 内容可能对应: dynamic_mixed_d64l1r4(1核)
+  ⚠ experiments  (模型 240)
+      -> 内容可能对应: dynamic_mixed_d128(9核), dynamic_mixed_d256(9核), dynamic_mixed_d256h4(9核), dynamic_mixed_d64l1r4(8核), mixed_basic_large(4核), mixed_cond_d64l1r4h4(3核), mixed_label_d64l1r4h4(3核), mixed_multi_tasks(6核), nonlinear_d256r8(2核), nonlinear_d64r4(2核), tribonacci_d256r4_w30(2核), tribonacci_investigate(4核)
+  ⚠ mixed_ab_supplement  (模型 8)
+      -> 内容可能对应: mixed_basic_supplement(3核)
+  ⚠ mixed_label_expo_2  (模型 256)
+      -> 内容可能对应: mixed_cond_d64l1r4(16核), mixed_label_d64l1r4(16核)
+  ⚠ mixed_n5  (模型 20)
+      -> 内容可能对应: mixed_multi_tasks(3核)
+
+======================================================================
+四、跨目录内容对应关系摘要
+======================================================================
+以下模型目录的内容分散对应多个日志目录，或日志目录的模型散落在其他目录：
+
+  模型目录 addition_p127_tr64_ood128_miss2nd_d256h4:
+      -> addition_p127_tr64_ood128_miss2nd_d256h4 (12 个共同核心实验)
+      -> addition_p127_tr64_ood128_miss2nd_d256h4_predict (12 个共同核心实验)
+  模型目录 addition_p127_tr64_ood128_miss2nd_d256h4_predict:
+      -> addition_p127_tr64_ood128_miss2nd_d256h4 (12 个共同核心实验)
+      -> addition_p127_tr64_ood128_miss2nd_d256h4_predict (30 个共同核心实验)
+  模型目录 addition_p127_tr64_ood128_misslen_d256h4:
+      -> addition_p127_tr64_ood128_misslen_d256h4 (15 个共同核心实验)
+      -> addition_p127_tr64_ood128_misslen_d256h4_predict (15 个共同核心实验)
+  模型目录 addition_p127_tr64_ood128_misslen_d256h4_predict:
+      -> addition_p127_tr64_ood128_misslen_d256h4 (15 个共同核心实验)
+      -> addition_p127_tr64_ood128_misslen_d256h4_predict (33 个共同核心实验)
+  模型目录 dynamic_mixed:
+      -> dynamic_mixed_d64l1r4 (1 个共同核心实验)
+  模型目录 dynamic_mixed_2:
+      -> dynamic_mixed_d64l1r4 (1 个共同核心实验)
+  模型目录 experiments:
+      -> dynamic_mixed_d128 (9 个共同核心实验)
+      -> dynamic_mixed_d256 (9 个共同核心实验)
+      -> dynamic_mixed_d256h4 (9 个共同核心实验)
+      -> dynamic_mixed_d64l1r4 (8 个共同核心实验)
+      -> mixed_basic_large (4 个共同核心实验)
+      -> mixed_cond_d64l1r4h4 (3 个共同核心实验)
+      -> mixed_label_d64l1r4h4 (3 个共同核心实验)
+      -> mixed_multi_tasks (6 个共同核心实验)
+      -> nonlinear_d256r8 (2 个共同核心实验)
+      -> nonlinear_d64r4 (2 个共同核心实验)
+      -> tribonacci_d256r4_w30 (2 个共同核心实验)
+      -> tribonacci_investigate (4 个共同核心实验)
+  模型目录 mixed_ab_downscale_l1h4:
+      -> mixed_ab_downscale_l1h4 (6 个共同核心实验)
+      -> mixed_basic_d256l1r8h2_p127_rules12345 (1 个共同核心实验)
+      -> mixed_basic_supplement (6 个共同核心实验)
+  模型目录 mixed_ab_supplement:
+      -> mixed_basic_supplement (3 个共同核心实验)
+  模型目录 mixed_basic_d256l1r8h2_p127_rules12345:
+      -> mixed_ab_downscale_l1h4 (1 个共同核心实验)
+      -> mixed_basic_d256l1r8h2_p127_rules12345 (1 个共同核心实验)
+  模型目录 mixed_label_expo_2:
+      -> mixed_cond_d64l1r4 (16 个共同核心实验)
+      -> mixed_label_d64l1r4 (16 个共同核心实验)
+  模型目录 mixed_n5:
+      -> mixed_multi_tasks (3 个共同核心实验)
+
+======================================================================
+五、特殊情况
+======================================================================
+空模型目录（1 个）: addition_p127_tr64_ood128_randmisslen_d256h4_predict_ml2345
+空日志目录（1 个）: addition_p127_tr64_ood128_randmisslen_d256h4_predict_ml2345
+日志根目录下的 .git 已排除在统计之外。

@@ -2,7 +2,7 @@
 # 等线B (action_misslen2_n2_scaleup) 的 batch_run 结束后，
 # 在 GPU 4-7 上续跑 d1024l4 miss0.1 的两个超时实验。
 set -u
-cd "$(dirname "$0")"
+cd "$(dirname "$0")/.."
 
 ts() { date '+%F %T'; }
 

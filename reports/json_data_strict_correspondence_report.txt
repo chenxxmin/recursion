@@ -1,0 +1,683 @@
+======================================================================
+实验 JSON 与 /data 目录/文件对应关系检查
+======================================================================
+JSON 文件数: 36
+日志目录数: 57
+模型目录数: 40
+
+======================================================================
+一、JSON 文件名与 /data/cxm/recursion 日志目录的对应
+======================================================================
+有同名日志目录的 JSON: 24 个
+  ✓ action_p127_tr64_ood128_misslen_d256h4_predict.json
+  ✓ addition_p127_tr64_ood128_miss2nd_d256h4.json
+  ✓ addition_p127_tr64_ood128_miss2nd_d256h4_predict.json
+  ✓ addition_p127_tr64_ood128_misslen_d128h4.json
+  ✓ addition_p127_tr64_ood128_misslen_d256h4.json
+  ✓ addition_p127_tr64_ood128_misslen_d256h4_predict.json
+  ✓ addition_p127_tr64_ood128_randmisslen_d256h4_predict.json
+  ✓ addition_p53.json
+  ✓ curriculum_exposure_p251_baselines.json
+  ✓ dynamic_d512.json
+  ✓ mixed_ab_basic_bigP.json
+  ✓ mixed_ab_downscale_l1h4.json
+  ✓ mixed_ab_exposure_p251.json
+  ✓ mixed_ab_exposure_p251_supplement.json
+  ✓ mixed_ab_exposure_p509.json
+  ✓ mixed_ab_p127_tr64_ood128_missing.json
+  ✓ mixed_ab_p127_tr64_ood128_missing_l2.json
+  ✓ mixed_abc_basic.json
+  ✓ mixed_basic_d256l1r8h2_p127_rules12345.json
+  ✓ nonlinear_p127_tr64_ood128_randmiss0.1len1_d512r8_predict.json
+  ✓ nonlinear_p127_tr64_ood128_randmisslen_d256h4_predict.json
+  ✓ tribonacci_investigate.json
+  ✓ tribonacci_shortcut_robustness.json
+  ✓ tribonacci_w30.json
+
+无同名日志目录的 JSON: 12 个
+  ⚠ curriculum_ab_p53.json
+  ⚠ curriculum_exposure_p251_l1.json
+  ⚠ curriculum_exposure_p251_l2.json
+  ⚠ dynamic_missing.json
+  ⚠ dynamic_mixed.json
+  ⚠ dynamic_mixed_large.json
+  ⚠ experiments.json
+  ⚠ mixed_ab_supplement.json
+  ⚠ mixed_abc_smoke.json
+  ⚠ mixed_n5.json
+  ⚠ nonlinear.json
+  ⚠ tribonacci.json
+
+======================================================================
+二、JSON 文件名与 /data/cxm/models 模型目录的对应
+======================================================================
+有同名模型目录的 JSON: 28 个
+  ✓ action_p127_tr64_ood128_misslen_d256h4_predict.json
+  ✓ addition_p127_tr64_ood128_miss2nd_d256h4.json
+  ✓ addition_p127_tr64_ood128_miss2nd_d256h4_predict.json
+  ✓ addition_p127_tr64_ood128_misslen_d128h4.json
+  ✓ addition_p127_tr64_ood128_misslen_d256h4.json
+  ✓ addition_p127_tr64_ood128_misslen_d256h4_predict.json
+  ✓ addition_p127_tr64_ood128_randmisslen_d256h4_predict.json
+  ✓ addition_p53.json
+  ✓ curriculum_exposure_p251_baselines.json
+  ✓ dynamic_d512.json
+  ✓ dynamic_mixed.json
+  ✓ experiments.json
+  ✓ mixed_ab_basic_bigP.json
+  ✓ mixed_ab_downscale_l1h4.json
+  ✓ mixed_ab_exposure_p251.json
+  ✓ mixed_ab_exposure_p251_supplement.json
+  ✓ mixed_ab_exposure_p509.json
+  ✓ mixed_ab_p127_tr64_ood128_missing.json
+  ✓ mixed_ab_p127_tr64_ood128_missing_l2.json
+  ✓ mixed_ab_supplement.json
+  ✓ mixed_abc_basic.json
+  ✓ mixed_basic_d256l1r8h2_p127_rules12345.json
+  ✓ mixed_n5.json
+  ✓ nonlinear_p127_tr64_ood128_randmiss0.1len1_d512r8_predict.json
+  ✓ nonlinear_p127_tr64_ood128_randmisslen_d256h4_predict.json
+  ✓ tribonacci_investigate.json
+  ✓ tribonacci_shortcut_robustness.json
+  ✓ tribonacci_w30.json
+
+无同名模型目录的 JSON: 8 个
+  ⚠ curriculum_ab_p53.json
+  ⚠ curriculum_exposure_p251_l1.json
+  ⚠ curriculum_exposure_p251_l2.json
+  ⚠ dynamic_missing.json
+  ⚠ dynamic_mixed_large.json
+  ⚠ mixed_abc_smoke.json
+  ⚠ nonlinear.json
+  ⚠ tribonacci.json
+
+======================================================================
+三、JSON 条目 name 与 /data 文件对应详情
+======================================================================
+
+  curriculum_ab_p53.json: [无 experiments 条目]
+
+  curriculum_exposure_p251_l1.json: [无 experiments 条目]
+
+  curriculum_exposure_p251_l2.json: [无 experiments 条目]
+
+  action_p127_tr64_ood128_misslen_d256h4_predict.json
+    条目数: 96
+    同名日志目录: ✓  同名模型目录: ✓
+    模型文件: 96/96 找到, 0 缺失
+    日志文件: 96/96 找到, 0 缺失
+
+  addition_p127_tr64_ood128_miss2nd_d256h4.json
+    条目数: 96
+    同名日志目录: ✓  同名模型目录: ✓
+    模型文件: 96/96 找到, 0 缺失
+    日志文件: 96/96 找到, 0 缺失
+
+  addition_p127_tr64_ood128_miss2nd_d256h4_predict.json
+    条目数: 240
+    同名日志目录: ✓  同名模型目录: ✓
+    模型文件: 240/240 找到, 0 缺失
+    日志文件: 240/240 找到, 0 缺失
+
+  addition_p127_tr64_ood128_misslen_d128h4.json
+    条目数: 120
+    同名日志目录: ✓  同名模型目录: ✓
+    模型文件: 120/120 找到, 0 缺失
+    日志文件: 120/120 找到, 0 缺失
+
+  addition_p127_tr64_ood128_misslen_d256h4.json
+    条目数: 120
+    同名日志目录: ✓  同名模型目录: ✓
+    模型文件: 120/120 找到, 0 缺失
+    日志文件: 120/120 找到, 0 缺失
+
+  addition_p127_tr64_ood128_misslen_d256h4_predict.json
+    条目数: 264
+    同名日志目录: ✓  同名模型目录: ✓
+    模型文件: 264/264 找到, 0 缺失
+    日志文件: 264/264 找到, 0 缺失
+
+  addition_p127_tr64_ood128_randmisslen_d256h4_predict.json
+    条目数: 216
+    同名日志目录: ✓  同名模型目录: ✓
+    模型文件: 216/216 找到, 0 缺失
+    日志文件: 216/216 找到, 0 缺失
+
+  addition_p53.json
+    条目数: 39
+    同名日志目录: ✓  同名模型目录: ✓
+    模型文件: 39/39 找到, 0 缺失
+    日志文件: 39/39 找到, 0 缺失
+
+  curriculum_exposure_p251_baselines.json
+    条目数: 18
+    同名日志目录: ✓  同名模型目录: ✓
+    模型文件: 18/18 找到, 0 缺失
+    日志文件: 18/18 找到, 0 缺失
+
+  dynamic_d512.json
+    条目数: 72
+    同名日志目录: ✓  同名模型目录: ✓
+    模型文件: 72/72 找到, 0 缺失
+    日志文件: 72/72 找到, 0 缺失
+
+  dynamic_missing.json
+    条目数: 1
+    同名日志目录: ✗  同名模型目录: ✗
+    模型文件: 0/1 找到, 1 缺失
+    日志文件: 0/1 找到, 1 缺失
+    缺模型: dynamic_a11a12_P53_miss0.1len3_seed42
+    缺日志: dynamic_a11a12_P53_miss0.1len3_seed42
+
+  dynamic_mixed.json
+    条目数: 72
+    同名日志目录: ✗  同名模型目录: ✓
+    模型文件: 0/72 找到, 72 缺失
+    日志文件: 0/72 找到, 72 缺失
+
+  dynamic_mixed_large.json
+    条目数: 18
+    同名日志目录: ✗  同名模型目录: ✗
+    模型文件: 0/18 找到, 18 缺失
+    日志文件: 0/18 找到, 18 缺失
+
+  experiments.json
+    条目数: 23
+    同名日志目录: ✗  同名模型目录: ✓
+    模型文件: 23/23 找到, 0 缺失
+    日志文件: 0/23 找到, 23 缺失
+
+  mixed_ab_basic_bigP.json
+    条目数: 72
+    同名日志目录: ✓  同名模型目录: ✓
+    模型文件: 39/72 找到, 33 缺失
+    日志文件: 44/72 找到, 28 缺失
+
+  mixed_ab_downscale_l1h4.json
+    条目数: 6
+    同名日志目录: ✓  同名模型目录: ✓
+    模型文件: 6/6 找到, 0 缺失
+    日志文件: 6/6 找到, 0 缺失
+
+  mixed_ab_exposure_p251.json
+    条目数: 72
+    同名日志目录: ✓  同名模型目录: ✓
+    模型文件: 72/72 找到, 0 缺失
+    日志文件: 72/72 找到, 0 缺失
+
+  mixed_ab_exposure_p251_supplement.json
+    条目数: 30
+    同名日志目录: ✓  同名模型目录: ✓
+    模型文件: 30/30 找到, 0 缺失
+    日志文件: 30/30 找到, 0 缺失
+
+  mixed_ab_exposure_p509.json
+    条目数: 72
+    同名日志目录: ✓  同名模型目录: ✓
+    模型文件: 72/72 找到, 0 缺失
+    日志文件: 72/72 找到, 0 缺失
+
+  mixed_ab_p127_tr64_ood128_missing.json
+    条目数: 15
+    同名日志目录: ✓  同名模型目录: ✓
+    模型文件: 15/15 找到, 0 缺失
+    日志文件: 15/15 找到, 0 缺失
+
+  mixed_ab_p127_tr64_ood128_missing_l2.json
+    条目数: 15
+    同名日志目录: ✓  同名模型目录: ✓
+    模型文件: 14/15 找到, 1 缺失
+    日志文件: 15/15 找到, 0 缺失
+    缺模型: mixed_basic_d256l2r8h2_P127_N2_e0.7_tr64ood128_miss0.4_seed7955
+
+  mixed_ab_supplement.json
+    条目数: 9
+    同名日志目录: ✗  同名模型目录: ✓
+    模型文件: 8/9 找到, 1 缺失
+    日志文件: 0/9 找到, 9 缺失
+    缺模型: mixed_basic_d4096l1r16h4_P127_N2_e0.5_seed12345
+
+  mixed_abc_basic.json
+    条目数: 36
+    同名日志目录: ✓  同名模型目录: ✓
+    模型文件: 34/36 找到, 2 缺失
+    日志文件: 36/36 找到, 0 缺失
+    缺模型: mixed_abc_d1024l1r8h4_P31_N2_e0.7_seed0, mixed_abc_d1024l1r8h4_P31_N2_e0.7_seed12345
+
+  mixed_abc_smoke.json
+    条目数: 1
+    同名日志目录: ✗  同名模型目录: ✗
+    模型文件: 0/1 找到, 1 缺失
+    日志文件: 0/1 找到, 1 缺失
+    缺模型: mixed_abc_smoke_p23
+    缺日志: mixed_abc_smoke_p23
+
+  mixed_basic_d256l1r8h2_p127_rules12345.json
+    条目数: 16
+    同名日志目录: ✓  同名模型目录: ✓
+    模型文件: 4/16 找到, 12 缺失
+    日志文件: 11/16 找到, 5 缺失
+    缺日志: mixed_basic_d256l1r8h2_P127_N4_e0.7_seed44536, mixed_basic_d256l1r8h2_P127_N5_e0.7_seed17996, mixed_basic_d256l1r8h2_P127_N5_e0.7_seed18318, mixed_basic_d256l1r8h2_P127_N5_e0.7_seed34789, mixed_basic_d256l1r8h2_P127_N5_e0.7_seed44536
+
+  mixed_n5.json
+    条目数: 24
+    同名日志目录: ✗  同名模型目录: ✓
+    模型文件: 20/24 找到, 4 缺失
+    日志文件: 0/24 找到, 24 缺失
+    缺模型: mixed_basic_d2048l2r8_N5_e0.7_seed3, mixed_basic_d2048l2r8_N5_e0.7_seed5, mixed_basic_d2048l2r8_N5_e0.7_seed6, mixed_basic_d2048l2r8_N5_e0.7_seed7
+
+  nonlinear.json
+    条目数: 32
+    同名日志目录: ✗  同名模型目录: ✗
+    模型文件: 0/32 找到, 32 缺失
+    日志文件: 0/32 找到, 32 缺失
+
+  nonlinear_p127_tr64_ood128_randmiss0.1len1_d512r8_predict.json
+    条目数: 24
+    同名日志目录: ✓  同名模型目录: ✓
+    模型文件: 8/24 找到, 16 缺失
+    日志文件: 14/24 找到, 10 缺失
+
+  nonlinear_p127_tr64_ood128_randmisslen_d256h4_predict.json
+    条目数: 224
+    同名日志目录: ✓  同名模型目录: ✓
+    模型文件: 224/224 找到, 0 缺失
+    日志文件: 224/224 找到, 0 缺失
+
+  tribonacci.json
+    条目数: 32
+    同名日志目录: ✗  同名模型目录: ✗
+    模型文件: 0/32 找到, 32 缺失
+    日志文件: 0/32 找到, 32 缺失
+
+  tribonacci_investigate.json
+    条目数: 72
+    同名日志目录: ✓  同名模型目录: ✓
+    模型文件: 72/72 找到, 0 缺失
+    日志文件: 72/72 找到, 0 缺失
+
+  tribonacci_shortcut_robustness.json
+    条目数: 96
+    同名日志目录: ✓  同名模型目录: ✓
+    模型文件: 96/96 找到, 0 缺失
+    日志文件: 96/96 找到, 0 缺失
+
+  tribonacci_w30.json
+    条目数: 8
+    同名日志目录: ✓  同名模型目录: ✓
+    模型文件: 8/8 找到, 0 缺失
+    日志文件: 8/8 找到, 0 缺失
+
+======================================================================
+四、总体缺失统计
+======================================================================
+所有 JSON 中缺失的模型文件总数: 225
+所有 JSON 中缺失的日志文件总数: 255
+
+======================================================================
+五、缺失模型文件清单（按 JSON 聚合）
+======================================================================
+
+  dynamic_missing.json (1 个缺失):
+    - dynamic_a11a12_P53_miss0.1len3_seed42
+
+  dynamic_mixed.json (72 个缺失):
+    - dynamic_mixed_d64l1r4_N2_seed0
+    - dynamic_mixed_d64l1r4_N2_seed1
+    - dynamic_mixed_d64l1r4_N2_seed2
+    - dynamic_mixed_d64l1r4_N2_seed3
+    - dynamic_mixed_d64l1r4_N2_seed4
+    - dynamic_mixed_d64l1r4_N2_seed5
+    - dynamic_mixed_d64l1r4_N2_seed6
+    - dynamic_mixed_d64l1r4_N2_seed7
+    - dynamic_mixed_d64l1r4_N3_seed0
+    - dynamic_mixed_d64l1r4_N3_seed1
+    - dynamic_mixed_d64l1r4_N3_seed2
+    - dynamic_mixed_d64l1r4_N3_seed3
+    - dynamic_mixed_d64l1r4_N3_seed4
+    - dynamic_mixed_d64l1r4_N3_seed5
+    - dynamic_mixed_d64l1r4_N3_seed6
+    - dynamic_mixed_d64l1r4_N3_seed7
+    - dynamic_mixed_d64l1r4_N4_seed0
+    - dynamic_mixed_d64l1r4_N4_seed1
+    - dynamic_mixed_d64l1r4_N4_seed2
+    - dynamic_mixed_d64l1r4_N4_seed3
+    ... 还有 52 个
+
+  dynamic_mixed_large.json (18 个缺失):
+    - dynamic_mixed_d128l1r8_N2_seed0
+    - dynamic_mixed_d128l1r8_N3_seed0
+    - dynamic_mixed_d128l1r8_N4_seed0
+    - dynamic_mixed_d128l1r8_N5_seed0
+    - dynamic_mixed_d128l1r8_N6_seed0
+    - dynamic_mixed_d128l1r8_N7_seed0
+    - dynamic_mixed_d128l1r8_N8_seed0
+    - dynamic_mixed_d128l1r8_N9_seed0
+    - dynamic_mixed_d128l1r8_N10_seed0
+    - dynamic_mixed_d256l1r8_N2_seed0
+    - dynamic_mixed_d256l1r8_N3_seed0
+    - dynamic_mixed_d256l1r8_N4_seed0
+    - dynamic_mixed_d256l1r8_N5_seed0
+    - dynamic_mixed_d256l1r8_N6_seed0
+    - dynamic_mixed_d256l1r8_N7_seed0
+    - dynamic_mixed_d256l1r8_N8_seed0
+    - dynamic_mixed_d256l1r8_N9_seed0
+    - dynamic_mixed_d256l1r8_N10_seed0
+
+  mixed_ab_basic_bigP.json (33 个缺失):
+    - mixed_basic_d4096l1r16h1_P127_N2_e0.7_seed999
+    - mixed_basic_d4096l1r16h2_P509_N2_e0.7_seed999
+    - mixed_basic_d4096l1r16h2_P509_N2_e0.7_seed12345
+    - mixed_basic_d4096l1r16h4_P509_N2_e0.7_seed0
+    - mixed_basic_d4096l1r16h4_P509_N2_e0.7_seed999
+    - mixed_basic_d4096l1r16h4_P509_N2_e0.7_seed12345
+    - mixed_basic_d512l2r8h1_P509_N2_e0.7_seed0
+    - mixed_basic_d512l2r8h1_P509_N2_e0.7_seed999
+    - mixed_basic_d512l2r8h1_P509_N2_e0.7_seed12345
+    - mixed_basic_d512l2r8h2_P509_N2_e0.7_seed0
+    - mixed_basic_d512l2r8h2_P509_N2_e0.7_seed999
+    - mixed_basic_d512l2r8h2_P509_N2_e0.7_seed12345
+    - mixed_basic_d512l2r8h4_P509_N2_e0.7_seed0
+    - mixed_basic_d512l2r8h4_P509_N2_e0.7_seed999
+    - mixed_basic_d512l2r8h4_P509_N2_e0.7_seed12345
+    - mixed_basic_d256l2r8h1_P509_N2_e0.7_seed0
+    - mixed_basic_d256l2r8h1_P509_N2_e0.7_seed999
+    - mixed_basic_d256l2r8h1_P509_N2_e0.7_seed12345
+    - mixed_basic_d256l2r8h2_P509_N2_e0.7_seed0
+    - mixed_basic_d256l2r8h2_P509_N2_e0.7_seed999
+    ... 还有 13 个
+
+  mixed_ab_p127_tr64_ood128_missing_l2.json (1 个缺失):
+    - mixed_basic_d256l2r8h2_P127_N2_e0.7_tr64ood128_miss0.4_seed7955
+
+  mixed_ab_supplement.json (1 个缺失):
+    - mixed_basic_d4096l1r16h4_P127_N2_e0.5_seed12345
+
+  mixed_abc_basic.json (2 个缺失):
+    - mixed_abc_d1024l1r8h4_P31_N2_e0.7_seed0
+    - mixed_abc_d1024l1r8h4_P31_N2_e0.7_seed12345
+
+  mixed_abc_smoke.json (1 个缺失):
+    - mixed_abc_smoke_p23
+
+  mixed_basic_d256l1r8h2_p127_rules12345.json (12 个缺失):
+    - mixed_basic_d256l1r8h2_P127_N3_e0.7_seed17996
+    - mixed_basic_d256l1r8h2_P127_N3_e0.7_seed18318
+    - mixed_basic_d256l1r8h2_P127_N3_e0.7_seed34789
+    - mixed_basic_d256l1r8h2_P127_N3_e0.7_seed44536
+    - mixed_basic_d256l1r8h2_P127_N4_e0.7_seed17996
+    - mixed_basic_d256l1r8h2_P127_N4_e0.7_seed18318
+    - mixed_basic_d256l1r8h2_P127_N4_e0.7_seed34789
+    - mixed_basic_d256l1r8h2_P127_N4_e0.7_seed44536
+    - mixed_basic_d256l1r8h2_P127_N5_e0.7_seed17996
+    - mixed_basic_d256l1r8h2_P127_N5_e0.7_seed18318
+    - mixed_basic_d256l1r8h2_P127_N5_e0.7_seed34789
+    - mixed_basic_d256l1r8h2_P127_N5_e0.7_seed44536
+
+  mixed_n5.json (4 个缺失):
+    - mixed_basic_d2048l2r8_N5_e0.7_seed3
+    - mixed_basic_d2048l2r8_N5_e0.7_seed5
+    - mixed_basic_d2048l2r8_N5_e0.7_seed6
+    - mixed_basic_d2048l2r8_N5_e0.7_seed7
+
+  nonlinear.json (32 个缺失):
+    - nonlinear_d64l1r4_P53_seed0
+    - nonlinear_d64l1r4_P53_seed1
+    - nonlinear_d64l1r4_P53_seed2
+    - nonlinear_d64l1r4_P53_seed3
+    - nonlinear_d64l1r4_P53_seed4
+    - nonlinear_d64l1r4_P53_seed5
+    - nonlinear_d64l1r4_P53_seed6
+    - nonlinear_d64l1r4_P53_seed7
+    - nonlinear_d64l1r4_P1009_seed0
+    - nonlinear_d64l1r4_P1009_seed1
+    - nonlinear_d64l1r4_P1009_seed2
+    - nonlinear_d64l1r4_P1009_seed3
+    - nonlinear_d64l1r4_P1009_seed4
+    - nonlinear_d64l1r4_P1009_seed5
+    - nonlinear_d64l1r4_P1009_seed6
+    - nonlinear_d64l1r4_P1009_seed7
+    - nonlinear_d256l1r8_P53_seed0
+    - nonlinear_d256l1r8_P53_seed1
+    - nonlinear_d256l1r8_P53_seed2
+    - nonlinear_d256l1r8_P53_seed3
+    ... 还有 12 个
+
+  nonlinear_p127_tr64_ood128_randmiss0.1len1_d512r8_predict.json (16 个缺失):
+    - nonlinear_d512l3r8h4_P127_tr64ood128_randmiss0.1len1_seed17996
+    - nonlinear_d512l3r8h4_P127_tr64ood128_randmiss0.1len1_seed18318
+    - nonlinear_d512l3r8h4_P127_tr64ood128_randmiss0.1len1_seed34789
+    - nonlinear_d512l3r8h4_P127_tr64ood128_randmiss0.1len1_seed44536
+    - nonlinear_d512l3r8h4_P127_tr64ood128_randmiss0.1len1_seed62513
+    - nonlinear_d512l3r8h4_P127_tr64ood128_randmiss0.1len1_seed64154
+    - nonlinear_d512l3r8h4_P127_tr64ood128_randmiss0.1len1_seed72814
+    - nonlinear_d512l3r8h4_P127_tr64ood128_randmiss0.1len1_seed82585
+    - nonlinear_d512l4r8h4_P127_tr64ood128_randmiss0.1len1_seed17996
+    - nonlinear_d512l4r8h4_P127_tr64ood128_randmiss0.1len1_seed18318
+    - nonlinear_d512l4r8h4_P127_tr64ood128_randmiss0.1len1_seed34789
+    - nonlinear_d512l4r8h4_P127_tr64ood128_randmiss0.1len1_seed44536
+    - nonlinear_d512l4r8h4_P127_tr64ood128_randmiss0.1len1_seed62513
+    - nonlinear_d512l4r8h4_P127_tr64ood128_randmiss0.1len1_seed64154
+    - nonlinear_d512l4r8h4_P127_tr64ood128_randmiss0.1len1_seed72814
+    - nonlinear_d512l4r8h4_P127_tr64ood128_randmiss0.1len1_seed82585
+
+  tribonacci.json (32 个缺失):
+    - tribonacci_d256l1r4_a1b1c1_seed0
+    - tribonacci_d256l1r4_a1b1c1_seed1
+    - tribonacci_d256l1r4_a1b1c1_seed2
+    - tribonacci_d256l1r4_a1b1c1_seed3
+    - tribonacci_d256l1r4_a1b1c1_seed4
+    - tribonacci_d256l1r4_a1b1c1_seed5
+    - tribonacci_d256l1r4_a1b1c1_seed6
+    - tribonacci_d256l1r4_a1b1c1_seed7
+    - tribonacci_d256l1r4_a1b2c4_seed0
+    - tribonacci_d256l1r4_a1b2c4_seed1
+    - tribonacci_d256l1r4_a1b2c4_seed2
+    - tribonacci_d256l1r4_a1b2c4_seed3
+    - tribonacci_d256l1r4_a1b2c4_seed4
+    - tribonacci_d256l1r4_a1b2c4_seed5
+    - tribonacci_d256l1r4_a1b2c4_seed6
+    - tribonacci_d256l1r4_a1b2c4_seed7
+    - tribonacci_d256l1r4_a1b2c3_seed0
+    - tribonacci_d256l1r4_a1b2c3_seed1
+    - tribonacci_d256l1r4_a1b2c3_seed2
+    - tribonacci_d256l1r4_a1b2c3_seed3
+    ... 还有 12 个
+
+======================================================================
+六、缺失日志文件清单（按 JSON 聚合）
+======================================================================
+
+  dynamic_missing.json (1 个缺失):
+    - dynamic_a11a12_P53_miss0.1len3_seed42
+
+  dynamic_mixed.json (72 个缺失):
+    - dynamic_mixed_d64l1r4_N2_seed0
+    - dynamic_mixed_d64l1r4_N2_seed1
+    - dynamic_mixed_d64l1r4_N2_seed2
+    - dynamic_mixed_d64l1r4_N2_seed3
+    - dynamic_mixed_d64l1r4_N2_seed4
+    - dynamic_mixed_d64l1r4_N2_seed5
+    - dynamic_mixed_d64l1r4_N2_seed6
+    - dynamic_mixed_d64l1r4_N2_seed7
+    - dynamic_mixed_d64l1r4_N3_seed0
+    - dynamic_mixed_d64l1r4_N3_seed1
+    - dynamic_mixed_d64l1r4_N3_seed2
+    - dynamic_mixed_d64l1r4_N3_seed3
+    - dynamic_mixed_d64l1r4_N3_seed4
+    - dynamic_mixed_d64l1r4_N3_seed5
+    - dynamic_mixed_d64l1r4_N3_seed6
+    - dynamic_mixed_d64l1r4_N3_seed7
+    - dynamic_mixed_d64l1r4_N4_seed0
+    - dynamic_mixed_d64l1r4_N4_seed1
+    - dynamic_mixed_d64l1r4_N4_seed2
+    - dynamic_mixed_d64l1r4_N4_seed3
+    ... 还有 52 个
+
+  dynamic_mixed_large.json (18 个缺失):
+    - dynamic_mixed_d128l1r8_N2_seed0
+    - dynamic_mixed_d128l1r8_N3_seed0
+    - dynamic_mixed_d128l1r8_N4_seed0
+    - dynamic_mixed_d128l1r8_N5_seed0
+    - dynamic_mixed_d128l1r8_N6_seed0
+    - dynamic_mixed_d128l1r8_N7_seed0
+    - dynamic_mixed_d128l1r8_N8_seed0
+    - dynamic_mixed_d128l1r8_N9_seed0
+    - dynamic_mixed_d128l1r8_N10_seed0
+    - dynamic_mixed_d256l1r8_N2_seed0
+    - dynamic_mixed_d256l1r8_N3_seed0
+    - dynamic_mixed_d256l1r8_N4_seed0
+    - dynamic_mixed_d256l1r8_N5_seed0
+    - dynamic_mixed_d256l1r8_N6_seed0
+    - dynamic_mixed_d256l1r8_N7_seed0
+    - dynamic_mixed_d256l1r8_N8_seed0
+    - dynamic_mixed_d256l1r8_N9_seed0
+    - dynamic_mixed_d256l1r8_N10_seed0
+
+  experiments.json (23 个缺失):
+    - mixed_basic_d4096l1r16h4_n2_e50_seed0
+    - dynamic_mixed_d256l1r8h4_N2_seed0
+    - dynamic_mixed_d256l1r8h4_N3_seed0
+    - dynamic_mixed_d256l1r8h4_N4_seed0
+    - dynamic_mixed_d256l1r8h4_N5_seed0
+    - dynamic_mixed_d256l1r8h4_N6_seed0
+    - dynamic_mixed_d256l1r8h4_N7_seed0
+    - dynamic_mixed_d256l1r8h4_N8_seed0
+    - dynamic_mixed_d256l1r8h4_N9_seed0
+    - dynamic_mixed_d256l1r8h4_N10_seed0
+    - tribonacci_d256l1r4h4_a1b0c2_seed0
+    - tribonacci_d256l1r4h4_a1b1c1_seed0
+    - tribonacci_d256l1r4h4_a1b2c3_seed0
+    - tribonacci_d256l1r4h4_a1b2c4_seed0
+    - mixed_basic_d1024l2r8h4_N3_e0.7_seed0
+    - mixed_basic_d1024l2r8h4_N4_e0.7_seed0
+    - mixed_basic_d2048l2r8h4_N5_e0.7_seed0
+    - mixed_cond_d64l1r4h4_N3_e0.7_seed0
+    - mixed_cond_d64l1r4h4_N4_e0.7_seed0
+    - mixed_cond_d64l1r4h4_N5_e0.7_seed0
+    ... 还有 3 个
+
+  mixed_ab_basic_bigP.json (28 个缺失):
+    - mixed_basic_d4096l1r16h4_P509_N2_e0.7_seed12345
+    - mixed_basic_d512l2r8h1_P509_N2_e0.7_seed0
+    - mixed_basic_d512l2r8h1_P509_N2_e0.7_seed999
+    - mixed_basic_d512l2r8h1_P509_N2_e0.7_seed12345
+    - mixed_basic_d512l2r8h2_P509_N2_e0.7_seed0
+    - mixed_basic_d512l2r8h2_P509_N2_e0.7_seed999
+    - mixed_basic_d512l2r8h2_P509_N2_e0.7_seed12345
+    - mixed_basic_d512l2r8h4_P509_N2_e0.7_seed0
+    - mixed_basic_d512l2r8h4_P509_N2_e0.7_seed999
+    - mixed_basic_d512l2r8h4_P509_N2_e0.7_seed12345
+    - mixed_basic_d256l2r8h1_P509_N2_e0.7_seed0
+    - mixed_basic_d256l2r8h1_P509_N2_e0.7_seed999
+    - mixed_basic_d256l2r8h1_P509_N2_e0.7_seed12345
+    - mixed_basic_d256l2r8h2_P509_N2_e0.7_seed0
+    - mixed_basic_d256l2r8h2_P509_N2_e0.7_seed999
+    - mixed_basic_d256l2r8h2_P509_N2_e0.7_seed12345
+    - mixed_basic_d256l2r8h4_P509_N2_e0.7_seed0
+    - mixed_basic_d256l2r8h4_P509_N2_e0.7_seed999
+    - mixed_basic_d256l2r8h4_P509_N2_e0.7_seed12345
+    - mixed_basic_d128l2r8h1_P509_N2_e0.7_seed0
+    ... 还有 8 个
+
+  mixed_ab_supplement.json (9 个缺失):
+    - mixed_basic_d4096l1r16h4_P53_N2_e0.5_seed0
+    - mixed_basic_d4096l1r16h4_P53_N2_e0.5_seed999
+    - mixed_basic_d4096l1r16h4_P53_N2_e0.5_seed12345
+    - mixed_basic_d4096l1r16h4_P53_N2_e0.7_seed0
+    - mixed_basic_d4096l1r16h4_P53_N2_e0.7_seed999
+    - mixed_basic_d4096l1r16h4_P53_N2_e0.7_seed12345
+    - mixed_basic_d4096l1r16h4_P127_N2_e0.5_seed0
+    - mixed_basic_d4096l1r16h4_P127_N2_e0.5_seed999
+    - mixed_basic_d4096l1r16h4_P127_N2_e0.5_seed12345
+
+  mixed_abc_smoke.json (1 个缺失):
+    - mixed_abc_smoke_p23
+
+  mixed_basic_d256l1r8h2_p127_rules12345.json (5 个缺失):
+    - mixed_basic_d256l1r8h2_P127_N4_e0.7_seed44536
+    - mixed_basic_d256l1r8h2_P127_N5_e0.7_seed17996
+    - mixed_basic_d256l1r8h2_P127_N5_e0.7_seed18318
+    - mixed_basic_d256l1r8h2_P127_N5_e0.7_seed34789
+    - mixed_basic_d256l1r8h2_P127_N5_e0.7_seed44536
+
+  mixed_n5.json (24 个缺失):
+    - mixed_basic_d2048l2r8_N5_e0.7_seed0
+    - mixed_basic_d2048l2r8_N5_e0.7_seed1
+    - mixed_basic_d2048l2r8_N5_e0.7_seed2
+    - mixed_basic_d2048l2r8_N5_e0.7_seed3
+    - mixed_basic_d2048l2r8_N5_e0.7_seed4
+    - mixed_basic_d2048l2r8_N5_e0.7_seed5
+    - mixed_basic_d2048l2r8_N5_e0.7_seed6
+    - mixed_basic_d2048l2r8_N5_e0.7_seed7
+    - mixed_cond_d64l1r4_N5_e0.7_seed0
+    - mixed_cond_d64l1r4_N5_e0.7_seed1
+    - mixed_cond_d64l1r4_N5_e0.7_seed2
+    - mixed_cond_d64l1r4_N5_e0.7_seed3
+    - mixed_cond_d64l1r4_N5_e0.7_seed4
+    - mixed_cond_d64l1r4_N5_e0.7_seed5
+    - mixed_cond_d64l1r4_N5_e0.7_seed6
+    - mixed_cond_d64l1r4_N5_e0.7_seed7
+    - mixed_label_d64l1r4_N5_e0.7_seed0
+    - mixed_label_d64l1r4_N5_e0.7_seed1
+    - mixed_label_d64l1r4_N5_e0.7_seed2
+    - mixed_label_d64l1r4_N5_e0.7_seed3
+    ... 还有 4 个
+
+  nonlinear.json (32 个缺失):
+    - nonlinear_d64l1r4_P53_seed0
+    - nonlinear_d64l1r4_P53_seed1
+    - nonlinear_d64l1r4_P53_seed2
+    - nonlinear_d64l1r4_P53_seed3
+    - nonlinear_d64l1r4_P53_seed4
+    - nonlinear_d64l1r4_P53_seed5
+    - nonlinear_d64l1r4_P53_seed6
+    - nonlinear_d64l1r4_P53_seed7
+    - nonlinear_d64l1r4_P1009_seed0
+    - nonlinear_d64l1r4_P1009_seed1
+    - nonlinear_d64l1r4_P1009_seed2
+    - nonlinear_d64l1r4_P1009_seed3
+    - nonlinear_d64l1r4_P1009_seed4
+    - nonlinear_d64l1r4_P1009_seed5
+    - nonlinear_d64l1r4_P1009_seed6
+    - nonlinear_d64l1r4_P1009_seed7
+    - nonlinear_d256l1r8_P53_seed0
+    - nonlinear_d256l1r8_P53_seed1
+    - nonlinear_d256l1r8_P53_seed2
+    - nonlinear_d256l1r8_P53_seed3
+    ... 还有 12 个
+
+  nonlinear_p127_tr64_ood128_randmiss0.1len1_d512r8_predict.json (10 个缺失):
+    - nonlinear_d512l3r8h4_P127_tr64ood128_randmiss0.1len1_seed72814
+    - nonlinear_d512l3r8h4_P127_tr64ood128_randmiss0.1len1_seed82585
+    - nonlinear_d512l4r8h4_P127_tr64ood128_randmiss0.1len1_seed17996
+    - nonlinear_d512l4r8h4_P127_tr64ood128_randmiss0.1len1_seed18318
+    - nonlinear_d512l4r8h4_P127_tr64ood128_randmiss0.1len1_seed34789
+    - nonlinear_d512l4r8h4_P127_tr64ood128_randmiss0.1len1_seed44536
+    - nonlinear_d512l4r8h4_P127_tr64ood128_randmiss0.1len1_seed62513
+    - nonlinear_d512l4r8h4_P127_tr64ood128_randmiss0.1len1_seed64154
+    - nonlinear_d512l4r8h4_P127_tr64ood128_randmiss0.1len1_seed72814
+    - nonlinear_d512l4r8h4_P127_tr64ood128_randmiss0.1len1_seed82585
+
+  tribonacci.json (32 个缺失):
+    - tribonacci_d256l1r4_a1b1c1_seed0
+    - tribonacci_d256l1r4_a1b1c1_seed1
+    - tribonacci_d256l1r4_a1b1c1_seed2
+    - tribonacci_d256l1r4_a1b1c1_seed3
+    - tribonacci_d256l1r4_a1b1c1_seed4
+    - tribonacci_d256l1r4_a1b1c1_seed5
+    - tribonacci_d256l1r4_a1b1c1_seed6
+    - tribonacci_d256l1r4_a1b1c1_seed7
+    - tribonacci_d256l1r4_a1b2c4_seed0
+    - tribonacci_d256l1r4_a1b2c4_seed1
+    - tribonacci_d256l1r4_a1b2c4_seed2
+    - tribonacci_d256l1r4_a1b2c4_seed3
+    - tribonacci_d256l1r4_a1b2c4_seed4
+    - tribonacci_d256l1r4_a1b2c4_seed5
+    - tribonacci_d256l1r4_a1b2c4_seed6
+    - tribonacci_d256l1r4_a1b2c4_seed7
+    - tribonacci_d256l1r4_a1b2c3_seed0
+    - tribonacci_d256l1r4_a1b2c3_seed1
+    - tribonacci_d256l1r4_a1b2c3_seed2
+    - tribonacci_d256l1r4_a1b2c3_seed3
+    ... 还有 12 个

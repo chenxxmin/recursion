@@ -12,3 +12,4 @@ session_*.zip
 circle.png
 # Experiment outputs under /data/cxm (not in repo)
 /data/
+nohup.out

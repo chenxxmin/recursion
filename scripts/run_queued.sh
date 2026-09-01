@@ -11,7 +11,7 @@
 # （nvidia-smi 显存 <100MB 视为空闲），别人的进程占着的卡会被自动跳过。
 
 set -u
-cd "$(dirname "$0")"
+cd "$(dirname "$0")/.."
 
 PYTHON_BIN="${PYTHON_BIN:-python}"
 POLL_SEC=60
