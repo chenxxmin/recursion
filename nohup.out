@@ -1,0 +1,1284 @@
+Using experiments config: experiments/mixed_ab_basic_bigP.json
+Total experiments: 72, concurrency: 8
+--------------------------------------------------
+==================================================
+GPU detection: 4 idle of 8 GPUs: [1, 2, 4, 5]
+Effective concurrency: 4 (one experiment per GPU)
+==================================================
+[05:18:50] Start experiment: mixed_basic_d4096l1r16h1_P127_N2_e0.7_seed999 on cuda:2[05:18:50] Start experiment: mixed_basic_d4096l1r16h1_P127_N2_e0.7_seed0 on cuda:1
+
+[05:18:50] Start experiment: mixed_basic_d4096l1r16h1_P127_N2_e0.7_seed12345 on cuda:4
+[05:18:50] Start experiment: mixed_basic_d4096l1r16h2_P127_N2_e0.7_seed0 on cuda:5
+[14:42:42] Start attention analysis: mixed_basic_d4096l1r16h2_P127_N2_e0.7_seed0
+[14:42:51] Attention analysis completed: mixed_basic_d4096l1r16h2_P127_N2_e0.7_seed0
+[14:42:51] Experiment completed: mixed_basic_d4096l1r16h2_P127_N2_e0.7_seed0 (33840s), log: /data/cxm/recursion/mixed_ab_basic_bigP/logs/mixed_basic_d4096l1r16h2_P127_N2_e0.7_seed0.log
+[14:42:51] Start experiment: mixed_basic_d4096l1r16h2_P127_N2_e0.7_seed999 on cuda:5
+[22:01:54] Start attention analysis: mixed_basic_d4096l1r16h1_P127_N2_e0.7_seed0
+[22:02:03] Attention analysis completed: mixed_basic_d4096l1r16h1_P127_N2_e0.7_seed0
+[22:02:03] Experiment completed: mixed_basic_d4096l1r16h1_P127_N2_e0.7_seed0 (60192s), log: /data/cxm/recursion/mixed_ab_basic_bigP/logs/mixed_basic_d4096l1r16h1_P127_N2_e0.7_seed0.log
+[22:02:03] Start experiment: mixed_basic_d4096l1r16h2_P127_N2_e0.7_seed12345 on cuda:1
+[23:04:38] Start attention analysis: mixed_basic_d4096l1r16h2_P127_N2_e0.7_seed999
+[23:04:47] Attention analysis completed: mixed_basic_d4096l1r16h2_P127_N2_e0.7_seed999
+[23:04:47] Experiment completed: mixed_basic_d4096l1r16h2_P127_N2_e0.7_seed999 (30116s), log: /data/cxm/recursion/mixed_ab_basic_bigP/logs/mixed_basic_d4096l1r16h2_P127_N2_e0.7_seed999.log
+[23:04:47] Start experiment: mixed_basic_d4096l1r16h4_P127_N2_e0.7_seed0 on cuda:5
+[23:47:39] Start attention analysis: mixed_basic_d4096l1r16h1_P127_N2_e0.7_seed12345
+[23:47:47] Attention analysis completed: mixed_basic_d4096l1r16h1_P127_N2_e0.7_seed12345
+[23:47:47] Experiment completed: mixed_basic_d4096l1r16h1_P127_N2_e0.7_seed12345 (66537s), log: /data/cxm/recursion/mixed_ab_basic_bigP/logs/mixed_basic_d4096l1r16h1_P127_N2_e0.7_seed12345.log
+[23:47:47] Start experiment: mixed_basic_d4096l1r16h4_P127_N2_e0.7_seed999 on cuda:4
+[06:55:49] Start attention analysis: mixed_basic_d4096l1r16h4_P127_N2_e0.7_seed0
+[06:55:57] Attention analysis completed: mixed_basic_d4096l1r16h4_P127_N2_e0.7_seed0
+[06:55:57] Experiment completed: mixed_basic_d4096l1r16h4_P127_N2_e0.7_seed0 (28271s), log: /data/cxm/recursion/mixed_ab_basic_bigP/logs/mixed_basic_d4096l1r16h4_P127_N2_e0.7_seed0.log
+[06:55:57] Start experiment: mixed_basic_d4096l1r16h4_P127_N2_e0.7_seed12345 on cuda:5
+[06:58:58] Start attention analysis: mixed_basic_d4096l1r16h2_P127_N2_e0.7_seed12345
+[06:59:06] Attention analysis completed: mixed_basic_d4096l1r16h2_P127_N2_e0.7_seed12345
+[06:59:06] Experiment completed: mixed_basic_d4096l1r16h2_P127_N2_e0.7_seed12345 (32224s), log: /data/cxm/recursion/mixed_ab_basic_bigP/logs/mixed_basic_d4096l1r16h2_P127_N2_e0.7_seed12345.log
+[06:59:06] Start experiment: mixed_basic_d512l2r8h1_P127_N2_e0.7_seed0 on cuda:1
+[07:06:00] Start attention analysis: mixed_basic_d512l2r8h1_P127_N2_e0.7_seed0
+[07:06:03] Attention analysis completed: mixed_basic_d512l2r8h1_P127_N2_e0.7_seed0
+[07:06:03] Experiment completed: mixed_basic_d512l2r8h1_P127_N2_e0.7_seed0 (417s), log: /data/cxm/recursion/mixed_ab_basic_bigP/logs/mixed_basic_d512l2r8h1_P127_N2_e0.7_seed0.log
+[07:06:03] Start experiment: mixed_basic_d512l2r8h1_P127_N2_e0.7_seed999 on cuda:1
+[07:09:06] Start attention analysis: mixed_basic_d4096l1r16h4_P127_N2_e0.7_seed999
+[07:09:14] Attention analysis completed: mixed_basic_d4096l1r16h4_P127_N2_e0.7_seed999
+[07:09:14] Experiment completed: mixed_basic_d4096l1r16h4_P127_N2_e0.7_seed999 (26487s), log: /data/cxm/recursion/mixed_ab_basic_bigP/logs/mixed_basic_d4096l1r16h4_P127_N2_e0.7_seed999.log
+[07:09:14] Start experiment: mixed_basic_d512l2r8h1_P127_N2_e0.7_seed12345 on cuda:4
+[07:12:15] Start attention analysis: mixed_basic_d512l2r8h1_P127_N2_e0.7_seed999
+[07:12:17] Attention analysis completed: mixed_basic_d512l2r8h1_P127_N2_e0.7_seed999
+[07:12:17] Experiment completed: mixed_basic_d512l2r8h1_P127_N2_e0.7_seed999 (375s), log: /data/cxm/recursion/mixed_ab_basic_bigP/logs/mixed_basic_d512l2r8h1_P127_N2_e0.7_seed999.log
+[07:12:17] Start experiment: mixed_basic_d512l2r8h2_P127_N2_e0.7_seed0 on cuda:1
+[07:15:23] Start attention analysis: mixed_basic_d512l2r8h1_P127_N2_e0.7_seed12345
+[07:15:25] Attention analysis completed: mixed_basic_d512l2r8h1_P127_N2_e0.7_seed12345
+[07:15:25] Experiment completed: mixed_basic_d512l2r8h1_P127_N2_e0.7_seed12345 (371s), log: /data/cxm/recursion/mixed_ab_basic_bigP/logs/mixed_basic_d512l2r8h1_P127_N2_e0.7_seed12345.log
+[07:15:25] Start experiment: mixed_basic_d512l2r8h2_P127_N2_e0.7_seed999 on cuda:4
+[07:19:00] Start attention analysis: mixed_basic_d512l2r8h2_P127_N2_e0.7_seed0
+[07:19:02] Attention analysis completed: mixed_basic_d512l2r8h2_P127_N2_e0.7_seed0
+[07:19:02] Experiment completed: mixed_basic_d512l2r8h2_P127_N2_e0.7_seed0 (405s), log: /data/cxm/recursion/mixed_ab_basic_bigP/logs/mixed_basic_d512l2r8h2_P127_N2_e0.7_seed0.log
+[07:19:02] Start experiment: mixed_basic_d512l2r8h2_P127_N2_e0.7_seed12345 on cuda:1
+[07:22:30] Start attention analysis: mixed_basic_d512l2r8h2_P127_N2_e0.7_seed999
+[07:22:32] Attention analysis completed: mixed_basic_d512l2r8h2_P127_N2_e0.7_seed999
+[07:22:32] Experiment completed: mixed_basic_d512l2r8h2_P127_N2_e0.7_seed999 (426s), log: /data/cxm/recursion/mixed_ab_basic_bigP/logs/mixed_basic_d512l2r8h2_P127_N2_e0.7_seed999.log
+[07:22:32] Start experiment: mixed_basic_d512l2r8h4_P127_N2_e0.7_seed0 on cuda:4
+[07:25:44] Start attention analysis: mixed_basic_d512l2r8h2_P127_N2_e0.7_seed12345
+[07:25:46] Attention analysis completed: mixed_basic_d512l2r8h2_P127_N2_e0.7_seed12345
+[07:25:46] Experiment completed: mixed_basic_d512l2r8h2_P127_N2_e0.7_seed12345 (404s), log: /data/cxm/recursion/mixed_ab_basic_bigP/logs/mixed_basic_d512l2r8h2_P127_N2_e0.7_seed12345.log
+[07:25:46] Start experiment: mixed_basic_d512l2r8h4_P127_N2_e0.7_seed999 on cuda:1
+[07:26:10] Experiment failed: mixed_basic_d4096l1r16h1_P127_N2_e0.7_seed999 (94039s), return code: -15, log: /data/cxm/recursion/mixed_ab_basic_bigP/logs/mixed_basic_d4096l1r16h1_P127_N2_e0.7_seed999.log
+[07:26:10] Start experiment: mixed_basic_d512l2r8h4_P127_N2_e0.7_seed12345 on cuda:2
+[07:29:37] Start attention analysis: mixed_basic_d512l2r8h4_P127_N2_e0.7_seed0
+[07:29:39] Attention analysis completed: mixed_basic_d512l2r8h4_P127_N2_e0.7_seed0
+[07:29:39] Experiment completed: mixed_basic_d512l2r8h4_P127_N2_e0.7_seed0 (428s), log: /data/cxm/recursion/mixed_ab_basic_bigP/logs/mixed_basic_d512l2r8h4_P127_N2_e0.7_seed0.log
+[07:29:39] Start experiment: mixed_basic_d256l2r8h1_P127_N2_e0.7_seed0 on cuda:4
+[07:32:13] Start attention analysis: mixed_basic_d256l2r8h1_P127_N2_e0.7_seed0
+[07:32:15] Attention analysis completed: mixed_basic_d256l2r8h1_P127_N2_e0.7_seed0
+[07:32:15] Experiment completed: mixed_basic_d256l2r8h1_P127_N2_e0.7_seed0 (155s), log: /data/cxm/recursion/mixed_ab_basic_bigP/logs/mixed_basic_d256l2r8h1_P127_N2_e0.7_seed0.log
+[07:32:15] Start experiment: mixed_basic_d256l2r8h1_P127_N2_e0.7_seed999 on cuda:4
+[07:32:52] Start attention analysis: mixed_basic_d512l2r8h4_P127_N2_e0.7_seed999
+[07:32:54] Start attention analysis: mixed_basic_d512l2r8h4_P127_N2_e0.7_seed12345
+[07:32:54] Attention analysis completed: mixed_basic_d512l2r8h4_P127_N2_e0.7_seed999
+[07:32:54] Experiment completed: mixed_basic_d512l2r8h4_P127_N2_e0.7_seed999 (428s), log: /data/cxm/recursion/mixed_ab_basic_bigP/logs/mixed_basic_d512l2r8h4_P127_N2_e0.7_seed999.log
+[07:32:54] Start experiment: mixed_basic_d256l2r8h1_P127_N2_e0.7_seed12345 on cuda:1
+[07:32:56] Attention analysis completed: mixed_basic_d512l2r8h4_P127_N2_e0.7_seed12345
+[07:32:56] Experiment completed: mixed_basic_d512l2r8h4_P127_N2_e0.7_seed12345 (406s), log: /data/cxm/recursion/mixed_ab_basic_bigP/logs/mixed_basic_d512l2r8h4_P127_N2_e0.7_seed12345.log
+[07:32:56] Start experiment: mixed_basic_d256l2r8h2_P127_N2_e0.7_seed0 on cuda:2
+[07:35:13] Start attention analysis: mixed_basic_d256l2r8h1_P127_N2_e0.7_seed999
+[07:35:15] Attention analysis completed: mixed_basic_d256l2r8h1_P127_N2_e0.7_seed999
+[07:35:15] Experiment completed: mixed_basic_d256l2r8h1_P127_N2_e0.7_seed999 (181s), log: /data/cxm/recursion/mixed_ab_basic_bigP/logs/mixed_basic_d256l2r8h1_P127_N2_e0.7_seed999.log
+[07:35:15] Start experiment: mixed_basic_d256l2r8h2_P127_N2_e0.7_seed999 on cuda:4
+[07:35:30] Start attention analysis: mixed_basic_d256l2r8h1_P127_N2_e0.7_seed12345
+[07:35:33] Attention analysis completed: mixed_basic_d256l2r8h1_P127_N2_e0.7_seed12345
+[07:35:33] Experiment completed: mixed_basic_d256l2r8h1_P127_N2_e0.7_seed12345 (159s), log: /data/cxm/recursion/mixed_ab_basic_bigP/logs/mixed_basic_d256l2r8h1_P127_N2_e0.7_seed12345.log
+[07:35:33] Start experiment: mixed_basic_d256l2r8h2_P127_N2_e0.7_seed12345 on cuda:1
+[07:36:01] Start attention analysis: mixed_basic_d256l2r8h2_P127_N2_e0.7_seed0
+[07:36:03] Attention analysis completed: mixed_basic_d256l2r8h2_P127_N2_e0.7_seed0
+[07:36:03] Experiment completed: mixed_basic_d256l2r8h2_P127_N2_e0.7_seed0 (187s), log: /data/cxm/recursion/mixed_ab_basic_bigP/logs/mixed_basic_d256l2r8h2_P127_N2_e0.7_seed0.log
+[07:36:03] Start experiment: mixed_basic_d256l2r8h4_P127_N2_e0.7_seed0 on cuda:2
+[07:37:52] Start attention analysis: mixed_basic_d256l2r8h2_P127_N2_e0.7_seed999
+[07:37:54] Attention analysis completed: mixed_basic_d256l2r8h2_P127_N2_e0.7_seed999
+[07:37:54] Experiment completed: mixed_basic_d256l2r8h2_P127_N2_e0.7_seed999 (159s), log: /data/cxm/recursion/mixed_ab_basic_bigP/logs/mixed_basic_d256l2r8h2_P127_N2_e0.7_seed999.log
+[07:37:54] Start experiment: mixed_basic_d256l2r8h4_P127_N2_e0.7_seed999 on cuda:4
+[07:38:25] Start attention analysis: mixed_basic_d256l2r8h2_P127_N2_e0.7_seed12345
+[07:38:27] Attention analysis completed: mixed_basic_d256l2r8h2_P127_N2_e0.7_seed12345
+[07:38:27] Experiment completed: mixed_basic_d256l2r8h2_P127_N2_e0.7_seed12345 (174s), log: /data/cxm/recursion/mixed_ab_basic_bigP/logs/mixed_basic_d256l2r8h2_P127_N2_e0.7_seed12345.log
+[07:38:27] Start experiment: mixed_basic_d256l2r8h4_P127_N2_e0.7_seed12345 on cuda:1
+[07:39:13] Start attention analysis: mixed_basic_d256l2r8h4_P127_N2_e0.7_seed0
+[07:39:15] Attention analysis completed: mixed_basic_d256l2r8h4_P127_N2_e0.7_seed0
+[07:39:15] Experiment completed: mixed_basic_d256l2r8h4_P127_N2_e0.7_seed0 (192s), log: /data/cxm/recursion/mixed_ab_basic_bigP/logs/mixed_basic_d256l2r8h4_P127_N2_e0.7_seed0.log
+[07:39:15] Start experiment: mixed_basic_d128l2r8h1_P127_N2_e0.7_seed0 on cuda:2
+[07:40:46] Start attention analysis: mixed_basic_d128l2r8h1_P127_N2_e0.7_seed0
+[07:40:47] Attention analysis completed: mixed_basic_d128l2r8h1_P127_N2_e0.7_seed0
+[07:40:47] Experiment completed: mixed_basic_d128l2r8h1_P127_N2_e0.7_seed0 (93s), log: /data/cxm/recursion/mixed_ab_basic_bigP/logs/mixed_basic_d128l2r8h1_P127_N2_e0.7_seed0.log
+[07:40:47] Start experiment: mixed_basic_d128l2r8h1_P127_N2_e0.7_seed999 on cuda:2
+[07:41:29] Start attention analysis: mixed_basic_d256l2r8h4_P127_N2_e0.7_seed999
+[07:41:31] Attention analysis completed: mixed_basic_d256l2r8h4_P127_N2_e0.7_seed999
+[07:41:31] Experiment completed: mixed_basic_d256l2r8h4_P127_N2_e0.7_seed999 (217s), log: /data/cxm/recursion/mixed_ab_basic_bigP/logs/mixed_basic_d256l2r8h4_P127_N2_e0.7_seed999.log
+[07:41:31] Start experiment: mixed_basic_d128l2r8h1_P127_N2_e0.7_seed12345 on cuda:4
+[07:41:43] Start attention analysis: mixed_basic_d256l2r8h4_P127_N2_e0.7_seed12345
+[07:41:45] Attention analysis completed: mixed_basic_d256l2r8h4_P127_N2_e0.7_seed12345
+[07:41:45] Experiment completed: mixed_basic_d256l2r8h4_P127_N2_e0.7_seed12345 (198s), log: /data/cxm/recursion/mixed_ab_basic_bigP/logs/mixed_basic_d256l2r8h4_P127_N2_e0.7_seed12345.log
+[07:41:45] Start experiment: mixed_basic_d128l2r8h2_P127_N2_e0.7_seed0 on cuda:1
+[07:42:15] Start attention analysis: mixed_basic_d128l2r8h1_P127_N2_e0.7_seed999
+[07:42:17] Attention analysis completed: mixed_basic_d128l2r8h1_P127_N2_e0.7_seed999
+[07:42:17] Experiment completed: mixed_basic_d128l2r8h1_P127_N2_e0.7_seed999 (89s), log: /data/cxm/recursion/mixed_ab_basic_bigP/logs/mixed_basic_d128l2r8h1_P127_N2_e0.7_seed999.log
+[07:42:17] Start experiment: mixed_basic_d128l2r8h2_P127_N2_e0.7_seed999 on cuda:2
+[07:43:03] Start attention analysis: mixed_basic_d128l2r8h1_P127_N2_e0.7_seed12345
+[07:43:04] Attention analysis completed: mixed_basic_d128l2r8h1_P127_N2_e0.7_seed12345
+[07:43:04] Experiment completed: mixed_basic_d128l2r8h1_P127_N2_e0.7_seed12345 (93s), log: /data/cxm/recursion/mixed_ab_basic_bigP/logs/mixed_basic_d128l2r8h1_P127_N2_e0.7_seed12345.log
+[07:43:04] Start experiment: mixed_basic_d128l2r8h2_P127_N2_e0.7_seed12345 on cuda:4
+[07:43:50] Start attention analysis: mixed_basic_d128l2r8h2_P127_N2_e0.7_seed0
+[07:43:52] Attention analysis completed: mixed_basic_d128l2r8h2_P127_N2_e0.7_seed0
+[07:43:52] Experiment completed: mixed_basic_d128l2r8h2_P127_N2_e0.7_seed0 (127s), log: /data/cxm/recursion/mixed_ab_basic_bigP/logs/mixed_basic_d128l2r8h2_P127_N2_e0.7_seed0.log
+[07:43:52] Start experiment: mixed_basic_d128l2r8h4_P127_N2_e0.7_seed0 on cuda:1
+[07:43:59] Start attention analysis: mixed_basic_d128l2r8h2_P127_N2_e0.7_seed999
+[07:44:01] Attention analysis completed: mixed_basic_d128l2r8h2_P127_N2_e0.7_seed999
+[07:44:01] Experiment completed: mixed_basic_d128l2r8h2_P127_N2_e0.7_seed999 (104s), log: /data/cxm/recursion/mixed_ab_basic_bigP/logs/mixed_basic_d128l2r8h2_P127_N2_e0.7_seed999.log
+[07:44:01] Start experiment: mixed_basic_d128l2r8h4_P127_N2_e0.7_seed999 on cuda:2
+[07:45:04] Start attention analysis: mixed_basic_d128l2r8h2_P127_N2_e0.7_seed12345
+[07:45:06] Attention analysis completed: mixed_basic_d128l2r8h2_P127_N2_e0.7_seed12345
+[07:45:06] Experiment completed: mixed_basic_d128l2r8h2_P127_N2_e0.7_seed12345 (121s), log: /data/cxm/recursion/mixed_ab_basic_bigP/logs/mixed_basic_d128l2r8h2_P127_N2_e0.7_seed12345.log
+[07:45:06] Start experiment: mixed_basic_d128l2r8h4_P127_N2_e0.7_seed12345 on cuda:4
+[07:46:59] Start attention analysis: mixed_basic_d128l2r8h4_P127_N2_e0.7_seed999
+[07:47:01] Attention analysis completed: mixed_basic_d128l2r8h4_P127_N2_e0.7_seed999
+[07:47:01] Experiment completed: mixed_basic_d128l2r8h4_P127_N2_e0.7_seed999 (180s), log: /data/cxm/recursion/mixed_ab_basic_bigP/logs/mixed_basic_d128l2r8h4_P127_N2_e0.7_seed999.log
+[07:47:01] Start experiment: mixed_basic_d4096l1r16h1_P509_N2_e0.7_seed0 on cuda:2
+[07:47:14] Start attention analysis: mixed_basic_d128l2r8h4_P127_N2_e0.7_seed12345
+[07:47:16] Attention analysis completed: mixed_basic_d128l2r8h4_P127_N2_e0.7_seed12345
+[07:47:16] Experiment completed: mixed_basic_d128l2r8h4_P127_N2_e0.7_seed12345 (130s), log: /data/cxm/recursion/mixed_ab_basic_bigP/logs/mixed_basic_d128l2r8h4_P127_N2_e0.7_seed12345.log
+[07:47:16] Start experiment: mixed_basic_d4096l1r16h1_P509_N2_e0.7_seed999 on cuda:4
+[07:48:57] Start attention analysis: mixed_basic_d128l2r8h4_P127_N2_e0.7_seed0
+[07:48:59] Attention analysis completed: mixed_basic_d128l2r8h4_P127_N2_e0.7_seed0
+[07:48:59] Experiment completed: mixed_basic_d128l2r8h4_P127_N2_e0.7_seed0 (307s), log: /data/cxm/recursion/mixed_ab_basic_bigP/logs/mixed_basic_d128l2r8h4_P127_N2_e0.7_seed0.log
+[07:48:59] Start experiment: mixed_basic_d4096l1r16h1_P509_N2_e0.7_seed12345 on cuda:1
+[14:31:20] Start attention analysis: mixed_basic_d4096l1r16h4_P127_N2_e0.7_seed12345
+[14:31:28] Attention analysis completed: mixed_basic_d4096l1r16h4_P127_N2_e0.7_seed12345
+[14:31:28] Experiment completed: mixed_basic_d4096l1r16h4_P127_N2_e0.7_seed12345 (27331s), log: /data/cxm/recursion/mixed_ab_basic_bigP/logs/mixed_basic_d4096l1r16h4_P127_N2_e0.7_seed12345.log
+[14:31:28] Start experiment: mixed_basic_d4096l1r16h2_P509_N2_e0.7_seed0 on cuda:5
+[05:31:38] Start attention analysis: mixed_basic_d4096l1r16h1_P509_N2_e0.7_seed999
+[05:31:46] Attention analysis completed: mixed_basic_d4096l1r16h1_P509_N2_e0.7_seed999
+[05:31:46] Experiment completed: mixed_basic_d4096l1r16h1_P509_N2_e0.7_seed999 (164671s), log: /data/cxm/recursion/mixed_ab_basic_bigP/logs/mixed_basic_d4096l1r16h1_P509_N2_e0.7_seed999.log
+[05:31:46] Start experiment: mixed_basic_d4096l1r16h2_P509_N2_e0.7_seed999 on cuda:4
+[05:38:50] Start attention analysis: mixed_basic_d4096l1r16h1_P509_N2_e0.7_seed12345
+[05:38:58] Attention analysis completed: mixed_basic_d4096l1r16h1_P509_N2_e0.7_seed12345
+[05:38:58] Experiment completed: mixed_basic_d4096l1r16h1_P509_N2_e0.7_seed12345 (164999s), log: /data/cxm/recursion/mixed_ab_basic_bigP/logs/mixed_basic_d4096l1r16h1_P509_N2_e0.7_seed12345.log
+[05:38:58] Start experiment: mixed_basic_d4096l1r16h2_P509_N2_e0.7_seed12345 on cuda:1
+[05:49:02] Start attention analysis: mixed_basic_d4096l1r16h1_P509_N2_e0.7_seed0
+[05:49:10] Attention analysis completed: mixed_basic_d4096l1r16h1_P509_N2_e0.7_seed0
+[05:49:10] Experiment completed: mixed_basic_d4096l1r16h1_P509_N2_e0.7_seed0 (165729s), log: /data/cxm/recursion/mixed_ab_basic_bigP/logs/mixed_basic_d4096l1r16h1_P509_N2_e0.7_seed0.log
+[05:49:10] Start experiment: mixed_basic_d4096l1r16h4_P509_N2_e0.7_seed0 on cuda:2
+[12:57:52] Start attention analysis: mixed_basic_d4096l1r16h2_P509_N2_e0.7_seed0
+[12:58:00] Attention analysis completed: mixed_basic_d4096l1r16h2_P509_N2_e0.7_seed0
+[12:58:00] Experiment completed: mixed_basic_d4096l1r16h2_P509_N2_e0.7_seed0 (167191s), log: /data/cxm/recursion/mixed_ab_basic_bigP/logs/mixed_basic_d4096l1r16h2_P509_N2_e0.7_seed0.log
+[12:58:00] Start experiment: mixed_basic_d4096l1r16h4_P509_N2_e0.7_seed999 on cuda:5
+[2026-08-06 08:34:38] 等待自己的训练进程结束（每 60s 检查一次）...
+[2026-08-06 08:34:38] 仍有 9 个训练进程在运行，继续等待...
+[2026-08-06 08:35:38] 仍有 9 个训练进程在运行，继续等待...
+[2026-08-06 08:36:38] 仍有 9 个训练进程在运行，继续等待...
+[2026-08-06 08:37:38] 仍有 9 个训练进程在运行，继续等待...
+[2026-08-06 08:38:39] 仍有 9 个训练进程在运行，继续等待...
+[2026-08-06 08:39:39] 仍有 9 个训练进程在运行，继续等待...
+[2026-08-06 08:40:39] 仍有 9 个训练进程在运行，继续等待...
+[2026-08-06 08:41:39] 仍有 9 个训练进程在运行，继续等待...
+[2026-08-06 08:42:39] 仍有 9 个训练进程在运行，继续等待...
+[2026-08-06 08:43:39] 仍有 9 个训练进程在运行，继续等待...
+[2026-08-06 08:44:39] 仍有 9 个训练进程在运行，继续等待...
+[2026-08-06 08:45:39] 仍有 9 个训练进程在运行，继续等待...
+[2026-08-06 08:46:39] 仍有 9 个训练进程在运行，继续等待...
+[2026-08-06 08:47:40] 仍有 9 个训练进程在运行，继续等待...
+[2026-08-06 08:48:40] 仍有 9 个训练进程在运行，继续等待...
+[2026-08-06 08:49:40] 仍有 9 个训练进程在运行，继续等待...
+[2026-08-06 08:50:40] 仍有 9 个训练进程在运行，继续等待...
+[2026-08-06 08:51:40] 仍有 9 个训练进程在运行，继续等待...
+[2026-08-06 08:52:40] 仍有 9 个训练进程在运行，继续等待...
+[2026-08-06 08:53:40] 仍有 9 个训练进程在运行，继续等待...
+[2026-08-06 08:54:40] 仍有 9 个训练进程在运行，继续等待...
+[2026-08-06 08:55:41] 仍有 9 个训练进程在运行，继续等待...
+[2026-08-06 08:56:41] 仍有 9 个训练进程在运行，继续等待...
+[2026-08-06 08:57:41] 仍有 9 个训练进程在运行，继续等待...
+[2026-08-06 08:58:41] 仍有 9 个训练进程在运行，继续等待...
+[2026-08-06 08:59:41] 仍有 9 个训练进程在运行，继续等待...
+[2026-08-06 09:00:41] 仍有 9 个训练进程在运行，继续等待...
+[2026-08-06 09:01:41] 仍有 9 个训练进程在运行，继续等待...
+[2026-08-06 09:02:42] 仍有 9 个训练进程在运行，继续等待...
+[2026-08-06 09:03:42] 仍有 9 个训练进程在运行，继续等待...
+[2026-08-06 09:04:42] 仍有 9 个训练进程在运行，继续等待...
+[2026-08-06 09:05:42] 仍有 9 个训练进程在运行，继续等待...
+[2026-08-06 09:06:42] 仍有 9 个训练进程在运行，继续等待...
+[2026-08-06 09:07:42] 仍有 9 个训练进程在运行，继续等待...
+[2026-08-06 09:08:42] 仍有 9 个训练进程在运行，继续等待...
+[2026-08-06 09:09:42] 仍有 9 个训练进程在运行，继续等待...
+[2026-08-06 09:10:43] 仍有 9 个训练进程在运行，继续等待...
+[2026-08-06 09:11:43] 仍有 9 个训练进程在运行，继续等待...
+[2026-08-06 09:12:43] 仍有 9 个训练进程在运行，继续等待...
+[2026-08-06 09:13:43] 仍有 9 个训练进程在运行，继续等待...
+[2026-08-06 09:14:43] 仍有 9 个训练进程在运行，继续等待...
+[2026-08-06 09:15:43] 仍有 9 个训练进程在运行，继续等待...
+[2026-08-06 09:16:43] 仍有 9 个训练进程在运行，继续等待...
+[2026-08-06 09:17:43] 仍有 9 个训练进程在运行，继续等待...
+[2026-08-06 09:18:44] 仍有 9 个训练进程在运行，继续等待...
+[2026-08-06 09:19:44] 仍有 9 个训练进程在运行，继续等待...
+[2026-08-06 09:20:44] 仍有 9 个训练进程在运行，继续等待...
+[2026-08-06 09:21:44] 仍有 9 个训练进程在运行，继续等待...
+[2026-08-06 09:22:44] 仍有 9 个训练进程在运行，继续等待...
+[2026-08-06 09:23:44] 仍有 9 个训练进程在运行，继续等待...
+[2026-08-06 09:24:44] 仍有 9 个训练进程在运行，继续等待...
+[2026-08-06 09:25:45] 仍有 9 个训练进程在运行，继续等待...
+[2026-08-06 09:26:45] 仍有 9 个训练进程在运行，继续等待...
+[2026-08-06 09:27:45] 仍有 9 个训练进程在运行，继续等待...
+[2026-08-06 09:28:45] 仍有 9 个训练进程在运行，继续等待...
+[2026-08-06 09:29:45] 仍有 9 个训练进程在运行，继续等待...
+[2026-08-06 09:30:45] 仍有 9 个训练进程在运行，继续等待...
+[2026-08-06 09:31:45] 仍有 9 个训练进程在运行，继续等待...
+[2026-08-06 09:32:46] 仍有 9 个训练进程在运行，继续等待...
+[2026-08-06 09:33:46] 仍有 9 个训练进程在运行，继续等待...
+[2026-08-06 09:34:46] 仍有 9 个训练进程在运行，继续等待...
+[2026-08-06 09:35:46] 仍有 9 个训练进程在运行，继续等待...
+[2026-08-06 09:36:46] 仍有 9 个训练进程在运行，继续等待...
+[2026-08-06 09:37:46] 仍有 9 个训练进程在运行，继续等待...
+[2026-08-06 09:38:46] 仍有 9 个训练进程在运行，继续等待...
+[2026-08-06 09:39:46] 仍有 9 个训练进程在运行，继续等待...
+[2026-08-06 09:40:47] 仍有 9 个训练进程在运行，继续等待...
+[2026-08-06 09:41:47] 仍有 9 个训练进程在运行，继续等待...
+[2026-08-06 09:42:47] 仍有 9 个训练进程在运行，继续等待...
+[2026-08-06 09:43:47] 仍有 9 个训练进程在运行，继续等待...
+[2026-08-06 09:44:47] 仍有 9 个训练进程在运行，继续等待...
+[2026-08-06 09:45:47] 仍有 9 个训练进程在运行，继续等待...
+[2026-08-06 09:46:47] 仍有 9 个训练进程在运行，继续等待...
+[2026-08-06 09:47:47] 仍有 9 个训练进程在运行，继续等待...
+[2026-08-06 09:48:48] 仍有 9 个训练进程在运行，继续等待...
+[2026-08-06 09:49:48] 仍有 8 个训练进程在运行，继续等待...
+[2026-08-06 09:50:48] 仍有 9 个训练进程在运行，继续等待...
+[2026-08-06 09:51:48] 仍有 9 个训练进程在运行，继续等待...
+[2026-08-06 09:52:48] 仍有 9 个训练进程在运行，继续等待...
+[2026-08-06 09:53:48] 仍有 9 个训练进程在运行，继续等待...
+[2026-08-06 09:54:48] 仍有 9 个训练进程在运行，继续等待...
+[2026-08-06 09:55:48] 仍有 9 个训练进程在运行，继续等待...
+[2026-08-06 09:56:49] 仍有 9 个训练进程在运行，继续等待...
+[2026-08-06 09:57:49] 仍有 9 个训练进程在运行，继续等待...
+[2026-08-06 09:58:49] 仍有 9 个训练进程在运行，继续等待...
+[2026-08-06 09:59:49] 仍有 9 个训练进程在运行，继续等待...
+[2026-08-06 10:00:49] 仍有 9 个训练进程在运行，继续等待...
+[2026-08-06 10:01:49] 仍有 9 个训练进程在运行，继续等待...
+[2026-08-06 10:02:49] 仍有 9 个训练进程在运行，继续等待...
+[2026-08-06 10:03:49] 仍有 9 个训练进程在运行，继续等待...
+[2026-08-06 10:04:50] 仍有 9 个训练进程在运行，继续等待...
+[2026-08-06 10:05:50] 仍有 9 个训练进程在运行，继续等待...
+[2026-08-06 10:06:50] 仍有 9 个训练进程在运行，继续等待...
+[2026-08-06 10:07:50] 仍有 9 个训练进程在运行，继续等待...
+[2026-08-06 10:08:50] 仍有 9 个训练进程在运行，继续等待...
+[2026-08-06 10:09:50] 仍有 9 个训练进程在运行，继续等待...
+[2026-08-06 10:10:50] 仍有 9 个训练进程在运行，继续等待...
+[2026-08-06 10:11:50] 仍有 9 个训练进程在运行，继续等待...
+[2026-08-06 10:12:51] 仍有 9 个训练进程在运行，继续等待...
+[2026-08-06 10:13:51] 仍有 9 个训练进程在运行，继续等待...
+[2026-08-06 10:14:51] 仍有 9 个训练进程在运行，继续等待...
+[2026-08-06 10:15:51] 仍有 9 个训练进程在运行，继续等待...
+[2026-08-06 10:16:51] 仍有 9 个训练进程在运行，继续等待...
+[2026-08-06 10:17:51] 仍有 9 个训练进程在运行，继续等待...
+[2026-08-06 10:18:51] 仍有 9 个训练进程在运行，继续等待...
+[2026-08-06 10:19:51] 仍有 9 个训练进程在运行，继续等待...
+[2026-08-06 10:20:52] 仍有 9 个训练进程在运行，继续等待...
+[2026-08-06 10:21:52] 仍有 9 个训练进程在运行，继续等待...
+[2026-08-06 10:22:52] 仍有 9 个训练进程在运行，继续等待...
+[2026-08-06 10:23:52] 仍有 9 个训练进程在运行，继续等待...
+[2026-08-06 10:24:52] 仍有 9 个训练进程在运行，继续等待...
+[2026-08-06 10:25:52] 仍有 9 个训练进程在运行，继续等待...
+[2026-08-06 10:26:52] 仍有 9 个训练进程在运行，继续等待...
+[2026-08-06 10:27:53] 仍有 9 个训练进程在运行，继续等待...
+[2026-08-06 10:28:53] 仍有 8 个训练进程在运行，继续等待...
+[2026-08-06 10:29:53] 仍有 9 个训练进程在运行，继续等待...
+[2026-08-06 10:30:53] 仍有 9 个训练进程在运行，继续等待...
+[2026-08-06 10:31:53] 仍有 9 个训练进程在运行，继续等待...
+[2026-08-06 10:32:53] 仍有 9 个训练进程在运行，继续等待...
+[2026-08-06 10:33:53] 仍有 9 个训练进程在运行，继续等待...
+[2026-08-06 10:34:53] 仍有 9 个训练进程在运行，继续等待...
+[2026-08-06 10:35:54] 仍有 9 个训练进程在运行，继续等待...
+[2026-08-06 10:36:54] 仍有 9 个训练进程在运行，继续等待...
+[2026-08-06 10:37:54] 仍有 9 个训练进程在运行，继续等待...
+[2026-08-06 10:38:54] 仍有 8 个训练进程在运行，继续等待...
+[2026-08-06 10:39:54] 仍有 8 个训练进程在运行，继续等待...
+[2026-08-06 10:40:54] 仍有 8 个训练进程在运行，继续等待...
+[2026-08-06 10:41:54] 仍有 8 个训练进程在运行，继续等待...
+[2026-08-06 10:42:54] 仍有 8 个训练进程在运行，继续等待...
+[2026-08-06 10:43:55] 仍有 8 个训练进程在运行，继续等待...
+[2026-08-06 10:44:55] 仍有 8 个训练进程在运行，继续等待...
+[2026-08-06 10:45:55] 仍有 8 个训练进程在运行，继续等待...
+[2026-08-06 10:46:55] 仍有 7 个训练进程在运行，继续等待...
+[2026-08-06 10:47:55] 仍有 7 个训练进程在运行，继续等待...
+[2026-08-06 10:48:55] 仍有 7 个训练进程在运行，继续等待...
+[2026-08-06 10:49:55] 仍有 7 个训练进程在运行，继续等待...
+[2026-08-06 10:50:55] 仍有 7 个训练进程在运行，继续等待...
+[2026-08-06 10:51:56] 仍有 7 个训练进程在运行，继续等待...
+[2026-08-06 10:52:56] 仍有 7 个训练进程在运行，继续等待...
+[2026-08-06 10:53:56] 仍有 7 个训练进程在运行，继续等待...
+[2026-08-06 10:54:56] 仍有 7 个训练进程在运行，继续等待...
+[2026-08-06 10:55:56] 仍有 7 个训练进程在运行，继续等待...
+[2026-08-06 10:56:56] 仍有 7 个训练进程在运行，继续等待...
+[2026-08-06 10:57:56] 仍有 6 个训练进程在运行，继续等待...
+[2026-08-06 10:58:56] 仍有 6 个训练进程在运行，继续等待...
+[2026-08-06 10:59:57] 仍有 6 个训练进程在运行，继续等待...
+[2026-08-06 11:00:57] 仍有 5 个训练进程在运行，继续等待...
+[2026-08-06 11:01:57] 仍有 5 个训练进程在运行，继续等待...
+[2026-08-06 11:02:57] 仍有 5 个训练进程在运行，继续等待...
+[2026-08-06 11:03:57] 仍有 4 个训练进程在运行，继续等待...
+[2026-08-06 11:04:57] 仍有 3 个训练进程在运行，继续等待...
+[2026-08-06 11:05:57] 仍有 3 个训练进程在运行，继续等待...
+[2026-08-06 11:06:57] 仍有 3 个训练进程在运行，继续等待...
+[2026-08-06 11:07:58] 仍有 2 个训练进程在运行，继续等待...
+[2026-08-06 11:08:58] 仍有 2 个训练进程在运行，继续等待...
+[2026-08-06 11:09:58] 已无自己的训练进程。拉取最新代码...
+Already up to date.
+[2026-08-06 11:10:04] 开始批次 1/1: addition_p127_tr64_ood128_misslen_l3plus.json
+Using experiments config: experiments/addition_p127_tr64_ood128_misslen_l3plus.json
+Total experiments: 144, concurrency: 8
+--------------------------------------------------
+==================================================
+GPU detection: 8 idle of 8 GPUs: [0, 1, 2, 3, 4, 5, 6, 7]
+Effective concurrency: 8 (one experiment per GPU)
+==================================================
+[11:10:05] Start experiment: addition_a1b1_d64l3r4h1_P127_tr64ood128_miss0.1len1_seed17996 on cuda:0
+[11:10:05] Start experiment: addition_a1b1_d64l3r4h1_P127_tr64ood128_miss0.1len1_seed18318 on cuda:1
+[11:10:05] Start experiment: addition_a1b1_d64l3r4h1_P127_tr64ood128_miss0.1len1_seed34789 on cuda:2
+[11:10:05] Start experiment: addition_a1b1_d64l3r4h1_P127_tr64ood128_miss0.1len1_seed44536 on cuda:3
+[11:10:05] Start experiment: addition_a1b1_d64l3r4h1_P127_tr64ood128_miss0.1len1_seed64154 on cuda:5
+[11:10:05] Start experiment: addition_a1b1_d64l3r4h1_P127_tr64ood128_miss0.1len1_seed62513 on cuda:4
+[11:10:05] Start experiment: addition_a1b1_d64l3r4h1_P127_tr64ood128_miss0.1len1_seed72814 on cuda:6
+[11:10:05] Start experiment: addition_a1b1_d64l3r4h1_P127_tr64ood128_miss0.1len1_seed82585 on cuda:7
+[11:13:31] Start attention analysis: addition_a1b1_d64l3r4h1_P127_tr64ood128_miss0.1len1_seed17996
+[11:13:34] Attention analysis completed: addition_a1b1_d64l3r4h1_P127_tr64ood128_miss0.1len1_seed17996
+[11:13:34] Experiment completed: addition_a1b1_d64l3r4h1_P127_tr64ood128_miss0.1len1_seed17996 (209s), log: /data/cxm/recursion/addition_p127_tr64_ood128_misslen_l3plus/logs/addition_a1b1_d64l3r4h1_P127_tr64ood128_miss0.1len1_seed17996.log
+[11:13:34] Start experiment: addition_a1b1_d64l3r4h1_P127_tr64ood128_miss0.2len1_seed17996 on cuda:0
+[11:13:36] Start attention analysis: addition_a1b1_d64l3r4h1_P127_tr64ood128_miss0.1len1_seed82585
+[11:13:38] Attention analysis completed: addition_a1b1_d64l3r4h1_P127_tr64ood128_miss0.1len1_seed82585
+[11:13:38] Experiment completed: addition_a1b1_d64l3r4h1_P127_tr64ood128_miss0.1len1_seed82585 (213s), log: /data/cxm/recursion/addition_p127_tr64_ood128_misslen_l3plus/logs/addition_a1b1_d64l3r4h1_P127_tr64ood128_miss0.1len1_seed82585.log
+[11:13:38] Start experiment: addition_a1b1_d64l3r4h1_P127_tr64ood128_miss0.2len1_seed18318 on cuda:7
+[11:13:50] Start attention analysis: addition_a1b1_d64l3r4h1_P127_tr64ood128_miss0.1len1_seed64154
+[11:13:52] Attention analysis completed: addition_a1b1_d64l3r4h1_P127_tr64ood128_miss0.1len1_seed64154
+[11:13:52] Experiment completed: addition_a1b1_d64l3r4h1_P127_tr64ood128_miss0.1len1_seed64154 (227s), log: /data/cxm/recursion/addition_p127_tr64_ood128_misslen_l3plus/logs/addition_a1b1_d64l3r4h1_P127_tr64ood128_miss0.1len1_seed64154.log
+[11:13:52] Start experiment: addition_a1b1_d64l3r4h1_P127_tr64ood128_miss0.2len1_seed34789 on cuda:5
+[11:17:07] Start attention analysis: addition_a1b1_d64l3r4h1_P127_tr64ood128_miss0.2len1_seed34789
+[11:17:08] Attention analysis completed: addition_a1b1_d64l3r4h1_P127_tr64ood128_miss0.2len1_seed34789
+[11:17:08] Experiment completed: addition_a1b1_d64l3r4h1_P127_tr64ood128_miss0.2len1_seed34789 (197s), log: /data/cxm/recursion/addition_p127_tr64_ood128_misslen_l3plus/logs/addition_a1b1_d64l3r4h1_P127_tr64ood128_miss0.2len1_seed34789.log
+[11:17:08] Start experiment: addition_a1b1_d64l3r4h1_P127_tr64ood128_miss0.2len1_seed44536 on cuda:5
+[11:17:09] Start attention analysis: addition_a1b1_d64l3r4h1_P127_tr64ood128_miss0.2len1_seed18318
+[11:17:11] Attention analysis completed: addition_a1b1_d64l3r4h1_P127_tr64ood128_miss0.2len1_seed18318
+[11:17:11] Experiment completed: addition_a1b1_d64l3r4h1_P127_tr64ood128_miss0.2len1_seed18318 (213s), log: /data/cxm/recursion/addition_p127_tr64_ood128_misslen_l3plus/logs/addition_a1b1_d64l3r4h1_P127_tr64ood128_miss0.2len1_seed18318.log
+[11:17:11] Start experiment: addition_a1b1_d64l3r4h1_P127_tr64ood128_miss0.2len1_seed62513 on cuda:7
+[11:17:31] Start attention analysis: addition_a1b1_d64l3r4h1_P127_tr64ood128_miss0.1len1_seed18318
+[11:17:33] Attention analysis completed: addition_a1b1_d64l3r4h1_P127_tr64ood128_miss0.1len1_seed18318
+[11:17:33] Experiment completed: addition_a1b1_d64l3r4h1_P127_tr64ood128_miss0.1len1_seed18318 (448s), log: /data/cxm/recursion/addition_p127_tr64_ood128_misslen_l3plus/logs/addition_a1b1_d64l3r4h1_P127_tr64ood128_miss0.1len1_seed18318.log
+[11:17:33] Start experiment: addition_a1b1_d64l3r4h1_P127_tr64ood128_miss0.2len1_seed64154 on cuda:1
+[11:18:47] Start attention analysis: addition_a1b1_d64l3r4h1_P127_tr64ood128_miss0.1len1_seed62513
+[11:18:49] Attention analysis completed: addition_a1b1_d64l3r4h1_P127_tr64ood128_miss0.1len1_seed62513
+[11:18:49] Experiment completed: addition_a1b1_d64l3r4h1_P127_tr64ood128_miss0.1len1_seed62513 (524s), log: /data/cxm/recursion/addition_p127_tr64_ood128_misslen_l3plus/logs/addition_a1b1_d64l3r4h1_P127_tr64ood128_miss0.1len1_seed62513.log
+[11:18:49] Start experiment: addition_a1b1_d64l3r4h1_P127_tr64ood128_miss0.2len1_seed72814 on cuda:4
+[11:20:59] Start attention analysis: addition_a1b1_d64l3r4h1_P127_tr64ood128_miss0.2len1_seed64154
+[11:21:00] Attention analysis completed: addition_a1b1_d64l3r4h1_P127_tr64ood128_miss0.2len1_seed64154
+[11:21:00] Experiment completed: addition_a1b1_d64l3r4h1_P127_tr64ood128_miss0.2len1_seed64154 (207s), log: /data/cxm/recursion/addition_p127_tr64_ood128_misslen_l3plus/logs/addition_a1b1_d64l3r4h1_P127_tr64ood128_miss0.2len1_seed64154.log
+[11:21:00] Start experiment: addition_a1b1_d64l3r4h1_P127_tr64ood128_miss0.2len1_seed82585 on cuda:1
+[11:21:08] Start attention analysis: addition_a1b1_d64l3r4h1_P127_tr64ood128_miss0.1len1_seed34789
+[11:21:10] Attention analysis completed: addition_a1b1_d64l3r4h1_P127_tr64ood128_miss0.1len1_seed34789
+[11:21:10] Experiment completed: addition_a1b1_d64l3r4h1_P127_tr64ood128_miss0.1len1_seed34789 (665s), log: /data/cxm/recursion/addition_p127_tr64_ood128_misslen_l3plus/logs/addition_a1b1_d64l3r4h1_P127_tr64ood128_miss0.1len1_seed34789.log
+[11:21:10] Start experiment: addition_a1b1_d64l3r4h1_P127_tr64ood128_miss0.3len1_seed17996 on cuda:2
+[11:21:19] Start attention analysis: addition_a1b1_d64l3r4h1_P127_tr64ood128_miss0.2len1_seed17996
+[11:21:21] Attention analysis completed: addition_a1b1_d64l3r4h1_P127_tr64ood128_miss0.2len1_seed17996
+[11:21:21] Experiment completed: addition_a1b1_d64l3r4h1_P127_tr64ood128_miss0.2len1_seed17996 (467s), log: /data/cxm/recursion/addition_p127_tr64_ood128_misslen_l3plus/logs/addition_a1b1_d64l3r4h1_P127_tr64ood128_miss0.2len1_seed17996.log
+[11:21:21] Start experiment: addition_a1b1_d64l3r4h1_P127_tr64ood128_miss0.3len1_seed18318 on cuda:0
+[11:23:10] Start attention analysis: addition_a1b1_d64l3r4h1_P127_tr64ood128_miss0.2len1_seed72814
+[11:23:12] Attention analysis completed: addition_a1b1_d64l3r4h1_P127_tr64ood128_miss0.2len1_seed72814
+[11:23:12] Experiment completed: addition_a1b1_d64l3r4h1_P127_tr64ood128_miss0.2len1_seed72814 (262s), log: /data/cxm/recursion/addition_p127_tr64_ood128_misslen_l3plus/logs/addition_a1b1_d64l3r4h1_P127_tr64ood128_miss0.2len1_seed72814.log
+[11:23:12] Start experiment: addition_a1b1_d64l3r4h1_P127_tr64ood128_miss0.3len1_seed34789 on cuda:4
+[11:23:34] Start attention analysis: addition_a1b1_d64l3r4h1_P127_tr64ood128_miss0.2len1_seed62513
+[11:23:36] Attention analysis completed: addition_a1b1_d64l3r4h1_P127_tr64ood128_miss0.2len1_seed62513
+[11:23:36] Experiment completed: addition_a1b1_d64l3r4h1_P127_tr64ood128_miss0.2len1_seed62513 (385s), log: /data/cxm/recursion/addition_p127_tr64_ood128_misslen_l3plus/logs/addition_a1b1_d64l3r4h1_P127_tr64ood128_miss0.2len1_seed62513.log
+[11:23:36] Start experiment: addition_a1b1_d64l3r4h1_P127_tr64ood128_miss0.3len1_seed44536 on cuda:7
+[11:23:49] Start attention analysis: addition_a1b1_d64l3r4h1_P127_tr64ood128_miss0.1len1_seed44536
+[11:23:52] Attention analysis completed: addition_a1b1_d64l3r4h1_P127_tr64ood128_miss0.1len1_seed44536
+[11:23:52] Experiment completed: addition_a1b1_d64l3r4h1_P127_tr64ood128_miss0.1len1_seed44536 (826s), log: /data/cxm/recursion/addition_p127_tr64_ood128_misslen_l3plus/logs/addition_a1b1_d64l3r4h1_P127_tr64ood128_miss0.1len1_seed44536.log
+[11:23:52] Start experiment: addition_a1b1_d64l3r4h1_P127_tr64ood128_miss0.3len1_seed62513 on cuda:3
+[11:24:08] Start attention analysis: addition_a1b1_d64l3r4h1_P127_tr64ood128_miss0.2len1_seed44536
+[11:24:10] Attention analysis completed: addition_a1b1_d64l3r4h1_P127_tr64ood128_miss0.2len1_seed44536
+[11:24:10] Experiment completed: addition_a1b1_d64l3r4h1_P127_tr64ood128_miss0.2len1_seed44536 (421s), log: /data/cxm/recursion/addition_p127_tr64_ood128_misslen_l3plus/logs/addition_a1b1_d64l3r4h1_P127_tr64ood128_miss0.2len1_seed44536.log
+[11:24:10] Start experiment: addition_a1b1_d64l3r4h1_P127_tr64ood128_miss0.3len1_seed64154 on cuda:5
+[11:24:24] Start attention analysis: addition_a1b1_d64l3r4h1_P127_tr64ood128_miss0.3len1_seed18318
+[11:24:26] Attention analysis completed: addition_a1b1_d64l3r4h1_P127_tr64ood128_miss0.3len1_seed18318
+[11:24:26] Experiment completed: addition_a1b1_d64l3r4h1_P127_tr64ood128_miss0.3len1_seed18318 (185s), log: /data/cxm/recursion/addition_p127_tr64_ood128_misslen_l3plus/logs/addition_a1b1_d64l3r4h1_P127_tr64ood128_miss0.3len1_seed18318.log
+[11:24:26] Start experiment: addition_a1b1_d64l3r4h1_P127_tr64ood128_miss0.3len1_seed72814 on cuda:0
+[11:24:41] Start attention analysis: addition_a1b1_d64l3r4h1_P127_tr64ood128_miss0.3len1_seed17996
+[11:24:43] Attention analysis completed: addition_a1b1_d64l3r4h1_P127_tr64ood128_miss0.3len1_seed17996
+[11:24:43] Experiment completed: addition_a1b1_d64l3r4h1_P127_tr64ood128_miss0.3len1_seed17996 (213s), log: /data/cxm/recursion/addition_p127_tr64_ood128_misslen_l3plus/logs/addition_a1b1_d64l3r4h1_P127_tr64ood128_miss0.3len1_seed17996.log
+[11:24:43] Start experiment: addition_a1b1_d64l3r4h1_P127_tr64ood128_miss0.3len1_seed82585 on cuda:2
+[11:26:03] Start attention analysis: addition_a1b1_d64l3r4h1_P127_tr64ood128_miss0.2len1_seed82585
+[11:26:05] Attention analysis completed: addition_a1b1_d64l3r4h1_P127_tr64ood128_miss0.2len1_seed82585
+[11:26:05] Experiment completed: addition_a1b1_d64l3r4h1_P127_tr64ood128_miss0.2len1_seed82585 (305s), log: /data/cxm/recursion/addition_p127_tr64_ood128_misslen_l3plus/logs/addition_a1b1_d64l3r4h1_P127_tr64ood128_miss0.2len1_seed82585.log
+[11:26:05] Start experiment: addition_a1b1_d64l3r4h1_P127_tr64ood128_miss0.1len2_seed17996 on cuda:1
+[11:26:22] Start attention analysis: addition_a1b1_d64l3r4h1_P127_tr64ood128_miss0.3len1_seed34789
+[11:26:23] Attention analysis completed: addition_a1b1_d64l3r4h1_P127_tr64ood128_miss0.3len1_seed34789
+[11:26:23] Experiment completed: addition_a1b1_d64l3r4h1_P127_tr64ood128_miss0.3len1_seed34789 (191s), log: /data/cxm/recursion/addition_p127_tr64_ood128_misslen_l3plus/logs/addition_a1b1_d64l3r4h1_P127_tr64ood128_miss0.3len1_seed34789.log
+[11:26:23] Start experiment: addition_a1b1_d64l3r4h1_P127_tr64ood128_miss0.1len2_seed18318 on cuda:4
+[11:27:19] Start attention analysis: addition_a1b1_d64l3r4h1_P127_tr64ood128_miss0.3len1_seed72814
+[11:27:21] Attention analysis completed: addition_a1b1_d64l3r4h1_P127_tr64ood128_miss0.3len1_seed72814
+[11:27:21] Experiment completed: addition_a1b1_d64l3r4h1_P127_tr64ood128_miss0.3len1_seed72814 (175s), log: /data/cxm/recursion/addition_p127_tr64_ood128_misslen_l3plus/logs/addition_a1b1_d64l3r4h1_P127_tr64ood128_miss0.3len1_seed72814.log
+[11:27:21] Start experiment: addition_a1b1_d64l3r4h1_P127_tr64ood128_miss0.1len2_seed34789 on cuda:0
+[11:27:45] Start attention analysis: addition_a1b1_d64l3r4h1_P127_tr64ood128_miss0.3len1_seed44536
+[11:27:46] Attention analysis completed: addition_a1b1_d64l3r4h1_P127_tr64ood128_miss0.3len1_seed44536
+[11:27:46] Experiment completed: addition_a1b1_d64l3r4h1_P127_tr64ood128_miss0.3len1_seed44536 (251s), log: /data/cxm/recursion/addition_p127_tr64_ood128_misslen_l3plus/logs/addition_a1b1_d64l3r4h1_P127_tr64ood128_miss0.3len1_seed44536.log
+[11:27:46] Start experiment: addition_a1b1_d64l3r4h1_P127_tr64ood128_miss0.1len2_seed44536 on cuda:7
+[11:28:42] Start attention analysis: addition_a1b1_d64l3r4h1_P127_tr64ood128_miss0.3len1_seed82585
+[11:28:44] Attention analysis completed: addition_a1b1_d64l3r4h1_P127_tr64ood128_miss0.3len1_seed82585
+[11:28:44] Experiment completed: addition_a1b1_d64l3r4h1_P127_tr64ood128_miss0.3len1_seed82585 (241s), log: /data/cxm/recursion/addition_p127_tr64_ood128_misslen_l3plus/logs/addition_a1b1_d64l3r4h1_P127_tr64ood128_miss0.3len1_seed82585.log
+[11:28:44] Start experiment: addition_a1b1_d64l3r4h1_P127_tr64ood128_miss0.1len2_seed62513 on cuda:2
+[11:29:32] Start attention analysis: addition_a1b1_d64l3r4h1_P127_tr64ood128_miss0.3len1_seed62513
+[11:29:34] Attention analysis completed: addition_a1b1_d64l3r4h1_P127_tr64ood128_miss0.3len1_seed62513
+[11:29:34] Experiment completed: addition_a1b1_d64l3r4h1_P127_tr64ood128_miss0.3len1_seed62513 (342s), log: /data/cxm/recursion/addition_p127_tr64_ood128_misslen_l3plus/logs/addition_a1b1_d64l3r4h1_P127_tr64ood128_miss0.3len1_seed62513.log
+[11:29:34] Start experiment: addition_a1b1_d64l3r4h1_P127_tr64ood128_miss0.1len2_seed64154 on cuda:3
+[11:29:49] Start attention analysis: addition_a1b1_d64l3r4h1_P127_tr64ood128_miss0.3len1_seed64154
+[11:29:51] Attention analysis completed: addition_a1b1_d64l3r4h1_P127_tr64ood128_miss0.3len1_seed64154
+[11:29:51] Experiment completed: addition_a1b1_d64l3r4h1_P127_tr64ood128_miss0.3len1_seed64154 (342s), log: /data/cxm/recursion/addition_p127_tr64_ood128_misslen_l3plus/logs/addition_a1b1_d64l3r4h1_P127_tr64ood128_miss0.3len1_seed64154.log
+[11:29:51] Start experiment: addition_a1b1_d64l3r4h1_P127_tr64ood128_miss0.1len2_seed72814 on cuda:5
+[11:33:37] Start attention analysis: addition_a1b1_d64l3r4h1_P127_tr64ood128_miss0.1len1_seed72814
+[11:33:39] Attention analysis completed: addition_a1b1_d64l3r4h1_P127_tr64ood128_miss0.1len1_seed72814
+[11:33:39] Experiment completed: addition_a1b1_d64l3r4h1_P127_tr64ood128_miss0.1len1_seed72814 (1413s), log: /data/cxm/recursion/addition_p127_tr64_ood128_misslen_l3plus/logs/addition_a1b1_d64l3r4h1_P127_tr64ood128_miss0.1len1_seed72814.log
+[11:33:39] Start experiment: addition_a1b1_d64l3r4h1_P127_tr64ood128_miss0.1len2_seed82585 on cuda:6
+[11:46:14] Start attention analysis: addition_a1b1_d64l3r4h1_P127_tr64ood128_miss0.1len2_seed82585
+[11:46:16] Attention analysis completed: addition_a1b1_d64l3r4h1_P127_tr64ood128_miss0.1len2_seed82585
+[11:46:16] Experiment completed: addition_a1b1_d64l3r4h1_P127_tr64ood128_miss0.1len2_seed82585 (758s), log: /data/cxm/recursion/addition_p127_tr64_ood128_misslen_l3plus/logs/addition_a1b1_d64l3r4h1_P127_tr64ood128_miss0.1len2_seed82585.log
+[11:46:16] Start experiment: addition_a1b1_d64l3r4h1_P127_tr64ood128_miss0.2len2_seed17996 on cuda:6
+[12:01:17] Start attention analysis: addition_a1b1_d64l3r4h1_P127_tr64ood128_miss0.2len2_seed17996
+[12:01:19] Attention analysis completed: addition_a1b1_d64l3r4h1_P127_tr64ood128_miss0.2len2_seed17996
+[12:01:19] Experiment completed: addition_a1b1_d64l3r4h1_P127_tr64ood128_miss0.2len2_seed17996 (903s), log: /data/cxm/recursion/addition_p127_tr64_ood128_misslen_l3plus/logs/addition_a1b1_d64l3r4h1_P127_tr64ood128_miss0.2len2_seed17996.log
+[12:01:19] Start experiment: addition_a1b1_d64l3r4h1_P127_tr64ood128_miss0.2len2_seed18318 on cuda:6
+[12:07:17] Start attention analysis: addition_a1b1_d64l3r4h1_P127_tr64ood128_miss0.1len2_seed44536
+[12:07:19] Attention analysis completed: addition_a1b1_d64l3r4h1_P127_tr64ood128_miss0.1len2_seed44536
+[12:07:19] Experiment completed: addition_a1b1_d64l3r4h1_P127_tr64ood128_miss0.1len2_seed44536 (2372s), log: /data/cxm/recursion/addition_p127_tr64_ood128_misslen_l3plus/logs/addition_a1b1_d64l3r4h1_P127_tr64ood128_miss0.1len2_seed44536.log
+[12:07:19] Start experiment: addition_a1b1_d64l3r4h1_P127_tr64ood128_miss0.2len2_seed34789 on cuda:7
+[12:09:55] Start attention analysis: addition_a1b1_d64l3r4h1_P127_tr64ood128_miss0.1len2_seed18318
+[12:09:57] Attention analysis completed: addition_a1b1_d64l3r4h1_P127_tr64ood128_miss0.1len2_seed18318
+[12:09:57] Experiment completed: addition_a1b1_d64l3r4h1_P127_tr64ood128_miss0.1len2_seed18318 (2614s), log: /data/cxm/recursion/addition_p127_tr64_ood128_misslen_l3plus/logs/addition_a1b1_d64l3r4h1_P127_tr64ood128_miss0.1len2_seed18318.log
+[12:09:57] Start experiment: addition_a1b1_d64l3r4h1_P127_tr64ood128_miss0.2len2_seed44536 on cuda:4
+[12:23:20] Start attention analysis: addition_a1b1_d64l3r4h1_P127_tr64ood128_miss0.1len2_seed34789
+[12:23:22] Attention analysis completed: addition_a1b1_d64l3r4h1_P127_tr64ood128_miss0.1len2_seed34789
+[12:23:22] Experiment completed: addition_a1b1_d64l3r4h1_P127_tr64ood128_miss0.1len2_seed34789 (3361s), log: /data/cxm/recursion/addition_p127_tr64_ood128_misslen_l3plus/logs/addition_a1b1_d64l3r4h1_P127_tr64ood128_miss0.1len2_seed34789.log
+[12:23:22] Start experiment: addition_a1b1_d64l3r4h1_P127_tr64ood128_miss0.2len2_seed62513 on cuda:0
+[12:27:23] Start attention analysis: addition_a1b1_d64l3r4h1_P127_tr64ood128_miss0.1len2_seed64154
+[12:27:25] Attention analysis completed: addition_a1b1_d64l3r4h1_P127_tr64ood128_miss0.1len2_seed64154
+[12:27:25] Experiment completed: addition_a1b1_d64l3r4h1_P127_tr64ood128_miss0.1len2_seed64154 (3471s), log: /data/cxm/recursion/addition_p127_tr64_ood128_misslen_l3plus/logs/addition_a1b1_d64l3r4h1_P127_tr64ood128_miss0.1len2_seed64154.log
+[12:27:25] Start experiment: addition_a1b1_d64l3r4h1_P127_tr64ood128_miss0.2len2_seed64154 on cuda:3
+[12:30:16] Start attention analysis: addition_a1b1_d64l3r4h1_P127_tr64ood128_miss0.1len2_seed72814
+[12:30:18] Attention analysis completed: addition_a1b1_d64l3r4h1_P127_tr64ood128_miss0.1len2_seed72814
+[12:30:18] Experiment completed: addition_a1b1_d64l3r4h1_P127_tr64ood128_miss0.1len2_seed72814 (3627s), log: /data/cxm/recursion/addition_p127_tr64_ood128_misslen_l3plus/logs/addition_a1b1_d64l3r4h1_P127_tr64ood128_miss0.1len2_seed72814.log
+[12:30:18] Start experiment: addition_a1b1_d64l3r4h1_P127_tr64ood128_miss0.2len2_seed72814 on cuda:5
+[12:32:03] Start attention analysis: addition_a1b1_d64l3r4h1_P127_tr64ood128_miss0.2len2_seed44536
+[12:32:05] Attention analysis completed: addition_a1b1_d64l3r4h1_P127_tr64ood128_miss0.2len2_seed44536
+[12:32:05] Experiment completed: addition_a1b1_d64l3r4h1_P127_tr64ood128_miss0.2len2_seed44536 (1328s), log: /data/cxm/recursion/addition_p127_tr64_ood128_misslen_l3plus/logs/addition_a1b1_d64l3r4h1_P127_tr64ood128_miss0.2len2_seed44536.log
+[12:32:05] Start experiment: addition_a1b1_d64l3r4h1_P127_tr64ood128_miss0.2len2_seed82585 on cuda:4
+[12:35:25] Start attention analysis: addition_a1b1_d64l3r4h1_P127_tr64ood128_miss0.2len2_seed34789
+[12:35:27] Attention analysis completed: addition_a1b1_d64l3r4h1_P127_tr64ood128_miss0.2len2_seed34789
+[12:35:27] Experiment completed: addition_a1b1_d64l3r4h1_P127_tr64ood128_miss0.2len2_seed34789 (1689s), log: /data/cxm/recursion/addition_p127_tr64_ood128_misslen_l3plus/logs/addition_a1b1_d64l3r4h1_P127_tr64ood128_miss0.2len2_seed34789.log
+[12:35:27] Start experiment: addition_a1b1_d64l3r4h1_P127_tr64ood128_miss0.3len2_seed17996 on cuda:7
+[12:37:13] Start attention analysis: addition_a1b1_d64l3r4h1_P127_tr64ood128_miss0.2len2_seed18318
+[12:37:15] Attention analysis completed: addition_a1b1_d64l3r4h1_P127_tr64ood128_miss0.2len2_seed18318
+[12:37:15] Experiment completed: addition_a1b1_d64l3r4h1_P127_tr64ood128_miss0.2len2_seed18318 (2156s), log: /data/cxm/recursion/addition_p127_tr64_ood128_misslen_l3plus/logs/addition_a1b1_d64l3r4h1_P127_tr64ood128_miss0.2len2_seed18318.log
+[12:37:15] Start experiment: addition_a1b1_d64l3r4h1_P127_tr64ood128_miss0.3len2_seed18318 on cuda:6
+[12:47:11] Start attention analysis: addition_a1b1_d64l3r4h1_P127_tr64ood128_miss0.2len2_seed62513
+[12:47:13] Attention analysis completed: addition_a1b1_d64l3r4h1_P127_tr64ood128_miss0.2len2_seed62513
+[12:47:13] Experiment completed: addition_a1b1_d64l3r4h1_P127_tr64ood128_miss0.2len2_seed62513 (1432s), log: /data/cxm/recursion/addition_p127_tr64_ood128_misslen_l3plus/logs/addition_a1b1_d64l3r4h1_P127_tr64ood128_miss0.2len2_seed62513.log
+[12:47:13] Start experiment: addition_a1b1_d64l3r4h1_P127_tr64ood128_miss0.3len2_seed34789 on cuda:0
+[13:04:45] Start attention analysis: addition_a1b1_d64l3r4h1_P127_tr64ood128_miss0.2len2_seed64154
+[13:04:47] Attention analysis completed: addition_a1b1_d64l3r4h1_P127_tr64ood128_miss0.2len2_seed64154
+[13:04:47] Experiment completed: addition_a1b1_d64l3r4h1_P127_tr64ood128_miss0.2len2_seed64154 (2242s), log: /data/cxm/recursion/addition_p127_tr64_ood128_misslen_l3plus/logs/addition_a1b1_d64l3r4h1_P127_tr64ood128_miss0.2len2_seed64154.log
+[13:04:47] Start experiment: addition_a1b1_d64l3r4h1_P127_tr64ood128_miss0.3len2_seed44536 on cuda:3
+[13:10:02] Start attention analysis: addition_a1b1_d64l3r4h1_P127_tr64ood128_miss0.1len2_seed62513
+[13:10:03] Attention analysis completed: addition_a1b1_d64l3r4h1_P127_tr64ood128_miss0.1len2_seed62513
+[13:10:03] Experiment completed: addition_a1b1_d64l3r4h1_P127_tr64ood128_miss0.1len2_seed62513 (6079s), log: /data/cxm/recursion/addition_p127_tr64_ood128_misslen_l3plus/logs/addition_a1b1_d64l3r4h1_P127_tr64ood128_miss0.1len2_seed62513.log
+[13:10:03] Start experiment: addition_a1b1_d64l3r4h1_P127_tr64ood128_miss0.3len2_seed62513 on cuda:2
+[13:12:32] Start attention analysis: addition_a1b1_d64l3r4h1_P127_tr64ood128_miss0.3len2_seed34789
+[13:12:34] Attention analysis completed: addition_a1b1_d64l3r4h1_P127_tr64ood128_miss0.3len2_seed34789
+[13:12:34] Experiment completed: addition_a1b1_d64l3r4h1_P127_tr64ood128_miss0.3len2_seed34789 (1521s), log: /data/cxm/recursion/addition_p127_tr64_ood128_misslen_l3plus/logs/addition_a1b1_d64l3r4h1_P127_tr64ood128_miss0.3len2_seed34789.log
+[13:12:34] Start experiment: addition_a1b1_d64l3r4h1_P127_tr64ood128_miss0.3len2_seed64154 on cuda:0
+[13:13:49] Start attention analysis: addition_a1b1_d64l3r4h1_P127_tr64ood128_miss0.2len2_seed82585
+[13:13:51] Attention analysis completed: addition_a1b1_d64l3r4h1_P127_tr64ood128_miss0.2len2_seed82585
+[13:13:51] Experiment completed: addition_a1b1_d64l3r4h1_P127_tr64ood128_miss0.2len2_seed82585 (2506s), log: /data/cxm/recursion/addition_p127_tr64_ood128_misslen_l3plus/logs/addition_a1b1_d64l3r4h1_P127_tr64ood128_miss0.2len2_seed82585.log
+[13:13:51] Start experiment: addition_a1b1_d64l3r4h1_P127_tr64ood128_miss0.3len2_seed72814 on cuda:4
+[13:20:54] Start attention analysis: addition_a1b1_d64l3r4h1_P127_tr64ood128_miss0.2len2_seed72814
+[13:20:56] Attention analysis completed: addition_a1b1_d64l3r4h1_P127_tr64ood128_miss0.2len2_seed72814
+[13:20:56] Experiment completed: addition_a1b1_d64l3r4h1_P127_tr64ood128_miss0.2len2_seed72814 (3038s), log: /data/cxm/recursion/addition_p127_tr64_ood128_misslen_l3plus/logs/addition_a1b1_d64l3r4h1_P127_tr64ood128_miss0.2len2_seed72814.log
+[13:20:56] Start experiment: addition_a1b1_d64l3r4h1_P127_tr64ood128_miss0.3len2_seed82585 on cuda:5
+[13:22:05] Start attention analysis: addition_a1b1_d64l3r4h1_P127_tr64ood128_miss0.3len2_seed62513
+[13:22:07] Attention analysis completed: addition_a1b1_d64l3r4h1_P127_tr64ood128_miss0.3len2_seed62513
+[13:22:07] Experiment completed: addition_a1b1_d64l3r4h1_P127_tr64ood128_miss0.3len2_seed62513 (723s), log: /data/cxm/recursion/addition_p127_tr64_ood128_misslen_l3plus/logs/addition_a1b1_d64l3r4h1_P127_tr64ood128_miss0.3len2_seed62513.log
+[13:22:07] Start experiment: addition_a1b1_d64l4r4h1_P127_tr64ood128_miss0.1len2_seed17996 on cuda:2
+[13:28:53] Start attention analysis: addition_a1b1_d64l3r4h1_P127_tr64ood128_miss0.3len2_seed72814
+[13:28:55] Attention analysis completed: addition_a1b1_d64l3r4h1_P127_tr64ood128_miss0.3len2_seed72814
+[13:28:55] Experiment completed: addition_a1b1_d64l3r4h1_P127_tr64ood128_miss0.3len2_seed72814 (904s), log: /data/cxm/recursion/addition_p127_tr64_ood128_misslen_l3plus/logs/addition_a1b1_d64l3r4h1_P127_tr64ood128_miss0.3len2_seed72814.log
+[13:28:55] Start experiment: addition_a1b1_d64l4r4h1_P127_tr64ood128_miss0.1len2_seed18318 on cuda:4
+[13:31:33] Start attention analysis: addition_a1b1_d64l3r4h1_P127_tr64ood128_miss0.1len2_seed17996
+[13:31:35] Attention analysis completed: addition_a1b1_d64l3r4h1_P127_tr64ood128_miss0.1len2_seed17996
+[13:31:35] Experiment completed: addition_a1b1_d64l3r4h1_P127_tr64ood128_miss0.1len2_seed17996 (7530s), log: /data/cxm/recursion/addition_p127_tr64_ood128_misslen_l3plus/logs/addition_a1b1_d64l3r4h1_P127_tr64ood128_miss0.1len2_seed17996.log
+[13:31:35] Start experiment: addition_a1b1_d64l4r4h1_P127_tr64ood128_miss0.1len2_seed34789 on cuda:1
+[13:34:46] Start attention analysis: addition_a1b1_d64l3r4h1_P127_tr64ood128_miss0.3len2_seed82585
+[13:34:48] Attention analysis completed: addition_a1b1_d64l3r4h1_P127_tr64ood128_miss0.3len2_seed82585
+[13:34:48] Experiment completed: addition_a1b1_d64l3r4h1_P127_tr64ood128_miss0.3len2_seed82585 (832s), log: /data/cxm/recursion/addition_p127_tr64_ood128_misslen_l3plus/logs/addition_a1b1_d64l3r4h1_P127_tr64ood128_miss0.3len2_seed82585.log
+[13:34:48] Start experiment: addition_a1b1_d64l4r4h1_P127_tr64ood128_miss0.1len2_seed44536 on cuda:5
+[13:35:43] Start attention analysis: addition_a1b1_d64l3r4h1_P127_tr64ood128_miss0.3len2_seed44536
+[13:35:45] Attention analysis completed: addition_a1b1_d64l3r4h1_P127_tr64ood128_miss0.3len2_seed44536
+[13:35:45] Experiment completed: addition_a1b1_d64l3r4h1_P127_tr64ood128_miss0.3len2_seed44536 (1858s), log: /data/cxm/recursion/addition_p127_tr64_ood128_misslen_l3plus/logs/addition_a1b1_d64l3r4h1_P127_tr64ood128_miss0.3len2_seed44536.log
+[13:35:45] Start experiment: addition_a1b1_d64l4r4h1_P127_tr64ood128_miss0.1len2_seed62513 on cuda:3
+[13:36:46] Start attention analysis: addition_a1b1_d64l3r4h1_P127_tr64ood128_miss0.3len2_seed64154
+[13:36:47] Attention analysis completed: addition_a1b1_d64l3r4h1_P127_tr64ood128_miss0.3len2_seed64154
+[13:36:47] Experiment completed: addition_a1b1_d64l3r4h1_P127_tr64ood128_miss0.3len2_seed64154 (1453s), log: /data/cxm/recursion/addition_p127_tr64_ood128_misslen_l3plus/logs/addition_a1b1_d64l3r4h1_P127_tr64ood128_miss0.3len2_seed64154.log
+[13:36:47] Start experiment: addition_a1b1_d64l4r4h1_P127_tr64ood128_miss0.1len2_seed64154 on cuda:0
+[14:07:31] Start attention analysis: addition_a1b1_d64l4r4h1_P127_tr64ood128_miss0.1len2_seed34789
+[14:07:33] Attention analysis completed: addition_a1b1_d64l4r4h1_P127_tr64ood128_miss0.1len2_seed34789
+[14:07:33] Experiment completed: addition_a1b1_d64l4r4h1_P127_tr64ood128_miss0.1len2_seed34789 (2158s), log: /data/cxm/recursion/addition_p127_tr64_ood128_misslen_l3plus/logs/addition_a1b1_d64l4r4h1_P127_tr64ood128_miss0.1len2_seed34789.log
+[14:07:33] Start experiment: addition_a1b1_d64l4r4h1_P127_tr64ood128_miss0.1len2_seed72814 on cuda:1
+[14:13:48] Start attention analysis: addition_a1b1_d64l3r4h1_P127_tr64ood128_miss0.3len2_seed18318
+[14:13:50] Attention analysis completed: addition_a1b1_d64l3r4h1_P127_tr64ood128_miss0.3len2_seed18318
+[14:13:50] Experiment completed: addition_a1b1_d64l3r4h1_P127_tr64ood128_miss0.3len2_seed18318 (5795s), log: /data/cxm/recursion/addition_p127_tr64_ood128_misslen_l3plus/logs/addition_a1b1_d64l3r4h1_P127_tr64ood128_miss0.3len2_seed18318.log
+[14:13:50] Start experiment: addition_a1b1_d64l4r4h1_P127_tr64ood128_miss0.1len2_seed82585 on cuda:6
+[14:15:33] Start attention analysis: addition_a1b1_d64l4r4h1_P127_tr64ood128_miss0.1len2_seed44536
+[14:15:35] Attention analysis completed: addition_a1b1_d64l4r4h1_P127_tr64ood128_miss0.1len2_seed44536
+[14:15:35] Experiment completed: addition_a1b1_d64l4r4h1_P127_tr64ood128_miss0.1len2_seed44536 (2447s), log: /data/cxm/recursion/addition_p127_tr64_ood128_misslen_l3plus/logs/addition_a1b1_d64l4r4h1_P127_tr64ood128_miss0.1len2_seed44536.log
+[14:15:35] Start experiment: addition_a1b1_d64l4r4h1_P127_tr64ood128_miss0.2len2_seed17996 on cuda:5
+[14:26:28] Start attention analysis: addition_a1b1_d64l4r4h1_P127_tr64ood128_miss0.1len2_seed64154
+[14:26:30] Attention analysis completed: addition_a1b1_d64l4r4h1_P127_tr64ood128_miss0.1len2_seed64154
+[14:26:30] Experiment completed: addition_a1b1_d64l4r4h1_P127_tr64ood128_miss0.1len2_seed64154 (2983s), log: /data/cxm/recursion/addition_p127_tr64_ood128_misslen_l3plus/logs/addition_a1b1_d64l4r4h1_P127_tr64ood128_miss0.1len2_seed64154.log
+[14:26:30] Start experiment: addition_a1b1_d64l4r4h1_P127_tr64ood128_miss0.2len2_seed18318 on cuda:0
+[14:27:53] Start attention analysis: addition_a1b1_d64l3r4h1_P127_tr64ood128_miss0.3len2_seed17996
+[14:27:55] Attention analysis completed: addition_a1b1_d64l3r4h1_P127_tr64ood128_miss0.3len2_seed17996
+[14:27:55] Experiment completed: addition_a1b1_d64l3r4h1_P127_tr64ood128_miss0.3len2_seed17996 (6747s), log: /data/cxm/recursion/addition_p127_tr64_ood128_misslen_l3plus/logs/addition_a1b1_d64l3r4h1_P127_tr64ood128_miss0.3len2_seed17996.log
+[14:27:55] Start experiment: addition_a1b1_d64l4r4h1_P127_tr64ood128_miss0.2len2_seed34789 on cuda:7
+[14:40:40] Start attention analysis: addition_a1b1_d64l4r4h1_P127_tr64ood128_miss0.1len2_seed72814
+[14:40:42] Attention analysis completed: addition_a1b1_d64l4r4h1_P127_tr64ood128_miss0.1len2_seed72814
+[14:40:42] Experiment completed: addition_a1b1_d64l4r4h1_P127_tr64ood128_miss0.1len2_seed72814 (1989s), log: /data/cxm/recursion/addition_p127_tr64_ood128_misslen_l3plus/logs/addition_a1b1_d64l4r4h1_P127_tr64ood128_miss0.1len2_seed72814.log
+[14:40:42] Start experiment: addition_a1b1_d64l4r4h1_P127_tr64ood128_miss0.2len2_seed44536 on cuda:1
+[14:41:16] Start attention analysis: addition_a1b1_d64l4r4h1_P127_tr64ood128_miss0.1len2_seed62513
+[14:41:18] Attention analysis completed: addition_a1b1_d64l4r4h1_P127_tr64ood128_miss0.1len2_seed62513
+[14:41:18] Experiment completed: addition_a1b1_d64l4r4h1_P127_tr64ood128_miss0.1len2_seed62513 (3933s), log: /data/cxm/recursion/addition_p127_tr64_ood128_misslen_l3plus/logs/addition_a1b1_d64l4r4h1_P127_tr64ood128_miss0.1len2_seed62513.log
+[14:41:18] Start experiment: addition_a1b1_d64l4r4h1_P127_tr64ood128_miss0.2len2_seed62513 on cuda:3
+[15:07:09] Start attention analysis: addition_a1b1_d64l4r4h1_P127_tr64ood128_miss0.2len2_seed34789
+[15:07:11] Attention analysis completed: addition_a1b1_d64l4r4h1_P127_tr64ood128_miss0.2len2_seed34789
+[15:07:11] Experiment completed: addition_a1b1_d64l4r4h1_P127_tr64ood128_miss0.2len2_seed34789 (2356s), log: /data/cxm/recursion/addition_p127_tr64_ood128_misslen_l3plus/logs/addition_a1b1_d64l4r4h1_P127_tr64ood128_miss0.2len2_seed34789.log
+[15:07:11] Start experiment: addition_a1b1_d64l4r4h1_P127_tr64ood128_miss0.2len2_seed64154 on cuda:7
+[15:11:28] Start attention analysis: addition_a1b1_d64l4r4h1_P127_tr64ood128_miss0.2len2_seed18318
+[15:11:30] Attention analysis completed: addition_a1b1_d64l4r4h1_P127_tr64ood128_miss0.2len2_seed18318
+[15:11:30] Experiment completed: addition_a1b1_d64l4r4h1_P127_tr64ood128_miss0.2len2_seed18318 (2700s), log: /data/cxm/recursion/addition_p127_tr64_ood128_misslen_l3plus/logs/addition_a1b1_d64l4r4h1_P127_tr64ood128_miss0.2len2_seed18318.log
+[15:11:30] Start experiment: addition_a1b1_d64l4r4h1_P127_tr64ood128_miss0.2len2_seed72814 on cuda:0
+[15:20:27] Start attention analysis: addition_a1b1_d64l4r4h1_P127_tr64ood128_miss0.2len2_seed44536
+[15:20:30] Attention analysis completed: addition_a1b1_d64l4r4h1_P127_tr64ood128_miss0.2len2_seed44536
+[15:20:30] Experiment completed: addition_a1b1_d64l4r4h1_P127_tr64ood128_miss0.2len2_seed44536 (2387s), log: /data/cxm/recursion/addition_p127_tr64_ood128_misslen_l3plus/logs/addition_a1b1_d64l4r4h1_P127_tr64ood128_miss0.2len2_seed44536.log
+[15:20:30] Start experiment: addition_a1b1_d64l4r4h1_P127_tr64ood128_miss0.2len2_seed82585 on cuda:1
+[15:22:19] Start attention analysis: addition_a1b1_d64l4r4h1_P127_tr64ood128_miss0.2len2_seed17996
+[15:22:20] Attention analysis completed: addition_a1b1_d64l4r4h1_P127_tr64ood128_miss0.2len2_seed17996
+[15:22:20] Experiment completed: addition_a1b1_d64l4r4h1_P127_tr64ood128_miss0.2len2_seed17996 (4005s), log: /data/cxm/recursion/addition_p127_tr64_ood128_misslen_l3plus/logs/addition_a1b1_d64l4r4h1_P127_tr64ood128_miss0.2len2_seed17996.log
+[15:22:20] Start experiment: addition_a1b1_d64l4r4h1_P127_tr64ood128_miss0.3len2_seed17996 on cuda:5
+[15:28:44] Start attention analysis: addition_a1b1_d64l4r4h1_P127_tr64ood128_miss0.1len2_seed82585
+[15:28:46] Attention analysis completed: addition_a1b1_d64l4r4h1_P127_tr64ood128_miss0.1len2_seed82585
+[15:28:46] Experiment completed: addition_a1b1_d64l4r4h1_P127_tr64ood128_miss0.1len2_seed82585 (4496s), log: /data/cxm/recursion/addition_p127_tr64_ood128_misslen_l3plus/logs/addition_a1b1_d64l4r4h1_P127_tr64ood128_miss0.1len2_seed82585.log
+[15:28:46] Start experiment: addition_a1b1_d64l4r4h1_P127_tr64ood128_miss0.3len2_seed18318 on cuda:6
+[15:29:25] Start attention analysis: addition_a1b1_d64l4r4h1_P127_tr64ood128_miss0.1len2_seed18318
+[15:29:27] Attention analysis completed: addition_a1b1_d64l4r4h1_P127_tr64ood128_miss0.1len2_seed18318
+[15:29:27] Experiment completed: addition_a1b1_d64l4r4h1_P127_tr64ood128_miss0.1len2_seed18318 (7232s), log: /data/cxm/recursion/addition_p127_tr64_ood128_misslen_l3plus/logs/addition_a1b1_d64l4r4h1_P127_tr64ood128_miss0.1len2_seed18318.log
+[15:29:27] Start experiment: addition_a1b1_d64l4r4h1_P127_tr64ood128_miss0.3len2_seed34789 on cuda:4
+[15:43:18] Start attention analysis: addition_a1b1_d64l4r4h1_P127_tr64ood128_miss0.2len2_seed64154
+[15:43:20] Attention analysis completed: addition_a1b1_d64l4r4h1_P127_tr64ood128_miss0.2len2_seed64154
+[15:43:20] Experiment completed: addition_a1b1_d64l4r4h1_P127_tr64ood128_miss0.2len2_seed64154 (2170s), log: /data/cxm/recursion/addition_p127_tr64_ood128_misslen_l3plus/logs/addition_a1b1_d64l4r4h1_P127_tr64ood128_miss0.2len2_seed64154.log
+[15:43:20] Start experiment: addition_a1b1_d64l4r4h1_P127_tr64ood128_miss0.3len2_seed44536 on cuda:7
+[16:00:43] Start attention analysis: addition_a1b1_d64l4r4h1_P127_tr64ood128_miss0.1len2_seed17996
+[16:00:45] Attention analysis completed: addition_a1b1_d64l4r4h1_P127_tr64ood128_miss0.1len2_seed17996
+[16:00:45] Experiment completed: addition_a1b1_d64l4r4h1_P127_tr64ood128_miss0.1len2_seed17996 (9519s), log: /data/cxm/recursion/addition_p127_tr64_ood128_misslen_l3plus/logs/addition_a1b1_d64l4r4h1_P127_tr64ood128_miss0.1len2_seed17996.log
+[16:00:45] Start experiment: addition_a1b1_d64l4r4h1_P127_tr64ood128_miss0.3len2_seed62513 on cuda:2
+[16:10:17] Start attention analysis: addition_a1b1_d64l4r4h1_P127_tr64ood128_miss0.3len2_seed18318
+[16:10:19] Attention analysis completed: addition_a1b1_d64l4r4h1_P127_tr64ood128_miss0.3len2_seed18318
+[16:10:19] Experiment completed: addition_a1b1_d64l4r4h1_P127_tr64ood128_miss0.3len2_seed18318 (2494s), log: /data/cxm/recursion/addition_p127_tr64_ood128_misslen_l3plus/logs/addition_a1b1_d64l4r4h1_P127_tr64ood128_miss0.3len2_seed18318.log
+[16:10:19] Start experiment: addition_a1b1_d64l4r4h1_P127_tr64ood128_miss0.3len2_seed64154 on cuda:6
+[16:13:09] Start attention analysis: addition_a1b1_d64l4r4h1_P127_tr64ood128_miss0.3len2_seed34789
+[16:13:11] Attention analysis completed: addition_a1b1_d64l4r4h1_P127_tr64ood128_miss0.3len2_seed34789
+[16:13:11] Experiment completed: addition_a1b1_d64l4r4h1_P127_tr64ood128_miss0.3len2_seed34789 (2624s), log: /data/cxm/recursion/addition_p127_tr64_ood128_misslen_l3plus/logs/addition_a1b1_d64l4r4h1_P127_tr64ood128_miss0.3len2_seed34789.log
+[16:13:11] Start experiment: addition_a1b1_d64l4r4h1_P127_tr64ood128_miss0.3len2_seed72814 on cuda:4
+[16:32:39] Start attention analysis: addition_a1b1_d64l4r4h1_P127_tr64ood128_miss0.3len2_seed17996
+[16:32:41] Attention analysis completed: addition_a1b1_d64l4r4h1_P127_tr64ood128_miss0.3len2_seed17996
+[16:32:41] Experiment completed: addition_a1b1_d64l4r4h1_P127_tr64ood128_miss0.3len2_seed17996 (4221s), log: /data/cxm/recursion/addition_p127_tr64_ood128_misslen_l3plus/logs/addition_a1b1_d64l4r4h1_P127_tr64ood128_miss0.3len2_seed17996.log
+[16:32:41] Start experiment: addition_a1b1_d64l4r4h1_P127_tr64ood128_miss0.3len2_seed82585 on cuda:5
+[16:42:14] Start attention analysis: addition_a1b1_d64l4r4h1_P127_tr64ood128_miss0.3len2_seed62513
+[16:42:16] Attention analysis completed: addition_a1b1_d64l4r4h1_P127_tr64ood128_miss0.3len2_seed62513
+[16:42:16] Experiment completed: addition_a1b1_d64l4r4h1_P127_tr64ood128_miss0.3len2_seed62513 (2491s), log: /data/cxm/recursion/addition_p127_tr64_ood128_misslen_l3plus/logs/addition_a1b1_d64l4r4h1_P127_tr64ood128_miss0.3len2_seed62513.log
+[16:42:16] Start experiment: addition_a1b1_d64l3r4h1_P127_tr64ood128_miss0.1len3_seed17996 on cuda:2
+[16:44:58] Start attention analysis: addition_a1b1_d64l4r4h1_P127_tr64ood128_miss0.2len2_seed82585
+[16:45:00] Attention analysis completed: addition_a1b1_d64l4r4h1_P127_tr64ood128_miss0.2len2_seed82585
+[16:45:00] Experiment completed: addition_a1b1_d64l4r4h1_P127_tr64ood128_miss0.2len2_seed82585 (5070s), log: /data/cxm/recursion/addition_p127_tr64_ood128_misslen_l3plus/logs/addition_a1b1_d64l4r4h1_P127_tr64ood128_miss0.2len2_seed82585.log
+[16:45:00] Start experiment: addition_a1b1_d64l3r4h1_P127_tr64ood128_miss0.1len3_seed18318 on cuda:1
+[16:59:03] Start attention analysis: addition_a1b1_d64l3r4h1_P127_tr64ood128_miss0.1len3_seed17996
+[16:59:05] Attention analysis completed: addition_a1b1_d64l3r4h1_P127_tr64ood128_miss0.1len3_seed17996
+[16:59:05] Experiment completed: addition_a1b1_d64l3r4h1_P127_tr64ood128_miss0.1len3_seed17996 (1009s), log: /data/cxm/recursion/addition_p127_tr64_ood128_misslen_l3plus/logs/addition_a1b1_d64l3r4h1_P127_tr64ood128_miss0.1len3_seed17996.log
+[16:59:05] Start experiment: addition_a1b1_d64l3r4h1_P127_tr64ood128_miss0.1len3_seed34789 on cuda:2
+[17:02:21] Start attention analysis: addition_a1b1_d64l4r4h1_P127_tr64ood128_miss0.3len2_seed72814
+[17:02:23] Attention analysis completed: addition_a1b1_d64l4r4h1_P127_tr64ood128_miss0.3len2_seed72814
+[17:02:23] Experiment completed: addition_a1b1_d64l4r4h1_P127_tr64ood128_miss0.3len2_seed72814 (2952s), log: /data/cxm/recursion/addition_p127_tr64_ood128_misslen_l3plus/logs/addition_a1b1_d64l4r4h1_P127_tr64ood128_miss0.3len2_seed72814.log
+[17:02:23] Start experiment: addition_a1b1_d64l3r4h1_P127_tr64ood128_miss0.1len3_seed44536 on cuda:4
+[17:02:42] Start attention analysis: addition_a1b1_d64l4r4h1_P127_tr64ood128_miss0.3len2_seed44536
+[17:02:43] Attention analysis completed: addition_a1b1_d64l4r4h1_P127_tr64ood128_miss0.3len2_seed44536
+[17:02:43] Experiment completed: addition_a1b1_d64l4r4h1_P127_tr64ood128_miss0.3len2_seed44536 (4763s), log: /data/cxm/recursion/addition_p127_tr64_ood128_misslen_l3plus/logs/addition_a1b1_d64l4r4h1_P127_tr64ood128_miss0.3len2_seed44536.log
+[17:02:43] Start experiment: addition_a1b1_d64l3r4h1_P127_tr64ood128_miss0.1len3_seed62513 on cuda:7
+[17:10:12] Start attention analysis: addition_a1b1_d64l3r4h1_P127_tr64ood128_miss0.1len3_seed18318
+[17:10:14] Attention analysis completed: addition_a1b1_d64l3r4h1_P127_tr64ood128_miss0.1len3_seed18318
+[17:10:14] Experiment completed: addition_a1b1_d64l3r4h1_P127_tr64ood128_miss0.1len3_seed18318 (1514s), log: /data/cxm/recursion/addition_p127_tr64_ood128_misslen_l3plus/logs/addition_a1b1_d64l3r4h1_P127_tr64ood128_miss0.1len3_seed18318.log
+[17:10:14] Start experiment: addition_a1b1_d64l3r4h1_P127_tr64ood128_miss0.1len3_seed64154 on cuda:1
+[18:00:11] Start attention analysis: addition_a1b1_d64l3r4h1_P127_tr64ood128_miss0.1len3_seed44536
+[18:00:14] Attention analysis completed: addition_a1b1_d64l3r4h1_P127_tr64ood128_miss0.1len3_seed44536
+[18:00:14] Experiment completed: addition_a1b1_d64l3r4h1_P127_tr64ood128_miss0.1len3_seed44536 (3470s), log: /data/cxm/recursion/addition_p127_tr64_ood128_misslen_l3plus/logs/addition_a1b1_d64l3r4h1_P127_tr64ood128_miss0.1len3_seed44536.log
+[18:00:14] Start experiment: addition_a1b1_d64l3r4h1_P127_tr64ood128_miss0.1len3_seed72814 on cuda:4
+[18:52:29] Start attention analysis: addition_a1b1_d64l3r4h1_P127_tr64ood128_miss0.1len3_seed62513
+[18:52:32] Attention analysis completed: addition_a1b1_d64l3r4h1_P127_tr64ood128_miss0.1len3_seed62513
+[18:52:32] Experiment completed: addition_a1b1_d64l3r4h1_P127_tr64ood128_miss0.1len3_seed62513 (6589s), log: /data/cxm/recursion/addition_p127_tr64_ood128_misslen_l3plus/logs/addition_a1b1_d64l3r4h1_P127_tr64ood128_miss0.1len3_seed62513.log
+[18:52:32] Start experiment: addition_a1b1_d64l3r4h1_P127_tr64ood128_miss0.1len3_seed82585 on cuda:7
+[19:24:14] Start attention analysis: addition_a1b1_d64l3r4h1_P127_tr64ood128_miss0.1len3_seed64154
+[19:24:17] Attention analysis completed: addition_a1b1_d64l3r4h1_P127_tr64ood128_miss0.1len3_seed64154
+[19:24:17] Experiment completed: addition_a1b1_d64l3r4h1_P127_tr64ood128_miss0.1len3_seed64154 (8042s), log: /data/cxm/recursion/addition_p127_tr64_ood128_misslen_l3plus/logs/addition_a1b1_d64l3r4h1_P127_tr64ood128_miss0.1len3_seed64154.log
+[19:24:17] Start experiment: addition_a1b1_d64l3r4h1_P127_tr64ood128_miss0.2len3_seed17996 on cuda:1
+[19:26:47] Start attention analysis: addition_a1b1_d64l4r4h1_P127_tr64ood128_miss0.3len2_seed64154
+[19:26:49] Attention analysis completed: addition_a1b1_d64l4r4h1_P127_tr64ood128_miss0.3len2_seed64154
+[19:26:49] Experiment completed: addition_a1b1_d64l4r4h1_P127_tr64ood128_miss0.3len2_seed64154 (11790s), log: /data/cxm/recursion/addition_p127_tr64_ood128_misslen_l3plus/logs/addition_a1b1_d64l4r4h1_P127_tr64ood128_miss0.3len2_seed64154.log
+[19:26:49] Start experiment: addition_a1b1_d64l3r4h1_P127_tr64ood128_miss0.2len3_seed18318 on cuda:6
+[19:27:52] Start attention analysis: addition_a1b1_d64l4r4h1_P127_tr64ood128_miss0.2len2_seed72814
+[19:27:55] Attention analysis completed: addition_a1b1_d64l4r4h1_P127_tr64ood128_miss0.2len2_seed72814
+[19:27:55] Experiment completed: addition_a1b1_d64l4r4h1_P127_tr64ood128_miss0.2len2_seed72814 (15385s), log: /data/cxm/recursion/addition_p127_tr64_ood128_misslen_l3plus/logs/addition_a1b1_d64l4r4h1_P127_tr64ood128_miss0.2len2_seed72814.log
+[19:27:55] Start experiment: addition_a1b1_d64l3r4h1_P127_tr64ood128_miss0.2len3_seed34789 on cuda:0
+[19:38:57] Start attention analysis: addition_a1b1_d64l4r4h1_P127_tr64ood128_miss0.2len2_seed62513
+[19:38:59] Attention analysis completed: addition_a1b1_d64l4r4h1_P127_tr64ood128_miss0.2len2_seed62513
+[19:38:59] Experiment completed: addition_a1b1_d64l4r4h1_P127_tr64ood128_miss0.2len2_seed62513 (17861s), log: /data/cxm/recursion/addition_p127_tr64_ood128_misslen_l3plus/logs/addition_a1b1_d64l4r4h1_P127_tr64ood128_miss0.2len2_seed62513.log
+[19:38:59] Start experiment: addition_a1b1_d64l3r4h1_P127_tr64ood128_miss0.2len3_seed44536 on cuda:3
+[20:30:16] Start attention analysis: addition_a1b1_d64l3r4h1_P127_tr64ood128_miss0.1len3_seed82585
+[20:30:18] Attention analysis completed: addition_a1b1_d64l3r4h1_P127_tr64ood128_miss0.1len3_seed82585
+[20:30:18] Experiment completed: addition_a1b1_d64l3r4h1_P127_tr64ood128_miss0.1len3_seed82585 (5866s), log: /data/cxm/recursion/addition_p127_tr64_ood128_misslen_l3plus/logs/addition_a1b1_d64l3r4h1_P127_tr64ood128_miss0.1len3_seed82585.log
+[20:30:18] Start experiment: addition_a1b1_d64l3r4h1_P127_tr64ood128_miss0.2len3_seed62513 on cuda:7
+[20:52:22] Start attention analysis: addition_a1b1_d64l3r4h1_P127_tr64ood128_miss0.2len3_seed17996
+[20:52:24] Attention analysis completed: addition_a1b1_d64l3r4h1_P127_tr64ood128_miss0.2len3_seed17996
+[20:52:24] Experiment completed: addition_a1b1_d64l3r4h1_P127_tr64ood128_miss0.2len3_seed17996 (5287s), log: /data/cxm/recursion/addition_p127_tr64_ood128_misslen_l3plus/logs/addition_a1b1_d64l3r4h1_P127_tr64ood128_miss0.2len3_seed17996.log
+[20:52:24] Start experiment: addition_a1b1_d64l3r4h1_P127_tr64ood128_miss0.2len3_seed64154 on cuda:1
+[21:02:43] Start attention analysis: addition_a1b1_d64l3r4h1_P127_tr64ood128_miss0.1len3_seed34789
+[21:02:45] Attention analysis completed: addition_a1b1_d64l3r4h1_P127_tr64ood128_miss0.1len3_seed34789
+[21:02:45] Experiment completed: addition_a1b1_d64l3r4h1_P127_tr64ood128_miss0.1len3_seed34789 (14620s), log: /data/cxm/recursion/addition_p127_tr64_ood128_misslen_l3plus/logs/addition_a1b1_d64l3r4h1_P127_tr64ood128_miss0.1len3_seed34789.log
+[21:02:45] Start experiment: addition_a1b1_d64l3r4h1_P127_tr64ood128_miss0.2len3_seed72814 on cuda:2
+[21:08:28] Start attention analysis: addition_a1b1_d64l3r4h1_P127_tr64ood128_miss0.2len3_seed34789
+[21:08:31] Attention analysis completed: addition_a1b1_d64l3r4h1_P127_tr64ood128_miss0.2len3_seed34789
+[21:08:31] Experiment completed: addition_a1b1_d64l3r4h1_P127_tr64ood128_miss0.2len3_seed34789 (6036s), log: /data/cxm/recursion/addition_p127_tr64_ood128_misslen_l3plus/logs/addition_a1b1_d64l3r4h1_P127_tr64ood128_miss0.2len3_seed34789.log
+[21:08:31] Start experiment: addition_a1b1_d64l3r4h1_P127_tr64ood128_miss0.2len3_seed82585 on cuda:0
+[21:48:07] Start attention analysis: addition_a1b1_d64l3r4h1_P127_tr64ood128_miss0.2len3_seed44536
+[21:48:10] Attention analysis completed: addition_a1b1_d64l3r4h1_P127_tr64ood128_miss0.2len3_seed44536
+[21:48:10] Experiment completed: addition_a1b1_d64l3r4h1_P127_tr64ood128_miss0.2len3_seed44536 (7750s), log: /data/cxm/recursion/addition_p127_tr64_ood128_misslen_l3plus/logs/addition_a1b1_d64l3r4h1_P127_tr64ood128_miss0.2len3_seed44536.log
+[21:48:10] Start experiment: addition_a1b1_d64l3r4h1_P127_tr64ood128_miss0.3len3_seed17996 on cuda:3
+[22:24:00] Start attention analysis: addition_a1b1_d64l3r4h1_P127_tr64ood128_miss0.2len3_seed82585
+[22:24:03] Attention analysis completed: addition_a1b1_d64l3r4h1_P127_tr64ood128_miss0.2len3_seed82585
+[22:24:03] Experiment completed: addition_a1b1_d64l3r4h1_P127_tr64ood128_miss0.2len3_seed82585 (4532s), log: /data/cxm/recursion/addition_p127_tr64_ood128_misslen_l3plus/logs/addition_a1b1_d64l3r4h1_P127_tr64ood128_miss0.2len3_seed82585.log
+[22:24:03] Start experiment: addition_a1b1_d64l3r4h1_P127_tr64ood128_miss0.3len3_seed18318 on cuda:0
+[22:31:54] Start attention analysis: addition_a1b1_d64l4r4h1_P127_tr64ood128_miss0.3len2_seed82585
+[22:31:56] Attention analysis completed: addition_a1b1_d64l4r4h1_P127_tr64ood128_miss0.3len2_seed82585
+[22:31:56] Experiment completed: addition_a1b1_d64l4r4h1_P127_tr64ood128_miss0.3len2_seed82585 (21555s), log: /data/cxm/recursion/addition_p127_tr64_ood128_misslen_l3plus/logs/addition_a1b1_d64l4r4h1_P127_tr64ood128_miss0.3len2_seed82585.log
+[22:31:56] Start experiment: addition_a1b1_d64l3r4h1_P127_tr64ood128_miss0.3len3_seed34789 on cuda:5
+[22:39:10] Start attention analysis: addition_a1b1_d64l3r4h1_P127_tr64ood128_miss0.2len3_seed72814
+[22:39:13] Attention analysis completed: addition_a1b1_d64l3r4h1_P127_tr64ood128_miss0.2len3_seed72814
+[22:39:13] Experiment completed: addition_a1b1_d64l3r4h1_P127_tr64ood128_miss0.2len3_seed72814 (5787s), log: /data/cxm/recursion/addition_p127_tr64_ood128_misslen_l3plus/logs/addition_a1b1_d64l3r4h1_P127_tr64ood128_miss0.2len3_seed72814.log
+[22:39:13] Start experiment: addition_a1b1_d64l3r4h1_P127_tr64ood128_miss0.3len3_seed44536 on cuda:2
+[23:27:13] Start attention analysis: addition_a1b1_d64l3r4h1_P127_tr64ood128_miss0.2len3_seed18318
+[23:27:16] Attention analysis completed: addition_a1b1_d64l3r4h1_P127_tr64ood128_miss0.2len3_seed18318
+[23:27:16] Experiment completed: addition_a1b1_d64l3r4h1_P127_tr64ood128_miss0.2len3_seed18318 (14426s), log: /data/cxm/recursion/addition_p127_tr64_ood128_misslen_l3plus/logs/addition_a1b1_d64l3r4h1_P127_tr64ood128_miss0.2len3_seed18318.log
+[23:27:16] Start experiment: addition_a1b1_d64l3r4h1_P127_tr64ood128_miss0.3len3_seed62513 on cuda:6
+[23:53:41] Start attention analysis: addition_a1b1_d64l3r4h1_P127_tr64ood128_miss0.3len3_seed44536
+[23:53:43] Attention analysis completed: addition_a1b1_d64l3r4h1_P127_tr64ood128_miss0.3len3_seed44536
+[23:53:43] Experiment completed: addition_a1b1_d64l3r4h1_P127_tr64ood128_miss0.3len3_seed44536 (4471s), log: /data/cxm/recursion/addition_p127_tr64_ood128_misslen_l3plus/logs/addition_a1b1_d64l3r4h1_P127_tr64ood128_miss0.3len3_seed44536.log
+[23:53:43] Start experiment: addition_a1b1_d64l3r4h1_P127_tr64ood128_miss0.3len3_seed64154 on cuda:2
+[23:57:17] Start attention analysis: addition_a1b1_d64l3r4h1_P127_tr64ood128_miss0.3len3_seed18318
+[23:57:20] Attention analysis completed: addition_a1b1_d64l3r4h1_P127_tr64ood128_miss0.3len3_seed18318
+[23:57:20] Experiment completed: addition_a1b1_d64l3r4h1_P127_tr64ood128_miss0.3len3_seed18318 (5597s), log: /data/cxm/recursion/addition_p127_tr64_ood128_misslen_l3plus/logs/addition_a1b1_d64l3r4h1_P127_tr64ood128_miss0.3len3_seed18318.log
+[23:57:20] Start experiment: addition_a1b1_d64l3r4h1_P127_tr64ood128_miss0.3len3_seed72814 on cuda:0
+[00:22:48] Start attention analysis: addition_a1b1_d64l3r4h1_P127_tr64ood128_miss0.3len3_seed17996
+[00:22:51] Attention analysis completed: addition_a1b1_d64l3r4h1_P127_tr64ood128_miss0.3len3_seed17996
+[00:22:51] Experiment completed: addition_a1b1_d64l3r4h1_P127_tr64ood128_miss0.3len3_seed17996 (9281s), log: /data/cxm/recursion/addition_p127_tr64_ood128_misslen_l3plus/logs/addition_a1b1_d64l3r4h1_P127_tr64ood128_miss0.3len3_seed17996.log
+[00:22:51] Start experiment: addition_a1b1_d64l3r4h1_P127_tr64ood128_miss0.3len3_seed82585 on cuda:3
+[00:56:39] Start attention analysis: addition_a1b1_d64l3r4h1_P127_tr64ood128_miss0.3len3_seed72814
+[00:56:41] Start attention analysis: addition_a1b1_d64l3r4h1_P127_tr64ood128_miss0.2len3_seed62513
+[00:56:42] Attention analysis completed: addition_a1b1_d64l3r4h1_P127_tr64ood128_miss0.3len3_seed72814
+[00:56:42] Experiment completed: addition_a1b1_d64l3r4h1_P127_tr64ood128_miss0.3len3_seed72814 (3563s), log: /data/cxm/recursion/addition_p127_tr64_ood128_misslen_l3plus/logs/addition_a1b1_d64l3r4h1_P127_tr64ood128_miss0.3len3_seed72814.log
+[00:56:42] Start experiment: addition_a1b1_d64l4r4h1_P127_tr64ood128_miss0.1len3_seed17996 on cuda:0
+[00:56:44] Attention analysis completed: addition_a1b1_d64l3r4h1_P127_tr64ood128_miss0.2len3_seed62513
+[00:56:44] Experiment completed: addition_a1b1_d64l3r4h1_P127_tr64ood128_miss0.2len3_seed62513 (15986s), log: /data/cxm/recursion/addition_p127_tr64_ood128_misslen_l3plus/logs/addition_a1b1_d64l3r4h1_P127_tr64ood128_miss0.2len3_seed62513.log
+[00:56:44] Start experiment: addition_a1b1_d64l4r4h1_P127_tr64ood128_miss0.1len3_seed18318 on cuda:7
+[01:40:51] Start attention analysis: addition_a1b1_d64l3r4h1_P127_tr64ood128_miss0.3len3_seed64154
+[01:40:54] Attention analysis completed: addition_a1b1_d64l3r4h1_P127_tr64ood128_miss0.3len3_seed64154
+[01:40:54] Experiment completed: addition_a1b1_d64l3r4h1_P127_tr64ood128_miss0.3len3_seed64154 (6430s), log: /data/cxm/recursion/addition_p127_tr64_ood128_misslen_l3plus/logs/addition_a1b1_d64l3r4h1_P127_tr64ood128_miss0.3len3_seed64154.log
+[01:40:54] Start experiment: addition_a1b1_d64l4r4h1_P127_tr64ood128_miss0.1len3_seed34789 on cuda:2
+[01:41:06] Start attention analysis: addition_a1b1_d64l3r4h1_P127_tr64ood128_miss0.3len3_seed82585
+[01:41:08] Attention analysis completed: addition_a1b1_d64l3r4h1_P127_tr64ood128_miss0.3len3_seed82585
+[01:41:08] Experiment completed: addition_a1b1_d64l3r4h1_P127_tr64ood128_miss0.3len3_seed82585 (4698s), log: /data/cxm/recursion/addition_p127_tr64_ood128_misslen_l3plus/logs/addition_a1b1_d64l3r4h1_P127_tr64ood128_miss0.3len3_seed82585.log
+[01:41:08] Start experiment: addition_a1b1_d64l4r4h1_P127_tr64ood128_miss0.1len3_seed44536 on cuda:3
+[02:02:00] Start attention analysis: addition_a1b1_d64l4r4h1_P127_tr64ood128_miss0.1len3_seed18318
+[02:02:03] Attention analysis completed: addition_a1b1_d64l4r4h1_P127_tr64ood128_miss0.1len3_seed18318
+[02:02:03] Experiment completed: addition_a1b1_d64l4r4h1_P127_tr64ood128_miss0.1len3_seed18318 (3919s), log: /data/cxm/recursion/addition_p127_tr64_ood128_misslen_l3plus/logs/addition_a1b1_d64l4r4h1_P127_tr64ood128_miss0.1len3_seed18318.log
+[02:02:03] Start experiment: addition_a1b1_d64l4r4h1_P127_tr64ood128_miss0.1len3_seed62513 on cuda:7
+[02:15:53] Start attention analysis: addition_a1b1_d64l3r4h1_P127_tr64ood128_miss0.1len3_seed72814
+[02:15:56] Attention analysis completed: addition_a1b1_d64l3r4h1_P127_tr64ood128_miss0.1len3_seed72814
+[02:15:56] Experiment completed: addition_a1b1_d64l3r4h1_P127_tr64ood128_miss0.1len3_seed72814 (29742s), log: /data/cxm/recursion/addition_p127_tr64_ood128_misslen_l3plus/logs/addition_a1b1_d64l3r4h1_P127_tr64ood128_miss0.1len3_seed72814.log
+[02:15:56] Start experiment: addition_a1b1_d64l4r4h1_P127_tr64ood128_miss0.1len3_seed64154 on cuda:4
+[02:57:25] Start attention analysis: addition_a1b1_d64l4r4h1_P127_tr64ood128_miss0.1len3_seed44536
+[02:57:28] Attention analysis completed: addition_a1b1_d64l4r4h1_P127_tr64ood128_miss0.1len3_seed44536
+[02:57:28] Experiment completed: addition_a1b1_d64l4r4h1_P127_tr64ood128_miss0.1len3_seed44536 (4580s), log: /data/cxm/recursion/addition_p127_tr64_ood128_misslen_l3plus/logs/addition_a1b1_d64l4r4h1_P127_tr64ood128_miss0.1len3_seed44536.log
+[02:57:28] Start experiment: addition_a1b1_d64l4r4h1_P127_tr64ood128_miss0.1len3_seed72814 on cuda:3
+[03:01:33] Start attention analysis: addition_a1b1_d64l3r4h1_P127_tr64ood128_miss0.3len3_seed62513
+[03:01:35] Attention analysis completed: addition_a1b1_d64l3r4h1_P127_tr64ood128_miss0.3len3_seed62513
+[03:01:35] Experiment completed: addition_a1b1_d64l3r4h1_P127_tr64ood128_miss0.3len3_seed62513 (12859s), log: /data/cxm/recursion/addition_p127_tr64_ood128_misslen_l3plus/logs/addition_a1b1_d64l3r4h1_P127_tr64ood128_miss0.3len3_seed62513.log
+[03:01:35] Start experiment: addition_a1b1_d64l4r4h1_P127_tr64ood128_miss0.1len3_seed82585 on cuda:6
+[04:14:01] Start attention analysis: addition_a1b1_d64l3r4h1_P127_tr64ood128_miss0.3len3_seed34789
+[04:14:03] Attention analysis completed: addition_a1b1_d64l3r4h1_P127_tr64ood128_miss0.3len3_seed34789
+[04:14:03] Experiment completed: addition_a1b1_d64l3r4h1_P127_tr64ood128_miss0.3len3_seed34789 (20527s), log: /data/cxm/recursion/addition_p127_tr64_ood128_misslen_l3plus/logs/addition_a1b1_d64l3r4h1_P127_tr64ood128_miss0.3len3_seed34789.log
+[04:14:03] Start experiment: addition_a1b1_d64l4r4h1_P127_tr64ood128_miss0.2len3_seed17996 on cuda:5
+[04:28:44] Start attention analysis: addition_a1b1_d64l4r4h1_P127_tr64ood128_miss0.1len3_seed17996
+[04:28:47] Attention analysis completed: addition_a1b1_d64l4r4h1_P127_tr64ood128_miss0.1len3_seed17996
+[04:28:47] Experiment completed: addition_a1b1_d64l4r4h1_P127_tr64ood128_miss0.1len3_seed17996 (12725s), log: /data/cxm/recursion/addition_p127_tr64_ood128_misslen_l3plus/logs/addition_a1b1_d64l4r4h1_P127_tr64ood128_miss0.1len3_seed17996.log
+[04:28:47] Start experiment: addition_a1b1_d64l4r4h1_P127_tr64ood128_miss0.2len3_seed18318 on cuda:0
+[05:09:53] Start attention analysis: addition_a1b1_d64l3r4h1_P127_tr64ood128_miss0.2len3_seed64154
+[05:09:55] Attention analysis completed: addition_a1b1_d64l3r4h1_P127_tr64ood128_miss0.2len3_seed64154
+[05:09:55] Experiment completed: addition_a1b1_d64l3r4h1_P127_tr64ood128_miss0.2len3_seed64154 (29851s), log: /data/cxm/recursion/addition_p127_tr64_ood128_misslen_l3plus/logs/addition_a1b1_d64l3r4h1_P127_tr64ood128_miss0.2len3_seed64154.log
+[05:09:55] Start experiment: addition_a1b1_d64l4r4h1_P127_tr64ood128_miss0.2len3_seed34789 on cuda:1
+[05:14:38] Start attention analysis: addition_a1b1_d64l4r4h1_P127_tr64ood128_miss0.1len3_seed34789
+[05:14:40] Attention analysis completed: addition_a1b1_d64l4r4h1_P127_tr64ood128_miss0.1len3_seed34789
+[05:14:40] Experiment completed: addition_a1b1_d64l4r4h1_P127_tr64ood128_miss0.1len3_seed34789 (12827s), log: /data/cxm/recursion/addition_p127_tr64_ood128_misslen_l3plus/logs/addition_a1b1_d64l4r4h1_P127_tr64ood128_miss0.1len3_seed34789.log
+[05:14:40] Start experiment: addition_a1b1_d64l4r4h1_P127_tr64ood128_miss0.2len3_seed44536 on cuda:2
+[05:48:46] Start attention analysis: addition_a1b1_d64l4r4h1_P127_tr64ood128_miss0.1len3_seed64154
+[05:48:49] Attention analysis completed: addition_a1b1_d64l4r4h1_P127_tr64ood128_miss0.1len3_seed64154
+[05:48:49] Experiment completed: addition_a1b1_d64l4r4h1_P127_tr64ood128_miss0.1len3_seed64154 (12773s), log: /data/cxm/recursion/addition_p127_tr64_ood128_misslen_l3plus/logs/addition_a1b1_d64l4r4h1_P127_tr64ood128_miss0.1len3_seed64154.log
+[05:48:49] Start experiment: addition_a1b1_d64l4r4h1_P127_tr64ood128_miss0.2len3_seed62513 on cuda:4
+[05:56:58] Start attention analysis: addition_a1b1_d64l4r4h1_P127_tr64ood128_miss0.1len3_seed82585
+[05:57:00] Attention analysis completed: addition_a1b1_d64l4r4h1_P127_tr64ood128_miss0.1len3_seed82585
+[05:57:00] Experiment completed: addition_a1b1_d64l4r4h1_P127_tr64ood128_miss0.1len3_seed82585 (10525s), log: /data/cxm/recursion/addition_p127_tr64_ood128_misslen_l3plus/logs/addition_a1b1_d64l4r4h1_P127_tr64ood128_miss0.1len3_seed82585.log
+[05:57:00] Start experiment: addition_a1b1_d64l4r4h1_P127_tr64ood128_miss0.2len3_seed64154 on cuda:6
+[07:34:37] Start attention analysis: addition_a1b1_d64l4r4h1_P127_tr64ood128_miss0.1len3_seed62513
+[07:34:40] Attention analysis completed: addition_a1b1_d64l4r4h1_P127_tr64ood128_miss0.1len3_seed62513
+[07:34:40] Experiment completed: addition_a1b1_d64l4r4h1_P127_tr64ood128_miss0.1len3_seed62513 (19957s), log: /data/cxm/recursion/addition_p127_tr64_ood128_misslen_l3plus/logs/addition_a1b1_d64l4r4h1_P127_tr64ood128_miss0.1len3_seed62513.log
+[07:34:40] Start experiment: addition_a1b1_d64l4r4h1_P127_tr64ood128_miss0.2len3_seed72814 on cuda:7
+[07:38:23] Start attention analysis: addition_a1b1_d64l4r4h1_P127_tr64ood128_miss0.2len3_seed62513
+[07:38:26] Attention analysis completed: addition_a1b1_d64l4r4h1_P127_tr64ood128_miss0.2len3_seed62513
+[07:38:26] Experiment completed: addition_a1b1_d64l4r4h1_P127_tr64ood128_miss0.2len3_seed62513 (6577s), log: /data/cxm/recursion/addition_p127_tr64_ood128_misslen_l3plus/logs/addition_a1b1_d64l4r4h1_P127_tr64ood128_miss0.2len3_seed62513.log
+[07:38:26] Start experiment: addition_a1b1_d64l4r4h1_P127_tr64ood128_miss0.2len3_seed82585 on cuda:4
+[08:12:14] Start attention analysis: addition_a1b1_d64l4r4h1_P127_tr64ood128_miss0.1len3_seed72814
+[08:12:16] Attention analysis completed: addition_a1b1_d64l4r4h1_P127_tr64ood128_miss0.1len3_seed72814
+[08:12:16] Experiment completed: addition_a1b1_d64l4r4h1_P127_tr64ood128_miss0.1len3_seed72814 (18888s), log: /data/cxm/recursion/addition_p127_tr64_ood128_misslen_l3plus/logs/addition_a1b1_d64l4r4h1_P127_tr64ood128_miss0.1len3_seed72814.log
+[08:12:16] Start experiment: addition_a1b1_d64l4r4h1_P127_tr64ood128_miss0.3len3_seed17996 on cuda:3
+[08:54:13] Start attention analysis: addition_a1b1_d64l4r4h1_P127_tr64ood128_miss0.2len3_seed44536
+[08:54:15] Attention analysis completed: addition_a1b1_d64l4r4h1_P127_tr64ood128_miss0.2len3_seed44536
+[08:54:15] Experiment completed: addition_a1b1_d64l4r4h1_P127_tr64ood128_miss0.2len3_seed44536 (13175s), log: /data/cxm/recursion/addition_p127_tr64_ood128_misslen_l3plus/logs/addition_a1b1_d64l4r4h1_P127_tr64ood128_miss0.2len3_seed44536.log
+[08:54:15] Start experiment: addition_a1b1_d64l4r4h1_P127_tr64ood128_miss0.3len3_seed18318 on cuda:2
+[09:00:40] Start attention analysis: addition_a1b1_d64l4r4h1_P127_tr64ood128_miss0.2len3_seed64154
+[09:00:43] Attention analysis completed: addition_a1b1_d64l4r4h1_P127_tr64ood128_miss0.2len3_seed64154
+[09:00:43] Experiment completed: addition_a1b1_d64l4r4h1_P127_tr64ood128_miss0.2len3_seed64154 (11023s), log: /data/cxm/recursion/addition_p127_tr64_ood128_misslen_l3plus/logs/addition_a1b1_d64l4r4h1_P127_tr64ood128_miss0.2len3_seed64154.log
+[09:00:43] Start experiment: addition_a1b1_d64l4r4h1_P127_tr64ood128_miss0.3len3_seed34789 on cuda:6
+[09:52:15] Start attention analysis: addition_a1b1_d64l4r4h1_P127_tr64ood128_miss0.2len3_seed72814
+[09:52:17] Attention analysis completed: addition_a1b1_d64l4r4h1_P127_tr64ood128_miss0.2len3_seed72814
+[09:52:17] Experiment completed: addition_a1b1_d64l4r4h1_P127_tr64ood128_miss0.2len3_seed72814 (8257s), log: /data/cxm/recursion/addition_p127_tr64_ood128_misslen_l3plus/logs/addition_a1b1_d64l4r4h1_P127_tr64ood128_miss0.2len3_seed72814.log
+[09:52:17] Start experiment: addition_a1b1_d64l4r4h1_P127_tr64ood128_miss0.3len3_seed44536 on cuda:7
+[10:17:36] Start attention analysis: addition_a1b1_d64l4r4h1_P127_tr64ood128_miss0.2len3_seed34789
+[10:17:38] Attention analysis completed: addition_a1b1_d64l4r4h1_P127_tr64ood128_miss0.2len3_seed34789
+[10:17:38] Experiment completed: addition_a1b1_d64l4r4h1_P127_tr64ood128_miss0.2len3_seed34789 (18463s), log: /data/cxm/recursion/addition_p127_tr64_ood128_misslen_l3plus/logs/addition_a1b1_d64l4r4h1_P127_tr64ood128_miss0.2len3_seed34789.log
+[10:17:38] Start experiment: addition_a1b1_d64l4r4h1_P127_tr64ood128_miss0.3len3_seed62513 on cuda:1
+[10:46:51] Start attention analysis: addition_a1b1_d64l4r4h1_P127_tr64ood128_miss0.2len3_seed17996
+[10:46:54] Attention analysis completed: addition_a1b1_d64l4r4h1_P127_tr64ood128_miss0.2len3_seed17996
+[10:46:54] Experiment completed: addition_a1b1_d64l4r4h1_P127_tr64ood128_miss0.2len3_seed17996 (23570s), log: /data/cxm/recursion/addition_p127_tr64_ood128_misslen_l3plus/logs/addition_a1b1_d64l4r4h1_P127_tr64ood128_miss0.2len3_seed17996.log
+[10:46:54] Start experiment: addition_a1b1_d64l4r4h1_P127_tr64ood128_miss0.3len3_seed64154 on cuda:5
+[11:02:21] Start attention analysis: addition_a1b1_d64l4r4h1_P127_tr64ood128_miss0.3len3_seed18318
+[11:02:24] Attention analysis completed: addition_a1b1_d64l4r4h1_P127_tr64ood128_miss0.3len3_seed18318
+[11:02:24] Experiment completed: addition_a1b1_d64l4r4h1_P127_tr64ood128_miss0.3len3_seed18318 (7689s), log: /data/cxm/recursion/addition_p127_tr64_ood128_misslen_l3plus/logs/addition_a1b1_d64l4r4h1_P127_tr64ood128_miss0.3len3_seed18318.log
+[11:02:24] Start experiment: addition_a1b1_d64l4r4h1_P127_tr64ood128_miss0.3len3_seed72814 on cuda:2
+[11:47:52] Start attention analysis: addition_a1b1_d64l4r4h1_P127_tr64ood128_miss0.3len3_seed44536
+[11:47:54] Attention analysis completed: addition_a1b1_d64l4r4h1_P127_tr64ood128_miss0.3len3_seed44536
+[11:47:54] Experiment completed: addition_a1b1_d64l4r4h1_P127_tr64ood128_miss0.3len3_seed44536 (6937s), log: /data/cxm/recursion/addition_p127_tr64_ood128_misslen_l3plus/logs/addition_a1b1_d64l4r4h1_P127_tr64ood128_miss0.3len3_seed44536.log
+[11:47:54] Start experiment: addition_a1b1_d64l4r4h1_P127_tr64ood128_miss0.3len3_seed82585 on cuda:7
+[12:45:41] Start attention analysis: addition_a1b1_d64l4r4h1_P127_tr64ood128_miss0.3len3_seed64154
+[12:45:43] Attention analysis completed: addition_a1b1_d64l4r4h1_P127_tr64ood128_miss0.3len3_seed64154
+[12:45:43] Experiment completed: addition_a1b1_d64l4r4h1_P127_tr64ood128_miss0.3len3_seed64154 (7130s), log: /data/cxm/recursion/addition_p127_tr64_ood128_misslen_l3plus/logs/addition_a1b1_d64l4r4h1_P127_tr64ood128_miss0.3len3_seed64154.log
+[12:45:43] Start experiment: addition_a1b1_d64l5r4h1_P127_tr64ood128_miss0.1len3_seed17996 on cuda:5
+[13:07:56] Start attention analysis: addition_a1b1_d64l4r4h1_P127_tr64ood128_miss0.3len3_seed34789
+[13:07:58] Attention analysis completed: addition_a1b1_d64l4r4h1_P127_tr64ood128_miss0.3len3_seed34789
+[13:07:58] Experiment completed: addition_a1b1_d64l4r4h1_P127_tr64ood128_miss0.3len3_seed34789 (14835s), log: /data/cxm/recursion/addition_p127_tr64_ood128_misslen_l3plus/logs/addition_a1b1_d64l4r4h1_P127_tr64ood128_miss0.3len3_seed34789.log
+[13:07:58] Start experiment: addition_a1b1_d64l5r4h1_P127_tr64ood128_miss0.1len3_seed18318 on cuda:6
+[13:49:07] Start attention analysis: addition_a1b1_d64l4r4h1_P127_tr64ood128_miss0.2len3_seed18318
+[13:49:09] Attention analysis completed: addition_a1b1_d64l4r4h1_P127_tr64ood128_miss0.2len3_seed18318
+[13:49:09] Experiment completed: addition_a1b1_d64l4r4h1_P127_tr64ood128_miss0.2len3_seed18318 (33622s), log: /data/cxm/recursion/addition_p127_tr64_ood128_misslen_l3plus/logs/addition_a1b1_d64l4r4h1_P127_tr64ood128_miss0.2len3_seed18318.log
+[13:49:09] Start experiment: addition_a1b1_d64l5r4h1_P127_tr64ood128_miss0.1len3_seed34789 on cuda:0
+[13:59:39] Start attention analysis: addition_a1b1_d64l4r4h1_P127_tr64ood128_miss0.3len3_seed62513
+[13:59:42] Attention analysis completed: addition_a1b1_d64l4r4h1_P127_tr64ood128_miss0.3len3_seed62513
+[13:59:42] Experiment completed: addition_a1b1_d64l4r4h1_P127_tr64ood128_miss0.3len3_seed62513 (13323s), log: /data/cxm/recursion/addition_p127_tr64_ood128_misslen_l3plus/logs/addition_a1b1_d64l4r4h1_P127_tr64ood128_miss0.3len3_seed62513.log
+[13:59:42] Start experiment: addition_a1b1_d64l5r4h1_P127_tr64ood128_miss0.1len3_seed44536 on cuda:1
+[15:19:33] Start attention analysis: addition_a1b1_d64l5r4h1_P127_tr64ood128_miss0.1len3_seed17996
+[15:19:36] Attention analysis completed: addition_a1b1_d64l5r4h1_P127_tr64ood128_miss0.1len3_seed17996
+[15:19:36] Experiment completed: addition_a1b1_d64l5r4h1_P127_tr64ood128_miss0.1len3_seed17996 (9233s), log: /data/cxm/recursion/addition_p127_tr64_ood128_misslen_l3plus/logs/addition_a1b1_d64l5r4h1_P127_tr64ood128_miss0.1len3_seed17996.log
+[15:19:36] Start experiment: addition_a1b1_d64l5r4h1_P127_tr64ood128_miss0.1len3_seed62513 on cuda:5
+[16:42:43] Start attention analysis: addition_a1b1_d64l4r4h1_P127_tr64ood128_miss0.2len3_seed82585
+[16:42:45] Attention analysis completed: addition_a1b1_d64l4r4h1_P127_tr64ood128_miss0.2len3_seed82585
+[16:42:45] Experiment completed: addition_a1b1_d64l4r4h1_P127_tr64ood128_miss0.2len3_seed82585 (32659s), log: /data/cxm/recursion/addition_p127_tr64_ood128_misslen_l3plus/logs/addition_a1b1_d64l4r4h1_P127_tr64ood128_miss0.2len3_seed82585.log
+[16:42:45] Start experiment: addition_a1b1_d64l5r4h1_P127_tr64ood128_miss0.1len3_seed64154 on cuda:4
+[17:18:07] Start attention analysis: addition_a1b1_d64l4r4h1_P127_tr64ood128_miss0.3len3_seed72814
+[17:18:10] Attention analysis completed: addition_a1b1_d64l4r4h1_P127_tr64ood128_miss0.3len3_seed72814
+[17:18:10] Experiment completed: addition_a1b1_d64l4r4h1_P127_tr64ood128_miss0.3len3_seed72814 (22546s), log: /data/cxm/recursion/addition_p127_tr64_ood128_misslen_l3plus/logs/addition_a1b1_d64l4r4h1_P127_tr64ood128_miss0.3len3_seed72814.log
+[17:18:10] Start experiment: addition_a1b1_d64l5r4h1_P127_tr64ood128_miss0.1len3_seed72814 on cuda:2
+[17:35:14] Start attention analysis: addition_a1b1_d64l4r4h1_P127_tr64ood128_miss0.3len3_seed17996
+[17:35:16] Attention analysis completed: addition_a1b1_d64l4r4h1_P127_tr64ood128_miss0.3len3_seed17996
+[17:35:16] Experiment completed: addition_a1b1_d64l4r4h1_P127_tr64ood128_miss0.3len3_seed17996 (33780s), log: /data/cxm/recursion/addition_p127_tr64_ood128_misslen_l3plus/logs/addition_a1b1_d64l4r4h1_P127_tr64ood128_miss0.3len3_seed17996.log
+[17:35:16] Start experiment: addition_a1b1_d64l5r4h1_P127_tr64ood128_miss0.1len3_seed82585 on cuda:3
+[18:05:26] Start attention analysis: addition_a1b1_d64l5r4h1_P127_tr64ood128_miss0.1len3_seed62513
+[18:05:28] Attention analysis completed: addition_a1b1_d64l5r4h1_P127_tr64ood128_miss0.1len3_seed62513
+[18:05:28] Experiment completed: addition_a1b1_d64l5r4h1_P127_tr64ood128_miss0.1len3_seed62513 (9952s), log: /data/cxm/recursion/addition_p127_tr64_ood128_misslen_l3plus/logs/addition_a1b1_d64l5r4h1_P127_tr64ood128_miss0.1len3_seed62513.log
+[18:05:28] Start experiment: addition_a1b1_d64l5r4h1_P127_tr64ood128_miss0.2len3_seed17996 on cuda:5
+[18:23:58] Start attention analysis: addition_a1b1_d64l5r4h1_P127_tr64ood128_miss0.1len3_seed34789
+[18:24:00] Attention analysis completed: addition_a1b1_d64l5r4h1_P127_tr64ood128_miss0.1len3_seed34789
+[18:24:00] Experiment completed: addition_a1b1_d64l5r4h1_P127_tr64ood128_miss0.1len3_seed34789 (16491s), log: /data/cxm/recursion/addition_p127_tr64_ood128_misslen_l3plus/logs/addition_a1b1_d64l5r4h1_P127_tr64ood128_miss0.1len3_seed34789.log
+[18:24:00] Start experiment: addition_a1b1_d64l5r4h1_P127_tr64ood128_miss0.2len3_seed18318 on cuda:0
+[19:05:08] Start attention analysis: addition_a1b1_d64l5r4h1_P127_tr64ood128_miss0.1len3_seed18318
+[19:05:11] Attention analysis completed: addition_a1b1_d64l5r4h1_P127_tr64ood128_miss0.1len3_seed18318
+[19:05:11] Experiment completed: addition_a1b1_d64l5r4h1_P127_tr64ood128_miss0.1len3_seed18318 (21433s), log: /data/cxm/recursion/addition_p127_tr64_ood128_misslen_l3plus/logs/addition_a1b1_d64l5r4h1_P127_tr64ood128_miss0.1len3_seed18318.log
+[19:05:11] Start experiment: addition_a1b1_d64l5r4h1_P127_tr64ood128_miss0.2len3_seed34789 on cuda:6
+[19:45:29] Start attention analysis: addition_a1b1_d64l5r4h1_P127_tr64ood128_miss0.2len3_seed18318
+[19:45:31] Attention analysis completed: addition_a1b1_d64l5r4h1_P127_tr64ood128_miss0.2len3_seed18318
+[19:45:31] Experiment completed: addition_a1b1_d64l5r4h1_P127_tr64ood128_miss0.2len3_seed18318 (4891s), log: /data/cxm/recursion/addition_p127_tr64_ood128_misslen_l3plus/logs/addition_a1b1_d64l5r4h1_P127_tr64ood128_miss0.2len3_seed18318.log
+[19:45:31] Start experiment: addition_a1b1_d64l5r4h1_P127_tr64ood128_miss0.2len3_seed44536 on cuda:0
+[19:55:35] Start attention analysis: addition_a1b1_d64l5r4h1_P127_tr64ood128_miss0.1len3_seed64154
+[19:55:38] Attention analysis completed: addition_a1b1_d64l5r4h1_P127_tr64ood128_miss0.1len3_seed64154
+[19:55:38] Experiment completed: addition_a1b1_d64l5r4h1_P127_tr64ood128_miss0.1len3_seed64154 (11573s), log: /data/cxm/recursion/addition_p127_tr64_ood128_misslen_l3plus/logs/addition_a1b1_d64l5r4h1_P127_tr64ood128_miss0.1len3_seed64154.log
+[19:55:38] Start experiment: addition_a1b1_d64l5r4h1_P127_tr64ood128_miss0.2len3_seed62513 on cuda:4
+[20:34:00] Start attention analysis: addition_a1b1_d64l5r4h1_P127_tr64ood128_miss0.1len3_seed44536
+[20:34:02] Attention analysis completed: addition_a1b1_d64l5r4h1_P127_tr64ood128_miss0.1len3_seed44536
+[20:34:02] Experiment completed: addition_a1b1_d64l5r4h1_P127_tr64ood128_miss0.1len3_seed44536 (23661s), log: /data/cxm/recursion/addition_p127_tr64_ood128_misslen_l3plus/logs/addition_a1b1_d64l5r4h1_P127_tr64ood128_miss0.1len3_seed44536.log
+[20:34:02] Start experiment: addition_a1b1_d64l5r4h1_P127_tr64ood128_miss0.2len3_seed64154 on cuda:1
+[21:08:20] Start attention analysis: addition_a1b1_d64l4r4h1_P127_tr64ood128_miss0.3len3_seed82585
+[21:08:23] Attention analysis completed: addition_a1b1_d64l4r4h1_P127_tr64ood128_miss0.3len3_seed82585
+[21:08:23] Experiment completed: addition_a1b1_d64l4r4h1_P127_tr64ood128_miss0.3len3_seed82585 (33629s), log: /data/cxm/recursion/addition_p127_tr64_ood128_misslen_l3plus/logs/addition_a1b1_d64l4r4h1_P127_tr64ood128_miss0.3len3_seed82585.log
+[21:08:23] Start experiment: addition_a1b1_d64l5r4h1_P127_tr64ood128_miss0.2len3_seed72814 on cuda:7
+[23:03:05] Start attention analysis: addition_a1b1_d64l5r4h1_P127_tr64ood128_miss0.2len3_seed62513
+[23:03:08] Attention analysis completed: addition_a1b1_d64l5r4h1_P127_tr64ood128_miss0.2len3_seed62513
+[23:03:08] Experiment completed: addition_a1b1_d64l5r4h1_P127_tr64ood128_miss0.2len3_seed62513 (11249s), log: /data/cxm/recursion/addition_p127_tr64_ood128_misslen_l3plus/logs/addition_a1b1_d64l5r4h1_P127_tr64ood128_miss0.2len3_seed62513.log
+[23:03:08] Start experiment: addition_a1b1_d64l5r4h1_P127_tr64ood128_miss0.2len3_seed82585 on cuda:4
+[01:20:21] Start attention analysis: addition_a1b1_d64l5r4h1_P127_tr64ood128_miss0.2len3_seed64154
+[01:20:24] Attention analysis completed: addition_a1b1_d64l5r4h1_P127_tr64ood128_miss0.2len3_seed64154
+[01:20:24] Experiment completed: addition_a1b1_d64l5r4h1_P127_tr64ood128_miss0.2len3_seed64154 (17181s), log: /data/cxm/recursion/addition_p127_tr64_ood128_misslen_l3plus/logs/addition_a1b1_d64l5r4h1_P127_tr64ood128_miss0.2len3_seed64154.log
+[01:20:24] Start experiment: addition_a1b1_d64l5r4h1_P127_tr64ood128_miss0.3len3_seed17996 on cuda:1
+[01:56:00] Start attention analysis: addition_a1b1_d64l5r4h1_P127_tr64ood128_miss0.2len3_seed34789
+[01:56:03] Attention analysis completed: addition_a1b1_d64l5r4h1_P127_tr64ood128_miss0.2len3_seed34789
+[01:56:03] Experiment completed: addition_a1b1_d64l5r4h1_P127_tr64ood128_miss0.2len3_seed34789 (24652s), log: /data/cxm/recursion/addition_p127_tr64_ood128_misslen_l3plus/logs/addition_a1b1_d64l5r4h1_P127_tr64ood128_miss0.2len3_seed34789.log
+[01:56:03] Start experiment: addition_a1b1_d64l5r4h1_P127_tr64ood128_miss0.3len3_seed18318 on cuda:6
+[02:13:05] Start attention analysis: addition_a1b1_d64l5r4h1_P127_tr64ood128_miss0.2len3_seed44536
+[02:13:08] Attention analysis completed: addition_a1b1_d64l5r4h1_P127_tr64ood128_miss0.2len3_seed44536
+[02:13:08] Experiment completed: addition_a1b1_d64l5r4h1_P127_tr64ood128_miss0.2len3_seed44536 (23257s), log: /data/cxm/recursion/addition_p127_tr64_ood128_misslen_l3plus/logs/addition_a1b1_d64l5r4h1_P127_tr64ood128_miss0.2len3_seed44536.log
+[02:13:08] Start experiment: addition_a1b1_d64l5r4h1_P127_tr64ood128_miss0.3len3_seed34789 on cuda:0
+[02:41:33] Start attention analysis: addition_a1b1_d64l5r4h1_P127_tr64ood128_miss0.2len3_seed82585
+[02:41:35] Attention analysis completed: addition_a1b1_d64l5r4h1_P127_tr64ood128_miss0.2len3_seed82585
+[02:41:35] Experiment completed: addition_a1b1_d64l5r4h1_P127_tr64ood128_miss0.2len3_seed82585 (13107s), log: /data/cxm/recursion/addition_p127_tr64_ood128_misslen_l3plus/logs/addition_a1b1_d64l5r4h1_P127_tr64ood128_miss0.2len3_seed82585.log
+[02:41:35] Start experiment: addition_a1b1_d64l5r4h1_P127_tr64ood128_miss0.3len3_seed44536 on cuda:4
+[02:53:58] Start attention analysis: addition_a1b1_d64l5r4h1_P127_tr64ood128_miss0.3len3_seed17996
+[02:54:01] Attention analysis completed: addition_a1b1_d64l5r4h1_P127_tr64ood128_miss0.3len3_seed17996
+[02:54:01] Experiment completed: addition_a1b1_d64l5r4h1_P127_tr64ood128_miss0.3len3_seed17996 (5617s), log: /data/cxm/recursion/addition_p127_tr64_ood128_misslen_l3plus/logs/addition_a1b1_d64l5r4h1_P127_tr64ood128_miss0.3len3_seed17996.log
+[02:54:01] Start experiment: addition_a1b1_d64l5r4h1_P127_tr64ood128_miss0.3len3_seed62513 on cuda:1
+[03:31:47] Start attention analysis: addition_a1b1_d64l5r4h1_P127_tr64ood128_miss0.1len3_seed72814
+[03:31:50] Attention analysis completed: addition_a1b1_d64l5r4h1_P127_tr64ood128_miss0.1len3_seed72814
+[03:31:50] Experiment completed: addition_a1b1_d64l5r4h1_P127_tr64ood128_miss0.1len3_seed72814 (36820s), log: /data/cxm/recursion/addition_p127_tr64_ood128_misslen_l3plus/logs/addition_a1b1_d64l5r4h1_P127_tr64ood128_miss0.1len3_seed72814.log
+[03:31:50] Start experiment: addition_a1b1_d64l5r4h1_P127_tr64ood128_miss0.3len3_seed64154 on cuda:2
+[03:52:33] Start attention analysis: addition_a1b1_d64l5r4h1_P127_tr64ood128_miss0.3len3_seed44536
+[03:52:35] Attention analysis completed: addition_a1b1_d64l5r4h1_P127_tr64ood128_miss0.3len3_seed44536
+[03:52:35] Experiment completed: addition_a1b1_d64l5r4h1_P127_tr64ood128_miss0.3len3_seed44536 (4260s), log: /data/cxm/recursion/addition_p127_tr64_ood128_misslen_l3plus/logs/addition_a1b1_d64l5r4h1_P127_tr64ood128_miss0.3len3_seed44536.log
+[03:52:35] Start experiment: addition_a1b1_d64l5r4h1_P127_tr64ood128_miss0.3len3_seed72814 on cuda:4
+[04:06:51] Start attention analysis: addition_a1b1_d64l5r4h1_P127_tr64ood128_miss0.1len3_seed82585
+[04:06:53] Attention analysis completed: addition_a1b1_d64l5r4h1_P127_tr64ood128_miss0.1len3_seed82585
+[04:06:53] Experiment completed: addition_a1b1_d64l5r4h1_P127_tr64ood128_miss0.1len3_seed82585 (37897s), log: /data/cxm/recursion/addition_p127_tr64_ood128_misslen_l3plus/logs/addition_a1b1_d64l5r4h1_P127_tr64ood128_miss0.1len3_seed82585.log
+[04:06:53] Start experiment: addition_a1b1_d64l5r4h1_P127_tr64ood128_miss0.3len3_seed82585 on cuda:3
+[04:33:37] Start attention analysis: addition_a1b1_d64l5r4h1_P127_tr64ood128_miss0.2len3_seed17996
+[04:33:40] Attention analysis completed: addition_a1b1_d64l5r4h1_P127_tr64ood128_miss0.2len3_seed17996
+[04:33:40] Experiment completed: addition_a1b1_d64l5r4h1_P127_tr64ood128_miss0.2len3_seed17996 (37692s), log: /data/cxm/recursion/addition_p127_tr64_ood128_misslen_l3plus/logs/addition_a1b1_d64l5r4h1_P127_tr64ood128_miss0.2len3_seed17996.log
+[05:19:55] Start attention analysis: addition_a1b1_d64l5r4h1_P127_tr64ood128_miss0.3len3_seed72814
+[05:19:57] Attention analysis completed: addition_a1b1_d64l5r4h1_P127_tr64ood128_miss0.3len3_seed72814
+[05:19:57] Experiment completed: addition_a1b1_d64l5r4h1_P127_tr64ood128_miss0.3len3_seed72814 (5242s), log: /data/cxm/recursion/addition_p127_tr64_ood128_misslen_l3plus/logs/addition_a1b1_d64l5r4h1_P127_tr64ood128_miss0.3len3_seed72814.log
+[05:47:10] Start attention analysis: addition_a1b1_d64l5r4h1_P127_tr64ood128_miss0.3len3_seed82585
+[05:47:13] Attention analysis completed: addition_a1b1_d64l5r4h1_P127_tr64ood128_miss0.3len3_seed82585
+[05:47:13] Experiment completed: addition_a1b1_d64l5r4h1_P127_tr64ood128_miss0.3len3_seed82585 (6019s), log: /data/cxm/recursion/addition_p127_tr64_ood128_misslen_l3plus/logs/addition_a1b1_d64l5r4h1_P127_tr64ood128_miss0.3len3_seed82585.log
+[05:49:21] Start attention analysis: addition_a1b1_d64l5r4h1_P127_tr64ood128_miss0.3len3_seed34789
+[05:49:23] Attention analysis completed: addition_a1b1_d64l5r4h1_P127_tr64ood128_miss0.3len3_seed34789
+[05:49:23] Experiment completed: addition_a1b1_d64l5r4h1_P127_tr64ood128_miss0.3len3_seed34789 (12975s), log: /data/cxm/recursion/addition_p127_tr64_ood128_misslen_l3plus/logs/addition_a1b1_d64l5r4h1_P127_tr64ood128_miss0.3len3_seed34789.log
+[07:35:31] Start attention analysis: addition_a1b1_d64l5r4h1_P127_tr64ood128_miss0.2len3_seed72814
+[07:35:34] Attention analysis completed: addition_a1b1_d64l5r4h1_P127_tr64ood128_miss0.2len3_seed72814
+[07:35:34] Experiment completed: addition_a1b1_d64l5r4h1_P127_tr64ood128_miss0.2len3_seed72814 (37631s), log: /data/cxm/recursion/addition_p127_tr64_ood128_misslen_l3plus/logs/addition_a1b1_d64l5r4h1_P127_tr64ood128_miss0.2len3_seed72814.log
+[08:13:06] Start attention analysis: addition_a1b1_d64l5r4h1_P127_tr64ood128_miss0.3len3_seed18318
+[08:13:09] Attention analysis completed: addition_a1b1_d64l5r4h1_P127_tr64ood128_miss0.3len3_seed18318
+[08:13:09] Experiment completed: addition_a1b1_d64l5r4h1_P127_tr64ood128_miss0.3len3_seed18318 (22626s), log: /data/cxm/recursion/addition_p127_tr64_ood128_misslen_l3plus/logs/addition_a1b1_d64l5r4h1_P127_tr64ood128_miss0.3len3_seed18318.log
+[11:35:43] Start attention analysis: addition_a1b1_d64l5r4h1_P127_tr64ood128_miss0.3len3_seed62513
+[11:35:46] Attention analysis completed: addition_a1b1_d64l5r4h1_P127_tr64ood128_miss0.3len3_seed62513
+[11:35:46] Experiment completed: addition_a1b1_d64l5r4h1_P127_tr64ood128_miss0.3len3_seed62513 (31305s), log: /data/cxm/recursion/addition_p127_tr64_ood128_misslen_l3plus/logs/addition_a1b1_d64l5r4h1_P127_tr64ood128_miss0.3len3_seed62513.log
+[12:09:27] Start attention analysis: addition_a1b1_d64l5r4h1_P127_tr64ood128_miss0.3len3_seed64154
+[12:09:29] Attention analysis completed: addition_a1b1_d64l5r4h1_P127_tr64ood128_miss0.3len3_seed64154
+[12:09:29] Experiment completed: addition_a1b1_d64l5r4h1_P127_tr64ood128_miss0.3len3_seed64154 (31060s), log: /data/cxm/recursion/addition_p127_tr64_ood128_misslen_l3plus/logs/addition_a1b1_d64l5r4h1_P127_tr64ood128_miss0.3len3_seed64154.log
+
+==================================================
+Experiment Summary
+==================================================
+[OK] Success: addition_a1b1_d64l3r4h1_P127_tr64ood128_miss0.1len1_seed17996
+[OK] Success: addition_a1b1_d64l3r4h1_P127_tr64ood128_miss0.1len1_seed82585
+[OK] Success: addition_a1b1_d64l3r4h1_P127_tr64ood128_miss0.1len1_seed64154
+[OK] Success: addition_a1b1_d64l3r4h1_P127_tr64ood128_miss0.2len1_seed34789
+[OK] Success: addition_a1b1_d64l3r4h1_P127_tr64ood128_miss0.2len1_seed18318
+[OK] Success: addition_a1b1_d64l3r4h1_P127_tr64ood128_miss0.1len1_seed18318
+[OK] Success: addition_a1b1_d64l3r4h1_P127_tr64ood128_miss0.1len1_seed62513
+[OK] Success: addition_a1b1_d64l3r4h1_P127_tr64ood128_miss0.2len1_seed64154
+[OK] Success: addition_a1b1_d64l3r4h1_P127_tr64ood128_miss0.1len1_seed34789
+[OK] Success: addition_a1b1_d64l3r4h1_P127_tr64ood128_miss0.2len1_seed17996
+[OK] Success: addition_a1b1_d64l3r4h1_P127_tr64ood128_miss0.2len1_seed72814
+[OK] Success: addition_a1b1_d64l3r4h1_P127_tr64ood128_miss0.2len1_seed62513
+[OK] Success: addition_a1b1_d64l3r4h1_P127_tr64ood128_miss0.1len1_seed44536
+[OK] Success: addition_a1b1_d64l3r4h1_P127_tr64ood128_miss0.2len1_seed44536
+[OK] Success: addition_a1b1_d64l3r4h1_P127_tr64ood128_miss0.3len1_seed18318
+[OK] Success: addition_a1b1_d64l3r4h1_P127_tr64ood128_miss0.3len1_seed17996
+[OK] Success: addition_a1b1_d64l3r4h1_P127_tr64ood128_miss0.2len1_seed82585
+[OK] Success: addition_a1b1_d64l3r4h1_P127_tr64ood128_miss0.3len1_seed34789
+[OK] Success: addition_a1b1_d64l3r4h1_P127_tr64ood128_miss0.3len1_seed72814
+[OK] Success: addition_a1b1_d64l3r4h1_P127_tr64ood128_miss0.3len1_seed44536
+[OK] Success: addition_a1b1_d64l3r4h1_P127_tr64ood128_miss0.3len1_seed82585
+[OK] Success: addition_a1b1_d64l3r4h1_P127_tr64ood128_miss0.3len1_seed62513
+[OK] Success: addition_a1b1_d64l3r4h1_P127_tr64ood128_miss0.3len1_seed64154
+[OK] Success: addition_a1b1_d64l3r4h1_P127_tr64ood128_miss0.1len1_seed72814
+[OK] Success: addition_a1b1_d64l3r4h1_P127_tr64ood128_miss0.1len2_seed82585
+[OK] Success: addition_a1b1_d64l3r4h1_P127_tr64ood128_miss0.2len2_seed17996
+[OK] Success: addition_a1b1_d64l3r4h1_P127_tr64ood128_miss0.1len2_seed44536
+[OK] Success: addition_a1b1_d64l3r4h1_P127_tr64ood128_miss0.1len2_seed18318
+[OK] Success: addition_a1b1_d64l3r4h1_P127_tr64ood128_miss0.1len2_seed34789
+[OK] Success: addition_a1b1_d64l3r4h1_P127_tr64ood128_miss0.1len2_seed64154
+[OK] Success: addition_a1b1_d64l3r4h1_P127_tr64ood128_miss0.1len2_seed72814
+[OK] Success: addition_a1b1_d64l3r4h1_P127_tr64ood128_miss0.2len2_seed44536
+[OK] Success: addition_a1b1_d64l3r4h1_P127_tr64ood128_miss0.2len2_seed34789
+[OK] Success: addition_a1b1_d64l3r4h1_P127_tr64ood128_miss0.2len2_seed18318
+[OK] Success: addition_a1b1_d64l3r4h1_P127_tr64ood128_miss0.2len2_seed62513
+[OK] Success: addition_a1b1_d64l3r4h1_P127_tr64ood128_miss0.2len2_seed64154
+[OK] Success: addition_a1b1_d64l3r4h1_P127_tr64ood128_miss0.1len2_seed62513
+[OK] Success: addition_a1b1_d64l3r4h1_P127_tr64ood128_miss0.3len2_seed34789
+[OK] Success: addition_a1b1_d64l3r4h1_P127_tr64ood128_miss0.2len2_seed82585
+[OK] Success: addition_a1b1_d64l3r4h1_P127_tr64ood128_miss0.2len2_seed72814
+[OK] Success: addition_a1b1_d64l3r4h1_P127_tr64ood128_miss0.3len2_seed62513
+[OK] Success: addition_a1b1_d64l3r4h1_P127_tr64ood128_miss0.3len2_seed72814
+[OK] Success: addition_a1b1_d64l3r4h1_P127_tr64ood128_miss0.1len2_seed17996
+[OK] Success: addition_a1b1_d64l3r4h1_P127_tr64ood128_miss0.3len2_seed82585
+[OK] Success: addition_a1b1_d64l3r4h1_P127_tr64ood128_miss0.3len2_seed44536
+[OK] Success: addition_a1b1_d64l3r4h1_P127_tr64ood128_miss0.3len2_seed64154
+[OK] Success: addition_a1b1_d64l4r4h1_P127_tr64ood128_miss0.1len2_seed34789
+[OK] Success: addition_a1b1_d64l3r4h1_P127_tr64ood128_miss0.3len2_seed18318
+[OK] Success: addition_a1b1_d64l4r4h1_P127_tr64ood128_miss0.1len2_seed44536
+[OK] Success: addition_a1b1_d64l4r4h1_P127_tr64ood128_miss0.1len2_seed64154
+[OK] Success: addition_a1b1_d64l3r4h1_P127_tr64ood128_miss0.3len2_seed17996
+[OK] Success: addition_a1b1_d64l4r4h1_P127_tr64ood128_miss0.1len2_seed72814
+[OK] Success: addition_a1b1_d64l4r4h1_P127_tr64ood128_miss0.1len2_seed62513
+[OK] Success: addition_a1b1_d64l4r4h1_P127_tr64ood128_miss0.2len2_seed34789
+[OK] Success: addition_a1b1_d64l4r4h1_P127_tr64ood128_miss0.2len2_seed18318
+[OK] Success: addition_a1b1_d64l4r4h1_P127_tr64ood128_miss0.2len2_seed44536
+[OK] Success: addition_a1b1_d64l4r4h1_P127_tr64ood128_miss0.2len2_seed17996
+[OK] Success: addition_a1b1_d64l4r4h1_P127_tr64ood128_miss0.1len2_seed82585
+[OK] Success: addition_a1b1_d64l4r4h1_P127_tr64ood128_miss0.1len2_seed18318
+[OK] Success: addition_a1b1_d64l4r4h1_P127_tr64ood128_miss0.2len2_seed64154
+[OK] Success: addition_a1b1_d64l4r4h1_P127_tr64ood128_miss0.1len2_seed17996
+[OK] Success: addition_a1b1_d64l4r4h1_P127_tr64ood128_miss0.3len2_seed18318
+[OK] Success: addition_a1b1_d64l4r4h1_P127_tr64ood128_miss0.3len2_seed34789
+[OK] Success: addition_a1b1_d64l4r4h1_P127_tr64ood128_miss0.3len2_seed17996
+[OK] Success: addition_a1b1_d64l4r4h1_P127_tr64ood128_miss0.3len2_seed62513
+[OK] Success: addition_a1b1_d64l4r4h1_P127_tr64ood128_miss0.2len2_seed82585
+[OK] Success: addition_a1b1_d64l3r4h1_P127_tr64ood128_miss0.1len3_seed17996
+[OK] Success: addition_a1b1_d64l4r4h1_P127_tr64ood128_miss0.3len2_seed72814
+[OK] Success: addition_a1b1_d64l4r4h1_P127_tr64ood128_miss0.3len2_seed44536
+[OK] Success: addition_a1b1_d64l3r4h1_P127_tr64ood128_miss0.1len3_seed18318
+[OK] Success: addition_a1b1_d64l3r4h1_P127_tr64ood128_miss0.1len3_seed44536
+[OK] Success: addition_a1b1_d64l3r4h1_P127_tr64ood128_miss0.1len3_seed62513
+[OK] Success: addition_a1b1_d64l3r4h1_P127_tr64ood128_miss0.1len3_seed64154
+[OK] Success: addition_a1b1_d64l4r4h1_P127_tr64ood128_miss0.3len2_seed64154
+[OK] Success: addition_a1b1_d64l4r4h1_P127_tr64ood128_miss0.2len2_seed72814
+[OK] Success: addition_a1b1_d64l4r4h1_P127_tr64ood128_miss0.2len2_seed62513
+[OK] Success: addition_a1b1_d64l3r4h1_P127_tr64ood128_miss0.1len3_seed82585
+[OK] Success: addition_a1b1_d64l3r4h1_P127_tr64ood128_miss0.2len3_seed17996
+[OK] Success: addition_a1b1_d64l3r4h1_P127_tr64ood128_miss0.1len3_seed34789
+[OK] Success: addition_a1b1_d64l3r4h1_P127_tr64ood128_miss0.2len3_seed34789
+[OK] Success: addition_a1b1_d64l3r4h1_P127_tr64ood128_miss0.2len3_seed44536
+[OK] Success: addition_a1b1_d64l3r4h1_P127_tr64ood128_miss0.2len3_seed82585
+[OK] Success: addition_a1b1_d64l4r4h1_P127_tr64ood128_miss0.3len2_seed82585
+[OK] Success: addition_a1b1_d64l3r4h1_P127_tr64ood128_miss0.2len3_seed72814
+[OK] Success: addition_a1b1_d64l3r4h1_P127_tr64ood128_miss0.2len3_seed18318
+[OK] Success: addition_a1b1_d64l3r4h1_P127_tr64ood128_miss0.3len3_seed44536
+[OK] Success: addition_a1b1_d64l3r4h1_P127_tr64ood128_miss0.3len3_seed18318
+[OK] Success: addition_a1b1_d64l3r4h1_P127_tr64ood128_miss0.3len3_seed17996
+[OK] Success: addition_a1b1_d64l3r4h1_P127_tr64ood128_miss0.3len3_seed72814
+[OK] Success: addition_a1b1_d64l3r4h1_P127_tr64ood128_miss0.2len3_seed62513
+[OK] Success: addition_a1b1_d64l3r4h1_P127_tr64ood128_miss0.3len3_seed64154
+[OK] Success: addition_a1b1_d64l3r4h1_P127_tr64ood128_miss0.3len3_seed82585
+[OK] Success: addition_a1b1_d64l4r4h1_P127_tr64ood128_miss0.1len3_seed18318
+[OK] Success: addition_a1b1_d64l3r4h1_P127_tr64ood128_miss0.1len3_seed72814
+[OK] Success: addition_a1b1_d64l4r4h1_P127_tr64ood128_miss0.1len3_seed44536
+[OK] Success: addition_a1b1_d64l3r4h1_P127_tr64ood128_miss0.3len3_seed62513
+[OK] Success: addition_a1b1_d64l3r4h1_P127_tr64ood128_miss0.3len3_seed34789
+[OK] Success: addition_a1b1_d64l4r4h1_P127_tr64ood128_miss0.1len3_seed17996
+[OK] Success: addition_a1b1_d64l3r4h1_P127_tr64ood128_miss0.2len3_seed64154
+[OK] Success: addition_a1b1_d64l4r4h1_P127_tr64ood128_miss0.1len3_seed34789
+[OK] Success: addition_a1b1_d64l4r4h1_P127_tr64ood128_miss0.1len3_seed64154
+[OK] Success: addition_a1b1_d64l4r4h1_P127_tr64ood128_miss0.1len3_seed82585
+[OK] Success: addition_a1b1_d64l4r4h1_P127_tr64ood128_miss0.1len3_seed62513
+[OK] Success: addition_a1b1_d64l4r4h1_P127_tr64ood128_miss0.2len3_seed62513
+[OK] Success: addition_a1b1_d64l4r4h1_P127_tr64ood128_miss0.1len3_seed72814
+[OK] Success: addition_a1b1_d64l4r4h1_P127_tr64ood128_miss0.2len3_seed44536
+[OK] Success: addition_a1b1_d64l4r4h1_P127_tr64ood128_miss0.2len3_seed64154
+[OK] Success: addition_a1b1_d64l4r4h1_P127_tr64ood128_miss0.2len3_seed72814
+[OK] Success: addition_a1b1_d64l4r4h1_P127_tr64ood128_miss0.2len3_seed34789
+[OK] Success: addition_a1b1_d64l4r4h1_P127_tr64ood128_miss0.2len3_seed17996
+[OK] Success: addition_a1b1_d64l4r4h1_P127_tr64ood128_miss0.3len3_seed18318
+[OK] Success: addition_a1b1_d64l4r4h1_P127_tr64ood128_miss0.3len3_seed44536
+[OK] Success: addition_a1b1_d64l4r4h1_P127_tr64ood128_miss0.3len3_seed64154
+[OK] Success: addition_a1b1_d64l4r4h1_P127_tr64ood128_miss0.3len3_seed34789
+[OK] Success: addition_a1b1_d64l4r4h1_P127_tr64ood128_miss0.2len3_seed18318
+[OK] Success: addition_a1b1_d64l4r4h1_P127_tr64ood128_miss0.3len3_seed62513
+[OK] Success: addition_a1b1_d64l5r4h1_P127_tr64ood128_miss0.1len3_seed17996
+[OK] Success: addition_a1b1_d64l4r4h1_P127_tr64ood128_miss0.2len3_seed82585
+[OK] Success: addition_a1b1_d64l4r4h1_P127_tr64ood128_miss0.3len3_seed72814
+[OK] Success: addition_a1b1_d64l4r4h1_P127_tr64ood128_miss0.3len3_seed17996
+[OK] Success: addition_a1b1_d64l5r4h1_P127_tr64ood128_miss0.1len3_seed62513
+[OK] Success: addition_a1b1_d64l5r4h1_P127_tr64ood128_miss0.1len3_seed34789
+[OK] Success: addition_a1b1_d64l5r4h1_P127_tr64ood128_miss0.1len3_seed18318
+[OK] Success: addition_a1b1_d64l5r4h1_P127_tr64ood128_miss0.2len3_seed18318
+[OK] Success: addition_a1b1_d64l5r4h1_P127_tr64ood128_miss0.1len3_seed64154
+[OK] Success: addition_a1b1_d64l5r4h1_P127_tr64ood128_miss0.1len3_seed44536
+[OK] Success: addition_a1b1_d64l4r4h1_P127_tr64ood128_miss0.3len3_seed82585
+[OK] Success: addition_a1b1_d64l5r4h1_P127_tr64ood128_miss0.2len3_seed62513
+[OK] Success: addition_a1b1_d64l5r4h1_P127_tr64ood128_miss0.2len3_seed64154
+[OK] Success: addition_a1b1_d64l5r4h1_P127_tr64ood128_miss0.2len3_seed34789
+[OK] Success: addition_a1b1_d64l5r4h1_P127_tr64ood128_miss0.2len3_seed44536
+[OK] Success: addition_a1b1_d64l5r4h1_P127_tr64ood128_miss0.2len3_seed82585
+[OK] Success: addition_a1b1_d64l5r4h1_P127_tr64ood128_miss0.3len3_seed17996
+[OK] Success: addition_a1b1_d64l5r4h1_P127_tr64ood128_miss0.1len3_seed72814
+[OK] Success: addition_a1b1_d64l5r4h1_P127_tr64ood128_miss0.3len3_seed44536
+[OK] Success: addition_a1b1_d64l5r4h1_P127_tr64ood128_miss0.1len3_seed82585
+[OK] Success: addition_a1b1_d64l5r4h1_P127_tr64ood128_miss0.2len3_seed17996
+[OK] Success: addition_a1b1_d64l5r4h1_P127_tr64ood128_miss0.3len3_seed72814
+[OK] Success: addition_a1b1_d64l5r4h1_P127_tr64ood128_miss0.3len3_seed82585
+[OK] Success: addition_a1b1_d64l5r4h1_P127_tr64ood128_miss0.3len3_seed34789
+[OK] Success: addition_a1b1_d64l5r4h1_P127_tr64ood128_miss0.2len3_seed72814
+[OK] Success: addition_a1b1_d64l5r4h1_P127_tr64ood128_miss0.3len3_seed18318
+[OK] Success: addition_a1b1_d64l5r4h1_P127_tr64ood128_miss0.3len3_seed62513
+[OK] Success: addition_a1b1_d64l5r4h1_P127_tr64ood128_miss0.3len3_seed64154
+
+============================================================================================================================================
+Detailed Experiment Summary
+============================================================================================================================================
+Experiment                                     Epoch BestTest  1stTask   Exp-ID  Exp-OOD Unexp-ID Unexp-OOD
+--------------------------------------------------------------------------------------------------------------------------------------------
+addition_a1b1_d64l3r4h1_P127_tr64ood128_miss0.1len1_seed17996    400    100.0      N/A    100.0    100.0    100.0    100.0
+addition_a1b1_d64l3r4h1_P127_tr64ood128_miss0.1len1_seed18318    840     99.6      N/A    100.0    100.0    100.0    100.0
+addition_a1b1_d64l3r4h1_P127_tr64ood128_miss0.1len1_seed34789   1020     99.1      N/A    100.0    100.0    100.0    100.0
+addition_a1b1_d64l3r4h1_P127_tr64ood128_miss0.1len1_seed44536    940    100.0      N/A    100.0    100.0    100.0    100.0
+addition_a1b1_d64l3r4h1_P127_tr64ood128_miss0.1len1_seed62513    880     99.8      N/A    100.0    100.0    100.0    100.0
+addition_a1b1_d64l3r4h1_P127_tr64ood128_miss0.1len1_seed64154    460     99.8      N/A    100.0    100.0    100.0    100.0
+addition_a1b1_d64l3r4h1_P127_tr64ood128_miss0.1len1_seed72814   2220     99.9      N/A    100.0    100.0    100.0    100.0
+addition_a1b1_d64l3r4h1_P127_tr64ood128_miss0.1len1_seed82585    380     99.9      N/A    100.0    100.0    100.0    100.0
+addition_a1b1_d64l3r4h1_P127_tr64ood128_miss0.1len2_seed17996   9999     97.1      N/A    100.0     99.1    100.0     99.0
+addition_a1b1_d64l3r4h1_P127_tr64ood128_miss0.1len2_seed18318   3240     95.7      N/A    100.0    100.0    100.0    100.0
+addition_a1b1_d64l3r4h1_P127_tr64ood128_miss0.1len2_seed34789   5300     94.0      N/A    100.0    100.0    100.0    100.0
+addition_a1b1_d64l3r4h1_P127_tr64ood128_miss0.1len2_seed44536   3220     91.0      N/A    100.0    100.0    100.0    100.0
+addition_a1b1_d64l3r4h1_P127_tr64ood128_miss0.1len2_seed62513   9999     98.4      N/A    100.0    100.0    100.0    100.0
+addition_a1b1_d64l3r4h1_P127_tr64ood128_miss0.1len2_seed64154   4960     83.9      N/A    100.0    100.0    100.0    100.0
+addition_a1b1_d64l3r4h1_P127_tr64ood128_miss0.1len2_seed72814   4720     99.1      N/A    100.0    100.0    100.0    100.0
+addition_a1b1_d64l3r4h1_P127_tr64ood128_miss0.1len2_seed82585   1580     98.6      N/A    100.0    100.0    100.0    100.0
+addition_a1b1_d64l3r4h1_P127_tr64ood128_miss0.1len3_seed17996   1520     82.1      N/A    100.0    100.0    100.0    100.0
+addition_a1b1_d64l3r4h1_P127_tr64ood128_miss0.1len3_seed18318   1460     99.4      N/A    100.0    100.0    100.0    100.0
+addition_a1b1_d64l3r4h1_P127_tr64ood128_miss0.1len3_seed34789   5020     97.4      N/A    100.0    100.0    100.0    100.0
+addition_a1b1_d64l3r4h1_P127_tr64ood128_miss0.1len3_seed44536   1200     82.1      N/A    100.0    100.0    100.0    100.0
+addition_a1b1_d64l3r4h1_P127_tr64ood128_miss0.1len3_seed62513   2220     91.3      N/A    100.0     80.0    100.0     79.9
+addition_a1b1_d64l3r4h1_P127_tr64ood128_miss0.1len3_seed64154   2700     95.8      N/A    100.0     84.6    100.0     84.4
+addition_a1b1_d64l3r4h1_P127_tr64ood128_miss0.1len3_seed72814   9999     85.0      N/A    100.0    100.0    100.0    100.0
+addition_a1b1_d64l3r4h1_P127_tr64ood128_miss0.1len3_seed82585   1920     92.5      N/A    100.0    100.0    100.0    100.0
+addition_a1b1_d64l3r4h1_P127_tr64ood128_miss0.2len1_seed17996    980    100.0      N/A    100.0    100.0    100.0    100.0
+addition_a1b1_d64l3r4h1_P127_tr64ood128_miss0.2len1_seed18318    420    100.0      N/A    100.0    100.0    100.0    100.0
+addition_a1b1_d64l3r4h1_P127_tr64ood128_miss0.2len1_seed34789    420    100.0      N/A    100.0    100.0    100.0    100.0
+addition_a1b1_d64l3r4h1_P127_tr64ood128_miss0.2len1_seed44536    580     99.7      N/A    100.0    100.0    100.0    100.0
+addition_a1b1_d64l3r4h1_P127_tr64ood128_miss0.2len1_seed62513    500     99.9      N/A     99.9    100.0     99.9    100.0
+addition_a1b1_d64l3r4h1_P127_tr64ood128_miss0.2len1_seed64154    380    100.0      N/A    100.0    100.0    100.0    100.0
+addition_a1b1_d64l3r4h1_P127_tr64ood128_miss0.2len1_seed72814    480     99.4      N/A    100.0    100.0    100.0    100.0
+addition_a1b1_d64l3r4h1_P127_tr64ood128_miss0.2len1_seed82585    340     99.9      N/A    100.0    100.0    100.0    100.0
+addition_a1b1_d64l3r4h1_P127_tr64ood128_miss0.2len2_seed17996   2020     88.0      N/A    100.0     98.2    100.0     98.1
+addition_a1b1_d64l3r4h1_P127_tr64ood128_miss0.2len2_seed18318   4180     81.8      N/A    100.0    100.0    100.0    100.0
+addition_a1b1_d64l3r4h1_P127_tr64ood128_miss0.2len2_seed34789   2300     81.5      N/A    100.0    100.0    100.0    100.0
+addition_a1b1_d64l3r4h1_P127_tr64ood128_miss0.2len2_seed44536   3000     87.2      N/A    100.0    100.0    100.0    100.0
+addition_a1b1_d64l3r4h1_P127_tr64ood128_miss0.2len2_seed62513   3160     99.1      N/A    100.0    100.0    100.0    100.0
+addition_a1b1_d64l3r4h1_P127_tr64ood128_miss0.2len2_seed64154   3700     73.0      N/A    100.0    100.0    100.0    100.0
+addition_a1b1_d64l3r4h1_P127_tr64ood128_miss0.2len2_seed72814   5140     78.9      N/A    100.0    100.0    100.0    100.0
+addition_a1b1_d64l3r4h1_P127_tr64ood128_miss0.2len2_seed82585   4800     97.1      N/A    100.0    100.0    100.0    100.0
+addition_a1b1_d64l3r4h1_P127_tr64ood128_miss0.2len3_seed17996   1780     80.7      N/A    100.0     99.0    100.0     98.9
+addition_a1b1_d64l3r4h1_P127_tr64ood128_miss0.2len3_seed18318   4820     84.3      N/A    100.0    100.0    100.0    100.0
+addition_a1b1_d64l3r4h1_P127_tr64ood128_miss0.2len3_seed34789   2060     81.1      N/A    100.0     79.7    100.0     79.9
+addition_a1b1_d64l3r4h1_P127_tr64ood128_miss0.2len3_seed44536   2560     75.9      N/A    100.0    100.0    100.0    100.0
+addition_a1b1_d64l3r4h1_P127_tr64ood128_miss0.2len3_seed62513   5320     85.8      N/A    100.0    100.0    100.0    100.0
+addition_a1b1_d64l3r4h1_P127_tr64ood128_miss0.2len3_seed64154   9999     80.6      N/A    100.0    100.0    100.0    100.0
+addition_a1b1_d64l3r4h1_P127_tr64ood128_miss0.2len3_seed72814   1920     81.0      N/A    100.0    100.0    100.0    100.0
+addition_a1b1_d64l3r4h1_P127_tr64ood128_miss0.2len3_seed82585   1480     67.2      N/A    100.0    100.0    100.0    100.0
+addition_a1b1_d64l3r4h1_P127_tr64ood128_miss0.3len1_seed17996    380    100.0      N/A    100.0     98.8    100.0     98.8
+addition_a1b1_d64l3r4h1_P127_tr64ood128_miss0.3len1_seed18318    380    100.0      N/A    100.0    100.0    100.0    100.0
+addition_a1b1_d64l3r4h1_P127_tr64ood128_miss0.3len1_seed34789    420    100.0      N/A    100.0    100.0    100.0    100.0
+addition_a1b1_d64l3r4h1_P127_tr64ood128_miss0.3len1_seed44536    380     99.8      N/A    100.0    100.0    100.0    100.0
+addition_a1b1_d64l3r4h1_P127_tr64ood128_miss0.3len1_seed62513    400    100.0      N/A    100.0    100.0    100.0    100.0
+addition_a1b1_d64l3r4h1_P127_tr64ood128_miss0.3len1_seed64154    420     99.9      N/A     99.9    100.0     99.9    100.0
+addition_a1b1_d64l3r4h1_P127_tr64ood128_miss0.3len1_seed72814    340     99.5      N/A    100.0    100.0    100.0    100.0
+addition_a1b1_d64l3r4h1_P127_tr64ood128_miss0.3len1_seed82585    340     99.7      N/A     99.8    100.0     99.8    100.0
+addition_a1b1_d64l3r4h1_P127_tr64ood128_miss0.3len2_seed17996   9999     97.5      N/A    100.0    100.0    100.0    100.0
+addition_a1b1_d64l3r4h1_P127_tr64ood128_miss0.3len2_seed18318   9999     95.8      N/A    100.0     97.1    100.0     97.1
+addition_a1b1_d64l3r4h1_P127_tr64ood128_miss0.3len2_seed34789   3000     95.2      N/A    100.0    100.0    100.0    100.0
+addition_a1b1_d64l3r4h1_P127_tr64ood128_miss0.3len2_seed44536   3140     80.1      N/A     95.1     64.5     93.5     62.1
+addition_a1b1_d64l3r4h1_P127_tr64ood128_miss0.3len2_seed62513   1420     39.9      N/A     54.1     51.1     49.1     47.6
+addition_a1b1_d64l3r4h1_P127_tr64ood128_miss0.3len2_seed64154   3100     97.9      N/A    100.0     99.1    100.0     99.2
+addition_a1b1_d64l3r4h1_P127_tr64ood128_miss0.3len2_seed72814   2080     59.2      N/A     99.4     81.2     99.4     81.2
+addition_a1b1_d64l3r4h1_P127_tr64ood128_miss0.3len2_seed82585   1360     70.0      N/A    100.0    100.0    100.0    100.0
+addition_a1b1_d64l3r4h1_P127_tr64ood128_miss0.3len3_seed17996   3160     89.2      N/A    100.0    100.0    100.0    100.0
+addition_a1b1_d64l3r4h1_P127_tr64ood128_miss0.3len3_seed18318   1840     86.7      N/A    100.0    100.0    100.0    100.0
+addition_a1b1_d64l3r4h1_P127_tr64ood128_miss0.3len3_seed34789   6960     89.9      N/A    100.0    100.0    100.0    100.0
+addition_a1b1_d64l3r4h1_P127_tr64ood128_miss0.3len3_seed44536   1480     63.6      N/A     99.7     99.3     99.5     99.1
+addition_a1b1_d64l3r4h1_P127_tr64ood128_miss0.3len3_seed62513   4240     88.9      N/A    100.0    100.0    100.0    100.0
+addition_a1b1_d64l3r4h1_P127_tr64ood128_miss0.3len3_seed64154   2160     92.0      N/A    100.0    100.0    100.0    100.0
+addition_a1b1_d64l3r4h1_P127_tr64ood128_miss0.3len3_seed72814   1160     51.8      N/A     84.1     76.4     80.7     73.4
+addition_a1b1_d64l3r4h1_P127_tr64ood128_miss0.3len3_seed82585   1540     26.2      N/A     42.1     36.0     36.5     30.9
+addition_a1b1_d64l4r4h1_P127_tr64ood128_miss0.1len2_seed17996   9999     97.2      N/A    100.0     92.2    100.0     92.8
+addition_a1b1_d64l4r4h1_P127_tr64ood128_miss0.1len2_seed18318   7400     91.8      N/A    100.0    100.0    100.0    100.0
+addition_a1b1_d64l4r4h1_P127_tr64ood128_miss0.1len2_seed34789   2040     99.5      N/A    100.0     94.6    100.0     94.3
+addition_a1b1_d64l4r4h1_P127_tr64ood128_miss0.1len2_seed44536   2500     88.5      N/A    100.0    100.0    100.0    100.0
+addition_a1b1_d64l4r4h1_P127_tr64ood128_miss0.1len2_seed62513   4040     91.5      N/A    100.0    100.0    100.0    100.0
+addition_a1b1_d64l4r4h1_P127_tr64ood128_miss0.1len2_seed64154   3360     98.3      N/A    100.0    100.0    100.0    100.0
+addition_a1b1_d64l4r4h1_P127_tr64ood128_miss0.1len2_seed72814   2180     89.8      N/A    100.0    100.0    100.0    100.0
+addition_a1b1_d64l4r4h1_P127_tr64ood128_miss0.1len2_seed82585   3860     89.8      N/A    100.0    100.0    100.0    100.0
+addition_a1b1_d64l4r4h1_P127_tr64ood128_miss0.1len3_seed17996   3780     83.3      N/A    100.0    100.0    100.0    100.0
+addition_a1b1_d64l4r4h1_P127_tr64ood128_miss0.1len3_seed18318   1220     81.9      N/A    100.0     94.5    100.0     94.7
+addition_a1b1_d64l4r4h1_P127_tr64ood128_miss0.1len3_seed34789   3860     85.2      N/A    100.0    100.0    100.0    100.0
+addition_a1b1_d64l4r4h1_P127_tr64ood128_miss0.1len3_seed44536   1360     82.1      N/A    100.0    100.0    100.0    100.0
+addition_a1b1_d64l4r4h1_P127_tr64ood128_miss0.1len3_seed62513   5920     91.0      N/A    100.0    100.0    100.0    100.0
+addition_a1b1_d64l4r4h1_P127_tr64ood128_miss0.1len3_seed64154   3820     85.8      N/A    100.0    100.0    100.0    100.0
+addition_a1b1_d64l4r4h1_P127_tr64ood128_miss0.1len3_seed72814   5600     86.9      N/A    100.0     99.8    100.0     99.8
+addition_a1b1_d64l4r4h1_P127_tr64ood128_miss0.1len3_seed82585   3120     82.7      N/A    100.0     94.1    100.0     93.9
+addition_a1b1_d64l4r4h1_P127_tr64ood128_miss0.2len2_seed17996   3780     81.1      N/A     94.8     89.4     92.7     86.9
+addition_a1b1_d64l4r4h1_P127_tr64ood128_miss0.2len2_seed18318   2360     84.7      N/A    100.0    100.0    100.0    100.0
+addition_a1b1_d64l4r4h1_P127_tr64ood128_miss0.2len2_seed34789   2800     82.5      N/A    100.0     97.2    100.0     97.3
+addition_a1b1_d64l4r4h1_P127_tr64ood128_miss0.2len2_seed44536   2100     77.9      N/A    100.0    100.0    100.0    100.0
+addition_a1b1_d64l4r4h1_P127_tr64ood128_miss0.2len2_seed62513   9999     90.9      N/A    100.0    100.0    100.0    100.0
+addition_a1b1_d64l4r4h1_P127_tr64ood128_miss0.2len2_seed64154   2560     60.7      N/A     77.7     69.0     73.0     64.6
+addition_a1b1_d64l4r4h1_P127_tr64ood128_miss0.2len2_seed72814   9999     97.3      N/A    100.0    100.0    100.0    100.0
+addition_a1b1_d64l4r4h1_P127_tr64ood128_miss0.2len2_seed82585   4540     98.2      N/A    100.0    100.0    100.0    100.0
+addition_a1b1_d64l4r4h1_P127_tr64ood128_miss0.2len3_seed17996   7020     77.1      N/A    100.0    100.0    100.0    100.0
+addition_a1b1_d64l4r4h1_P127_tr64ood128_miss0.2len3_seed18318   9999     87.0      N/A    100.0    100.0    100.0    100.0
+addition_a1b1_d64l4r4h1_P127_tr64ood128_miss0.2len3_seed34789   5420     79.2      N/A    100.0    100.0    100.0     99.9
+addition_a1b1_d64l4r4h1_P127_tr64ood128_miss0.2len3_seed44536   3940     76.8      N/A     99.7     99.6     99.5     99.4
+addition_a1b1_d64l4r4h1_P127_tr64ood128_miss0.2len3_seed62513   1940     77.6      N/A     78.4     77.8     76.3     76.3
+addition_a1b1_d64l4r4h1_P127_tr64ood128_miss0.2len3_seed64154   3300     66.9      N/A    100.0    100.0    100.0    100.0
+addition_a1b1_d64l4r4h1_P127_tr64ood128_miss0.2len3_seed72814   2420     68.8      N/A    100.0     99.9    100.0     99.8
+addition_a1b1_d64l4r4h1_P127_tr64ood128_miss0.2len3_seed82585   9999     68.2      N/A    100.0    100.0    100.0    100.0
+addition_a1b1_d64l4r4h1_P127_tr64ood128_miss0.3len2_seed17996   3980     76.1      N/A    100.0    100.0    100.0    100.0
+addition_a1b1_d64l4r4h1_P127_tr64ood128_miss0.3len2_seed18318   2000     62.5      N/A    100.0    100.0    100.0    100.0
+addition_a1b1_d64l4r4h1_P127_tr64ood128_miss0.3len2_seed34789   2080     26.2      N/A     39.1     33.1     33.0     27.4
+addition_a1b1_d64l4r4h1_P127_tr64ood128_miss0.3len2_seed44536   3500     42.5      N/A     55.2     46.9     49.2     41.8
+addition_a1b1_d64l4r4h1_P127_tr64ood128_miss0.3len2_seed62513   2520     96.2      N/A    100.0    100.0    100.0    100.0
+addition_a1b1_d64l4r4h1_P127_tr64ood128_miss0.3len2_seed64154   5720     91.6      N/A    100.0    100.0    100.0    100.0
+addition_a1b1_d64l4r4h1_P127_tr64ood128_miss0.3len2_seed72814   2440     27.3      N/A     40.6     33.2     34.0     27.6
+addition_a1b1_d64l4r4h1_P127_tr64ood128_miss0.3len2_seed82585   7780     99.1      N/A    100.0    100.0    100.0    100.0
+addition_a1b1_d64l4r4h1_P127_tr64ood128_miss0.3len3_seed17996   9999     71.8      N/A    100.0    100.0    100.0    100.0
+addition_a1b1_d64l4r4h1_P127_tr64ood128_miss0.3len3_seed18318   2320     61.2      N/A    100.0    100.0    100.0    100.0
+addition_a1b1_d64l4r4h1_P127_tr64ood128_miss0.3len3_seed34789   4320     79.4      N/A     86.1     86.1     83.6     83.4
+addition_a1b1_d64l4r4h1_P127_tr64ood128_miss0.3len3_seed44536   2100     83.5      N/A    100.0    100.0    100.0    100.0
+addition_a1b1_d64l4r4h1_P127_tr64ood128_miss0.3len3_seed62513   3960     59.2      N/A     81.0     76.2     77.3     72.5
+addition_a1b1_d64l4r4h1_P127_tr64ood128_miss0.3len3_seed64154   2120     56.3      N/A    100.0     99.5    100.0     99.6
+addition_a1b1_d64l4r4h1_P127_tr64ood128_miss0.3len3_seed72814   6720     74.5      N/A    100.0    100.0    100.0    100.0
+addition_a1b1_d64l4r4h1_P127_tr64ood128_miss0.3len3_seed82585   9999     83.5      N/A     97.8     82.8     95.9     80.8
+addition_a1b1_d64l5r4h1_P127_tr64ood128_miss0.1len3_seed17996   2620     87.0      N/A    100.0    100.0    100.0    100.0
+addition_a1b1_d64l5r4h1_P127_tr64ood128_miss0.1len3_seed18318   5720     83.3      N/A    100.0    100.0    100.0    100.0
+addition_a1b1_d64l5r4h1_P127_tr64ood128_miss0.1len3_seed34789   4340     93.7      N/A    100.0    100.0    100.0    100.0
+addition_a1b1_d64l5r4h1_P127_tr64ood128_miss0.1len3_seed44536   6360     91.1      N/A    100.0     92.9    100.0     92.9
+addition_a1b1_d64l5r4h1_P127_tr64ood128_miss0.1len3_seed62513   2640     86.6      N/A    100.0    100.0    100.0    100.0
+addition_a1b1_d64l5r4h1_P127_tr64ood128_miss0.1len3_seed64154   3100     83.2      N/A    100.0    100.0    100.0    100.0
+addition_a1b1_d64l5r4h1_P127_tr64ood128_miss0.1len3_seed72814   9999     92.8      N/A    100.0    100.0    100.0    100.0
+addition_a1b1_d64l5r4h1_P127_tr64ood128_miss0.1len3_seed82585   9999     93.9      N/A    100.0    100.0    100.0    100.0
+addition_a1b1_d64l5r4h1_P127_tr64ood128_miss0.2len3_seed17996   9999     87.9      N/A    100.0    100.0    100.0    100.0
+addition_a1b1_d64l5r4h1_P127_tr64ood128_miss0.2len3_seed18318   1300     65.7      N/A    100.0     99.6    100.0     99.6
+addition_a1b1_d64l5r4h1_P127_tr64ood128_miss0.2len3_seed34789   6780     72.0      N/A    100.0     99.3    100.0     99.4
+addition_a1b1_d64l5r4h1_P127_tr64ood128_miss0.2len3_seed44536   6180     90.9      N/A    100.0     99.9    100.0     99.9
+addition_a1b1_d64l5r4h1_P127_tr64ood128_miss0.2len3_seed62513   3020     68.2      N/A    100.0    100.0    100.0    100.0
+addition_a1b1_d64l5r4h1_P127_tr64ood128_miss0.2len3_seed64154   4560     87.8      N/A    100.0     99.9    100.0     99.9
+addition_a1b1_d64l5r4h1_P127_tr64ood128_miss0.2len3_seed72814   9999     75.4      N/A    100.0    100.0    100.0    100.0
+addition_a1b1_d64l5r4h1_P127_tr64ood128_miss0.2len3_seed82585   3740     76.4      N/A    100.0    100.0    100.0    100.0
+addition_a1b1_d64l5r4h1_P127_tr64ood128_miss0.3len3_seed17996   1480     99.5      N/A    100.0    100.0    100.0     99.9
+addition_a1b1_d64l5r4h1_P127_tr64ood128_miss0.3len3_seed18318   6020     87.9      N/A     97.3     88.7     96.0     86.8
+addition_a1b1_d64l5r4h1_P127_tr64ood128_miss0.3len3_seed34789   3480     57.0      N/A     99.6     91.1     99.5     89.9
+addition_a1b1_d64l5r4h1_P127_tr64ood128_miss0.3len3_seed44536   1140     28.0      N/A     41.4     32.2     35.6     27.9
+addition_a1b1_d64l5r4h1_P127_tr64ood128_miss0.3len3_seed62513   9200     57.9      N/A     88.5     74.9     85.4     71.5
+addition_a1b1_d64l5r4h1_P127_tr64ood128_miss0.3len3_seed64154   9999     80.0      N/A    100.0     99.9    100.0     99.8
+addition_a1b1_d64l5r4h1_P127_tr64ood128_miss0.3len3_seed72814   1400     38.1      N/A     48.8     45.3     43.7     40.7
+addition_a1b1_d64l5r4h1_P127_tr64ood128_miss0.3len3_seed82585   1640     69.4      N/A     99.1     95.5     99.0     95.2
+============================================================================================================================================
+Saved learning curve to /data/cxm/recursion/addition_p127_tr64_ood128_misslen_l3plus/plots/addition_a1b1_d64l3r4h1_P127_tr64ood128_miss0.1len1_curve.png
+Saved per-position heatmap to /data/cxm/recursion/addition_p127_tr64_ood128_misslen_l3plus/plots/addition_a1b1_d64l3r4h1_P127_tr64ood128_miss0.1len1_per_pos.png
+No per-rule accuracy data to plot.
+[12:09:31] Grouped plots saved: addition_a1b1_d64l3r4h1_P127_tr64ood128_miss0.1len1
+Saved learning curve to /data/cxm/recursion/addition_p127_tr64_ood128_misslen_l3plus/plots/addition_a1b1_d64l3r4h1_P127_tr64ood128_miss0.1len2_curve.png
+Saved per-position heatmap to /data/cxm/recursion/addition_p127_tr64_ood128_misslen_l3plus/plots/addition_a1b1_d64l3r4h1_P127_tr64ood128_miss0.1len2_per_pos.png
+No per-rule accuracy data to plot.
+[12:09:32] Grouped plots saved: addition_a1b1_d64l3r4h1_P127_tr64ood128_miss0.1len2
+Saved learning curve to /data/cxm/recursion/addition_p127_tr64_ood128_misslen_l3plus/plots/addition_a1b1_d64l3r4h1_P127_tr64ood128_miss0.1len3_curve.png
+Saved per-position heatmap to /data/cxm/recursion/addition_p127_tr64_ood128_misslen_l3plus/plots/addition_a1b1_d64l3r4h1_P127_tr64ood128_miss0.1len3_per_pos.png
+No per-rule accuracy data to plot.
+[12:09:33] Grouped plots saved: addition_a1b1_d64l3r4h1_P127_tr64ood128_miss0.1len3
+Saved learning curve to /data/cxm/recursion/addition_p127_tr64_ood128_misslen_l3plus/plots/addition_a1b1_d64l3r4h1_P127_tr64ood128_miss0.2len1_curve.png
+Saved per-position heatmap to /data/cxm/recursion/addition_p127_tr64_ood128_misslen_l3plus/plots/addition_a1b1_d64l3r4h1_P127_tr64ood128_miss0.2len1_per_pos.png
+No per-rule accuracy data to plot.
+[12:09:34] Grouped plots saved: addition_a1b1_d64l3r4h1_P127_tr64ood128_miss0.2len1
+Saved learning curve to /data/cxm/recursion/addition_p127_tr64_ood128_misslen_l3plus/plots/addition_a1b1_d64l3r4h1_P127_tr64ood128_miss0.2len2_curve.png
+Saved per-position heatmap to /data/cxm/recursion/addition_p127_tr64_ood128_misslen_l3plus/plots/addition_a1b1_d64l3r4h1_P127_tr64ood128_miss0.2len2_per_pos.png
+No per-rule accuracy data to plot.
+[12:09:36] Grouped plots saved: addition_a1b1_d64l3r4h1_P127_tr64ood128_miss0.2len2
+Saved learning curve to /data/cxm/recursion/addition_p127_tr64_ood128_misslen_l3plus/plots/addition_a1b1_d64l3r4h1_P127_tr64ood128_miss0.2len3_curve.png
+Saved per-position heatmap to /data/cxm/recursion/addition_p127_tr64_ood128_misslen_l3plus/plots/addition_a1b1_d64l3r4h1_P127_tr64ood128_miss0.2len3_per_pos.png
+No per-rule accuracy data to plot.
+[12:09:37] Grouped plots saved: addition_a1b1_d64l3r4h1_P127_tr64ood128_miss0.2len3
+Saved learning curve to /data/cxm/recursion/addition_p127_tr64_ood128_misslen_l3plus/plots/addition_a1b1_d64l3r4h1_P127_tr64ood128_miss0.3len1_curve.png
+Saved per-position heatmap to /data/cxm/recursion/addition_p127_tr64_ood128_misslen_l3plus/plots/addition_a1b1_d64l3r4h1_P127_tr64ood128_miss0.3len1_per_pos.png
+No per-rule accuracy data to plot.
+[12:09:38] Grouped plots saved: addition_a1b1_d64l3r4h1_P127_tr64ood128_miss0.3len1
+Saved learning curve to /data/cxm/recursion/addition_p127_tr64_ood128_misslen_l3plus/plots/addition_a1b1_d64l3r4h1_P127_tr64ood128_miss0.3len2_curve.png
+Saved per-position heatmap to /data/cxm/recursion/addition_p127_tr64_ood128_misslen_l3plus/plots/addition_a1b1_d64l3r4h1_P127_tr64ood128_miss0.3len2_per_pos.png
+No per-rule accuracy data to plot.
+[12:09:40] Grouped plots saved: addition_a1b1_d64l3r4h1_P127_tr64ood128_miss0.3len2
+Saved learning curve to /data/cxm/recursion/addition_p127_tr64_ood128_misslen_l3plus/plots/addition_a1b1_d64l3r4h1_P127_tr64ood128_miss0.3len3_curve.png
+Saved per-position heatmap to /data/cxm/recursion/addition_p127_tr64_ood128_misslen_l3plus/plots/addition_a1b1_d64l3r4h1_P127_tr64ood128_miss0.3len3_per_pos.png
+No per-rule accuracy data to plot.
+[12:09:41] Grouped plots saved: addition_a1b1_d64l3r4h1_P127_tr64ood128_miss0.3len3
+Saved learning curve to /data/cxm/recursion/addition_p127_tr64_ood128_misslen_l3plus/plots/addition_a1b1_d64l4r4h1_P127_tr64ood128_miss0.1len2_curve.png
+Saved per-position heatmap to /data/cxm/recursion/addition_p127_tr64_ood128_misslen_l3plus/plots/addition_a1b1_d64l4r4h1_P127_tr64ood128_miss0.1len2_per_pos.png
+No per-rule accuracy data to plot.
+[12:09:42] Grouped plots saved: addition_a1b1_d64l4r4h1_P127_tr64ood128_miss0.1len2
+Saved learning curve to /data/cxm/recursion/addition_p127_tr64_ood128_misslen_l3plus/plots/addition_a1b1_d64l4r4h1_P127_tr64ood128_miss0.1len3_curve.png
+Saved per-position heatmap to /data/cxm/recursion/addition_p127_tr64_ood128_misslen_l3plus/plots/addition_a1b1_d64l4r4h1_P127_tr64ood128_miss0.1len3_per_pos.png
+No per-rule accuracy data to plot.
+[12:09:44] Grouped plots saved: addition_a1b1_d64l4r4h1_P127_tr64ood128_miss0.1len3
+Saved learning curve to /data/cxm/recursion/addition_p127_tr64_ood128_misslen_l3plus/plots/addition_a1b1_d64l4r4h1_P127_tr64ood128_miss0.2len2_curve.png
+Saved per-position heatmap to /data/cxm/recursion/addition_p127_tr64_ood128_misslen_l3plus/plots/addition_a1b1_d64l4r4h1_P127_tr64ood128_miss0.2len2_per_pos.png
+No per-rule accuracy data to plot.
+[12:09:45] Grouped plots saved: addition_a1b1_d64l4r4h1_P127_tr64ood128_miss0.2len2
+Saved learning curve to /data/cxm/recursion/addition_p127_tr64_ood128_misslen_l3plus/plots/addition_a1b1_d64l4r4h1_P127_tr64ood128_miss0.2len3_curve.png
+Saved per-position heatmap to /data/cxm/recursion/addition_p127_tr64_ood128_misslen_l3plus/plots/addition_a1b1_d64l4r4h1_P127_tr64ood128_miss0.2len3_per_pos.png
+No per-rule accuracy data to plot.
+[12:09:46] Grouped plots saved: addition_a1b1_d64l4r4h1_P127_tr64ood128_miss0.2len3
+Saved learning curve to /data/cxm/recursion/addition_p127_tr64_ood128_misslen_l3plus/plots/addition_a1b1_d64l4r4h1_P127_tr64ood128_miss0.3len2_curve.png
+Saved per-position heatmap to /data/cxm/recursion/addition_p127_tr64_ood128_misslen_l3plus/plots/addition_a1b1_d64l4r4h1_P127_tr64ood128_miss0.3len2_per_pos.png
+No per-rule accuracy data to plot.
+[12:09:48] Grouped plots saved: addition_a1b1_d64l4r4h1_P127_tr64ood128_miss0.3len2
+Saved learning curve to /data/cxm/recursion/addition_p127_tr64_ood128_misslen_l3plus/plots/addition_a1b1_d64l4r4h1_P127_tr64ood128_miss0.3len3_curve.png
+Saved per-position heatmap to /data/cxm/recursion/addition_p127_tr64_ood128_misslen_l3plus/plots/addition_a1b1_d64l4r4h1_P127_tr64ood128_miss0.3len3_per_pos.png
+No per-rule accuracy data to plot.
+[12:09:49] Grouped plots saved: addition_a1b1_d64l4r4h1_P127_tr64ood128_miss0.3len3
+Saved learning curve to /data/cxm/recursion/addition_p127_tr64_ood128_misslen_l3plus/plots/addition_a1b1_d64l5r4h1_P127_tr64ood128_miss0.1len3_curve.png
+Saved per-position heatmap to /data/cxm/recursion/addition_p127_tr64_ood128_misslen_l3plus/plots/addition_a1b1_d64l5r4h1_P127_tr64ood128_miss0.1len3_per_pos.png
+No per-rule accuracy data to plot.
+[12:09:50] Grouped plots saved: addition_a1b1_d64l5r4h1_P127_tr64ood128_miss0.1len3
+Saved learning curve to /data/cxm/recursion/addition_p127_tr64_ood128_misslen_l3plus/plots/addition_a1b1_d64l5r4h1_P127_tr64ood128_miss0.2len3_curve.png
+Saved per-position heatmap to /data/cxm/recursion/addition_p127_tr64_ood128_misslen_l3plus/plots/addition_a1b1_d64l5r4h1_P127_tr64ood128_miss0.2len3_per_pos.png
+No per-rule accuracy data to plot.
+[12:09:52] Grouped plots saved: addition_a1b1_d64l5r4h1_P127_tr64ood128_miss0.2len3
+Saved learning curve to /data/cxm/recursion/addition_p127_tr64_ood128_misslen_l3plus/plots/addition_a1b1_d64l5r4h1_P127_tr64ood128_miss0.3len3_curve.png
+Saved per-position heatmap to /data/cxm/recursion/addition_p127_tr64_ood128_misslen_l3plus/plots/addition_a1b1_d64l5r4h1_P127_tr64ood128_miss0.3len3_per_pos.png
+No per-rule accuracy data to plot.
+[12:09:53] Grouped plots saved: addition_a1b1_d64l5r4h1_P127_tr64ood128_miss0.3len3
+[2026-08-08 12:09:53] 批次 1/1 结束（batch_run 退出码 0）
+[2026-08-08 12:09:53] 全部完成。

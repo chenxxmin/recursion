@@ -25,11 +25,11 @@
 
 ## 3. 正式报告文件
 
-- `reports/activation_patch_mixed_basic_d512l2r8h4_P127_seed0.json`
-- `reports/activation_patch_mixed_basic_d256l2r8h4_P127_seed0.json`
-- `reports/activation_patch_mixed_basic_d512l1r8h4_P509_seed0.json`
-- `reports/activation_patch_mixed_basic_d256l1r8h4_P509_seed0.json`
-- `reports/activation_patch_mixed_basic_d1024l1r16h4_P127_seed0.json`
+- `reports/data/hss/activation_patch_mixed_basic_d512l2r8h4_P127_seed0.json`
+- `reports/data/hss/activation_patch_mixed_basic_d256l2r8h4_P127_seed0.json`
+- `reports/data/hss/activation_patch_mixed_basic_d512l1r8h4_P509_seed0.json`
+- `reports/data/hss/activation_patch_mixed_basic_d256l1r8h4_P509_seed0.json`
+- `reports/data/hss/activation_patch_mixed_basic_d1024l1r16h4_P127_seed0.json`
 
 参数：`--pairs 64 --len 32`。
 

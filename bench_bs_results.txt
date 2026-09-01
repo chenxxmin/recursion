@@ -1,0 +1,12 @@
+bs=512 epochs=4 wall=13s peak_mem=NAMiB rc=0
+
+bs=1024 epochs=200 wall=2s peak_mem=NAMiB rc=1
+bs=2048 epochs=200 wall=1s peak_mem=NAMiB rc=1
+bs=4096 epochs=200 wall=1s peak_mem=NAMiB rc=1
+bs=8192 epochs=200 wall=1s peak_mem=NAMiB rc=1
+done
+bs=1024 epochs=200 wall=382s peak_mem=5515MiB rc=0
+bs=2048 epochs=200 wall=382s peak_mem=5445MiB rc=0
+bs=4096 epochs=200 wall=381s peak_mem=10169MiB rc=0
+bs=8192 epochs=200 wall=384s peak_mem=27447MiB rc=0
+done
