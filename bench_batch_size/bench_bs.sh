@@ -1,14 +1,14 @@
 #!/bin/bash
 # 在空闲 GPU 上 benchmark 不同 BATCH_SIZE 的每 epoch 耗时与峰值显存
 # 用法: bash bench_bs.sh <gpu_id>
-cd "$(dirname "$0")"
+cd "$(dirname "$0")/.."   # 项目根目录
 GPU="${1:-2}"
-BASE_CFG=bench_base.json
-OUT=bench_bs_results.txt
+BASE_CFG=bench_batch_size/bench_base.json
+OUT=bench_batch_size/bench_bs_results.txt
 
 run_bench() {
     local bs=$1 epochs=$2
-    local cfg="config_bench_bs${bs}.json"
+    local cfg="bench_batch_size/config_bench_bs${bs}.json"
     python3 - "$BASE_CFG" "$cfg" "$bs" "$epochs" <<'EOF'
 import json, sys
 src, dst, bs, epochs = sys.argv[1], sys.argv[2], int(sys.argv[3]), int(sys.argv[4])
