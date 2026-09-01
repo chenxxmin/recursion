@@ -138,7 +138,7 @@
 - **B2 方向不对称在此批中方向不定**（seed17996 AtoB 强、seed44536 BtoA 强、
   seed34789 对称）——不对称依赖具体规则对/seed，非普遍现象。
 
-报告：`reports/flip_hunt_rules23_seed{17996,18318,34789,44536}.json`。
+报告：`reports/data/flip_hunt/flip_hunt_rules23_seed{17996,18318,34789,44536}.json`。
 
 ## 8. N=3 课程模型解剖（2026-08-27，curr_l2d512r8h4_N3，acc 99.6%）
 
@@ -158,5 +158,5 @@
 
 ## 9. 报告文件
 
-`reports/flip_hunt_{h2,h4}_seed{0,999,12345}.json`（l1，d256l1r8h{2,4}_P127）、
-`reports/flip_hunt_l2h2_seed{0,999,12345}.json`（l2，d256l2r8h2_P127）。
+`reports/data/flip_hunt/flip_hunt_{h2,h4}_seed{0,999,12345}.json`（l1，d256l1r8h{2,4}_P127）、
+`reports/data/flip_hunt/flip_hunt_l2h2_seed{0,999,12345}.json`（l2，d256l2r8h2_P127）。

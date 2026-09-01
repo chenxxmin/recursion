@@ -14,7 +14,7 @@
 **设置**：b ∈ {0,3,4,5,6,7,8,12,16,24,32,48,64,96,126}（+ b=1,2 对照），
 每 b 256 个样本（x1,x2 ∈ 1..p-1，排除 0 退化），prefix 3 / 5 两种条件，
 teacher forcing + 自由生成 16 步。报告：
-`reports/rule_generalization_d256l1r8h4_P127_seed{0,999,12345}.json`。
+`reports/data/rule_generalization/rule_generalization_d256l1r8h4_P127_seed{0,999,12345}.json`。
 
 ## 主要发现
 
