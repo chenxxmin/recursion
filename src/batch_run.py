@@ -193,7 +193,12 @@ def run_single(exp, base_config, dirs, concurrency=1, gpu_id=None):
         err_log_path = os.path.join(dirs['log'], f"{name}.err")
 
         def read_stdout():
-            with open(log_path, 'w', encoding='utf-8') as f:
+            # Resume rounds append to the existing log (preserve history);
+            # fresh runs start a new log.
+            mode = 'a' if merged_main.get('RESUME_FROM') else 'w'
+            with open(log_path, mode, encoding='utf-8') as f:
+                if mode == 'a':
+                    f.write(f"\n{'='*70}\n=== RESUME ROUND: {name} ===\n")
                 f.write(f"=== Experiment: {name} ===\n")
                 f.write(f"Time: {datetime.now().isoformat()}\n")
                 f.write(f"Task type: {task}\n")

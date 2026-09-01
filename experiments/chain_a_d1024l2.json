@@ -1,0 +1,69 @@
+{
+  "concurrency": 2,
+  "experiments": [
+    {
+      "name": "action_d1024l2r4h4_P127_tr64ood128_N3_randmiss0.1len1_seed17996",
+      "task": "action",
+      "config": {
+        "P": 127,
+        "TRAIN_LEN": 64,
+        "OOD_LEN": 128,
+        "N_HEAD": 4,
+        "MLP_RATIO": 4,
+        "D_MODEL": 1024,
+        "N_LAYER": 2,
+        "MISS_LEN": 1,
+        "MISSING_PROB": 0.1,
+        "AB_PAIRS": [
+          [
+            1,
+            1
+          ],
+          [
+            2,
+            3
+          ],
+          [
+            3,
+            5
+          ]
+        ],
+        "RANDOM_SEED": 17996,
+        "MAX_TRAIN_HOURS": 6,
+        "USE_AMP": false
+      }
+    },
+    {
+      "name": "action_d1024l2r4h4_P127_tr64ood128_N3_randmiss0.1len1_seed18318",
+      "task": "action",
+      "config": {
+        "P": 127,
+        "TRAIN_LEN": 64,
+        "OOD_LEN": 128,
+        "N_HEAD": 4,
+        "MLP_RATIO": 4,
+        "D_MODEL": 1024,
+        "N_LAYER": 2,
+        "MISS_LEN": 1,
+        "MISSING_PROB": 0.1,
+        "AB_PAIRS": [
+          [
+            1,
+            1
+          ],
+          [
+            2,
+            3
+          ],
+          [
+            3,
+            5
+          ]
+        ],
+        "RANDOM_SEED": 18318,
+        "MAX_TRAIN_HOURS": 6,
+        "USE_AMP": false
+      }
+    }
+  ]
+}
