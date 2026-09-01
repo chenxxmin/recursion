@@ -1,0 +1,71 @@
+{
+  "concurrency": 2,
+  "experiments": [
+    {
+      "name": "action_d512l6r4h4_P127_tr64ood128_N3_randmiss0.1len1_seed17996",
+      "task": "action",
+      "config": {
+        "P": 127,
+        "TRAIN_LEN": 64,
+        "OOD_LEN": 128,
+        "N_HEAD": 4,
+        "MLP_RATIO": 4,
+        "D_MODEL": 512,
+        "N_LAYER": 6,
+        "MISS_LEN": 1,
+        "MISSING_PROB": 0.1,
+        "AB_PAIRS": [
+          [
+            1,
+            1
+          ],
+          [
+            2,
+            3
+          ],
+          [
+            3,
+            5
+          ]
+        ],
+        "RANDOM_SEED": 17996,
+        "USE_AMP": false,
+        "MAX_TRAIN_HOURS": 6,
+        "RESUME_FROM": "/data/cxm/models/action_misslen1_n3_depth_fp32/action_d512l6r4h4_P127_tr64ood128_N3_randmiss0.1len1_seed17996_resume.pth"
+      }
+    },
+    {
+      "name": "action_d512l6r4h4_P127_tr64ood128_N3_randmiss0.1len1_seed18318",
+      "task": "action",
+      "config": {
+        "P": 127,
+        "TRAIN_LEN": 64,
+        "OOD_LEN": 128,
+        "N_HEAD": 4,
+        "MLP_RATIO": 4,
+        "D_MODEL": 512,
+        "N_LAYER": 6,
+        "MISS_LEN": 1,
+        "MISSING_PROB": 0.1,
+        "AB_PAIRS": [
+          [
+            1,
+            1
+          ],
+          [
+            2,
+            3
+          ],
+          [
+            3,
+            5
+          ]
+        ],
+        "RANDOM_SEED": 18318,
+        "USE_AMP": false,
+        "MAX_TRAIN_HOURS": 6,
+        "RESUME_FROM": "/data/cxm/models/action_misslen1_n3_depth_fp32/action_d512l6r4h4_P127_tr64ood128_N3_randmiss0.1len1_seed18318_resume.pth"
+      }
+    }
+  ]
+}
