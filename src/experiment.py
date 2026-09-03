@@ -91,8 +91,15 @@ def _make_loaders(train_dataset, test_dataset, batch_size, collate_fn):
     train_sampler = BucketBatchSampler(train_dataset, batch_size=batch_size, shuffle=True)
     test_sampler = BucketBatchSampler(test_dataset, batch_size=batch_size, shuffle=False)
     train_loader = DataLoader(train_dataset, batch_sampler=train_sampler, collate_fn=collate_fn)
-    test_loader = DataLoader(test_dataset, batch_sampler=test_sampler, collate_fn=collate_fn)
+    test_loader = _make_test_loader(test_dataset, batch_size, collate_fn, test_sampler)
     return train_loader, test_loader
+
+
+def _make_test_loader(test_dataset, batch_size, collate_fn, sampler=None):
+    """Build the eval DataLoader (separated so fresh-test-per-eval can rebuild it)."""
+    if sampler is None:
+        sampler = BucketBatchSampler(test_dataset, batch_size=batch_size, shuffle=False)
+    return DataLoader(test_dataset, batch_sampler=sampler, collate_fn=collate_fn)
 
 
 def _print_task_banner(block_size, train_len, number_theory_msg):
@@ -274,6 +281,22 @@ def _prepare_action(config):
     collate = action_missing_collate_fn if missing_prob > 0 else action_collate_fn
     train_loader, test_loader = _make_loaders(train_dataset, test_dataset, BATCH_SIZE, collate)
 
+    # FRESH_TEST_PER_EVAL: rebuild the test set at every eval with a fresh seed
+    # (same length as train — no OOD split in this regime). A dedicated RNG
+    # keeps the fresh-seed stream reproducible per run but distinct per eval.
+    test_loader_fn = None
+    if cfg.get('FRESH_TEST_PER_EVAL', False):
+        fresh_rng = random.Random(cfg.get('RANDOM_SEED', 42) + 10 ** 6 + 7)
+
+        def test_loader_fn():  # noqa: F811 (intentional closure name)
+            fresh_seed = fresh_rng.randrange(2 ** 31)
+            ds = ActionDataset(
+                p=P, ab_pairs=AB_PAIRS, num_samples=NUM_TEST_SAMPLES,
+                length=OOD_LEN, seed=fresh_seed,
+                missing_prob=missing_prob, miss_len=miss_len)
+            print(f"[FreshTest] rebuilt test set: n={NUM_TEST_SAMPLES}, len={OOD_LEN}, seed={fresh_seed}")
+            return _make_test_loader(ds, BATCH_SIZE, collate)
+
     model = FibonacciTransformer(
         p=P, d_model=D_MODEL, n_head=N_HEAD, n_layer=N_LAYER,
         block_size=BLOCK_SIZE, dropout=DROPOUT,
@@ -320,6 +343,7 @@ def _prepare_action(config):
         'test_dataset': test_dataset,
         'train_loader': train_loader,
         'test_loader': test_loader,
+        'test_loader_fn': test_loader_fn,
         'num_mask': 0,  # unused; loss_mask comes from the dataset
         'extra_kwargs_fn': None,
         'save_config': save_config,
@@ -543,7 +567,8 @@ def run_experiment(config_path=None):
         max_train_hours=cfg.get('MAX_TRAIN_HOURS'),
         resume_state=resume_state,
         use_amp=cfg.get('USE_AMP', False),
-        amp_dtype=cfg.get('AMP_DTYPE', 'bfloat16')
+        amp_dtype=cfg.get('AMP_DTYPE', 'bfloat16'),
+        test_loader_fn=ctx.get('test_loader_fn')
     )
 
     if timed_out:

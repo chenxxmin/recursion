@@ -16,8 +16,8 @@ import json
 import os
 import sys
 
-DATA_BASE = '/data/cxm/recursion'
-MODEL_BASE = '/data/cxm/models'
+DATA_BASE = os.environ.get('CHAIN_DATA_BASE', '/data/cxm/recursion')
+MODEL_BASE = os.environ.get('CHAIN_MODEL_BASE', '/data/cxm/models')
 
 
 def main():

@@ -310,7 +310,7 @@ def run_training_engine(model, train_loader, test_loader, optimizer, scheduler, 
                         cond_fix=None, cond_fix_start=None,
                         cond_fix_start_a1=None, cond_fix_start_a2=None,
                         max_train_hours=None, resume_state=None, use_amp=False,
-                        amp_dtype='bfloat16'):
+                        amp_dtype='bfloat16', test_loader_fn=None):
     print(f"\nStart training...")
     # Autocast for the forward pass (weights/optimizer stay fp32). bf16 needs
     # no scaler (fp32-range exponent); fp16 needs GradScaler (5-bit exponent).
@@ -364,9 +364,10 @@ def run_training_engine(model, train_loader, test_loader, optimizer, scheduler, 
         scheduler.step()
         
         if epoch % eval_interval == 0 or epoch == epochs - 1:
+            eval_loader = test_loader_fn() if test_loader_fn is not None else test_loader
             with amp_ctx():
                 _, test_acc, test_pos_acc, test_group_acc = evaluate(
-                    model, test_loader, device,
+                    model, eval_loader, device,
                     num_mask=num_mask, extra_kwargs_fn=extra_kwargs_fn)
 
             # Conditional freeze: freeze cond_fix params when the start condition is met.

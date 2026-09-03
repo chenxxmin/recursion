@@ -35,7 +35,8 @@
     "RESUME_FROM": null,
     "ALLOW_TF32": true,
     "USE_AMP": false,
-    "AMP_DTYPE": "bfloat16"
+    "AMP_DTYPE": "bfloat16",
+    "FRESH_TEST_PER_EVAL": false
   },
   "tribonacci": {
     "P": 23,
