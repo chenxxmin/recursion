@@ -568,7 +568,9 @@ def run_experiment(config_path=None):
         resume_state=resume_state,
         use_amp=cfg.get('USE_AMP', False),
         amp_dtype=cfg.get('AMP_DTYPE', 'bfloat16'),
-        test_loader_fn=ctx.get('test_loader_fn')
+        test_loader_fn=ctx.get('test_loader_fn'),
+        grad_accum_steps=cfg.get('GRAD_ACCUM_STEPS', 1),
+        extra_epochs_after_high_acc=cfg.get('EARLY_STOP_EXTRA_EPOCHS', 200)
     )
 
     if timed_out:

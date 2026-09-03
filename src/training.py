@@ -167,15 +167,16 @@ def _default_loss_mask(batch_size, target_len, num_mask, first_task_weight=1.0, 
     return mask
 
 
-def train_epoch(model, dataloader, optimizer, device, num_mask=1, extra_kwargs_fn=None, first_task_weight=1.0, frozen_param_states=None, grad_scaler=None):
+def train_epoch(model, dataloader, optimizer, device, num_mask=1, extra_kwargs_fn=None, first_task_weight=1.0, frozen_param_states=None, grad_scaler=None, grad_accum_steps=1):
     model.train()
     total_loss = 0
     total_correct = 0
     total_samples = 0
     pos_correct = {}
     pos_total = {}
+    n_batches = len(dataloader)
     
-    for batch in dataloader:
+    for i, batch in enumerate(dataloader):
         x, loss_mask, kwargs, _, targets_override = _unpack_batch(batch, device, extra_kwargs_fn)
         B = x.size(0)
 
@@ -186,31 +187,35 @@ def train_epoch(model, dataloader, optimizer, device, num_mask=1, extra_kwargs_f
         if loss_mask is None:
             loss_mask = _default_loss_mask(B, targets.size(1), num_mask, first_task_weight, device)
         
-        optimizer.zero_grad()
+        if i % grad_accum_steps == 0:
+            optimizer.zero_grad()
         logits, loss, *_ = model(x, targets, loss_mask, **kwargs)
         
         if loss is not None and torch.isnan(loss):
             # NaN diagnostic: print to stderr so it shows up in .err logs
             _print_nan_diagnostics(x, logits, loss_mask, targets)
         
+        step_now = ((i + 1) % grad_accum_steps == 0) or (i == n_batches - 1)
         if loss is not None and not torch.isnan(loss):
             if grad_scaler is not None:
-                # fp16 path: scale loss to keep gradients in fp16 range,
-                # unscale before clipping, scaler skips the step on inf/NaN.
-                grad_scaler.scale(loss).backward()
-                grad_scaler.unscale_(optimizer)
-                torch.nn.utils.clip_grad_norm_(model.parameters(), 1.0)
-                grad_scaler.step(optimizer)
-                grad_scaler.update()
+                grad_scaler.scale(loss / grad_accum_steps).backward()
             else:
-                loss.backward()
-                torch.nn.utils.clip_grad_norm_(model.parameters(), 1.0)
-                optimizer.step()
-            # Restore frozen parameters (AdamW weight decay would otherwise drift them)
-            if frozen_param_states:
-                with torch.no_grad():
-                    for param, saved_value in frozen_param_states:
-                        param.copy_(saved_value)
+                (loss / grad_accum_steps).backward()
+            if step_now:
+                if grad_scaler is not None:
+                    # fp16 path: unscale before clipping, scaler skips on inf/NaN.
+                    grad_scaler.unscale_(optimizer)
+                    torch.nn.utils.clip_grad_norm_(model.parameters(), 1.0)
+                    grad_scaler.step(optimizer)
+                    grad_scaler.update()
+                else:
+                    torch.nn.utils.clip_grad_norm_(model.parameters(), 1.0)
+                    optimizer.step()
+                # Restore frozen parameters (AdamW weight decay would otherwise drift them)
+                if frozen_param_states:
+                    with torch.no_grad():
+                        for param, saved_value in frozen_param_states:
+                            param.copy_(saved_value)
         
         with torch.no_grad():
             _, batch_correct, batch_samples = _accumulate_accuracy(
@@ -310,7 +315,8 @@ def run_training_engine(model, train_loader, test_loader, optimizer, scheduler, 
                         cond_fix=None, cond_fix_start=None,
                         cond_fix_start_a1=None, cond_fix_start_a2=None,
                         max_train_hours=None, resume_state=None, use_amp=False,
-                        amp_dtype='bfloat16', test_loader_fn=None):
+                        amp_dtype='bfloat16', test_loader_fn=None, grad_accum_steps=1,
+                        extra_epochs_after_high_acc=200):
     print(f"\nStart training...")
     # Autocast for the forward pass (weights/optimizer stay fp32). bf16 needs
     # no scaler (fp32-range exponent); fp16 needs GradScaler (5-bit exponent).
@@ -342,7 +348,7 @@ def run_training_engine(model, train_loader, test_loader, optimizer, scheduler, 
     cond_fix_triggered = False
     # After test acc first reaches early_stop_accuracy, keep training for this
     # many extra epochs before stopping (instead of stopping immediately).
-    extra_epochs_after_high_acc = 200
+    # Config: EARLY_STOP_EXTRA_EPOCHS (default 200; v2 regime uses 20).
 
     # cond_fix_start == 0: freeze BEFORE the first gradient step. (Any other
     # start value keeps the threshold semantics: freeze at the first eval
@@ -360,7 +366,8 @@ def run_training_engine(model, train_loader, test_loader, optimizer, scheduler, 
                 num_mask=num_mask, extra_kwargs_fn=extra_kwargs_fn,
                 first_task_weight=first_task_weight,
                 frozen_param_states=frozen_param_states,
-                grad_scaler=grad_scaler)
+                grad_scaler=grad_scaler,
+                grad_accum_steps=grad_accum_steps)
         scheduler.step()
         
         if epoch % eval_interval == 0 or epoch == epochs - 1:
