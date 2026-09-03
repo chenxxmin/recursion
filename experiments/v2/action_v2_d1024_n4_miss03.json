@@ -1,0 +1,253 @@
+{
+  "concurrency": 4,
+  "experiments": [
+    {
+      "name": "action_v2_d1024l1r4h4_P127_tr127_N4_miss0.3len1_seed17996",
+      "task": "action",
+      "config": {
+        "P": 127,
+        "TRAIN_LEN": 64,
+        "OOD_LEN": 64,
+        "N_HEAD": 4,
+        "MLP_RATIO": 4,
+        "D_MODEL": 1024,
+        "N_LAYER": 1,
+        "AB_PAIRS": [
+          [
+            1,
+            1
+          ],
+          [
+            2,
+            3
+          ],
+          [
+            3,
+            5
+          ],
+          [
+            4,
+            7
+          ]
+        ],
+        "MISSING_PROB": 0.3,
+        "MISS_LEN": 1,
+        "NUM_TRAIN_SAMPLES": 300000,
+        "NUM_TEST_SAMPLES": 256,
+        "FRESH_TEST_PER_EVAL": true,
+        "BATCH_SIZE": 2048,
+        "RANDOM_SEED": 17996,
+        "MAX_TRAIN_HOURS": 6,
+        "USE_AMP": false,
+        "EARLY_STOP_EXTRA_EPOCHS": 20
+      }
+    },
+    {
+      "name": "action_v2_d1024l1r4h4_P127_tr127_N4_miss0.3len1_seed18318",
+      "task": "action",
+      "config": {
+        "P": 127,
+        "TRAIN_LEN": 64,
+        "OOD_LEN": 64,
+        "N_HEAD": 4,
+        "MLP_RATIO": 4,
+        "D_MODEL": 1024,
+        "N_LAYER": 1,
+        "AB_PAIRS": [
+          [
+            1,
+            1
+          ],
+          [
+            2,
+            3
+          ],
+          [
+            3,
+            5
+          ],
+          [
+            4,
+            7
+          ]
+        ],
+        "MISSING_PROB": 0.3,
+        "MISS_LEN": 1,
+        "NUM_TRAIN_SAMPLES": 300000,
+        "NUM_TEST_SAMPLES": 256,
+        "FRESH_TEST_PER_EVAL": true,
+        "BATCH_SIZE": 2048,
+        "RANDOM_SEED": 18318,
+        "MAX_TRAIN_HOURS": 6,
+        "USE_AMP": false,
+        "EARLY_STOP_EXTRA_EPOCHS": 20
+      }
+    },
+    {
+      "name": "action_v2_d1024l2r4h4_P127_tr127_N4_miss0.3len1_seed17996",
+      "task": "action",
+      "config": {
+        "P": 127,
+        "TRAIN_LEN": 64,
+        "OOD_LEN": 64,
+        "N_HEAD": 4,
+        "MLP_RATIO": 4,
+        "D_MODEL": 1024,
+        "N_LAYER": 2,
+        "AB_PAIRS": [
+          [
+            1,
+            1
+          ],
+          [
+            2,
+            3
+          ],
+          [
+            3,
+            5
+          ],
+          [
+            4,
+            7
+          ]
+        ],
+        "MISSING_PROB": 0.3,
+        "MISS_LEN": 1,
+        "NUM_TRAIN_SAMPLES": 300000,
+        "NUM_TEST_SAMPLES": 256,
+        "FRESH_TEST_PER_EVAL": true,
+        "BATCH_SIZE": 2048,
+        "RANDOM_SEED": 17996,
+        "MAX_TRAIN_HOURS": 6,
+        "USE_AMP": false,
+        "EARLY_STOP_EXTRA_EPOCHS": 20
+      }
+    },
+    {
+      "name": "action_v2_d1024l2r4h4_P127_tr127_N4_miss0.3len1_seed18318",
+      "task": "action",
+      "config": {
+        "P": 127,
+        "TRAIN_LEN": 64,
+        "OOD_LEN": 64,
+        "N_HEAD": 4,
+        "MLP_RATIO": 4,
+        "D_MODEL": 1024,
+        "N_LAYER": 2,
+        "AB_PAIRS": [
+          [
+            1,
+            1
+          ],
+          [
+            2,
+            3
+          ],
+          [
+            3,
+            5
+          ],
+          [
+            4,
+            7
+          ]
+        ],
+        "MISSING_PROB": 0.3,
+        "MISS_LEN": 1,
+        "NUM_TRAIN_SAMPLES": 300000,
+        "NUM_TEST_SAMPLES": 256,
+        "FRESH_TEST_PER_EVAL": true,
+        "BATCH_SIZE": 2048,
+        "RANDOM_SEED": 18318,
+        "MAX_TRAIN_HOURS": 6,
+        "USE_AMP": false,
+        "EARLY_STOP_EXTRA_EPOCHS": 20
+      }
+    },
+    {
+      "name": "action_v2_d1024l4r4h4_P127_tr127_N4_miss0.3len1_seed17996",
+      "task": "action",
+      "config": {
+        "P": 127,
+        "TRAIN_LEN": 64,
+        "OOD_LEN": 64,
+        "N_HEAD": 4,
+        "MLP_RATIO": 4,
+        "D_MODEL": 1024,
+        "N_LAYER": 4,
+        "AB_PAIRS": [
+          [
+            1,
+            1
+          ],
+          [
+            2,
+            3
+          ],
+          [
+            3,
+            5
+          ],
+          [
+            4,
+            7
+          ]
+        ],
+        "MISSING_PROB": 0.3,
+        "MISS_LEN": 1,
+        "NUM_TRAIN_SAMPLES": 300000,
+        "NUM_TEST_SAMPLES": 256,
+        "FRESH_TEST_PER_EVAL": true,
+        "BATCH_SIZE": 1024,
+        "RANDOM_SEED": 17996,
+        "MAX_TRAIN_HOURS": 6,
+        "USE_AMP": false,
+        "EARLY_STOP_EXTRA_EPOCHS": 20,
+        "GRAD_ACCUM_STEPS": 2
+      }
+    },
+    {
+      "name": "action_v2_d1024l4r4h4_P127_tr127_N4_miss0.3len1_seed18318",
+      "task": "action",
+      "config": {
+        "P": 127,
+        "TRAIN_LEN": 64,
+        "OOD_LEN": 64,
+        "N_HEAD": 4,
+        "MLP_RATIO": 4,
+        "D_MODEL": 1024,
+        "N_LAYER": 4,
+        "AB_PAIRS": [
+          [
+            1,
+            1
+          ],
+          [
+            2,
+            3
+          ],
+          [
+            3,
+            5
+          ],
+          [
+            4,
+            7
+          ]
+        ],
+        "MISSING_PROB": 0.3,
+        "MISS_LEN": 1,
+        "NUM_TRAIN_SAMPLES": 300000,
+        "NUM_TEST_SAMPLES": 256,
+        "FRESH_TEST_PER_EVAL": true,
+        "BATCH_SIZE": 1024,
+        "RANDOM_SEED": 18318,
+        "MAX_TRAIN_HOURS": 6,
+        "USE_AMP": false,
+        "EARLY_STOP_EXTRA_EPOCHS": 20,
+        "GRAD_ACCUM_STEPS": 2
+      }
+    }
+  ]
+}
