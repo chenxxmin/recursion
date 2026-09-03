@@ -98,7 +98,7 @@ def main():
             m = stats[c]['mass'][li] / stats[c]['n']
             for h in range(m.shape[0]):
                 parts = [f"{g}({m[h, gi].item() * 100:.1f}%)" for gi, g in enumerate(groups)
-                         if m[h, gi].item() * 100 > 5]
+                         if True]
                 print(f"- h{h}：" + " + ".join(parts))
             print()
 
