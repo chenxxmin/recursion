@@ -66,6 +66,7 @@ def main():
               f'{DATA}/action_misslen2_n2_scaleup/logs',
               f'{DATA}/action_misslen2_n2_d2048_resume/logs',
               f'{DATA}/action_misslen2_n2_d2048_resume2/logs',
+              f'{DATA}/chain_b_d2048l4_01/logs',
               f'{DATA}/chain_b_d2048l2/logs',
               f'{DATA}/chain_b_d2048l4/logs',
               f'{DATA}/chain_b_d1024l4/logs']
@@ -113,7 +114,7 @@ def main():
 
     p = os.path.join(REPO, 'reports/ACTION_MISSLEN_STATUS.md')
     txt = open(p).read()
-    txt = re.sub(r'\n## 结果总表（.*?）(?=\n## |\Z)', '', txt, flags=re.S)
+    txt = re.sub(r'\n## 结果总表（[^）]*）.*?(?=\n## [^#]|\Z)', '', txt, flags=re.S)
     txt = txt.replace('\n## 一、已有确定答案', '\n' + '\n'.join(out) + '\n\n## 一、已有确定答案')
     open(p, 'w').write(txt)
     print(f"tables updated in {p}")

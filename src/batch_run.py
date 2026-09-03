@@ -336,7 +336,8 @@ def main():
     except Exception:
         num_gpus_total = 0
 
-    idle_gpus = get_idle_gpus() if num_gpus_total > 0 else None
+    idle_gpus = get_idle_gpus(
+        int(os.environ.get('BATCH_RUN_IDLE_MEM_MB', '100'))) if num_gpus_total > 0 else None
 
     if idle_gpus is not None:
         gpu_ids = idle_gpus
