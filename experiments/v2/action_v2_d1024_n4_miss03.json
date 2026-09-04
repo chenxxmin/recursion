@@ -39,7 +39,8 @@
         "RANDOM_SEED": 17996,
         "MAX_TRAIN_HOURS": 6,
         "USE_AMP": false,
-        "EARLY_STOP_EXTRA_EPOCHS": 20
+        "EARLY_STOP_EXTRA_EPOCHS": 20,
+        "EVAL_INTERVAL": 1
       }
     },
     {
@@ -80,7 +81,8 @@
         "RANDOM_SEED": 18318,
         "MAX_TRAIN_HOURS": 6,
         "USE_AMP": false,
-        "EARLY_STOP_EXTRA_EPOCHS": 20
+        "EARLY_STOP_EXTRA_EPOCHS": 20,
+        "EVAL_INTERVAL": 1
       }
     },
     {
@@ -121,7 +123,8 @@
         "RANDOM_SEED": 17996,
         "MAX_TRAIN_HOURS": 6,
         "USE_AMP": false,
-        "EARLY_STOP_EXTRA_EPOCHS": 20
+        "EARLY_STOP_EXTRA_EPOCHS": 20,
+        "EVAL_INTERVAL": 1
       }
     },
     {
@@ -162,7 +165,8 @@
         "RANDOM_SEED": 18318,
         "MAX_TRAIN_HOURS": 6,
         "USE_AMP": false,
-        "EARLY_STOP_EXTRA_EPOCHS": 20
+        "EARLY_STOP_EXTRA_EPOCHS": 20,
+        "EVAL_INTERVAL": 1
       }
     },
     {
@@ -204,7 +208,8 @@
         "MAX_TRAIN_HOURS": 6,
         "USE_AMP": false,
         "EARLY_STOP_EXTRA_EPOCHS": 20,
-        "GRAD_ACCUM_STEPS": 2
+        "GRAD_ACCUM_STEPS": 2,
+        "EVAL_INTERVAL": 1
       }
     },
     {
@@ -246,7 +251,8 @@
         "MAX_TRAIN_HOURS": 6,
         "USE_AMP": false,
         "EARLY_STOP_EXTRA_EPOCHS": 20,
-        "GRAD_ACCUM_STEPS": 2
+        "GRAD_ACCUM_STEPS": 2,
+        "EVAL_INTERVAL": 1
       }
     }
   ]
