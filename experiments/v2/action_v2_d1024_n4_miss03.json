@@ -119,12 +119,13 @@
         "NUM_TRAIN_SAMPLES": 300000,
         "NUM_TEST_SAMPLES": 256,
         "FRESH_TEST_PER_EVAL": true,
-        "BATCH_SIZE": 2048,
+        "BATCH_SIZE": 1024,
         "RANDOM_SEED": 17996,
         "MAX_TRAIN_HOURS": 6,
         "USE_AMP": false,
         "EARLY_STOP_EXTRA_EPOCHS": 20,
-        "EVAL_INTERVAL": 1
+        "EVAL_INTERVAL": 1,
+        "GRAD_ACCUM_STEPS": 2
       }
     },
     {
@@ -161,12 +162,13 @@
         "NUM_TRAIN_SAMPLES": 300000,
         "NUM_TEST_SAMPLES": 256,
         "FRESH_TEST_PER_EVAL": true,
-        "BATCH_SIZE": 2048,
+        "BATCH_SIZE": 1024,
         "RANDOM_SEED": 18318,
         "MAX_TRAIN_HOURS": 6,
         "USE_AMP": false,
         "EARLY_STOP_EXTRA_EPOCHS": 20,
-        "EVAL_INTERVAL": 1
+        "EVAL_INTERVAL": 1,
+        "GRAD_ACCUM_STEPS": 2
       }
     },
     {
