@@ -7,6 +7,7 @@ symbols defined here (_unpack_batch, _sample_seq), so existing
 """
 import os
 import random
+import signal
 import sys
 import time
 from contextlib import nullcontext
@@ -14,6 +15,17 @@ from contextlib import nullcontext
 import torch
 
 from datasets import BatchTag
+
+# Set by the SIGTERM handler: checked at each eval point to save a resume
+# checkpoint and exit (manual graceful stop).
+_STOP_REQUESTED = False
+
+
+def _sigterm_handler(signum, frame):
+    # NOTE: do NOT print here — the signal may interrupt an in-flight print()
+    # and re-entering the writer raises RuntimeError. Just set the flag.
+    global _STOP_REQUESTED
+    _STOP_REQUESTED = True
 
 
 # ==================== Training Functions ====================
@@ -344,6 +356,11 @@ def run_training_engine(model, train_loader, test_loader, optimizer, scheduler, 
         print(f"[RESUME] continue from epoch {start_epoch}, "
               f"best={best_acc:.2%}(@{best_epoch})")
     train_t0 = time.time()
+    global _STOP_REQUESTED
+    _STOP_REQUESTED = False
+    # Graceful stop: SIGTERM (e.g. kill <pid>) triggers checkpoint-save+exit
+    # at the next eval point instead of losing in-round progress.
+    previous_handler = signal.signal(signal.SIGTERM, _sigterm_handler)
     frozen_param_states = None
     cond_fix_triggered = False
     # After test acc first reaches early_stop_accuracy, keep training for this
@@ -446,6 +463,16 @@ def run_training_engine(model, train_loader, test_loader, optimizer, scheduler, 
             if no_improve >= early_stop_no_improve:
                 print(f"[Early stop] No improvement for {early_stop_no_improve} consecutive epochs")
                 break
+
+            # Manual stop requested via SIGTERM: same checkpoint path as timeout.
+            if _STOP_REQUESTED:
+                resume_path = resume_checkpoint_path(save_path)
+                save_resume_checkpoint(resume_path, model, optimizer, scheduler,
+                                       epoch + 1, best_acc, best_epoch, no_improve,
+                                       high_acc_epoch, save_config)
+                print(f"[STOP] Checkpoint saved at epoch {epoch}: "
+                      f"{os.path.abspath(resume_path)}")
+                return best_acc, epoch, True
 
             # Wall-clock limit: save a full resume checkpoint and bail out.
             # Checked at eval points so best_acc/no_improve are up to date.
