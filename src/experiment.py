@@ -371,12 +371,21 @@ def _prepare_single_recurrence(config, task):
 
     BLOCK_SIZE = _round_up_pow2(max(TRAIN_LEN, OOD_LEN))
 
-    default_num_mask = {'addition': 1, 'multiplication': 1, 'tribonacci': 2, 'nonlinear': 1, 'nonlinear_mul': 1}[task]
+    default_num_mask = {'addition': 1, 'multiplication': 1, 'tribonacci': 2, 'tetranacci': 3, 'nonlinear': 1, 'nonlinear_mul': 1}[task]
     init_len, recurrence_fn, recurrence_name = single_rule_from_task(task, cfg)
     save_extra_config = save_config_extra(task, cfg)
 
+    # STATE_SPACE_CAP: cap the effective state space for high-order recurrences
+    # (e.g. p=127 at init_len=4 -> 2.6e8 states is infeasible to enumerate);
+    # the dataset then subsamples that many distinct initial states uniformly.
+    STATE_SPACE_CAP = cfg.get('STATE_SPACE_CAP')
     state_space_size = P ** init_len
-    NUM_TRAIN_SAMPLES = max(1, int(state_space_size * MAX_UNIQUE_RATIO))
+    if STATE_SPACE_CAP is not None:
+        state_space_size = min(state_space_size, STATE_SPACE_CAP)
+    # Explicit NUM_TRAIN_SAMPLES overrides the MAX_UNIQUE_RATIO-derived count.
+    NUM_TRAIN_SAMPLES = cfg.get('NUM_TRAIN_SAMPLES')
+    if NUM_TRAIN_SAMPLES is None:
+        NUM_TRAIN_SAMPLES = max(1, int(state_space_size * MAX_UNIQUE_RATIO))
     # NUM_MASK unset (None) falls back to the task's default mask count.
     num_mask_cfg = cfg.get('NUM_MASK')
     num_mask = default_num_mask if num_mask_cfg is None else num_mask_cfg
@@ -396,7 +405,8 @@ def _prepare_single_recurrence(config, task):
         miss_second=cfg.get('MISS_SECOND', False),
         predict_missing=predict_missing,
         num_mask=num_mask,
-        first_task_weight=cfg.get('FIRST_TASK_WEIGHT', 1.0)
+        first_task_weight=cfg.get('FIRST_TASK_WEIGHT', 1.0),
+        state_cap=STATE_SPACE_CAP
     )
     ds.run()
     train_dataset = ds.train_samples
@@ -413,6 +423,36 @@ def _prepare_single_recurrence(config, task):
     else:
         collate = collate_fn              # plain tensors -> PLAIN
     train_loader, test_loader = _make_loaders(train_dataset, test_dataset, BATCH_SIZE, collate)
+
+    # FRESH_TEST_PER_EVAL: rebuild the test set at every eval from fresh random
+    # initial states (NUM_TEST_SAMPLES windows of length OOD_LEN, drawn from
+    # the full state space via the dataset's subsampling path; num_samples=0
+    # sends them all to the test split). The fresh seed stream is reproducible
+    # per run but distinct per eval, and the global RNG state is preserved.
+    test_loader_fn = None
+    if cfg.get('FRESH_TEST_PER_EVAL', False):
+        NUM_TEST_SAMPLES = cfg.get('NUM_TEST_SAMPLES', 256)
+        fresh_rng = random.Random(cfg.get('RANDOM_SEED', 42) + 10 ** 6 + 7)
+
+        def test_loader_fn():  # noqa: F811 (intentional closure name)
+            fresh_seed = fresh_rng.randrange(2 ** 31)
+            rng_state = random.getstate()
+            random.seed(fresh_seed)
+            fresh_ds = RecurrenceDataset(
+                p=P, recurrence_fn=recurrence_fn, recurrence_name=recurrence_name,
+                init_len=init_len, num_samples=0, length=OOD_LEN, verbose=False,
+                missing_prob=missing_prob,
+                miss_len=cfg.get('MISS_LEN', 1),
+                miss_second=cfg.get('MISS_SECOND', False),
+                predict_missing=predict_missing,
+                num_mask=num_mask,
+                first_task_weight=cfg.get('FIRST_TASK_WEIGHT', 1.0),
+                state_cap=NUM_TEST_SAMPLES,
+            )
+            fresh_ds.run()
+            random.setstate(rng_state)
+            print(f"[FreshTest] rebuilt test set: n={NUM_TEST_SAMPLES}, len={OOD_LEN}, seed={fresh_seed}")
+            return _make_test_loader(fresh_ds.test_samples, BATCH_SIZE, collate)
 
     model = FibonacciTransformer(
         p=P, d_model=D_MODEL, n_head=N_HEAD, n_layer=N_LAYER,
@@ -444,6 +484,7 @@ def _prepare_single_recurrence(config, task):
         'test_dataset': test_dataset,
         'train_loader': train_loader,
         'test_loader': test_loader,
+        'test_loader_fn': test_loader_fn,
         'num_mask': num_mask,
         'extra_kwargs_fn': None,
         'save_config': save_config,
@@ -454,6 +495,7 @@ def _prepare_single_recurrence(config, task):
         'recurrence_fn': recurrence_fn,
         'init_len': init_len,
         'recurrence_name': recurrence_name,
+        'state_cap': STATE_SPACE_CAP,
     }
 
 
@@ -498,7 +540,7 @@ def run_experiment(config_path=None):
         ctx = _prepare_mixed_recurrence(config, device, order)
     elif TASK == 'action':
         ctx = _prepare_action(config)
-    elif TASK in ('addition', 'multiplication', 'tribonacci', 'nonlinear', 'nonlinear_mul'):
+    elif TASK in ('addition', 'multiplication', 'tribonacci', 'tetranacci', 'nonlinear', 'nonlinear_mul'):
         ctx = _prepare_single_recurrence(config, TASK)
     else:
         print(f"Unknown task: {TASK}")
@@ -592,4 +634,5 @@ def run_experiment(config_path=None):
         _run_single_recurrence_final_test(model, train_dataset,
                                           ctx['recurrence_fn'], ctx['init_len'],
                                           ctx['recurrence_name'], P, TRAIN_LEN,
-                                          OOD_LEN, num_mask, device)
+                                          OOD_LEN, num_mask, device,
+                                          state_cap=ctx.get('state_cap'))

@@ -16,9 +16,9 @@ sys.path.insert(0, os.path.join(os.path.dirname(os.path.abspath(__file__)), '..'
 from core import run_experiment
 
 
-def _run(tmpdir, fresh):
+def _run(tmpdir, fresh, task='action'):
     main = {
-        'TASK': 'action', 'P': 7, 'AB_PAIRS': [[1, 1], [2, 3]],
+        'TASK': task, 'P': 7, 'AB_PAIRS': [[1, 1], [2, 3]],
         'D_MODEL': 32, 'N_HEAD': 1, 'N_LAYER': 1, 'BATCH_SIZE': 32,
         'EPOCHS': 3, 'LR': 0.001, 'RANDOM_SEED': 42,
         'TRAIN_LEN': 8, 'OOD_LEN': 8, 'DROPOUT': 0.0, 'MAX_UNIQUE_RATIO': 0.7,
@@ -53,7 +53,20 @@ def test_fresh_test_disabled_by_default():
         assert '[FreshTest]' not in out
 
 
+def test_fresh_test_single_recurrence():
+    """Single-recurrence tasks (tribonacci) also rebuild the test set per eval:
+    fresh seeds differ per eval, and the train set stays at the explicit
+    NUM_TRAIN_SAMPLES rather than the MAX_UNIQUE_RATIO-derived count."""
+    with tempfile.TemporaryDirectory() as tmpdir:
+        out = _run(tmpdir, fresh=True, task='tribonacci')
+        seeds = re.findall(r'\[FreshTest\] rebuilt test set: n=32, len=8, seed=(\d+)', out)
+        assert len(seeds) >= 3, f"expected >=3 fresh rebuilds, got {len(seeds)}"
+        assert len(set(seeds)) == len(seeds), f"seeds must differ per eval: {seeds}"
+        assert '200 + ' in out, "train set should be NUM_TRAIN_SAMPLES=200"
+
+
 if __name__ == '__main__':
     test_fresh_test_per_eval_rebuilds_each_time()
     test_fresh_test_disabled_by_default()
+    test_fresh_test_single_recurrence()
     print("ALL TESTS PASSED: test_fresh_test_eval.py")

@@ -42,6 +42,7 @@ setsid nohup bash scripts/chain_rounds.sh experiments/<批次>.json <gpus> <roun
 ## 3. 关键运行行为（影响决策）
 
 - **6h 存盘**：`MAX_TRAIN_HOURS` 到点后写 `<model>_resume.pth`（含优化器/调度器/RNG），退出码 42，batch 标记 timed out。
+- **滚动 checkpoint**：每个 eval 点覆盖写 `<model>_latest.pth`（完整状态可续跑），best 更新时写 `<model>_best.pth`（纯权重）。意外死亡也能保住最佳权重和最新进度（2026-09-08 起）。
 - **手动关停保存**：对 core.py 进程 `kill <pid>`（SIGTERM）→ 下一个 eval 点存盘退出（码 42）。不要 kill -9（丢进度）。**教训：永远先等存盘/用 SIGTERM，不要在存盘点前强杀。**
 - **精度**：默认 fp32+TF32。bf16（`USE_AMP=true`）只能从零粗筛取阳性，续跑接近收敛的模型会摧毁它；结论性实验必须 fp32。细节见 `docs/AMP_PRECISION_NOTES.md`。
 - **曲线密度**：要画学习曲线就设 `EVAL_INTERVAL=1`（评估便宜）；默认 20 太稀。
@@ -58,8 +59,9 @@ python .agents/skills/recursion-experiment-runner/scripts/check_progress.py <批
 ## 5. 关停
 
 - **定时关停**：配 `MAX_TRAIN_HOURS`；或给 chain_rounds.sh 限定轮数。
-- **手动关停且保存**：先杀编排器（chain_rounds.sh / 等待器脚本），再对训练进程发 SIGTERM——当前轮在 eval 点存盘退出。
-- **手动关停整条链**：`pkill -f 'chain_rounds.sh experiments/<批次>'`，然后对 `core.py config_tmp_<实验名>` 逐个 `kill`（SIGTERM 存盘）。pkill 模式别写成能匹配到自己命令行的形式（会误杀 shell，用 `pgrep -af '...'` 先核对 PID 再 kill）。
+- **手动关停且保存**：**先对训练进程（core.py）发 SIGTERM**，等日志出现 `[STOP] Checkpoint saved`（下一个 eval 点，EVAL_INTERVAL=1 时秒级），**再杀编排器**（chain_rounds.sh / batch_run）。顺序不能反！
+- **手动关停整条链**：先 `kill` 各个 `core.py config_tmp_<实验名>`（SIGTERM 存盘），确认存盘后 `pkill -f 'chain_rounds.sh experiments/<批次>'`。pkill 模式别写成能匹配到自己命令行的形式（会误杀 shell，用 `pgrep -af '[c]ore.py ...'` 括号写法或先核对 PID 再 kill）。
+- 2026-09-08 教训：旧版 batch_run 用管道转发 core.py 的 stdout，先杀编排器会让训练进程下次 print 时 BrokenPipeError 静默死掉、丢 checkpoint（trib/tetra 跑了 12h 的进度因此丢失）。已修复为直接重定向到文件（编排器死亡不再影响训练进程），但仍建议按上面的顺序操作。
 
 ## 6. 汇总与上传
 

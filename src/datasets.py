@@ -18,7 +18,7 @@ class RecurrenceDataset(Dataset):
     def __init__(self, p=127, recurrence_fn=None, recurrence_name="X(k)=?", init_len=2, num_samples=1000, length=10,
                  verbose=True, missing_prob=0.0, num_mask=0, first_task_weight=1.0,
                  missing_token=None, miss_len=1, miss_second=False,
-                 predict_missing=False):
+                 predict_missing=False, state_cap=None):
         self.length = length
         self.p = p
         self.recurrence_fn = recurrence_fn
@@ -57,6 +57,11 @@ class RecurrenceDataset(Dataset):
         # When false (default), items are (corrupted_seq, loss_mask) and the
         # missing positions are masked out of the metrics.
         self.predict_missing = predict_missing
+        # STATE_SPACE_CAP: when p**init_len exceeds this, subsample state_cap
+        # distinct initial states uniformly (one window per state, rolled out
+        # step by step) instead of full cycle traversal; the train/test quota
+        # split is unchanged (first num_samples sampled states -> train).
+        self.state_cap = state_cap
         self.train_samples = []
         self.test_samples = []
         self.seen_indices = set()
@@ -106,36 +111,50 @@ class RecurrenceDataset(Dataset):
 
     def run(self):
         state_space = self.p ** self.init_len
+        capped = self.state_cap is not None and state_space > self.state_cap
 
-        # Randomly shuffle all state indices
-        all_indices = list(range(state_space))
-        random.shuffle(all_indices)
+        if capped:
+            # random.sample on a range has a fast path (no full enumeration)
+            # and returns its picks in random order, so no extra shuffle.
+            all_indices = random.sample(range(state_space), self.state_cap)
+        else:
+            # Randomly shuffle all state indices
+            all_indices = list(range(state_space))
+            random.shuffle(all_indices)
 
-        for start_idx in all_indices:
-            if start_idx in self.seen_indices:
-                continue
+        for idx_pos, start_idx in enumerate(all_indices):
+            if capped:
+                n_before = idx_pos
+                # One window per sampled state, rolled out step by step.
+                seq = self.index_to_values(start_idx)
+                num_inits = 1
+                while len(seq) < self.length:
+                    seq.append(self.recurrence_fn(seq[-self.init_len:], self.p))
+            else:
+                if start_idx in self.seen_indices:
+                    continue
 
-            # MAX_UNIQUE_RATIO is the proportion of initial states exposed to training.
-            # The first num_samples states (in shuffled order) go to train, the rest to test.
-            # The quota is enforced PER STATE (not per cycle): n_before is the number
-            # of states processed before this traversal, and window i comes from the
-            # (n_before + i)-th processed state. This keeps the exposed fraction exact
-            # even when one cycle spans a large part of the state space.
-            n_before = len(self.seen_indices)
+                # MAX_UNIQUE_RATIO is the proportion of initial states exposed to training.
+                # The first num_samples states (in shuffled order) go to train, the rest to test.
+                # The quota is enforced PER STATE (not per cycle): n_before is the number
+                # of states processed before this traversal, and window i comes from the
+                # (n_before + i)-th processed state. This keeps the exposed fraction exact
+                # even when one cycle spans a large part of the state space.
+                n_before = len(self.seen_indices)
 
-            # Traverse the entire cycle
-            self.seen_indices.add(start_idx)
-            seq = self.generate_cycle(start_idx)
+                # Traverse the entire cycle
+                self.seen_indices.add(start_idx)
+                seq = self.generate_cycle(start_idx)
 
-            # One training window per new state on the trajectory.
-            num_inits = len(seq) - (self.init_len - 1)
+                # One training window per new state on the trajectory.
+                num_inits = len(seq) - (self.init_len - 1)
 
-            # Extend the sequence to num_inits + length - 1 values by continuing
-            # the recurrence step by step. (Periodic doubling would be equivalent
-            # for pure cycles, but wrong for transient trajectories truncated at
-            # an already-seen state: the tail is not periodic.)
-            while len(seq) < num_inits + self.length - 1:
-                seq.append(self.recurrence_fn(seq[-self.init_len:], self.p))
+                # Extend the sequence to num_inits + length - 1 values by continuing
+                # the recurrence step by step. (Periodic doubling would be equivalent
+                # for pure cycles, but wrong for transient trajectories truncated at
+                # an already-seen state: the tail is not periodic.)
+                while len(seq) < num_inits + self.length - 1:
+                    seq.append(self.recurrence_fn(seq[-self.init_len:], self.p))
 
             # Append to train/test set
             for i in range(num_inits):
@@ -159,6 +178,8 @@ class RecurrenceDataset(Dataset):
             cov = len(self.train_samples) / state_space
             print(f"[Dataset] Cycle traverse + sliding window: {len(self.train_samples)} + {len(self.test_samples)} samples, length {self.length}, mod {self.p}")
             print(f"  - Initial state coverage: {len(self.train_samples)}/{state_space} ({cov*100:.1f}%)")
+            if capped:
+                print(f"  - State space subsampled (STATE_SPACE_CAP): {self.state_cap}/{state_space} initial states, one window per state")
             if self.missing_prob > 0:
                 print(f"  - Missing-value corruption: prob={self.missing_prob}, miss_len={self.miss_len}, "
                       f"miss_second={self.miss_second}, predict_missing={self.predict_missing}, "

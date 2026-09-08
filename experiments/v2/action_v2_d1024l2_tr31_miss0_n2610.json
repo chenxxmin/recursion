@@ -1,0 +1,275 @@
+{
+  "concurrency": 1,
+  "experiments": [
+    {
+      "name": "action_v2_d1024l2r4h4_P127_tr31_N2_miss0_seed17996",
+      "task": "action",
+      "config": {
+        "RANDOM_SEED": 17996,
+        "P": 127,
+        "AB_PAIRS": [
+          [
+            1,
+            1
+          ],
+          [
+            2,
+            3
+          ]
+        ],
+        "TRAIN_LEN": 16,
+        "OOD_LEN": 16,
+        "NUM_TRAIN_SAMPLES": 300000,
+        "NUM_TEST_SAMPLES": 256,
+        "FRESH_TEST_PER_EVAL": true,
+        "EVAL_INTERVAL": 1,
+        "BATCH_SIZE": 1024,
+        "D_MODEL": 1024,
+        "N_LAYER": 2,
+        "N_HEAD": 4,
+        "MLP_RATIO": 4
+      }
+    },
+    {
+      "name": "action_v2_d1024l2r4h4_P127_tr31_N2_miss0_seed18318",
+      "task": "action",
+      "config": {
+        "RANDOM_SEED": 18318,
+        "P": 127,
+        "AB_PAIRS": [
+          [
+            1,
+            1
+          ],
+          [
+            2,
+            3
+          ]
+        ],
+        "TRAIN_LEN": 16,
+        "OOD_LEN": 16,
+        "NUM_TRAIN_SAMPLES": 300000,
+        "NUM_TEST_SAMPLES": 256,
+        "FRESH_TEST_PER_EVAL": true,
+        "EVAL_INTERVAL": 1,
+        "BATCH_SIZE": 1024,
+        "D_MODEL": 1024,
+        "N_LAYER": 2,
+        "N_HEAD": 4,
+        "MLP_RATIO": 4
+      }
+    },
+    {
+      "name": "action_v2_d1024l2r4h4_P127_tr31_N6_miss0_seed17996",
+      "task": "action",
+      "config": {
+        "RANDOM_SEED": 17996,
+        "P": 127,
+        "AB_PAIRS": [
+          [
+            1,
+            1
+          ],
+          [
+            2,
+            3
+          ],
+          [
+            3,
+            5
+          ],
+          [
+            4,
+            7
+          ],
+          [
+            5,
+            9
+          ],
+          [
+            6,
+            11
+          ]
+        ],
+        "TRAIN_LEN": 16,
+        "OOD_LEN": 16,
+        "NUM_TRAIN_SAMPLES": 300000,
+        "NUM_TEST_SAMPLES": 256,
+        "FRESH_TEST_PER_EVAL": true,
+        "EVAL_INTERVAL": 1,
+        "BATCH_SIZE": 1024,
+        "D_MODEL": 1024,
+        "N_LAYER": 2,
+        "N_HEAD": 4,
+        "MLP_RATIO": 4
+      }
+    },
+    {
+      "name": "action_v2_d1024l2r4h4_P127_tr31_N6_miss0_seed18318",
+      "task": "action",
+      "config": {
+        "RANDOM_SEED": 18318,
+        "P": 127,
+        "AB_PAIRS": [
+          [
+            1,
+            1
+          ],
+          [
+            2,
+            3
+          ],
+          [
+            3,
+            5
+          ],
+          [
+            4,
+            7
+          ],
+          [
+            5,
+            9
+          ],
+          [
+            6,
+            11
+          ]
+        ],
+        "TRAIN_LEN": 16,
+        "OOD_LEN": 16,
+        "NUM_TRAIN_SAMPLES": 300000,
+        "NUM_TEST_SAMPLES": 256,
+        "FRESH_TEST_PER_EVAL": true,
+        "EVAL_INTERVAL": 1,
+        "BATCH_SIZE": 1024,
+        "D_MODEL": 1024,
+        "N_LAYER": 2,
+        "N_HEAD": 4,
+        "MLP_RATIO": 4
+      }
+    },
+    {
+      "name": "action_v2_d1024l2r4h4_P127_tr31_N10_miss0_seed17996",
+      "task": "action",
+      "config": {
+        "RANDOM_SEED": 17996,
+        "P": 127,
+        "AB_PAIRS": [
+          [
+            1,
+            1
+          ],
+          [
+            2,
+            3
+          ],
+          [
+            3,
+            5
+          ],
+          [
+            4,
+            7
+          ],
+          [
+            5,
+            9
+          ],
+          [
+            6,
+            11
+          ],
+          [
+            7,
+            13
+          ],
+          [
+            8,
+            15
+          ],
+          [
+            9,
+            17
+          ],
+          [
+            10,
+            19
+          ]
+        ],
+        "TRAIN_LEN": 16,
+        "OOD_LEN": 16,
+        "NUM_TRAIN_SAMPLES": 300000,
+        "NUM_TEST_SAMPLES": 256,
+        "FRESH_TEST_PER_EVAL": true,
+        "EVAL_INTERVAL": 1,
+        "BATCH_SIZE": 1024,
+        "D_MODEL": 1024,
+        "N_LAYER": 2,
+        "N_HEAD": 4,
+        "MLP_RATIO": 4
+      }
+    },
+    {
+      "name": "action_v2_d1024l2r4h4_P127_tr31_N10_miss0_seed18318",
+      "task": "action",
+      "config": {
+        "RANDOM_SEED": 18318,
+        "P": 127,
+        "AB_PAIRS": [
+          [
+            1,
+            1
+          ],
+          [
+            2,
+            3
+          ],
+          [
+            3,
+            5
+          ],
+          [
+            4,
+            7
+          ],
+          [
+            5,
+            9
+          ],
+          [
+            6,
+            11
+          ],
+          [
+            7,
+            13
+          ],
+          [
+            8,
+            15
+          ],
+          [
+            9,
+            17
+          ],
+          [
+            10,
+            19
+          ]
+        ],
+        "TRAIN_LEN": 16,
+        "OOD_LEN": 16,
+        "NUM_TRAIN_SAMPLES": 300000,
+        "NUM_TEST_SAMPLES": 256,
+        "FRESH_TEST_PER_EVAL": true,
+        "EVAL_INTERVAL": 1,
+        "BATCH_SIZE": 1024,
+        "D_MODEL": 1024,
+        "N_LAYER": 2,
+        "N_HEAD": 4,
+        "MLP_RATIO": 4
+      }
+    }
+  ]
+}

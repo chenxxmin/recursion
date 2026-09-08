@@ -11,6 +11,7 @@ does not re-export these symbols (no external `core.<name>` references
 exist).
 """
 import itertools
+import random
 
 import torch
 
@@ -169,7 +170,8 @@ def _run_mixed_ab_final_test(model, train_dataset, rules, order, p,
 
 def _run_single_recurrence_final_test(model, train_dataset, recurrence_fn,
                                       init_len, recurrence_name, p,
-                                      train_len, ood_len, num_mask, device):
+                                      train_len, ood_len, num_mask, device,
+                                      state_cap=None):
     """Stage-3 final generation test for single-recurrence tasks.
 
     Verbatim move of the single_recurrence stage-3 block from run_experiment;
@@ -186,7 +188,20 @@ def _run_single_recurrence_final_test(model, train_dataset, recurrence_fn,
         init_state = tuple(seq[:init_len].tolist())
         train_seen_inits.add(init_state)
 
-    all_inits = list(itertools.product(range(p), repeat=init_len))
+    state_space = p ** init_len
+    if state_cap is not None and state_space > state_cap:
+        # Same subsampling as the dataset (STATE_SPACE_CAP): evaluate on a
+        # uniform random subset of initial states instead of the full space.
+        all_inits = []
+        for idx in random.sample(range(state_space), state_cap):
+            vals = []
+            for _ in range(init_len):
+                vals.insert(0, idx % p)
+                idx //= p
+            all_inits.append(tuple(vals))
+        print(f"[Final test] State space subsampled (STATE_SPACE_CAP): {state_cap}/{state_space} initial states")
+    else:
+        all_inits = list(itertools.product(range(p), repeat=init_len))
     total_states = len(all_inits)
 
     # Build full true sequences of length OOD_LEN for every initial state

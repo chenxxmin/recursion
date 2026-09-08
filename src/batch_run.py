@@ -92,7 +92,7 @@ def _decode(raw):
     return raw.decode('utf-8', errors='replace').replace('\x00', '')
 
 
-def _spawn_script(script_name, args, env, stderr=subprocess.PIPE):
+def _spawn_script(script_name, args, env, stdout=subprocess.PIPE, stderr=subprocess.PIPE):
     """Launch a src/ script as a subprocess: python src/<script_name> <args...>.
 
     Script-file entry points are used instead of `python -c` strings so that
@@ -100,7 +100,7 @@ def _spawn_script(script_name, args, env, stderr=subprocess.PIPE):
     script's own directory lands on sys.path automatically.
     """
     return subprocess.Popen([sys.executable, os.path.join(SCRIPT_DIR, script_name), *args],
-                            stdout=subprocess.PIPE, stderr=stderr, env=env)
+                            stdout=stdout, stderr=stderr, env=env)
 
 
 def build_merged_config(exp, base_config, model_dir):
@@ -177,6 +177,7 @@ def run_single(exp, base_config, dirs, concurrency=1, gpu_id=None):
 
     try:
         log_path = os.path.join(dirs['log'], f"{name}.log")
+        err_log_path = os.path.join(dirs['log'], f"{name}.err")
         start_time = datetime.now()
         gpu_label = f"cuda:{gpu_id}" if gpu_id is not None else "cpu"
         print(f"[{start_time.strftime('%H:%M:%S')}] Start experiment: {name} on {gpu_label}")
@@ -185,49 +186,32 @@ def run_single(exp, base_config, dirs, concurrency=1, gpu_id=None):
         if gpu_id is not None:
             env['CUDA_VISIBLE_DEVICES'] = str(gpu_id)
 
-        # Separate stdout and stderr:
-        # - stdout: training log (clean model output)
-        # - stderr: errors/warnings (PyTorch/CUDA low-level output, may contain null bytes)
-        process = _spawn_script('core.py', [tmp_config_path], env, stderr=subprocess.PIPE)
-
-        err_log_path = os.path.join(dirs['log'], f"{name}.err")
-
-        def read_stdout():
-            # Resume rounds append to the existing log (preserve history);
-            # fresh runs start a new log.
-            mode = 'a' if merged_main.get('RESUME_FROM') else 'w'
-            with open(log_path, mode, encoding='utf-8') as f:
-                if mode == 'a':
-                    f.write(f"\n{'='*70}\n=== RESUME ROUND: {name} ===\n")
-                f.write(f"=== Experiment: {name} ===\n")
-                f.write(f"Time: {datetime.now().isoformat()}\n")
-                f.write(f"Task type: {task}\n")
-                f.write(f"GPU: {gpu_label}\n")
-                f.write("\n=== Merged Config ===\n")
-                f.write(format_config_table(merged_main))
-                f.write("\n--- output ---\n")
-                f.flush()
-                for raw in process.stdout:
-                    line = _decode(raw)
-                    f.write(line)
-                    f.flush()
-
-        def read_stderr():
-            with open(err_log_path, 'w', encoding='utf-8') as f:
-                for raw in process.stderr:
-                    line = _decode(raw)
-                    if line.strip():
-                        f.write(line)
-                        f.flush()
-
-        stdout_thread = threading.Thread(target=read_stdout)
-        stderr_thread = threading.Thread(target=read_stderr)
-        stdout_thread.start()
-        stderr_thread.start()
-
+        # Resume rounds append to the existing log (preserve history);
+        # fresh runs start a new log.
+        mode = 'a' if merged_main.get('RESUME_FROM') else 'w'
+        log_f = open(log_path, mode, encoding='utf-8')
+        if mode == 'a':
+            log_f.write(f"\n{'='*70}\n=== RESUME ROUND: {name} ===\n")
+        log_f.write(f"=== Experiment: {name} ===\n")
+        log_f.write(f"Time: {datetime.now().isoformat()}\n")
+        log_f.write(f"Task type: {task}\n")
+        log_f.write(f"GPU: {gpu_label}\n")
+        log_f.write("\n=== Merged Config ===\n")
+        log_f.write(format_config_table(merged_main))
+        log_f.write("\n--- output ---\n")
+        log_f.flush()
+        err_f = open(err_log_path, 'wb')
+        # Redirect the trainer's stdout/stderr STRAIGHT to files (no pipe
+        # relay): if this orchestrator is killed first, the trainer keeps
+        # running and its SIGTERM checkpoint-save path stays intact. (With a
+        # pipe relay, killing the orchestrator broke the pipe and the trainer
+        # died silently of BrokenPipeError at its next print, losing the
+        # checkpoint -- 2026-09-08 incident.)
+        process = _spawn_script('core.py', [tmp_config_path], env,
+                                stdout=log_f, stderr=err_f)
         returncode = process.wait()
-        stdout_thread.join()
-        stderr_thread.join()
+        log_f.close()
+        err_f.close()
 
         with open(log_path, 'a', encoding='utf-8') as f:
             f.write(f"\n--- Return code: {returncode} ---\n")

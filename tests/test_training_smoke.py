@@ -46,6 +46,13 @@ def _check_common(out, save_path):
     assert 'Final generation test' in out, "stage-3 final test did not run"
     assert 'Exposed' in out and 'Unexposed' in out, "exposure stats missing"
     assert 'nan' not in out.lower(), "NaN appeared in training"
+    # Rolling checkpoints: best (weights only) and latest (full resume state)
+    base = os.path.splitext(save_path)[0]
+    import torch
+    best = torch.load(base + '_best.pth', weights_only=False)
+    assert 'model_state_dict' in best and 'best_accuracy' in best
+    latest = torch.load(base + '_latest.pth', weights_only=False)
+    assert 'optimizer_state_dict' in latest and 'next_epoch' in latest
 
 
 def test_run_experiment_addition():

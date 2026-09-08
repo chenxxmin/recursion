@@ -1,6 +1,6 @@
 # Recursion 训练任务：模型结构与训练设置说明
 
-本文档汇总 `src/` 中 `addition`、`tribonacci`、`multiplication`、`nonlinear`、`mixed_ab`、`action` 六种递归训练任务的**模型结构**与**训练设置**。所有任务共享同一套 Transformer 主干，仅在递推规则、状态空间大小、输入格式以及多规则扩展上有所区别。
+本文档汇总 `src/` 中 `addition`、`tribonacci`、`tetranacci`、`multiplication`、`nonlinear`、`mixed_ab`、`action` 等递归训练任务的**模型结构**与**训练设置**。所有任务共享同一套 Transformer 主干，仅在递推规则、状态空间大小、输入格式以及多规则扩展上有所区别。
 
 ---
 
@@ -41,6 +41,18 @@ X(k) = a * X(k-1) + b * X(k-2) + c * X(k-3)  (mod P)
 - 默认参数：`P = 23`，`A = 1`，`B = 2`，`C = 3`
 - 初始状态长度：`init_len = 3`
 - 状态空间大小：`P^3 = 23^3 = 12167`
+- 模型：基础 `FibonacciTransformer`
+
+### 1.3.1 tetranacci
+四阶线性递推：
+
+```
+X(k) = a * X(k-1) + b * X(k-2) + c * X(k-3) + d * X(k-4)  (mod P)
+```
+
+- 默认参数：`P = 23`，`A = 1`，`B = 1`，`C = 1`，`D = 1`
+- 初始状态长度：`init_len = 4`，`NUM_MASK` 默认 `3`
+- 状态空间大小：`P^4`。P 较大时必须配 `STATE_SPACE_CAP`（见 §2 与 §4.1），否则枚举爆炸（如 `127^4 ≈ 2.6 亿`）
 - 模型：基础 `FibonacciTransformer`
 
 ### 1.4 nonlinear
@@ -114,6 +126,10 @@ x_k = a * x_{k-2} + b * x_{k-1}  (mod P)
 | `USE_LEARNABLE_PE` | 是否使用可学习位置编码（false 使用 RoPE） |
 | `MLP_RATIO` | MLP 隐藏层相对 d_model 的倍数 |
 | `MAX_UNIQUE_RATIO` | 暴露给训练的初始状态比例（单任务 / mixed_ab 默认 fallback） |
+| `STATE_SPACE_CAP` | 状态空间上限（默认 `null` 不限）。`P^init_len` 超过它时，数据集均匀无放回抽样这么多个初始状态（每状态一个窗口、逐步递推生成，不再做循环遍历），train/test 配额语义不变；final generation test 同样在抽样子集上评估。高阶递推（如 tetranacci @ P=127）必须设置 |
+| `NUM_TRAIN_SAMPLES` | 单规则任务显式训练样本数（默认 `null` → 按 `MAX_UNIQUE_RATIO × 状态空间` 计算）；设置后覆盖该公式（action 任务一直用此键，默认 10000） |
+| `FRESH_TEST_PER_EVAL` | `true` 时每个 eval 用新鲜随机种子重建测试集（单规则任务：从全状态空间均匀抽 `NUM_TEST_SAMPLES` 个初始状态，生成 `OOD_LEN` 长度窗口；action：同长度重生成）。配 `EVAL_INTERVAL=1` 即"每 epoch 测 256 个随机案例" |
+| `NUM_TEST_SAMPLES` | 新鲜测试集大小（单规则默认 256，action 默认 2000） |
 | `ENTROPY_PENALTY_WEIGHT` | 注意力熵惩罚权重 |
 | `FIRST_TASK_WEIGHT` | 第一个预测位置的损失权重 |
 | `NUM_MASK` | `null` 表示使用任务默认的 mask 起始位置。**注意：当前代码中 `0` 是字面值**（首位置也计入损失与评估）；旧代码（≤2026-07-08，如 05fc707）把 `0` 当"未设置"回退到任务默认值。**今后配置不要再写 `NUM_MASK: 0`**——想排除"只看 x0 预测 x1"这个不可预测的首位置时，应显式写 `1`（参考 addition_p127_tr64_ood128 与 addition-p127w64 的口径差异） |
@@ -143,6 +159,7 @@ x_k = a * x_{k-2} + b * x_{k-1}  (mod P)
 | `multiplication` | 无覆盖，使用 `main` 默认配置 |
 | `nonlinear` | 无覆盖，使用 `main` 默认配置 |
 | `tribonacci` | `P: 23`，`A: 1`，`B: 2`，`C: 3` |
+| `tetranacci` | `P: 23`，`A: 1`，`B: 1`，`C: 1`，`D: 1` |
 | `mixed_ab` | `USE_AB_TAG: false`，`USE_CONDITIONAL_WTE: false`，`COND_WTE_SHARED_RATIO: 0.0`，`MIXED_AB_MAX_UNIQUE_RATIOS: [0.7, 0.7]` |
 | `action` | `P: 53`，`AB_PAIRS: [[1,1],[1,2]]`，`NUM_TRAIN_SAMPLES: 10000`，`NUM_TEST_SAMPLES: 2000`，`TRAIN_LEN: 16`，`OOD_LEN: 32` |
 
@@ -152,10 +169,12 @@ x_k = a * x_{k-2} + b * x_{k-1}  (mod P)
 - **优化器**：`torch.optim.AdamW(model.parameters(), lr=LR, weight_decay=WEIGHT_DECAY)`
 - **学习率调度**：`CosineAnnealingLR(optimizer, T_max=EPOCHS)`
 - **梯度裁剪**：`clip_grad_norm_(model.parameters(), 1.0)`
+- **滚动 checkpoint**：每个 eval 点覆盖写 `<model>_latest.pth`（完整训练状态，可直接 `RESUME_FROM`）；best 更新时覆盖写 `<model>_best.pth`（纯权重，与最终保存同格式）。崩溃最多损失一个 eval 间隔的进度（2026-09-08 新增）
 - **损失函数**：每个时间步的交叉熵，按 `loss_mask` 平均后加上可选的熵惩罚和 rule loss
 - **mask 策略**：
   - `addition` / `multiplication` / `nonlinear`：默认屏蔽前 `1` 个位置（从预测第 3 项开始）
   - `tribonacci`：默认屏蔽前 `2` 个位置（从预测第 4 项开始）
+  - `tetranacci`：默认屏蔽前 `3` 个位置（从预测第 5 项开始）
   - `mixed_ab`：默认屏蔽前 `2` 个位置（从预测第 3 项开始，受 rule token 影响）
   - `action`：由数据集生成 2D loss_mask，只计算 `x3, x4, ...`
 - **block_size 计算**：`max(TRAIN_LEN, OOD_LEN)` 向上取整到最近的 2 的幂；`action` 按 `2*L - 2` 计算。
@@ -350,7 +369,7 @@ pad_token_id = P
 
 类：`src/datasets.py::RecurrenceDataset`
 
-1. 枚举所有 `P^init_len` 个初始状态。
+1. 枚举所有 `P^init_len` 个初始状态（若设了 `STATE_SPACE_CAP` 且 `P^init_len` 超过它，则改为均匀无放回抽样 `STATE_SPACE_CAP` 个状态，每状态直接逐步递推得到一个窗口，跳过循环遍历）。
 2. 随机打乱顺序后遍历每个初始状态，生成完整递推循环。
 3. 对循环做滑动窗口，得到长度为 `TRAIN_LEN` 的序列。
 4. 根据 `MAX_UNIQUE_RATIO` 决定前多少个初始状态进入训练集，其余进入测试集。

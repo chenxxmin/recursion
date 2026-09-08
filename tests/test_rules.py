@@ -76,6 +76,12 @@ def test_single_rule_from_task():
     assert init_len == 2 and fn([4, 5], p) == (5 + 4) % p
     init_len, fn, _ = single_rule_from_task('tribonacci', {'P': p, 'A': 1, 'B': 2, 'C': 3})
     assert init_len == 3 and fn([1, 2, 3], p) == (1 * 3 + 2 * 2 + 3 * 1) % p
+    init_len, fn, name = single_rule_from_task('tetranacci', {'P': p, 'A': 1, 'B': 2, 'C': 3, 'D': 4})
+    assert init_len == 4 and fn([1, 2, 3, 4], p) == (1 * 4 + 2 * 3 + 3 * 2 + 4 * 1) % p
+    assert 'X(k-4)' in name
+    # tetranacci coefficient default is 1 (lowercase checkpoint keys accepted)
+    init_len, fn, _ = single_rule_from_task('tetranacci', {'p': p})
+    assert init_len == 4 and fn([1, 2, 3, 4], p) == (4 + 3 + 2 + 1) % p
     _, fn, _ = single_rule_from_task('multiplication', {'P': p})
     assert fn([4, 5], p) == 20 % p
     _, fn, _ = single_rule_from_task('nonlinear', {'P': p})
@@ -94,8 +100,8 @@ def test_single_rule_from_task():
 def test_save_config_round_trip():
     """save_config_extra (writer) and task_from_save_config (reader) must agree,
     including the multiplication/multiplicative vocabulary split."""
-    for task in ('addition', 'multiplication', 'tribonacci', 'nonlinear', 'nonlinear_mul'):
-        cfg = {'P': 23, 'A': 2, 'B': 3, 'C': 4}
+    for task in ('addition', 'multiplication', 'tribonacci', 'tetranacci', 'nonlinear', 'nonlinear_mul'):
+        cfg = {'P': 23, 'A': 2, 'B': 3, 'C': 4, 'D': 5}
         extra = save_config_extra(task, cfg)
         assert task_from_save_config(extra) == task, (task, extra)
     # mixed / action checkpoints are not single-rule (old name kept for compat)

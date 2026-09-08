@@ -10,6 +10,7 @@ import random
 import signal
 import sys
 import time
+from collections import deque
 from contextlib import nullcontext
 
 import torch
@@ -294,6 +295,16 @@ def resume_checkpoint_path(save_path):
     return os.path.splitext(save_path)[0] + '_resume.pth'
 
 
+def best_checkpoint_path(save_path):
+    """Path of the rolling best-weights checkpoint for a given SAVE_PATH."""
+    return os.path.splitext(save_path)[0] + '_best.pth'
+
+
+def latest_checkpoint_path(save_path):
+    """Path of the rolling latest-full-state checkpoint for a given SAVE_PATH."""
+    return os.path.splitext(save_path)[0] + '_latest.pth'
+
+
 def save_resume_checkpoint(path, model, optimizer, scheduler, next_epoch,
                            best_acc, best_epoch, no_improve, high_acc_epoch,
                            save_config):
@@ -347,6 +358,11 @@ def run_training_engine(model, train_loader, test_loader, optimizer, scheduler, 
     no_improve = 0
     start_epoch = 0
     high_acc_epoch = None
+    # Fresh-test regime (test_loader_fn set, e.g. 300k train + fresh 256-case
+    # test per eval): early stop requires the MEAN test acc of the last 10
+    # evals to exceed early_stop_accuracy, so single-eval spikes don't count.
+    fresh_test = test_loader_fn is not None
+    recent_test_accs = deque(maxlen=10)
     if resume_state is not None:
         best_acc = resume_state['best_acc']
         best_epoch = resume_state['best_epoch']
@@ -363,9 +379,11 @@ def run_training_engine(model, train_loader, test_loader, optimizer, scheduler, 
     previous_handler = signal.signal(signal.SIGTERM, _sigterm_handler)
     frozen_param_states = None
     cond_fix_triggered = False
-    # After test acc first reaches early_stop_accuracy, keep training for this
-    # many extra epochs before stopping (instead of stopping immediately).
-    # Config: EARLY_STOP_EXTRA_EPOCHS (default 200; v2 regime uses 20).
+    # Early-stop rule (2026-09-07): static-split regimes stop DIRECTLY at
+    # early_stop_accuracy; fresh-test regimes (test_loader_fn set) stop when
+    # the last-10-eval mean exceeds it. EARLY_STOP_EXTRA_EPOCHS / high_acc_epoch
+    # are legacy and no longer affect stopping (high_acc_epoch is kept in
+    # resume checkpoints for backward compatibility).
 
     # cond_fix_start == 0: freeze BEFORE the first gradient step. (Any other
     # start value keeps the threshold semantics: freeze at the first eval
@@ -428,6 +446,14 @@ def run_training_engine(model, train_loader, test_loader, optimizer, scheduler, 
                 best_acc = test_acc
                 best_epoch = epoch
                 no_improve = 0
+                # Rolling best checkpoint (weights only, same layout as the
+                # final save): overwritten whenever the best improves, so the
+                # best weights are always on disk even if the process dies.
+                torch.save({'model_state_dict': model.state_dict(),
+                            'config': save_config,
+                            'best_accuracy': best_acc,
+                            'final_epoch': epoch},
+                           best_checkpoint_path(save_path))
             else:
                 no_improve += eval_interval
             
@@ -451,15 +477,23 @@ def run_training_engine(model, train_loader, test_loader, optimizer, scheduler, 
             if test_group_acc:
                 accs = ' '.join(f"{test_group_acc[g]:.2f}" for g in sorted(test_group_acc.keys()))
                 print(f"  per-rule acc: {accs}")
-            
-            if test_acc >= early_stop_accuracy and high_acc_epoch is None:
-                high_acc_epoch = epoch
-                print(f"[Early stop] Epoch {epoch}: test set reached high accuracy, "
-                      f"continuing {extra_epochs_after_high_acc} extra epochs")
-            if high_acc_epoch is not None and epoch - high_acc_epoch >= extra_epochs_after_high_acc:
-                print(f"[Early stop] Epoch {epoch}: finished {extra_epochs_after_high_acc} "
-                      f"extra epochs after reaching high accuracy")
-                break
+
+            if fresh_test:
+                recent_test_accs.append(test_acc)
+                if len(recent_test_accs) == recent_test_accs.maxlen:
+                    ma10 = sum(recent_test_accs) / len(recent_test_accs)
+                    print(f"  last-10-eval mean test acc: {ma10:.1%}")
+                    if ma10 > early_stop_accuracy:
+                        print(f"[Early stop] Epoch {epoch}: last-10-eval mean test acc "
+                              f"{ma10:.2%} > {early_stop_accuracy:.0%}")
+                        break
+            else:
+                # Static-split regime (e.g. 70/30 state split): stop directly
+                # once test acc reaches the threshold.
+                if test_acc >= early_stop_accuracy:
+                    print(f"[Early stop] Epoch {epoch}: test acc {test_acc:.2%} >= "
+                          f"{early_stop_accuracy:.0%}, stopping directly")
+                    break
             if no_improve >= early_stop_no_improve:
                 print(f"[Early stop] No improvement for {early_stop_no_improve} consecutive epochs")
                 break
@@ -485,6 +519,14 @@ def run_training_engine(model, train_loader, test_loader, optimizer, scheduler, 
                 print(f"[TIMEOUT] Reached MAX_TRAIN_HOURS={max_train_hours} at epoch {epoch}; "
                       f"resume checkpoint saved to: {os.path.abspath(resume_path)}")
                 return best_acc, epoch, True
+
+            # Rolling latest checkpoint (full training state, RESUME_FROM-
+            # compatible): overwritten at every eval point so a crash loses
+            # at most one eval interval of progress.
+            save_resume_checkpoint(latest_checkpoint_path(save_path), model,
+                                   optimizer, scheduler, epoch + 1, best_acc,
+                                   best_epoch, no_improve, high_acc_epoch,
+                                   save_config)
     
     print(f"\n{'='*50}")
     print("Saving model...")

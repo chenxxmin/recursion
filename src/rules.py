@@ -44,8 +44,8 @@ class LinearRecurrenceRule:
 def single_rule_from_task(task, cfg):
     """Resolve a single-rule task to (init_len, next_fn, recurrence_name).
 
-    task: 'addition' | 'multiplication' | 'tribonacci' | 'nonlinear' | 'nonlinear_mul'.
-    cfg accepts merged-config keys (P, A/B/C) or checkpoint keys (p, a/b/c);
+    task: 'addition' | 'multiplication' | 'tribonacci' | 'tetranacci' | 'nonlinear' | 'nonlinear_mul'.
+    cfg accepts merged-config keys (P, A/B/C/D) or checkpoint keys (p, a/b/c/d);
     missing coefficients default to 1. The returned next_fn takes (seq, p),
     matching RecurrenceDataset's recurrence_fn contract.
     """
@@ -61,6 +61,10 @@ def single_rule_from_task(task, cfg):
         a, b, c = get('a'), get('b'), get('c')
         name = f"X(k)=({a}*X(k-1)+{b}*X(k-2)+{c}*X(k-3)) mod {p}"
         return 3, (lambda seq, p: (a * seq[-1] + b * seq[-2] + c * seq[-3]) % p), name
+    if task == 'tetranacci':
+        a, b, c, d = get('a'), get('b'), get('c'), get('d')
+        name = f"X(k)=({a}*X(k-1)+{b}*X(k-2)+{c}*X(k-3)+{d}*X(k-4)) mod {p}"
+        return 4, (lambda seq, p: (a * seq[-1] + b * seq[-2] + c * seq[-3] + d * seq[-4]) % p), name
     if task == 'nonlinear':
         # The state map (x,y) -> (y, y^2+x) is bijective for any p
         # (invert: x = z - y^2), so all states lie on pure cycles.
@@ -84,6 +88,8 @@ def save_config_extra(task, cfg):
         return {'recurrence': 'multiplicative'}
     if task == 'tribonacci':
         return {'a': get('a'), 'b': get('b'), 'c': get('c'), 'recurrence': 'tribonacci'}
+    if task == 'tetranacci':
+        return {'a': get('a'), 'b': get('b'), 'c': get('c'), 'd': get('d'), 'recurrence': 'tetranacci'}
     if task == 'nonlinear':
         return {'recurrence': 'nonlinear'}
     if task == 'nonlinear_mul':
@@ -104,6 +110,8 @@ def task_from_save_config(config):
         return None
     if recurrence is None and 'ab_pairs' in config:
         return None  # mixed_ab/mixed_abc
+    if 'd' in config or recurrence == 'tetranacci':
+        return 'tetranacci'
     if 'c' in config or recurrence == 'tribonacci':
         return 'tribonacci'
     if recurrence == 'multiplicative':
