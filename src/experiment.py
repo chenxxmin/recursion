@@ -128,16 +128,29 @@ def _prepare_mixed_recurrence(config, device, order):
         max_seq_len += 1
     BLOCK_SIZE = _round_up_pow2(max_seq_len)
 
-    # Per-rule exposure ratio for mixed tasks. MAX_UNIQUE_RATIO means exposed (train) proportion.
-    if 'MIXED_AB_MAX_UNIQUE_RATIOS' in cfg:
-        ratios = cfg['MIXED_AB_MAX_UNIQUE_RATIOS']
+    # Explicit NUM_TRAIN_SAMPLES overrides the ratio-derived counts (same
+    # semantics as the single-rule path): a scalar gives every rule the same
+    # count, a list sets per-rule counts.
+    nts = cfg.get('NUM_TRAIN_SAMPLES')
+    if nts is not None:
+        if isinstance(nts, (int, float)):
+            nts = [nts] * len(rules)
+        assert len(nts) == len(rules), \
+            f"NUM_TRAIN_SAMPLES length ({len(nts)}) must equal number of rules ({len(rules)})"
+        NUM_TRAIN_SAMPLES = [max(1, int(n)) for n in nts]
+        # Keep `ratios` defined for save_config: actual exposure per rule.
+        ratios = [n / state_space_size for n in NUM_TRAIN_SAMPLES]
     else:
-        ratios = [MAX_UNIQUE_RATIO] * len(rules)
-    if isinstance(ratios, (int, float)):
-        ratios = [ratios] * len(rules)
-    assert len(ratios) == len(rules), \
-        f"MIXED_AB_MAX_UNIQUE_RATIOS length ({len(ratios)}) must equal number of rules ({len(rules)})"
-    NUM_TRAIN_SAMPLES = [max(1, int(state_space_size * r)) for r in ratios]
+        # Per-rule exposure ratio for mixed tasks. MAX_UNIQUE_RATIO means exposed (train) proportion.
+        if 'MIXED_AB_MAX_UNIQUE_RATIOS' in cfg:
+            ratios = cfg['MIXED_AB_MAX_UNIQUE_RATIOS']
+        else:
+            ratios = [MAX_UNIQUE_RATIO] * len(rules)
+        if isinstance(ratios, (int, float)):
+            ratios = [ratios] * len(rules)
+        assert len(ratios) == len(rules), \
+            f"MIXED_AB_MAX_UNIQUE_RATIOS length ({len(ratios)}) must equal number of rules ({len(rules)})"
+        NUM_TRAIN_SAMPLES = [max(1, int(state_space_size * r)) for r in ratios]
 
     # NUM_MASK unset (None) means: the first num_mask positions are initial
     # values and are not evaluated. Default 2, matching the tribonacci task.

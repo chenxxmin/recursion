@@ -29,7 +29,7 @@
 2. **早停分两制**：静态切分制（无 fresh test）测试 ≥ `EARLY_STOP_ACCURACY`(0.99) 直接停；新鲜测试制（`FRESH_TEST_PER_EVAL`）最近 10 个 eval 均值 >99% 才停。`EARLY_STOP_EXTRA_EPOCHS` 已废弃。
 3. **滚动 checkpoint**：每个 eval 点覆盖写 `<model>_latest.pth`（完整状态可 RESUME_FROM），best 更新时写 `<model>_best.pth`（纯权重）。
 4. **tetranacci task**：4 阶递推（A/B/C/D 键，init_len=4）。**P⁴ 状态空间必须配 `STATE_SPACE_CAP`**（否则枚举爆炸），抽样路径同时用于数据集和 final eval。
-5. **单规则任务支持** `NUM_TRAIN_SAMPLES` 显式覆盖 和 `FRESH_TEST_PER_EVAL`（每 eval 从全状态空间抽 NUM_TEST_SAMPLES 个全新状态生成 OOD_LEN 窗口）。
+5. **单规则任务支持** `NUM_TRAIN_SAMPLES` 显式覆盖 和 `FRESH_TEST_PER_EVAL`（每 eval 从全状态空间抽 NUM_TEST_SAMPLES 个全新状态生成 OOD_LEN 窗口）。**mixed_ab/mixed_abc 也支持 `NUM_TRAIN_SAMPLES` 显式覆盖**（2026-09-10）：标量=每规则同样数量，列表=逐规则数量，设置后覆盖 `MIXED_AB_MAX_UNIQUE_RATIOS` 的反推。
 6. **batch_run 直接文件重定向**（不再管道转发）：杀编排器不会误杀训练进程。
 
 ## 4. 本机环境的坑（反复踩过）

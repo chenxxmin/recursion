@@ -66,8 +66,41 @@ def test_prepare_ratios_length_mismatch():
         pass
 
 
+def test_prepare_num_train_samples_override():
+    # Scalar: same count for every rule.
+    cfg = {'main': {**_base_main(), 'ABC_PAIRS': [[1, 1, 1], [1, 2, 3]],
+                    'NUM_TRAIN_SAMPLES': 10}}
+    random.seed(0)
+    torch.manual_seed(0)
+    ctx = core._prepare_mixed_recurrence(cfg, 'cpu', 3)
+    assert len(ctx['train_dataset']) == 20
+    assert len(ctx['test_dataset']) == 2 * 125 - 20
+
+    # List: per-rule counts.
+    cfg = {'main': {**_base_main(), 'ABC_PAIRS': [[1, 1, 1], [1, 2, 3]],
+                    'NUM_TRAIN_SAMPLES': [10, 30]}}
+    random.seed(0)
+    torch.manual_seed(0)
+    ctx = core._prepare_mixed_recurrence(cfg, 'cpu', 3)
+    assert len(ctx['train_dataset']) == 40
+    labels = [idx for _, idx in ctx['train_dataset']]
+    assert labels.count(0) == 10 and labels.count(1) == 30
+
+    # List length mismatch must raise.
+    cfg = {'main': {**_base_main(), 'ABC_PAIRS': [[1, 1, 1], [1, 2, 3]],
+                    'NUM_TRAIN_SAMPLES': [10]}}
+    random.seed(0)
+    torch.manual_seed(0)
+    try:
+        core._prepare_mixed_recurrence(cfg, 'cpu', 3)
+        assert False, "NUM_TRAIN_SAMPLES/rules length mismatch must raise"
+    except AssertionError:
+        pass
+
+
 if __name__ == '__main__':
     test_prepare_mixed_ab_wiring()
     test_prepare_mixed_abc_wiring()
     test_prepare_ratios_length_mismatch()
+    test_prepare_num_train_samples_override()
     print("ALL TESTS PASSED: test_prepare_mixed_recurrence.py")

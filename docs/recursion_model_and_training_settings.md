@@ -127,7 +127,7 @@ x_k = a * x_{k-2} + b * x_{k-1}  (mod P)
 | `MLP_RATIO` | MLP 隐藏层相对 d_model 的倍数 |
 | `MAX_UNIQUE_RATIO` | 暴露给训练的初始状态比例（单任务 / mixed_ab 默认 fallback） |
 | `STATE_SPACE_CAP` | 状态空间上限（默认 `null` 不限）。`P^init_len` 超过它时，数据集均匀无放回抽样这么多个初始状态（每状态一个窗口、逐步递推生成，不再做循环遍历），train/test 配额语义不变；final generation test 同样在抽样子集上评估。高阶递推（如 tetranacci @ P=127）必须设置 |
-| `NUM_TRAIN_SAMPLES` | 单规则任务显式训练样本数（默认 `null` → 按 `MAX_UNIQUE_RATIO × 状态空间` 计算）；设置后覆盖该公式（action 任务一直用此键，默认 10000） |
+| `NUM_TRAIN_SAMPLES` | 显式训练样本数（默认 `null` → 按 `MAX_UNIQUE_RATIO × 状态空间` 计算）；设置后覆盖该公式。单规则任务为标量；mixed_ab/mixed_abc 支持标量（每规则同样数量）或列表（逐规则数量，长度必须=规则数）；action 任务一直用此键，默认 10000 |
 | `FRESH_TEST_PER_EVAL` | `true` 时每个 eval 用新鲜随机种子重建测试集（单规则任务：从全状态空间均匀抽 `NUM_TEST_SAMPLES` 个初始状态，生成 `OOD_LEN` 长度窗口；action：同长度重生成）。配 `EVAL_INTERVAL=1` 即"每 epoch 测 256 个随机案例" |
 | `NUM_TEST_SAMPLES` | 新鲜测试集大小（单规则默认 256，action 默认 2000） |
 | `ENTROPY_PENALTY_WEIGHT` | 注意力熵惩罚权重 |
@@ -379,7 +379,7 @@ pad_token_id = P
 类：`src/datasets.py::MixedRecurrenceDataset`（旧实现 `MixedABDataset` 已从 core.py 移出，保留在 `tests/test_mixed_ab_compat.py` 作为 golden master 对照）
 
 1. 对每条 `(a, b)` 规则分别调用 `RecurrenceDataset` 生成训练/测试样本。
-2. 每条规则的暴露比例由 `MIXED_AB_MAX_UNIQUE_RATIOS` 控制。
+2. 每条规则的样本数默认由 `MIXED_AB_MAX_UNIQUE_RATIOS` 控制；显式 `NUM_TRAIN_SAMPLES`（标量或逐规则列表）设置后覆盖。
 3. 合并所有规则样本后打乱训练顺序。
 4. 若启用 `USE_AB_TAG`，在序列开头拼接 rule token。
 
