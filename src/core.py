@@ -11,9 +11,9 @@ import sys
 
 from models import MixedABTransformer
 from datasets import (RecurrenceDataset, BatchTag, collate_fn,
-                      collate_fn_masked, collate_fn_predict,
-                      mixed_ab_collate_fn, mixed_ab_collate_fn_masked,
-                      mixed_ab_collate_fn_predict)
+                      make_missing_collate, make_mixed_missing_collate,
+                      make_action_missing_collate,
+                      mixed_ab_collate_fn)
 from training import _unpack_batch, _sample_seq
 from experiment import _prepare_mixed_recurrence, run_experiment
 

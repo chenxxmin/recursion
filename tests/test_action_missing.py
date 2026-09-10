@@ -1,4 +1,9 @@
-"""Tests for ActionDataset missing-value corruption (predict mode)."""
+"""Tests for action on-the-fly missing-value corruption (2026-09-09 regime).
+
+ActionDataset always stores CLEAN (seq, loss_mask) pairs;
+make_action_missing_collate corrupts value positions with fresh randomness
+per batch (predict mode: targets = clean values).
+"""
 import os
 import sys
 
@@ -6,22 +11,38 @@ import torch
 
 sys.path.insert(0, os.path.join(os.path.dirname(os.path.abspath(__file__)), '..', 'src'))
 
-from datasets import BatchTag, ActionDataset, action_missing_collate_fn
+from datasets import BatchTag, ActionDataset, make_action_missing_collate
 from training import _unpack_batch
 
 P, PAIRS, L = 7, [(1, 1), (1, 2)], 12
 
 
-def _make(missing_prob=0.5, miss_len=3, seed=42, n=200, length=L):
-    return ActionDataset(p=P, ab_pairs=PAIRS, num_samples=n,
-                               length=length, seed=seed,
-                               missing_prob=missing_prob, miss_len=miss_len)
+def _make(seed=42, n=200, length=L):
+    return ActionDataset(p=P, ab_pairs=PAIRS, num_samples=n, length=length, seed=seed)
+
+
+def _collate(missing_prob=0.5, miss_len=3):
+    return make_action_missing_collate(p=P, missing_prob=missing_prob, miss_len=miss_len)
+
+
+def test_dataset_always_clean():
+    ds = _make()
+    for item in ds.samples:
+        assert isinstance(item, tuple) and len(item) == 2
+        seq, mask = item
+        assert all(tok != P for tok in seq.tolist())
+        assert mask.sum().item() == L - 2  # x3..x_L targets only
+        for k in range(2, L):
+            assert mask[2 * (k - 1)] == 1.0
 
 
 def test_missing_only_on_value_positions():
     ds = _make()
+    collate = _collate()
+    views, tag, cleans, masks = collate(ds.samples[:100])
+    assert tag == BatchTag.ACTION_MISS
     n_masked = 0
-    for view, clean, mask in ds.samples:
+    for view, clean in zip(views, cleans):
         v, c = view.tolist(), clean.tolist()
         for i, tok in enumerate(v):
             if i >= 2 and i % 2 == 0:
@@ -29,18 +50,17 @@ def test_missing_only_on_value_positions():
             if tok == P:
                 assert i >= 3 and i % 2 == 1, f"M at non-value position {i}"
                 n_masked += 1
-        # view differs from clean only at M positions; clean layout intact
         for a, b in zip(v, c):
             assert a == b or a == P
-        assert all(tok < P for i, tok in enumerate(c) if i % 2 == 1 or i < 2)
-        assert all(tok >= P + 1 for i, tok in enumerate(c) if i >= 2 and i % 2 == 0)
     assert n_masked > 0
 
 
 def test_run_lengths_and_spacing():
-    ds = _make(missing_prob=0.4, miss_len=3, n=300)
+    ds = _make(n=300)
+    collate = _collate(missing_prob=0.4, miss_len=3)
+    views, _, _, _ = collate(ds.samples)
     seen_masked = 0
-    for view, clean, mask in ds.samples:
+    for view in views:
         v = view.tolist()
         masked_ks = [k for k in range(3, L + 1) if v[2 * k - 3] == P]
         if not masked_ks:
@@ -54,41 +74,26 @@ def test_run_lengths_and_spacing():
         runs.append((start, masked_ks[-1]))
         lengths = [b - a + 1 for a, b in runs]
         assert max(lengths) == 3, f"longest run {lengths} != miss_len 3"
-        # runs are separated by at least one clean value
         for (a1, b1), (a2, b2) in zip(runs, runs[1:]):
             assert a2 - b1 >= 2, f"adjacent runs merged: {runs}"
     assert seen_masked > 0
 
 
-def test_seed_reproducibility():
-    a = _make(seed=7, n=50)
-    b = _make(seed=7, n=50)
-    for (v1, c1, m1), (v2, c2, m2) in zip(a.samples, b.samples):
-        assert torch.equal(v1, v2) and torch.equal(c1, c2) and torch.equal(m1, m2)
-
-
-def test_no_missing_format_unchanged():
-    ds = ActionDataset(p=P, ab_pairs=PAIRS, num_samples=20, length=L, seed=3)
-    for item in ds.samples:
-        assert isinstance(item, tuple) and len(item) == 2
-        seq, mask = item
-        assert all(tok != P for tok in seq.tolist())
-        assert mask.sum().item() == L - 2  # x3..x_L targets only
-        for k in range(2, L):
-            assert mask[2 * (k - 1)] == 1.0
-
-
-def test_collate_action_miss():
-    ds = _make(n=4)
-    x, tag, clean, mask = action_missing_collate_fn(ds.samples[:4])
-    assert tag == BatchTag.ACTION_MISS
-    assert x.shape == clean.shape == (4, 2 * L - 2)
-    assert mask.shape == (4, 2 * L - 3)
+def test_fresh_randomness_per_call():
+    ds = _make(n=8)
+    collate = _collate()
+    b1 = collate(ds.samples[:8])
+    b2 = collate(ds.samples[:8])
+    assert not torch.equal(b1[0], b2[0])
 
 
 def test_unpack_action_miss():
     ds = _make(n=4)
-    batch = action_missing_collate_fn(ds.samples[:4])
+    collate = _collate()
+    batch = collate(ds.samples[:4])
+    assert batch[1] == BatchTag.ACTION_MISS
+    assert batch[0].shape == batch[2].shape == (4, 2 * L - 2)
+    assert batch[3].shape == (4, 2 * L - 3)
     x, loss_mask, kwargs, ab_labels, targets_override = _unpack_batch(list(batch), 'cpu', None)
     assert torch.equal(x, batch[0])
     assert torch.equal(loss_mask, batch[3])
@@ -119,13 +124,13 @@ def test_run_experiment_action_missing_smoke():
         'NUM_TRAIN_SAMPLES': 200, 'NUM_TEST_SAMPLES': 50,
         'MISSING_PROB': 0.3, 'MISS_LEN': 2,
     }
-    # Direct assertion: the prepared dataset must produce corrupted 3-tuples
-    # when MISSING_PROB > 0 (old code warned and ignored it -> 2-tuples).
+    # On-the-fly regime: the prepared dataset stores CLEAN (seq, mask) pairs;
+    # corruption happens in the collate.
     from experiment import _prepare_action
     prep = _prepare_action({'main': dict(main), '_BATCH_RUN_MERGED': True})
     sample = prep['train_dataset'].samples[0]
-    assert isinstance(sample, tuple) and len(sample) == 3, (
-        f"MISSING_PROB not wired: sample is a {len(sample)}-tuple, expected 3-tuple")
+    assert isinstance(sample, tuple) and len(sample) == 2, (
+        f"dataset must store clean (seq, mask) pairs, got {len(sample)}-tuple")
     assert prep['save_config']['missing_prob'] == 0.3
     assert prep['save_config']['miss_len'] == 2
     with tempfile.TemporaryDirectory() as tmpdir:
@@ -144,11 +149,10 @@ def test_run_experiment_action_missing_smoke():
 
 
 if __name__ == '__main__':
+    test_dataset_always_clean()
     test_missing_only_on_value_positions()
     test_run_lengths_and_spacing()
-    test_seed_reproducibility()
-    test_no_missing_format_unchanged()
-    test_collate_action_miss()
+    test_fresh_randomness_per_call()
     test_unpack_action_miss()
     test_run_experiment_action_missing_smoke()
     print("ALL TESTS PASSED: test_action_missing.py")

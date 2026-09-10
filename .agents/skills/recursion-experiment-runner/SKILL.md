@@ -1,6 +1,6 @@
 ---
 name: recursion-experiment-runner
-description: 在本仓库（/home/cxm/recursion，模运算递推/grokking 实验）批量运行训练实验的完整流程。当用户给出实验类型（JSON 里的 task，如 action/mixed_ab/addition 等）和超参（模型规模、规则数、污损概率、种子等）要求跑实验时使用。覆盖：生成实验配置 JSON、命名、用 batch_run.py/chain_rounds.sh 启动、日志与 checkpoint 落盘、画图、查进度、汇总结果到文档、定时关停、手动关停并保存。触发词示例：跑一批实验/启动实验/排个队列/查进度/停掉实验/汇总结果/同步结果库。
+description: 在本仓库（/home/cxm/recursion，模运算递推/grokking 实验）批量运行训练实验的完整流程。当用户给出实验类型（JSON 里的 task，如 action/mixed_ab/addition 等）和超参（模型规模、规则数、污损概率、种子等）要求跑实验时使用。覆盖：生成实验配置 JSON、命名、用 batch_run.py/chain_rounds.sh 启动、日志与 checkpoint 落盘、画图、查进度（逐卡队列/全量汇总）、关停单个实验或整条链、给在跑实验设定时/取消定时、汇总结果到文档、结果库同步。触发词示例：跑一批实验/启动实验/排个队列/查进度/每张卡队列/汇总所有实验/停掉实验/停止某条实验/设定时/取消定时/汇总结果/同步结果库。
 ---
 
 # Recursion 实验运行器
@@ -62,8 +62,38 @@ python .agents/skills/recursion-experiment-runner/scripts/check_progress.py <批
 - **手动关停且保存**：**先对训练进程（core.py）发 SIGTERM**，等日志出现 `[STOP] Checkpoint saved`（下一个 eval 点，EVAL_INTERVAL=1 时秒级），**再杀编排器**（chain_rounds.sh / batch_run）。顺序不能反！
 - **手动关停整条链**：先 `kill` 各个 `core.py config_tmp_<实验名>`（SIGTERM 存盘），确认存盘后 `pkill -f 'chain_rounds.sh experiments/<批次>'`。pkill 模式别写成能匹配到自己命令行的形式（会误杀 shell，用 `pgrep -af '[c]ore.py ...'` 括号写法或先核对 PID 再 kill）。
 - 2026-09-08 教训：旧版 batch_run 用管道转发 core.py 的 stdout，先杀编排器会让训练进程下次 print 时 BrokenPipeError 静默死掉、丢 checkpoint（trib/tetra 跑了 12h 的进度因此丢失）。已修复为直接重定向到文件（编排器死亡不再影响训练进程），但仍建议按上面的顺序操作。
+- **取消排队实验**：batch_run 把队列读进内存，改 JSON 不影响在跑的编排器。正确做法：直接杀编排器（训练进程因文件重定向不受影响，会继续跑完并正常存最终模型），不要让训练进程先退出——否则编排器会在 watcher 轮询间隙（秒级）内抢跑下一个实验（两次踩坑）。缺 plots 时用 `python -c "import batch_run; batch_run.generate_grouped_plots('<logs>', '<plots>')"` 手动补画。
 
-## 6. 汇总与上传
+## 6. 四个常用技能（2026-09-09 固化，脚本在 scripts/ 下）
+
+**技能 1 — 逐卡队列状态**（用户说“每张卡队列/在跑什么”）：
+```bash
+python .agents/skills/recursion-experiment-runner/scripts/gpu_queue_status.py
+```
+每张卡一行：在跑实验、累计 epoch（含续跑轮）、当前/best 正确率、已跑时长、定时（含 timer.sh 临时定时的剩余时间）；排队列（含定时）。排队语义：batch_run=JSON 里当前实验之后的条目；chain_rounds=未完成的实验（最后一轮则不再排）。
+
+**技能 2 — 全量实验汇总**（用户说“汇总所有实验”）：
+```bash
+python .agents/skills/recursion-experiment-runner/scripts/experiment_summary.py [--since-days 3] [--match 子串]
+```
+按批次分组列出每个实验：状态（RUN/DONE/STOP）、累计 epoch、best 正确率、每 epoch 耗时（含启动开销，短任务会被摊高）。
+
+**技能 3 — 下一个存档点退出某条实验**（用户说“停止/退出某实验”）：
+```bash
+bash .agents/skills/recursion-experiment-runner/scripts/stop_experiment.sh <实验名唯一子串>
+```
+对训练进程发 SIGTERM → 下一个 eval 点存 `_resume.pth` 退出（码 42）。子串必须恰好匹配一个进程，否则脚本拒绝执行。编排器不动，队列照常前进。
+
+**技能 4 — 临时定时**（用户说“给某实验设 N 小时定时/取消定时”）：
+```bash
+bash .agents/skills/recursion-experiment-runner/scripts/timer.sh set <实验名唯一子串> <小时>
+bash .agents/skills/recursion-experiment-runner/scripts/timer.sh cancel <子串>
+bash .agents/skills/recursion-experiment-runner/scripts/timer.sh list
+```
+原理：后台 watcher（setsid 分离，状态文件在 logs/timers/）到点后按技能 3 发 SIGTERM。只适用于**正在运行**的实验；未开始的实验直接在 JSON 配 MAX_TRAIN_HOURS。
+
+
+## 7. 汇总与上传
 
 - 结果汇总到状态文档（v1 口径：`reports/ACTION_MISSLEN_STATUS.md`，用 `scripts/update_status_tables.py` 重建表格；v2：`reports/v2/ACTION_V2_STATUS.md`，用 `scripts/update_v2_status.py`）。
 - 上传结果库（`/data/cxm/recursion`，master 分支）：把批次 logs/plots 复制进 `action_v2/<批次名>/`（v2 用 `v2/` 前缀子目录），checkpoint 放 `checkpoints/` 子目录（**不要叫 models/，会被 .gitignore 忽略**），`git add` + commit + `git push origin HEAD`。

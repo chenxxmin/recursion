@@ -21,10 +21,9 @@ from protocol import BATCH_RUN_MERGED_FLAG
 from models import FibonacciTransformer, MixedABTransformer
 from datasets import (RecurrenceDataset, MixedRecurrenceDataset,
                       ActionDataset, BucketBatchSampler,
-                      collate_fn, collate_fn_masked, collate_fn_predict,
-                      mixed_ab_collate_fn, mixed_ab_collate_fn_masked,
-                      mixed_ab_collate_fn_predict, action_collate_fn,
-                      action_missing_collate_fn)
+                      collate_fn, make_missing_collate,
+                      mixed_ab_collate_fn, make_mixed_missing_collate,
+                      action_collate_fn, make_action_missing_collate)
 from training import run_training_engine, resume_checkpoint_path
 from final_eval import (_run_mixed_ab_final_test,
                         _run_single_recurrence_final_test)
@@ -142,8 +141,6 @@ def _prepare_mixed_recurrence(config, device, order):
 
     # NUM_MASK unset (None) means: the first num_mask positions are initial
     # values and are not evaluated. Default 2, matching the tribonacci task.
-    # Computed before dataset construction because MISSING_PROB corruption
-    # bakes the mask prefix into per-sample loss masks.
     num_mask_cfg = cfg.get('NUM_MASK')
     num_mask = 2 if num_mask_cfg is None else num_mask_cfg
     # An all-zero loss mask yields a grad-less constant loss and crashes
@@ -154,23 +151,22 @@ def _prepare_mixed_recurrence(config, device, order):
     missing_prob = cfg.get('MISSING_PROB', 0.0)
     predict_missing = cfg.get('PREDICT_MISSING', False)
     ds = MixedRecurrenceDataset(rules=rules, num_samples=NUM_TRAIN_SAMPLES, length=TRAIN_LEN,
-                                verbose=True, use_ab_tag=cfg.get('USE_AB_TAG', True),
-                                missing_prob=missing_prob,
-                                miss_len=cfg.get('MISS_LEN', 1),
-                                miss_second=cfg.get('MISS_SECOND', False),
-                                predict_missing=predict_missing,
-                                num_mask=num_mask,
-                                first_task_weight=cfg.get('FIRST_TASK_WEIGHT', 1.0))
+                                verbose=True, use_ab_tag=cfg.get('USE_AB_TAG', True))
     train_dataset = ds.train_data
     test_dataset = ds.test_data
 
     _print_task_banner(BLOCK_SIZE, TRAIN_LEN, f"Rules: {[r.name for r in rules]}")
 
-    # Explicit collate selection matching the dataset's item layout.
-    if missing_prob > 0 and predict_missing:
-        mixed_collate = mixed_ab_collate_fn_predict   # (view, clean, label) -> MIXED_AB_TARGET
-    elif missing_prob > 0:
-        mixed_collate = mixed_ab_collate_fn_masked    # (seq, mask, label) -> MIXED_AB_MASKED
+    # Explicit collate selection: with MISSING_PROB, corruption is applied
+    # on the fly in the collate (fresh randomness per batch; datasets store
+    # clean windows only).
+    if missing_prob > 0:
+        mixed_collate = make_mixed_missing_collate(
+            p=P, order=order, n_rules=len(rules), use_ab_tag=cfg.get('USE_AB_TAG', True),
+            missing_prob=missing_prob, miss_len=cfg.get('MISS_LEN', 1),
+            miss_second=cfg.get('MISS_SECOND', False), num_mask=num_mask,
+            first_task_weight=cfg.get('FIRST_TASK_WEIGHT', 1.0),
+            predict_missing=predict_missing)
     else:
         mixed_collate = mixed_ab_collate_fn           # (seq, label) -> MIXED_AB
     train_loader, test_loader = _make_loaders(train_dataset, test_dataset, BATCH_SIZE, mixed_collate)
@@ -267,18 +263,20 @@ def _prepare_action(config):
 
     train_dataset = ActionDataset(
         p=P, ab_pairs=AB_PAIRS, num_samples=NUM_TRAIN_SAMPLES,
-        length=TRAIN_LEN, seed=cfg.get('RANDOM_SEED', 42),
-        missing_prob=missing_prob, miss_len=miss_len
+        length=TRAIN_LEN, seed=cfg.get('RANDOM_SEED', 42)
     )
     test_dataset = ActionDataset(
         p=P, ab_pairs=AB_PAIRS, num_samples=NUM_TEST_SAMPLES,
-        length=OOD_LEN, seed=cfg.get('RANDOM_SEED', 42) + 1,
-        missing_prob=missing_prob, miss_len=miss_len
+        length=OOD_LEN, seed=cfg.get('RANDOM_SEED', 42) + 1
     )
 
     _print_task_banner(BLOCK_SIZE, TRAIN_LEN, f"Dynamic mixed rules: {AB_PAIRS}")
 
-    collate = action_missing_collate_fn if missing_prob > 0 else action_collate_fn
+    # With MISSING_PROB, corruption is applied on the fly in the collate
+    # (fresh randomness per batch; datasets store clean samples only).
+    collate = (make_action_missing_collate(p=P, missing_prob=missing_prob,
+                                           miss_len=miss_len)
+               if missing_prob > 0 else action_collate_fn)
     train_loader, test_loader = _make_loaders(train_dataset, test_dataset, BATCH_SIZE, collate)
 
     # FRESH_TEST_PER_EVAL: rebuild the test set at every eval with a fresh seed
@@ -292,8 +290,7 @@ def _prepare_action(config):
             fresh_seed = fresh_rng.randrange(2 ** 31)
             ds = ActionDataset(
                 p=P, ab_pairs=AB_PAIRS, num_samples=NUM_TEST_SAMPLES,
-                length=OOD_LEN, seed=fresh_seed,
-                missing_prob=missing_prob, miss_len=miss_len)
+                length=OOD_LEN, seed=fresh_seed)
             print(f"[FreshTest] rebuilt test set: n={NUM_TEST_SAMPLES}, len={OOD_LEN}, seed={fresh_seed}")
             return _make_test_loader(ds, BATCH_SIZE, collate)
 
@@ -400,12 +397,6 @@ def _prepare_single_recurrence(config, task):
         p=P, recurrence_fn=recurrence_fn, recurrence_name=recurrence_name,
         init_len=init_len, num_samples=NUM_TRAIN_SAMPLES,
         length=TRAIN_LEN,
-        missing_prob=missing_prob,
-        miss_len=cfg.get('MISS_LEN', 1),
-        miss_second=cfg.get('MISS_SECOND', False),
-        predict_missing=predict_missing,
-        num_mask=num_mask,
-        first_task_weight=cfg.get('FIRST_TASK_WEIGHT', 1.0),
         state_cap=STATE_SPACE_CAP
     )
     ds.run()
@@ -414,12 +405,17 @@ def _prepare_single_recurrence(config, task):
 
     _print_task_banner(BLOCK_SIZE, TRAIN_LEN, recurrence_name)
 
-    # Explicit collate selection: the dataset's item layout is determined by
-    # the missing-value config, and the collate must match it.
-    if missing_prob > 0 and predict_missing:
-        collate = collate_fn_predict      # (view, clean) -> PLAIN_TARGET
-    elif missing_prob > 0:
-        collate = collate_fn_masked       # (seq, mask) -> LOSS_MASK
+    # Explicit collate selection: with MISSING_PROB, corruption is applied on
+    # the fly in the collate (fresh randomness per batch; the dataset stores
+    # clean windows only).
+    if missing_prob > 0:
+        collate = make_missing_collate(
+            p=P, init_len=init_len, missing_prob=missing_prob,
+            miss_len=cfg.get('MISS_LEN', 1),
+            miss_second=cfg.get('MISS_SECOND', False),
+            num_mask=num_mask,
+            first_task_weight=cfg.get('FIRST_TASK_WEIGHT', 1.0),
+            predict_missing=predict_missing)
     else:
         collate = collate_fn              # plain tensors -> PLAIN
     train_loader, test_loader = _make_loaders(train_dataset, test_dataset, BATCH_SIZE, collate)
@@ -441,12 +437,6 @@ def _prepare_single_recurrence(config, task):
             fresh_ds = RecurrenceDataset(
                 p=P, recurrence_fn=recurrence_fn, recurrence_name=recurrence_name,
                 init_len=init_len, num_samples=0, length=OOD_LEN, verbose=False,
-                missing_prob=missing_prob,
-                miss_len=cfg.get('MISS_LEN', 1),
-                miss_second=cfg.get('MISS_SECOND', False),
-                predict_missing=predict_missing,
-                num_mask=num_mask,
-                first_task_weight=cfg.get('FIRST_TASK_WEIGHT', 1.0),
                 state_cap=NUM_TEST_SAMPLES,
             )
             fresh_ds.run()
