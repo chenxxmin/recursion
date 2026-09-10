@@ -2,13 +2,13 @@
   "concurrency": 1,
   "experiments": [
     {
-      "name": "mixed_basic_d1024l6r8h4_P127_rules123_N3_e0.7_seed17996",
+      "name": "mixed_basic_d1024l4r8h4_P127_rules12_N2_e0.7_randmiss0.1len2_seed17996",
       "task": "mixed_ab",
       "config": {
         "RANDOM_SEED": 17996,
         "P": 127,
         "D_MODEL": 1024,
-        "N_LAYER": 6,
+        "N_LAYER": 4,
         "N_HEAD": 4,
         "MLP_RATIO": 8,
         "TRAIN_LEN": 16,
@@ -20,29 +20,25 @@
           [
             2,
             3
-          ],
-          [
-            3,
-            5
           ]
         ],
         "MIXED_AB_MAX_UNIQUE_RATIOS": [
           0.7,
-          0.7,
           0.7
         ],
-        "MAX_TRAIN_HOURS": 6,
-        "RESUME_FROM": "/data/cxm/models/mixed_basic_d1024l6r8h4_p127_rules123/mixed_basic_d1024l6r8h4_P127_rules123_N3_e0.7_seed17996_resume.pth"
+        "MISSING_PROB": 0.1,
+        "MISS_LEN": 2,
+        "MAX_TRAIN_HOURS": 6
       }
     },
     {
-      "name": "mixed_basic_d1024l6r8h4_P127_rules123_N3_e0.7_seed18318",
+      "name": "mixed_basic_d1024l4r8h4_P127_rules12_N2_e0.7_randmiss0.1len2_seed18318",
       "task": "mixed_ab",
       "config": {
         "RANDOM_SEED": 18318,
         "P": 127,
         "D_MODEL": 1024,
-        "N_LAYER": 6,
+        "N_LAYER": 4,
         "N_HEAD": 4,
         "MLP_RATIO": 8,
         "TRAIN_LEN": 16,
@@ -54,19 +50,15 @@
           [
             2,
             3
-          ],
-          [
-            3,
-            5
           ]
         ],
         "MIXED_AB_MAX_UNIQUE_RATIOS": [
           0.7,
-          0.7,
           0.7
         ],
-        "MAX_TRAIN_HOURS": 6,
-        "RESUME_FROM": "/data/cxm/models/mixed_basic_d1024l6r8h4_p127_rules123/mixed_basic_d1024l6r8h4_P127_rules123_N3_e0.7_seed18318_resume.pth"
+        "MISSING_PROB": 0.1,
+        "MISS_LEN": 2,
+        "MAX_TRAIN_HOURS": 6
       }
     }
   ]

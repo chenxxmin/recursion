@@ -1,0 +1,39 @@
+{
+  "concurrency": 1,
+  "experiments": [
+    {
+      "name": "addition_d1024l4r8h4_P127_tr16ood32_randmiss0.1len3_seed17996",
+      "task": "addition",
+      "config": {
+        "RANDOM_SEED": 17996,
+        "P": 127,
+        "D_MODEL": 1024,
+        "N_LAYER": 4,
+        "N_HEAD": 4,
+        "MLP_RATIO": 8,
+        "TRAIN_LEN": 16,
+        "OOD_LEN": 32,
+        "MISSING_PROB": 0.1,
+        "MISS_LEN": 3,
+        "MAX_TRAIN_HOURS": 6
+      }
+    },
+    {
+      "name": "addition_d1024l6r8h4_P127_tr16ood32_randmiss0.1len3_seed17996",
+      "task": "addition",
+      "config": {
+        "RANDOM_SEED": 17996,
+        "P": 127,
+        "D_MODEL": 1024,
+        "N_LAYER": 6,
+        "N_HEAD": 4,
+        "MLP_RATIO": 8,
+        "TRAIN_LEN": 16,
+        "OOD_LEN": 32,
+        "MISSING_PROB": 0.1,
+        "MISS_LEN": 3,
+        "MAX_TRAIN_HOURS": 6
+      }
+    }
+  ]
+}
