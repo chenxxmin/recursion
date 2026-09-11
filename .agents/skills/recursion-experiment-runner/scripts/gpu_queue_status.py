@@ -17,7 +17,7 @@ import subprocess
 import time
 from datetime import datetime
 
-BASES = ['/data/cxm/recursion', '/data/cxm/recursion_v2']
+BASES = ['/data/cxm/recursion']
 REPO = os.path.abspath(os.path.join(os.path.dirname(os.path.abspath(__file__)), '..', '..', '..', '..'))
 TIMER_DIR = os.path.join(REPO, 'logs', 'timers')
 

@@ -10,7 +10,7 @@ description: 在本仓库（/home/cxm/recursion，模运算递推/grokking 实�
 
 ## 1. 生成实验配置 JSON
 
-写到 `experiments/`（v2 制度实验写 `experiments/v2/`）。格式：
+写到 `experiments/`。格式：
 
 ```json
 {"concurrency": 2,
@@ -23,7 +23,7 @@ description: 在本仓库（/home/cxm/recursion，模运算递推/grokking 实�
 
 **命名约定**（从现有实验沿用，保证日志可分组成图）：
 - v1 制度：`{task}_d{D}l{L}r{R}h{H}_P{P}_tr{T}ood{O}_{N规则}_randmiss{prob}len{len}_seed{S}`
-- v2 制度（30万训练集/len127/新鲜测试）：`action_v2_d{D}l{L}r{R}h{H}_P127_tr127_{N}_miss{prob}len{len}_seed{S}`
+- v2 命名（30万训练集/新鲜测试）：`action_v2_d{D}l{L}r{R}h{H}_P127_tr127_{N}_miss{prob}len{len}_seed{S}`（只是命名风格，输出目录与其他实验相同）
 
 ## 2. 启动
 
@@ -36,7 +36,7 @@ setsid nohup bash scripts/chain_rounds.sh experiments/<批次>.json <gpus> <roun
 ```
 
 - GPU 分配：`BATCH_RUN_GPUS=0,1`（白名单）；`BATCH_RUN_IDLE_MEM_MB=4096`（共享卡时放宽空闲阈值，默认 100MB）。空闲 GPU 用 `nvidia-smi --query-gpu=index,memory.used --format=csv,noheader` 查。
-- 默认目录：`/data/cxm/recursion` + `/data/cxm/models`。v2 隔离制度用 `--base-dir/--model-base-dir`（batch_run）或 `CHAIN_DATA_BASE/CHAIN_MODEL_BASE`（chain_rounds.sh），见 `reports/v2/README.md`。
+- 默认目录：`/data/cxm/recursion` + `/data/cxm/models`。**2026-09-11 起不再有 v2 隔离目录**（`/data/cxm/recursion_v2`/`models_v2` 已废弃，历史内容已并入主库）；所有新实验一律用默认目录，不要再传 `--base-dir/--model-base-dir`。
 - 并发上限 = min(concurrency, 空闲卡数)，一卡一实验。
 
 ## 3. 关键运行行为（影响决策）
@@ -51,7 +51,7 @@ setsid nohup bash scripts/chain_rounds.sh experiments/<批次>.json <gpus> <roun
 ## 4. 查进度
 
 ```bash
-python .agents/skills/recursion-experiment-runner/scripts/check_progress.py <批次名> [--data-base /data/cxm/recursion_v2]
+python .agents/skills/recursion-experiment-runner/scripts/check_progress.py <批次名>
 ```
 
 输出每实验 `[完成/运行/存盘待续] epoch best%`。注意日志只在 eval 点写：慢实验（分钟级 epoch）几十分钟没新行是正常的，用 GPU 利用率确认存活。
@@ -95,7 +95,7 @@ bash .agents/skills/recursion-experiment-runner/scripts/timer.sh list
 
 ## 7. 汇总与上传
 
-- 结果汇总到状态文档（v1 口径：`reports/ACTION_MISSLEN_STATUS.md`，用 `scripts/update_status_tables.py` 重建表格；v2：`reports/v2/ACTION_V2_STATUS.md`，用 `scripts/update_v2_status.py`）。
-- 上传结果库（`/data/cxm/recursion`，master 分支）：把批次 logs/plots 复制进 `action_v2/<批次名>/`（v2 用 `v2/` 前缀子目录），checkpoint 放 `checkpoints/` 子目录（**不要叫 models/，会被 .gitignore 忽略**），`git add` + commit + `git push origin HEAD`。
+- 结果汇总到状态文档（`reports/ACTION_MISSLEN_STATUS.md`，用 `scripts/update_status_tables.py` 重建表格）。
+- 上传结果库（`/data/cxm/recursion`，master 分支）：把批次 logs/plots 复制进 `<批次名>/` 或对应任务子目录，checkpoint 放 `checkpoints/` 子目录（**不要叫 models/，会被 .gitignore 忽略**），`git add` + commit + `git push origin HEAD`。
 - **GitHub 单文件 100MB 限制**：大 checkpoint 先提取纯权重转 bf16（实证无损，见 AMP_PRECISION_NOTES.md §2.6），超 100MB 的完整 resume ckpt 只留本地。
 - 代码库推送用 main 分支；两个库远端有新提交时先 `git pull --no-rebase` 合并（历史上均无冲突）。

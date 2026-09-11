@@ -18,7 +18,7 @@ import subprocess
 import time
 from datetime import datetime
 
-BASES = ['/data/cxm/recursion', '/data/cxm/recursion_v2']
+BASES = ['/data/cxm/recursion']
 
 
 def running_names():

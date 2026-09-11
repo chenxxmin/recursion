@@ -21,7 +21,7 @@
 ## 2. 配置合并与实验 JSON
 
 - 合并顺序：`src/config.json` 的 main → task 默认段 → 实验 config 覆盖。实验 JSON 只写与默认不同的键。
-- 命名约定见 SKILL.md §1；v2 制度（30万样本/fresh 256 测试）写 `experiments/v2/` 并用 `--base-dir /data/cxm/recursion_v2 --model-base-dir /data/cxm/models_v2` 启动。
+- 命名约定见 SKILL.md §1。**2026-09-11 起不再有 v2 隔离目录**：所有实验输出一律生成在默认的 `/data/cxm/recursion` + `/data/cxm/models`（旧的 `/data/cxm/recursion_v2`、`/data/cxm/models_v2` 已废弃，内容已并入主库）。
 
 ## 3. 最近的语义改动（2026-09-08/09，改代码时注意一致性）
 
