@@ -64,6 +64,14 @@
     "TRAIN_LEN": 16,
     "OOD_LEN": 32
   },
+  "action_trib": {
+    "P": 53,
+    "ABC_PAIRS": [[1, 1, 1], [1, 2, 3]],
+    "NUM_TRAIN_SAMPLES": 10000,
+    "NUM_TEST_SAMPLES": 2000,
+    "TRAIN_LEN": 16,
+    "OOD_LEN": 32
+  },
   "mixed_ab": {
     "USE_AB_TAG": false,
     "USE_CONDITIONAL_WTE": false,

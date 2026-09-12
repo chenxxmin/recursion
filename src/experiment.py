@@ -238,8 +238,14 @@ def _prepare_mixed_recurrence(config, device, order):
     }
 
 
-def _prepare_action(config):
-    """Prepare dataset, model, loaders and training params for the action task."""
+def _prepare_action(config, order=2):
+    """Prepare dataset, model, loaders and training params for the action task family.
+
+    order: recurrence order. order=2 reads AB_PAIRS (task 'action'),
+    order=3 reads ABC_PAIRS (task 'action_trib'). The ACTION coefficient
+    convention applies: the first coefficient multiplies the OLDEST value
+    (opposite of LinearRecurrenceRule).
+    """
     cfg_main = config.get('main', {})
     # batch_run already merges the action section into main with the
     # correct precedence (main -> task defaults -> experiment override).
@@ -260,27 +266,29 @@ def _prepare_action(config):
     DROPOUT = cfg_main['DROPOUT']
     ENTROPY_PENALTY_WEIGHT = cfg_main.get('ENTROPY_PENALTY_WEIGHT', 0.0)
     USE_LEARNABLE_PE = cfg_main.get('USE_LEARNABLE_PE', False)
-    AB_PAIRS = [tuple(pair) for pair in cfg.get('AB_PAIRS', [[1, 1], [1, 2]])]
+    pairs_key = 'AB_PAIRS' if order == 2 else 'ABC_PAIRS'
+    pairs_default = [[1, 1], [1, 2]] if order == 2 else [[1, 1, 1], [1, 2, 3]]
+    AB_PAIRS = [tuple(pair) for pair in cfg.get(pairs_key, pairs_default)]
     for pair in AB_PAIRS:
-        if len(pair) != 2 or any(not 0 <= c < P for c in pair):
-            raise ValueError(f"AB_PAIRS entry {pair} must be two coefficients in [0, {P})")
+        if len(pair) != order or any(not 0 <= c < P for c in pair):
+            raise ValueError(f"{pairs_key} entry {pair} must be {order} coefficients in [0, {P})")
     NUM_TRAIN_SAMPLES = cfg.get('NUM_TRAIN_SAMPLES', 10000)
     NUM_TEST_SAMPLES = cfg.get('NUM_TEST_SAMPLES', 2000)  # default matches src/config.json
     TRAIN_LEN = cfg.get('TRAIN_LEN', 16)
     OOD_LEN = cfg.get('OOD_LEN', 32)
 
     # In action, each generated token is preceded by a flag token,
-    # so the actual sequence length is 2*length - 2.
-    max_seq_len = 2 * max(TRAIN_LEN, OOD_LEN) - 2
+    # so the actual sequence length is 2*length - order.
+    max_seq_len = 2 * max(TRAIN_LEN, OOD_LEN) - order
     BLOCK_SIZE = _round_up_pow2(max_seq_len)
 
     train_dataset = ActionDataset(
         p=P, ab_pairs=AB_PAIRS, num_samples=NUM_TRAIN_SAMPLES,
-        length=TRAIN_LEN, seed=cfg.get('RANDOM_SEED', 42)
+        length=TRAIN_LEN, seed=cfg.get('RANDOM_SEED', 42), order=order
     )
     test_dataset = ActionDataset(
         p=P, ab_pairs=AB_PAIRS, num_samples=NUM_TEST_SAMPLES,
-        length=OOD_LEN, seed=cfg.get('RANDOM_SEED', 42) + 1
+        length=OOD_LEN, seed=cfg.get('RANDOM_SEED', 42) + 1, order=order
     )
 
     _print_task_banner(BLOCK_SIZE, TRAIN_LEN, f"Dynamic mixed rules: {AB_PAIRS}")
@@ -288,7 +296,7 @@ def _prepare_action(config):
     # With MISSING_PROB, corruption is applied on the fly in the collate
     # (fresh randomness per batch; datasets store clean samples only).
     collate = (make_action_missing_collate(p=P, missing_prob=missing_prob,
-                                           miss_len=miss_len)
+                                           miss_len=miss_len, order=order)
                if missing_prob > 0 else action_collate_fn)
     train_loader, test_loader = _make_loaders(train_dataset, test_dataset, BATCH_SIZE, collate)
 
@@ -303,7 +311,7 @@ def _prepare_action(config):
             fresh_seed = fresh_rng.randrange(2 ** 31)
             ds = ActionDataset(
                 p=P, ab_pairs=AB_PAIRS, num_samples=NUM_TEST_SAMPLES,
-                length=OOD_LEN, seed=fresh_seed)
+                length=OOD_LEN, seed=fresh_seed, order=order)
             print(f"[FreshTest] rebuilt test set: n={NUM_TEST_SAMPLES}, len={OOD_LEN}, seed={fresh_seed}")
             return _make_test_loader(ds, BATCH_SIZE, collate)
 
@@ -332,6 +340,7 @@ def _prepare_action(config):
     save_config = {
         'p': P,
         'ab_pairs': AB_PAIRS,
+        'order': order,
         'd_model': D_MODEL,
         'n_head': N_HEAD,
         'n_layer': N_LAYER,
@@ -541,8 +550,8 @@ def run_experiment(config_path=None):
     if TASK in ('mixed_ab', 'mixed_abc'):
         order = 2 if TASK == 'mixed_ab' else 3
         ctx = _prepare_mixed_recurrence(config, device, order)
-    elif TASK == 'action':
-        ctx = _prepare_action(config)
+    elif TASK in ('action', 'action_trib'):
+        ctx = _prepare_action(config, order=3 if TASK == 'action_trib' else 2)
     elif TASK in ('addition', 'multiplication', 'tribonacci', 'tetranacci', 'nonlinear', 'nonlinear_mul'):
         ctx = _prepare_single_recurrence(config, TASK)
     else:

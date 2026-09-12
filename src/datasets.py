@@ -424,27 +424,32 @@ def make_mixed_missing_collate(*, p, order, n_rules, use_ab_tag, missing_prob,
     return collate
 
 
-def generate_action_sample(p, ab_pairs, flag_start_id, length, rng):
-    """Generate one action sequence [x1, x2, flag_3, x3, ..., flag_L, x_L].
+def generate_action_sample(p, ab_pairs, flag_start_id, length, rng, order=2):
+    """Generate one action sequence [x1..x_order, flag, x_{order+1}, ..., flag, x_L].
 
     rng: a random.Random instance owned by the caller (seeding decides the
     sequence). Shared by ActionDataset and the attention analysis.
+
+    order: recurrence order (number of initial values / coefficients per
+    rule). Coefficient convention (ACTION FAMILY, opposite of
+    LinearRecurrenceRule): the first coefficient multiplies the OLDEST
+    value, i.e. x_next = sum(c_i * values[-order + i]) % p; for order=2
+    that is a*values[-2] + b*values[-1].
     """
-    x1 = rng.randrange(p)
-    x2 = rng.randrange(p)
-    seq = [x1, x2]
-    values = [x1, x2]  # Only numeric values, used for recurrence
-    for _ in range(2, length):
+    values = [rng.randrange(p) for _ in range(order)]
+    seq = list(values)
+    for _ in range(order, length):
         rule_idx = rng.randrange(len(ab_pairs))
-        a, b = ab_pairs[rule_idx]
-        x_next = (a * values[-2] + b * values[-1]) % p
+        coeffs = ab_pairs[rule_idx]
+        x_next = sum(c * v for c, v in zip(coeffs, values[-order:])) % p
         seq.append(flag_start_id + rule_idx)
         seq.append(x_next)
         values.append(x_next)
 
-    # Sanity check: flag positions should be >= flag_start_id, value positions < p
+    # Sanity check: flag positions should be >= flag_start_id, value positions < p.
+    # Layout: indices 0..order-1 are initial values, then alternating flag/value.
     for i, tok in enumerate(seq):
-        if i % 2 == 0 and i >= 2:
+        if i >= order and (i - order) % 2 == 0:
             assert tok >= flag_start_id, \
                 f"Position {i} should be a flag token (>= {flag_start_id}), got {tok}"
         else:
@@ -456,22 +461,27 @@ def generate_action_sample(p, ab_pairs, flag_start_id, length, rng):
 class ActionDataset(Dataset):
     """Dataset where the recurrence rule can change at every step.
 
-    Input format: [x1, x2, flag_3, x3, flag_4, x4, ..., flag_L, x_L]
+    Input format: [x1..x_order, flag, x_{order+1}, flag, x_{order+2}, ...]
     where flag_k indicates which rule is used to generate x_k.
-    Loss is computed only on x3..x_L; x1, x2 and all flags are masked.
+    Loss is computed only on x_{order+1}..x_L; initial values and all flags
+    are masked.
 
     With missing_prob > 0, corruption is applied ON THE FLY in
     make_action_missing_collate (fresh randomness per batch): samples are
     always stored CLEAN as (seq, loss_mask) pairs.
     """
 
-    def __init__(self, p, ab_pairs, num_samples, length, seed=0):
+    def __init__(self, p, ab_pairs, num_samples, length, seed=0, order=2):
         super().__init__()
         self.p = p
         self.ab_pairs = [tuple(pair) for pair in ab_pairs]
+        for pair in self.ab_pairs:
+            assert len(pair) == order, \
+                f"rule {pair} must have exactly order={order} coefficients"
         self.num_ab_pairs = len(self.ab_pairs)
         self.num_samples = num_samples
         self.length = length
+        self.order = order
         self.pad_token_id = p
         self.flag_start_id = p + 1
         self.rng = random.Random(seed)
@@ -480,24 +490,19 @@ class ActionDataset(Dataset):
     def _generate_sample(self):
         """Generate one CLEAN sequence with per-step random rules.
 
-        Input format: [x1, x2, f3, x3, flag_4, x4, ..., f_L, x_L]
-        where flag_k indicates which rule is used to generate x_k.
-        Loss is computed only on x3..x_L; x1, x2 and all flags are masked.
-        Missing-value corruption happens on the fly in
+        Loss is computed only on generated values; initial values and all
+        flags are masked. Missing-value corruption happens on the fly in
         make_action_missing_collate, never here.
         """
         seq = generate_action_sample(self.p, self.ab_pairs, self.flag_start_id,
-                                      self.length, self.rng)
+                                      self.length, self.rng, order=self.order)
 
-        # Build loss mask aligned to targets = seq[1:]
-        # Input: [x1, x2, f3, x3, f4, x4, ..., f_L, x_L]
-        # Target: [x2, f3, x3, f4, x4, ..., f_L, x_L]
-        # Only x3, x4, ..., x_L should contribute to loss; x2 and all flags are masked.
-        # Loop index k=2 generates x_3 (target index 2), k=3 generates x_4 (target index 4),
-        # so x_{k+1} is at target index 2*(k-1).
+        # Build loss mask aligned to targets = seq[1:]. Value x_j (j >=
+        # order+1) sits at seq index 2*j - order - 1, i.e. target index
+        # 2*j - order - 2. With k = j - 1 in [order, length): 2*k - order.
         loss_mask = torch.zeros(len(seq) - 1, dtype=torch.float)
-        for k in range(2, self.length):
-            target_idx = 2 * (k - 1)
+        for k in range(self.order, self.length):
+            target_idx = 2 * k - self.order
             loss_mask[target_idx] = 1.0
 
         return torch.tensor(seq, dtype=torch.long), loss_mask
@@ -509,26 +514,26 @@ class ActionDataset(Dataset):
         return self.samples[idx]
 
 
-def corrupt_action_view(view, *, p, missing_prob, miss_len):
-    """Corrupt value positions x3..x_L (odd seq indices >= 3) of an action
-    sequence in place with the missing token p. Same run model as the legacy
-    ActionDataset._corrupt_values (scan from x3; a hit corrupts a run of
-    random length in [1, miss_len]; the value right after a run stays clean;
-    redo until the longest run equals miss_len), but with fresh global
-    randomness per call (on-the-fly regime).
+def corrupt_action_view(view, *, p, missing_prob, miss_len, order=2):
+    """Corrupt generated value positions of an action sequence in place with
+    the missing token p (flags are never corrupted). Same run model as the
+    legacy ActionDataset._corrupt_values (scan from x_{order+1}; a hit
+    corrupts a run of random length in [1, miss_len]; the value right after
+    a run stays clean; redo until the longest run equals miss_len), but
+    with fresh global randomness per call (on-the-fly regime).
     """
-    L = (len(view) + 2) // 2  # number of values: seq has 2 + 2*(L-2) tokens
+    L = (len(view) + order) // 2  # number of values: seq has order + 2*(L-order) tokens
     retries = 0
     while True:
         trial = view.clone()
         max_run = 0
-        k = 3
+        k = order + 1
         while k <= L:
             if random.random() < missing_prob:
                 run = random.randint(1, miss_len)
                 end = min(k + run, L + 1)  # exclusive value index
                 for q in range(k, end):
-                    trial[2 * q - 3] = p
+                    trial[2 * q - order - 1] = p
                 max_run = max(max_run, end - k)
                 k = end + 1  # the value right after a run stays clean
             else:
@@ -548,7 +553,7 @@ def action_collate_fn(batch):
     return torch.stack(sequences, dim=0), BatchTag.LOSS_MASK, torch.stack(loss_masks, dim=0)
 
 
-def make_action_missing_collate(*, p, missing_prob, miss_len=1):
+def make_action_missing_collate(*, p, missing_prob, miss_len=1, order=2):
     """Action on-the-fly corruption: items are (clean_seq, loss_mask); every
     batch gets fresh corruption of value positions -> (views, ACTION_MISS,
     cleans, masks). Predict mode: loss/accuracy targets are the clean values.
@@ -559,7 +564,8 @@ def make_action_missing_collate(*, p, missing_prob, miss_len=1):
         views = []
         for seq in seqs:
             view = seq.clone()
-            corrupt_action_view(view, p=p, missing_prob=missing_prob, miss_len=miss_len)
+            corrupt_action_view(view, p=p, missing_prob=missing_prob,
+                                miss_len=miss_len, order=order)
             views.append(view)
         return (torch.stack(views, dim=0), BatchTag.ACTION_MISS,
                 torch.stack(seqs, dim=0), loss_masks)

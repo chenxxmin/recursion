@@ -1,6 +1,6 @@
 # Recursion 训练任务：模型结构与训练设置说明
 
-本文档汇总 `src/` 中 `addition`、`tribonacci`、`tetranacci`、`multiplication`、`nonlinear`、`mixed_ab`、`action` 等递归训练任务的**模型结构**与**训练设置**。所有任务共享同一套 Transformer 主干，仅在递推规则、状态空间大小、输入格式以及多规则扩展上有所区别。
+本文档汇总 `src/` 中 `addition`、`tribonacci`、`tetranacci`、`multiplication`、`nonlinear`、`mixed_ab`、`action`、`action_trib` 等递归训练任务的**模型结构**与**训练设置**。所有任务共享同一套 Transformer 主干，仅在递推规则、状态空间大小、输入格式以及多规则扩展上有所区别。
 
 ---
 
@@ -102,6 +102,26 @@ x_k = a * x_{k-2} + b * x_{k-1}  (mod P)
 
 **缺失值污损（predict 模式）**：`MISSING_PROB > 0` 时启用（参考 `experiments/dynamic_missing.json`）。值子序列 `x3..x_L` 按单规则同款 run 模型污损——每个值位置独立以 `MISSING_PROB` 概率命中并污损随机长度 ∈ [1, `MISS_LEN`] 的连续段，段后第一个值强制干净；若整段扫描没有任何 run 达到 `MISS_LEN` 则重摇（全净样本也接受）。flag token 永不污损，缺失 token 为 `M = P`（词表已含，模型零改动）。**2026-09-09 起为在线污损**：数据集只存干净的 `(seq, loss_mask)`，污损在 `make_action_missing_collate` 里逐 batch 新鲜随机进行（每 epoch 缺失位置都不同），经 `BatchTag.ACTION_MISS` 路由，`_unpack_batch` 以 clean 序列为目标（predict 语义隐含，无 `PREDICT_MISSING` 开关）。`MISS_SECOND` 不支持（打 warning 并忽略）。
 
+### 1.7 action_trib
+每步规则可变的三阶线性递推（2026-09-10 新增，task 名 `action_trib`）。与 `action` 完全同构，仅阶数 2→3：三个初始值，之后每个新值前插一个 flag。序列格式：
+
+```
+[x0, x1, x2, flag_3, x3, flag_4, x4, ..., flag_L, x_L]
+```
+
+其中 `x3 = flag_1(x0,x1,x2)`，`x4 = flag_2(x1,x2,x3)`。每步从 `ABC_PAIRS` 中随机选一条规则：
+
+```
+x_k = a * x_{k-3} + b * x_{k-2} + c * x_{k-1}  (mod P)
+```
+
+**⚠ 系数顺序约定（action 家族通用）：第一个系数乘最老的值**，与 `LinearRecurrenceRule`（zip(coeffs, reversed(seq))，第一个系数乘最新的值）**相反**。action 入口（`_prepare_action` / `ActionDataset`）与 recurrence 入口（`single_rule_from_task` / `LinearRecurrenceRule`）相互独立，各自口径内部一致，不要跨入口套用。
+
+- 默认参数：`P = 53`，`ABC_PAIRS = [[1,1,1], [1,2,3]]`
+- 实际输入序列长度：`2 * L - 3`
+- 实现：与 action 共用 `ActionDataset` / `_prepare_action`（`order=3` 参数）；污损、loss mask（只算 `x3..x_L`）、词表（flag = `P+1..P+N`，missing = `P`）、`FRESH_TEST_PER_EVAL` 全部继承 action 机制
+- attention 分析暂不支持（analyze_attention.py 硬编码 order-2，batch_run 对 `action_trib` 跳过分析，TODO）
+
 ---
 
 ## 2. 公共训练设置
@@ -162,6 +182,7 @@ x_k = a * x_{k-2} + b * x_{k-1}  (mod P)
 | `tetranacci` | `P: 23`，`A: 1`，`B: 1`，`C: 1`，`D: 1` |
 | `mixed_ab` | `USE_AB_TAG: false`，`USE_CONDITIONAL_WTE: false`，`COND_WTE_SHARED_RATIO: 0.0`，`MIXED_AB_MAX_UNIQUE_RATIOS: [0.7, 0.7]` |
 | `action` | `P: 53`，`AB_PAIRS: [[1,1],[1,2]]`，`NUM_TRAIN_SAMPLES: 10000`，`NUM_TEST_SAMPLES: 2000`，`TRAIN_LEN: 16`，`OOD_LEN: 32` |
+| `action_trib` | 同 action 段，但 `AB_PAIRS` 换成 `ABC_PAIRS: [[1,1,1],[1,2,3]]` |
 
 ### 2.2 训练流程通用设置
 
@@ -177,7 +198,7 @@ x_k = a * x_{k-2} + b * x_{k-1}  (mod P)
   - `tetranacci`：默认屏蔽前 `3` 个位置（从预测第 5 项开始）
   - `mixed_ab`：默认屏蔽前 `2` 个位置（从预测第 3 项开始，受 rule token 影响）
   - `action`：由数据集生成 2D loss_mask，只计算 `x3, x4, ...`
-- **block_size 计算**：`max(TRAIN_LEN, OOD_LEN)` 向上取整到最近的 2 的幂；`action` 按 `2*L - 2` 计算。
+- **block_size 计算**：`max(TRAIN_LEN, OOD_LEN)` 向上取整到最近的 2 的幂；`action`/`action_trib` 按 `2*L - order` 计算（action 为 `2*L - 2`，action_trib 为 `2*L - 3`）。
 
 ---
 

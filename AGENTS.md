@@ -11,7 +11,7 @@
 ## 1. 代码结构（src/）
 
 - `core.py`：薄入口（re-export），实际逻辑在 `experiment.py`（run_experiment 主流程 + 三个 prepare）。
-- `experiment.py`：`_prepare_single_recurrence`（addition/multiplication/tribonacci/tetranacci/nonlinear*）、`_prepare_mixed_recurrence`（mixed_ab/mixed_abc）、`_prepare_action`（action）。
+- `experiment.py`：`_prepare_single_recurrence`（addition/multiplication/tribonacci/tetranacci/nonlinear*）、`_prepare_mixed_recurrence`（mixed_ab/mixed_abc）、`_prepare_action`（action/action_trib，order 参数区分阶数）。
 - `rules.py`：递推规则。`LinearRecurrenceRule`（任意阶任意系数的通用入口）、`single_rule_from_task`（task 名 → (init_len, next_fn, name)）。
 - `datasets.py`：RecurrenceDataset（全状态枚举+循环遍历，或 STATE_SPACE_CAP 抽样）、MixedRecurrenceDataset、ActionDataset、所有 collate。
 - `training.py`：训练/评估循环、早停、SIGTERM 优雅退出、checkpoint。
@@ -31,6 +31,7 @@
 4. **tetranacci task**：4 阶递推（A/B/C/D 键，init_len=4）。**P⁴ 状态空间必须配 `STATE_SPACE_CAP`**（否则枚举爆炸），抽样路径同时用于数据集和 final eval。
 5. **单规则任务支持** `NUM_TRAIN_SAMPLES` 显式覆盖 和 `FRESH_TEST_PER_EVAL`（每 eval 从全状态空间抽 NUM_TEST_SAMPLES 个全新状态生成 OOD_LEN 窗口）。**mixed_ab/mixed_abc 也支持 `NUM_TRAIN_SAMPLES` 显式覆盖**（2026-09-10）：标量=每规则同样数量，列表=逐规则数量，设置后覆盖 `MIXED_AB_MAX_UNIQUE_RATIOS` 的反推。
 6. **batch_run 直接文件重定向**（不再管道转发）：杀编排器不会误杀训练进程。
+7. **action_trib task**（2026-09-10）：action 家族三阶版，`[x0 x1 x2 flag1 x3 flag2 x4 ...]` 逐位置插 flag，`x_k = a·x_{k-3}+b·x_{k-2}+c·x_{k-1}`。与 action 共用 `ActionDataset`/`_prepare_action`（新增 `order` 参数，默认 2 保持原行为逐样本一致），规则读 `ABC_PAIRS`。⚠ action 家族系数约定：第一个系数乘**最老**的值，与 `LinearRecurrenceRule` 相反（文档见 docs/recursion_model_and_training_settings.md §1.7）。attention 分析暂不支持 action_trib（batch_run 跳过，TODO）。
 
 ## 4. 本机环境的坑（反复踩过）
 
