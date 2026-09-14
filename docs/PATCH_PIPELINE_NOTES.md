@@ -105,7 +105,7 @@ python src/head_ablation.py model.pth --pairs 256
 7. **逐模型验证解剖**：同一任务存在不同解法（rules23 批 seed18318 的
    证据-操作数纠缠解，无 lag2 纯证据头、无翻转位点）；
 8. **GPU/会话**：长任务用 `setsid nohup ... &` 脱离会话，否则会话关闭
-   进程被杀（课程调度器 src/curriculum_chain.py 可作模板）。
+   进程被杀（课程调度器 src/curriculum_chain_Ntask.py 可作模板）。
 
 ## 4. 当前结论一句话版
 
@@ -186,7 +186,7 @@ python src/head_ablation.py model.pth --pairs 256
   打 `_BATCH_RUN_MERGED` 标记（`protocol.py`）；写出 `config_tmp_<name>.json`
   后 spawn `core.py`；
 - GPU：`get_idle_gpus()`（nvidia-smi 探测）+ 队列分配，**会覆盖外层
-  CUDA_VISIBLE_DEVICES**——要钉卡需直接 spawn core.py（curriculum_chain.py
+  CUDA_VISIBLE_DEVICES**——要钉卡需直接 spawn core.py（curriculum_chain_Ntask.py
   就是这么做的）；
 - 输出：`/data/cxm/recursion/<批次名>/logs|plots`，`/data/cxm/models/<批次名>/`
   （PATH_CONVENTIONS.md）；

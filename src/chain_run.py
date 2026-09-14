@@ -23,6 +23,9 @@ Semantics:
 - After each stage, every experiment's checkpoint must exist, and (when the
   stage declares a gate) every experiment's best test accuracy must reach
   gate.min_best_accuracy; otherwise the chain aborts before the next stage.
+- A top-level "concurrency": N is passed through to each stage's batch_run
+  invocation (e.g. 2 to run two seeds in parallel on two GPUs); absent
+  means batch_run's default of 1 (stage experiments run serially).
 
 Usage (repo root):
     python src/chain_run.py experiments/curriculum_ab_p53.json \
@@ -162,8 +165,11 @@ def main():
                            args.model_base_dir)
 
         stage_path = os.path.join(tmp_dir, f'{batch_name}.json')
+        stage_batch = {'experiments': stage['experiments']}
+        if 'concurrency' in chain:
+            stage_batch['concurrency'] = chain['concurrency']
         with open(stage_path, 'w', encoding='utf-8') as f:
-            json.dump({'experiments': stage['experiments']}, f, indent=2)
+            json.dump(stage_batch, f, indent=2)
 
         ret = subprocess.run(
             [sys.executable, os.path.join(SCRIPT_DIR, 'batch_run.py'), stage_path,

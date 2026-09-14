@@ -15,7 +15,7 @@
 - `rules.py`：递推规则。`LinearRecurrenceRule`（任意阶任意系数的通用入口）、`single_rule_from_task`（task 名 → (init_len, next_fn, name)）。
 - `datasets.py`：RecurrenceDataset（全状态枚举+循环遍历，或 STATE_SPACE_CAP 抽样）、MixedRecurrenceDataset、ActionDataset、所有 collate。
 - `training.py`：训练/评估循环、早停、SIGTERM 优雅退出、checkpoint。
-- `batch_run.py`：批量编排（读 experiments/*.json，合并配置，一卡一实验）；`chain_rounds.sh` + `prepare_chain_round.py`：多轮续跑。
+- `batch_run.py`：批量编排（读 experiments/*.json，合并配置，一卡一实验）；`chain_rounds.sh` + `prepare_chain_round.py`：多轮续跑。`chain_run.py`：通用课程链（分 stage 串行，`INIT_FROM:"@prev"/@<stage>` 暖启动，gate 门槛，顶层 concurrency 透传）；交接文档 `docs/CURRICULUM_NTASK_HANDOVER.md`。`curriculum_chain_Ntask.py` 是旧的 N=2→5 专用调度器（硬编码，勿用作通用 pipeline）。
 - 测试：`tests/test_*.py` 是纯 assert 脚本，**没有 pytest**；运行 `/home/cxm/miniconda3/bin/python tests/test_xxx.py`（test_sample_gen.py 需要 `PYTHONPATH=src`）。
 
 ## 2. 配置合并与实验 JSON

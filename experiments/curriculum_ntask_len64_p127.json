@@ -1,0 +1,395 @@
+{
+  "concurrency": 2,
+  "stages": [
+    {
+      "name": "N1",
+      "gate": {
+        "min_best_accuracy": 0.95
+      },
+      "experiments": [
+        {
+          "name": "curr_N1_add11_P127_tr64_miss01_seed17996",
+          "task": "addition",
+          "config": {
+            "P": 127,
+            "D_MODEL": 1024,
+            "N_LAYER": 2,
+            "N_HEAD": 4,
+            "MLP_RATIO": 8,
+            "TRAIN_LEN": 64,
+            "OOD_LEN": 128,
+            "MISSING_PROB": 0.1,
+            "MISS_LEN": 1,
+            "MAX_TRAIN_HOURS": 12,
+            "RANDOM_SEED": 17996
+          }
+        },
+        {
+          "name": "curr_N1_add11_P127_tr64_miss01_seed18318",
+          "task": "addition",
+          "config": {
+            "P": 127,
+            "D_MODEL": 1024,
+            "N_LAYER": 2,
+            "N_HEAD": 4,
+            "MLP_RATIO": 8,
+            "TRAIN_LEN": 64,
+            "OOD_LEN": 128,
+            "MISSING_PROB": 0.1,
+            "MISS_LEN": 1,
+            "MAX_TRAIN_HOURS": 12,
+            "RANDOM_SEED": 18318
+          }
+        }
+      ]
+    },
+    {
+      "name": "N2",
+      "gate": {
+        "min_best_accuracy": 0.95
+      },
+      "experiments": [
+        {
+          "name": "curr_N2_rules12_P127_tr64_miss01_seed17996",
+          "task": "mixed_ab",
+          "config": {
+            "P": 127,
+            "D_MODEL": 1024,
+            "N_LAYER": 2,
+            "N_HEAD": 4,
+            "MLP_RATIO": 8,
+            "TRAIN_LEN": 64,
+            "OOD_LEN": 128,
+            "MISSING_PROB": 0.1,
+            "MISS_LEN": 1,
+            "MAX_TRAIN_HOURS": 12,
+            "RANDOM_SEED": 17996,
+            "AB_PAIRS": [
+              [
+                1,
+                1
+              ],
+              [
+                2,
+                3
+              ]
+            ],
+            "MIXED_AB_MAX_UNIQUE_RATIOS": [
+              0.7,
+              0.7
+            ],
+            "INIT_FROM": "@prev"
+          }
+        },
+        {
+          "name": "curr_N2_rules12_P127_tr64_miss01_seed18318",
+          "task": "mixed_ab",
+          "config": {
+            "P": 127,
+            "D_MODEL": 1024,
+            "N_LAYER": 2,
+            "N_HEAD": 4,
+            "MLP_RATIO": 8,
+            "TRAIN_LEN": 64,
+            "OOD_LEN": 128,
+            "MISSING_PROB": 0.1,
+            "MISS_LEN": 1,
+            "MAX_TRAIN_HOURS": 12,
+            "RANDOM_SEED": 18318,
+            "AB_PAIRS": [
+              [
+                1,
+                1
+              ],
+              [
+                2,
+                3
+              ]
+            ],
+            "MIXED_AB_MAX_UNIQUE_RATIOS": [
+              0.7,
+              0.7
+            ],
+            "INIT_FROM": "@prev"
+          }
+        }
+      ]
+    },
+    {
+      "name": "N3",
+      "gate": {
+        "min_best_accuracy": 0.95
+      },
+      "experiments": [
+        {
+          "name": "curr_N3_rules123_P127_tr64_miss01_seed17996",
+          "task": "mixed_ab",
+          "config": {
+            "P": 127,
+            "D_MODEL": 1024,
+            "N_LAYER": 2,
+            "N_HEAD": 4,
+            "MLP_RATIO": 8,
+            "TRAIN_LEN": 64,
+            "OOD_LEN": 128,
+            "MISSING_PROB": 0.1,
+            "MISS_LEN": 1,
+            "MAX_TRAIN_HOURS": 12,
+            "RANDOM_SEED": 17996,
+            "AB_PAIRS": [
+              [
+                1,
+                1
+              ],
+              [
+                2,
+                3
+              ],
+              [
+                3,
+                5
+              ]
+            ],
+            "MIXED_AB_MAX_UNIQUE_RATIOS": [
+              0.7,
+              0.7,
+              0.7
+            ],
+            "INIT_FROM": "@prev"
+          }
+        },
+        {
+          "name": "curr_N3_rules123_P127_tr64_miss01_seed18318",
+          "task": "mixed_ab",
+          "config": {
+            "P": 127,
+            "D_MODEL": 1024,
+            "N_LAYER": 2,
+            "N_HEAD": 4,
+            "MLP_RATIO": 8,
+            "TRAIN_LEN": 64,
+            "OOD_LEN": 128,
+            "MISSING_PROB": 0.1,
+            "MISS_LEN": 1,
+            "MAX_TRAIN_HOURS": 12,
+            "RANDOM_SEED": 18318,
+            "AB_PAIRS": [
+              [
+                1,
+                1
+              ],
+              [
+                2,
+                3
+              ],
+              [
+                3,
+                5
+              ]
+            ],
+            "MIXED_AB_MAX_UNIQUE_RATIOS": [
+              0.7,
+              0.7,
+              0.7
+            ],
+            "INIT_FROM": "@prev"
+          }
+        }
+      ]
+    },
+    {
+      "name": "N4",
+      "gate": {
+        "min_best_accuracy": 0.95
+      },
+      "experiments": [
+        {
+          "name": "curr_N4_rules1234_P127_tr64_miss01_seed17996",
+          "task": "mixed_ab",
+          "config": {
+            "P": 127,
+            "D_MODEL": 1024,
+            "N_LAYER": 2,
+            "N_HEAD": 4,
+            "MLP_RATIO": 8,
+            "TRAIN_LEN": 64,
+            "OOD_LEN": 128,
+            "MISSING_PROB": 0.1,
+            "MISS_LEN": 1,
+            "MAX_TRAIN_HOURS": 12,
+            "RANDOM_SEED": 17996,
+            "AB_PAIRS": [
+              [
+                1,
+                1
+              ],
+              [
+                2,
+                3
+              ],
+              [
+                3,
+                5
+              ],
+              [
+                4,
+                7
+              ]
+            ],
+            "MIXED_AB_MAX_UNIQUE_RATIOS": [
+              0.7,
+              0.7,
+              0.7,
+              0.7
+            ],
+            "INIT_FROM": "@prev"
+          }
+        },
+        {
+          "name": "curr_N4_rules1234_P127_tr64_miss01_seed18318",
+          "task": "mixed_ab",
+          "config": {
+            "P": 127,
+            "D_MODEL": 1024,
+            "N_LAYER": 2,
+            "N_HEAD": 4,
+            "MLP_RATIO": 8,
+            "TRAIN_LEN": 64,
+            "OOD_LEN": 128,
+            "MISSING_PROB": 0.1,
+            "MISS_LEN": 1,
+            "MAX_TRAIN_HOURS": 12,
+            "RANDOM_SEED": 18318,
+            "AB_PAIRS": [
+              [
+                1,
+                1
+              ],
+              [
+                2,
+                3
+              ],
+              [
+                3,
+                5
+              ],
+              [
+                4,
+                7
+              ]
+            ],
+            "MIXED_AB_MAX_UNIQUE_RATIOS": [
+              0.7,
+              0.7,
+              0.7,
+              0.7
+            ],
+            "INIT_FROM": "@prev"
+          }
+        }
+      ]
+    },
+    {
+      "name": "N5",
+      "gate": {
+        "min_best_accuracy": 0.95
+      },
+      "experiments": [
+        {
+          "name": "curr_N5_rules12345_P127_tr64_miss01_seed17996",
+          "task": "mixed_ab",
+          "config": {
+            "P": 127,
+            "D_MODEL": 1024,
+            "N_LAYER": 2,
+            "N_HEAD": 4,
+            "MLP_RATIO": 8,
+            "TRAIN_LEN": 64,
+            "OOD_LEN": 128,
+            "MISSING_PROB": 0.1,
+            "MISS_LEN": 1,
+            "MAX_TRAIN_HOURS": 12,
+            "RANDOM_SEED": 17996,
+            "AB_PAIRS": [
+              [
+                1,
+                1
+              ],
+              [
+                2,
+                3
+              ],
+              [
+                3,
+                5
+              ],
+              [
+                4,
+                7
+              ],
+              [
+                5,
+                9
+              ]
+            ],
+            "MIXED_AB_MAX_UNIQUE_RATIOS": [
+              0.7,
+              0.7,
+              0.7,
+              0.7,
+              0.7
+            ],
+            "INIT_FROM": "@prev"
+          }
+        },
+        {
+          "name": "curr_N5_rules12345_P127_tr64_miss01_seed18318",
+          "task": "mixed_ab",
+          "config": {
+            "P": 127,
+            "D_MODEL": 1024,
+            "N_LAYER": 2,
+            "N_HEAD": 4,
+            "MLP_RATIO": 8,
+            "TRAIN_LEN": 64,
+            "OOD_LEN": 128,
+            "MISSING_PROB": 0.1,
+            "MISS_LEN": 1,
+            "MAX_TRAIN_HOURS": 12,
+            "RANDOM_SEED": 18318,
+            "AB_PAIRS": [
+              [
+                1,
+                1
+              ],
+              [
+                2,
+                3
+              ],
+              [
+                3,
+                5
+              ],
+              [
+                4,
+                7
+              ],
+              [
+                5,
+                9
+              ]
+            ],
+            "MIXED_AB_MAX_UNIQUE_RATIOS": [
+              0.7,
+              0.7,
+              0.7,
+              0.7,
+              0.7
+            ],
+            "INIT_FROM": "@prev"
+          }
+        }
+      ]
+    }
+  ]
+}
