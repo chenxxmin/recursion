@@ -339,7 +339,7 @@ def run_training_engine(model, train_loader, test_loader, optimizer, scheduler, 
                         cond_fix_start_a1=None, cond_fix_start_a2=None,
                         max_train_hours=None, resume_state=None, use_amp=False,
                         amp_dtype='bfloat16', test_loader_fn=None, grad_accum_steps=1,
-                        extra_epochs_after_high_acc=200):
+                        extra_epochs_after_high_acc=200, per_rule_threshold=None):
     print(f"\nStart training...")
     # Autocast for the forward pass (weights/optimizer stay fp32). bf16 needs
     # no scaler (fp32-range exponent); fp16 needs GradScaler (5-bit exponent).
@@ -497,6 +497,15 @@ def run_training_engine(model, train_loader, test_loader, optimizer, scheduler, 
             if no_improve >= early_stop_no_improve:
                 print(f"[Early stop] No improvement for {early_stop_no_improve} consecutive epochs")
                 break
+
+            # Per-rule threshold early stop (all rules must exceed threshold)
+            if per_rule_threshold is not None and test_group_acc:
+                all_above = all(v >= per_rule_threshold
+                                for v in test_group_acc.values())
+                if all_above:
+                    print(f"[Early stop] Epoch {epoch}: all per-rule acc >= "
+                          f"{per_rule_threshold:.2%}")
+                    break
 
             # Manual stop requested via SIGTERM: same checkpoint path as timeout.
             if _STOP_REQUESTED:
