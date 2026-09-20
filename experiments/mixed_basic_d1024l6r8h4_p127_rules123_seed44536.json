@@ -31,7 +31,8 @@
           0.7,
           0.7
         ],
-        "MAX_TRAIN_HOURS": 3
+        "MAX_TRAIN_HOURS": 6,
+        "RESUME_FROM": "/data/cxm/models/mixed_basic_d1024l6r8h4_p127_rules123_seed44536/mixed_basic_d1024l6r8h4_P127_rules123_N3_e0.7_seed44536_latest.pth"
       }
     }
   ]

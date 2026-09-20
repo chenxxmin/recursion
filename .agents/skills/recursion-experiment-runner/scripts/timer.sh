@@ -23,7 +23,7 @@ case "$cmd" in
   set)
     hours="${3:?缺少小时数}"
     # 确认目标在跑且唯一
-    mapfile -t pids < <(pgrep -f "core.py config_tmp_.*${pat}")
+    mapfile -t pids < <(pgrep -f "[c]ore.py.*config_tmp_.*${pat}")
     [ "${#pids[@]}" -eq 1 ] || { echo "匹配进程数=${#pids[@]}（需要恰好 1 个）"; exit 1; }
     f="$(timer_file "$pat")"
     deadline=$(( $(date +%s) + $(python3 -c "print(int($hours*3600))") ))
@@ -32,10 +32,10 @@ case "$cmd" in
       while true; do
         sleep 30
         [ -f "$f" ] || exit 0                       # 被取消
-        tp=$(pgrep -f "[c]ore.py config_tmp_.*${pat}" | head -1)
+        tp=$(pgrep -f "[c]ore.py.*config_tmp_.*${pat}" | head -1)
         [ -z "$tp" ] && { rm -f "$f"; exit 0; }     # 实验已自行结束
         if [ "$(date +%s)" -ge "$deadline" ]; then
-          cnt=$(pgrep -fc "[c]ore.py config_tmp_.*${pat}")
+          cnt=$(pgrep -fc "[c]ore.py.*config_tmp_.*${pat}")
           if [ "$cnt" = 1 ]; then
             kill "$tp"
             echo "$(date -u "+%F %T") timer fired: SIGTERM $tp ($pat)" >> "$repo/logs/timers/fired.log"

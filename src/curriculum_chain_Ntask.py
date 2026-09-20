@@ -18,7 +18,7 @@ Logs: /data/cxm/recursion/curriculum_chains/logs/
 State: /data/cxm/recursion/curriculum_chains/chain_state.json
 
 Usage:
-  setsid nohup python src/curriculum_chain.py > .chain_tmp/curriculum_scheduler.log 2>&1 &
+  setsid nohup python src/curriculum_chain_Ntask.py > .chain_tmp/curriculum_scheduler.log 2>&1 &
 """
 import json
 import os

@@ -184,6 +184,34 @@ def _prepare_mixed_recurrence(config, device, order):
         mixed_collate = mixed_ab_collate_fn           # (seq, label) -> MIXED_AB
     train_loader, test_loader = _make_loaders(train_dataset, test_dataset, BATCH_SIZE, mixed_collate)
 
+    # FRESH_TEST_PER_EVAL (mixed): at every eval, sample NUM_TEST_SAMPLES fresh
+    # initial states PER RULE from each rule's full state space and roll out
+    # OOD_LEN windows (num_samples=0 sends them all to the test split). Same
+    # regime as the single-rule fresh test; eval cost stays tiny even when the
+    # static split has millions of held-out states.
+    test_loader_fn = None
+    if cfg.get('FRESH_TEST_PER_EVAL', False):
+        NUM_TEST_SAMPLES = cfg.get('NUM_TEST_SAMPLES', 256)
+        fresh_rng = random.Random(cfg.get('RANDOM_SEED', 42) + 10 ** 6 + 7)
+
+        def test_loader_fn():  # noqa: F811 (intentional closure name)
+            fresh_seed = fresh_rng.randrange(2 ** 31)
+            rng_state = random.getstate()
+            random.seed(fresh_seed)
+            fresh_samples, fresh_labels = [], []
+            for idx, rule in enumerate(rules):
+                fresh_ds = RecurrenceDataset(
+                    p=P, recurrence_fn=rule.next_fn(), recurrence_name=rule.name,
+                    init_len=rule.order, num_samples=0, length=OOD_LEN,
+                    verbose=False, state_cap=NUM_TEST_SAMPLES)
+                fresh_ds.run()
+                fresh_samples += fresh_ds.test_samples
+                fresh_labels += [idx] * len(fresh_ds.test_samples)
+            random.setstate(rng_state)
+            print(f"[FreshTest] rebuilt mixed test set: n={NUM_TEST_SAMPLES}/rule x {len(rules)}, len={OOD_LEN}, seed={fresh_seed}")
+            return _make_test_loader(list(zip(fresh_samples, fresh_labels)),
+                                     BATCH_SIZE, mixed_collate)
+
     model = MixedABTransformer(p=P, d_model=D_MODEL, n_head=N_HEAD, n_layer=N_LAYER, block_size=BLOCK_SIZE,
                                dropout=DROPOUT,
                                entropy_penalty_weight=cfg['ENTROPY_PENALTY_WEIGHT'],
@@ -226,6 +254,7 @@ def _prepare_mixed_recurrence(config, device, order):
         'test_dataset': test_dataset,
         'train_loader': train_loader,
         'test_loader': test_loader,
+        'test_loader_fn': test_loader_fn,
         'num_mask': num_mask,
         'extra_kwargs_fn': extra_kwargs_fn,
         'save_config': save_config,

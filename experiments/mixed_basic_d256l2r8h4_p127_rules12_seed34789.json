@@ -2,13 +2,13 @@
   "concurrency": 1,
   "experiments": [
     {
-      "name": "mixed_basic_d1024l6r8h4_P127_rules123_N3_e0.7_seed55555",
+      "name": "mixed_basic_d256l2r8h4_P127_rules12_N2_e0.7_seed34789",
       "task": "mixed_ab",
       "config": {
-        "RANDOM_SEED": 55555,
+        "RANDOM_SEED": 34789,
         "P": 127,
-        "D_MODEL": 1024,
-        "N_LAYER": 6,
+        "D_MODEL": 256,
+        "N_LAYER": 2,
         "N_HEAD": 4,
         "MLP_RATIO": 8,
         "TRAIN_LEN": 16,
@@ -20,19 +20,13 @@
           [
             2,
             3
-          ],
-          [
-            3,
-            5
           ]
         ],
         "MIXED_AB_MAX_UNIQUE_RATIOS": [
           0.7,
-          0.7,
           0.7
         ],
-        "MAX_TRAIN_HOURS": 6,
-        "RESUME_FROM": "/data/cxm/models/mixed_basic_d1024l6r8h4_p127_rules123_seed55555/mixed_basic_d1024l6r8h4_P127_rules123_N3_e0.7_seed55555_resume.pth"
+        "MAX_TRAIN_HOURS": 6
       }
     }
   ]

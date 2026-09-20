@@ -1,0 +1,22 @@
+{
+  "concurrency": 1,
+  "experiments": [
+    {
+      "name": "addition_d2048l2r8h8_P127_tr64ood128_randmiss0.1len8_seed17996",
+      "task": "addition",
+      "config": {
+        "RANDOM_SEED": 17996,
+        "P": 127,
+        "D_MODEL": 2048,
+        "N_LAYER": 2,
+        "N_HEAD": 8,
+        "MLP_RATIO": 8,
+        "TRAIN_LEN": 64,
+        "OOD_LEN": 128,
+        "MISSING_PROB": 0.1,
+        "MISS_LEN": 8,
+        "MAX_TRAIN_HOURS": 6
+      }
+    }
+  ]
+}

@@ -6,14 +6,14 @@
 set -u
 PAT="${1:?用法: bash stop_experiment.sh <实验名唯一子串>}"
 
-mapfile -t pids < <(pgrep -f "core.py config_tmp_.*${PAT}")
+mapfile -t pids < <(pgrep -f "[c]ore.py.*config_tmp_.*${PAT}")
 if [ "${#pids[@]}" -eq 0 ]; then
   echo "没有匹配的运行中实验: $PAT"
   exit 1
 fi
 if [ "${#pids[@]}" -gt 1 ]; then
   echo "匹配到多个进程，请改用更长的唯一子串:"
-  pgrep -af "core.py config_tmp_.*${PAT}"
+  pgrep -af "[c]ore.py.*config_tmp_.*${PAT}"
   exit 1
 fi
 kill "${pids[0]}"

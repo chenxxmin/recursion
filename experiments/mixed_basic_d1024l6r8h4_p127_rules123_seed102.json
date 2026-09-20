@@ -2,10 +2,10 @@
   "concurrency": 1,
   "experiments": [
     {
-      "name": "mixed_basic_d1024l6r8h4_P127_rules123_N3_e0.7_seed55555",
+      "name": "mixed_basic_d1024l6r8h4_P127_rules123_N3_e0.7_seed102",
       "task": "mixed_ab",
       "config": {
-        "RANDOM_SEED": 55555,
+        "RANDOM_SEED": 102,
         "P": 127,
         "D_MODEL": 1024,
         "N_LAYER": 6,
@@ -31,8 +31,7 @@
           0.7,
           0.7
         ],
-        "MAX_TRAIN_HOURS": 6,
-        "RESUME_FROM": "/data/cxm/models/mixed_basic_d1024l6r8h4_p127_rules123_seed55555/mixed_basic_d1024l6r8h4_P127_rules123_N3_e0.7_seed55555_resume.pth"
+        "MAX_TRAIN_HOURS": 6
       }
     }
   ]
