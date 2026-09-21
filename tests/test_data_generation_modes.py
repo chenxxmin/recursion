@@ -16,14 +16,25 @@ def _initial_state(seq, order):
     return tuple(seq[:order].tolist())
 
 
+class CountingRng(random.Random):
+    def __init__(self, seed):
+        super().__init__(seed)
+        self.randrange_calls = 0
+
+    def randrange(self, *args, **kwargs):
+        self.randrange_calls += 1
+        return super().randrange(*args, **kwargs)
+
+
 def test_sample_unique_train_has_exact_unique_count():
     ds = RecurrenceDataset(
         p=7, recurrence_fn=_add_rule, recurrence_name='add',
         init_len=2, num_samples=30, length=8, verbose=False)
-    rng = random.Random(123)
+    rng = CountingRng(123)
     train = ds.sample_unique_train(rng=rng)
 
     assert len(train) == 30
+    assert rng.randrange_calls == 30  # Floyd sampling: exactly one draw per sample
     states = [_initial_state(seq, 2) for seq in train]
     assert len(set(states)) == 30
     assert ds.test_samples == []
