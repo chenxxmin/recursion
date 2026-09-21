@@ -403,7 +403,7 @@ def _prepare_action(config, order=2):
 
 
 def _prepare_single_recurrence(config, task):
-    """Prepare dataset, model, loaders and training params for addition/multiplication/tribonacci/nonlinear/nonlinear_mul."""
+    """Prepare dataset, model, loaders and training params for single-rule recurrence tasks."""
     cfg = dict(config.get('main', {}))
     P = cfg['P']
     D_MODEL = cfg['D_MODEL']
@@ -429,8 +429,14 @@ def _prepare_single_recurrence(config, task):
     #     the state space; every evaluation draws a fresh test set with replacement.
     data_mode = cfg.get('DATA_MODE')
     if data_mode is None:
-        # Backward compatibility for existing experiment files.
-        data_mode = 'sampled_fresh_test' if cfg.get('FRESH_TEST_PER_EVAL', False) else 'full_split'
+        # Backward compatibility for existing experiment files. Legacy
+        # STATE_SPACE_CAP was only needed when full enumeration was too large,
+        # which corresponds to the new sampled_fresh_test regime.
+        legacy_sampled = (
+            cfg.get('FRESH_TEST_PER_EVAL', False)
+            or cfg.get('STATE_SPACE_CAP') is not None
+        )
+        data_mode = 'sampled_fresh_test' if legacy_sampled else 'full_split'
     if data_mode not in ('full_split', 'sampled_fresh_test'):
         raise ValueError(
             f"DATA_MODE must be 'full_split' or 'sampled_fresh_test', got {data_mode!r}")
