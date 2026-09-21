@@ -75,7 +75,7 @@ python src/rule_fit.py <model.pth> <cfg.json> # 单模型模式：按 pth 文件
 
 ```
 experiments/<name>.json 逐实验
-  → 拼模型路径 /data/cxm/models/<name>/<exp>.pth
+  → 拼模型路径 /mnt/workspace/hujiachen/models/<name>/<exp>.pth
   → 在 LOG_BASE_CANDIDATES 两个候选目录找 <exp>.log
   → run_one(args, exp_cfg, task, exp_name, pth, log)
        load_model(pth) 重建模型（analyze_attention.py，处理 MixedABTransformer 检测、
@@ -135,7 +135,7 @@ analyze_model_attention 选的**单条测试序列**，不是训练集统计—�
    不合并 `src/config.json` 的 main/任务段。后果：tribonacci 批次（实验不写 P，靠 base 段
    P=23）每个都 `TypeError` 崩；`TRAIN_LEN` 缺省静默用 16 (:242/:397)。**建议**：复用
    `batch_run.build_merged_config`（去掉 SAVE_PATH 填充）拿合并后配置。
-2. **路径硬编码**：`MODEL_BASE='/data/cxm/models'` (:54)、`LOG_BASE_CANDIDATES` (:55)
+2. **路径硬编码**：`MODEL_BASE='/mnt/workspace/hujiachen/models'` (:54)、`LOG_BASE_CANDIDATES` (:55)
    无 CLI 覆盖；离开服务器即不可用时是静默 skip（missing report 里一堆 "model not found"）。
 3. **`out_path` 重复赋值**：:542 和 :575 各写一遍 `'rule_fit_output.log'`。
 4. **报错不带 traceback**：:566/:601 只打 `type(exc).__name__: exc`，批处理排障困难。

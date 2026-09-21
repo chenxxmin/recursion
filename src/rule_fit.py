@@ -19,9 +19,9 @@ Given an experiment batch NAME, this script:
   7. reports experiments with missing log/model at the end
 
 Paths:
-  model: /data/cxm/models/<name>/<exp>.pth
-  log:   /data/cxm/models/<name>/logs/<exp>.log  or
-         /data/cxm/recursion/<name>/logs/<exp>.log
+  model: /mnt/workspace/hujiachen/models/<name>/<exp>.pth
+  log:   /mnt/workspace/hujiachen/models/<name>/logs/<exp>.log  or
+         /mnt/workspace/hujiachen/recursion_results/<name>/logs/<exp>.log
 
 Usage (repo root):
     python src/rule_fit.py <name>                 # batch mode: iterate experiments/<name>.json
@@ -55,8 +55,8 @@ from report_front_back_attention import (dump_matrices, parse_log,
 from rules import task_from_save_config
 from verify_sample import _Tee, build_single_rule
 
-MODEL_BASE = '/data/cxm/models'
-LOG_BASE_CANDIDATES = ['/data/cxm/models/{name}/logs', '/data/cxm/recursion/{name}/logs']
+MODEL_BASE = '/mnt/workspace/hujiachen/models'
+LOG_BASE_CANDIDATES = ['/mnt/workspace/hujiachen/models/{name}/logs', '/mnt/workspace/hujiachen/recursion_results/{name}/logs']
 SIG_THRESHOLD = 0.10  # attention values below this are ignored in signatures
 
 

@@ -21,7 +21,7 @@
         "DATA_MODE": "sampled_fresh_test",
         "EVAL_INTERVAL": 1,
         "MAX_TRAIN_HOURS": 6,
-        "RESUME_FROM": "/data/cxm/models/tetranacci_p127_d1024l2_300k/tetranacci_a1b2c4d8_d1024l2r4h4_P127_seed0_resume.pth"
+        "RESUME_FROM": "/mnt/workspace/hujiachen/models/tetranacci_p127_d1024l2_300k/tetranacci_a1b2c4d8_d1024l2r4h4_P127_seed0_resume.pth"
       }
     },
     {
@@ -44,7 +44,7 @@
         "DATA_MODE": "sampled_fresh_test",
         "EVAL_INTERVAL": 1,
         "MAX_TRAIN_HOURS": 6,
-        "RESUME_FROM": "/data/cxm/models/tetranacci_p127_d1024l2_300k/tetranacci_a1b3c5d7_d1024l2r4h4_P127_seed0_resume.pth"
+        "RESUME_FROM": "/mnt/workspace/hujiachen/models/tetranacci_p127_d1024l2_300k/tetranacci_a1b3c5d7_d1024l2r4h4_P127_seed0_resume.pth"
       }
     }
   ]

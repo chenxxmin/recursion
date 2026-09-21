@@ -37,7 +37,7 @@
         "USE_AMP": false,
         "EARLY_STOP_EXTRA_EPOCHS": 20,
         "EVAL_INTERVAL": 1,
-        "RESUME_FROM": "/data/cxm/models_v2/action_v2_d1024_n3_miss03/action_v2_d1024l1r4h4_P127_tr127_N3_miss0.3len1_seed17996_resume.pth"
+        "RESUME_FROM": "/mnt/workspace/hujiachen/models_v2/action_v2_d1024_n3_miss03/action_v2_d1024l1r4h4_P127_tr127_N3_miss0.3len1_seed17996_resume.pth"
       }
     },
     {
@@ -76,7 +76,7 @@
         "USE_AMP": false,
         "EARLY_STOP_EXTRA_EPOCHS": 20,
         "EVAL_INTERVAL": 1,
-        "RESUME_FROM": "/data/cxm/models_v2/action_v2_d1024_n3_miss03/action_v2_d1024l1r4h4_P127_tr127_N3_miss0.3len1_seed18318_resume.pth"
+        "RESUME_FROM": "/mnt/workspace/hujiachen/models_v2/action_v2_d1024_n3_miss03/action_v2_d1024l1r4h4_P127_tr127_N3_miss0.3len1_seed18318_resume.pth"
       }
     },
     {
@@ -115,7 +115,7 @@
         "USE_AMP": false,
         "EARLY_STOP_EXTRA_EPOCHS": 20,
         "EVAL_INTERVAL": 1,
-        "RESUME_FROM": "/data/cxm/models_v2/action_v2_d1024_n3_miss03/action_v2_d1024l2r4h4_P127_tr127_N3_miss0.3len1_seed18318_resume.pth",
+        "RESUME_FROM": "/mnt/workspace/hujiachen/models_v2/action_v2_d1024_n3_miss03/action_v2_d1024l2r4h4_P127_tr127_N3_miss0.3len1_seed18318_resume.pth",
         "GRAD_ACCUM_STEPS": 2
       }
     }

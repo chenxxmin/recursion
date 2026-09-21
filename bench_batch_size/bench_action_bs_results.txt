@@ -1,0 +1,16 @@
+bs=1024 epochs=20 wall=233s ~11s/epoch peak_mem=40307MiB rc=0
+bs=2048 epochs=20 wall=8s ~0s/epoch peak_mem=33MiB rc=1
+bs=4096 epochs=20 wall=8s ~0s/epoch peak_mem=467MiB rc=1
+bs=8192 epochs=20 wall=8s ~0s/epoch peak_mem=20MiB rc=1
+bs=16384 epochs=20 wall=8s ~0s/epoch peak_mem=467MiB rc=1
+done
+bs=1280 epochs=20 wall=8s ~0s/epoch peak_mem=33MiB rc=1
+bs=1536 epochs=20 wall=8s ~0s/epoch peak_mem=627MiB rc=1
+done
+bs=512 epochs=20 wall=235s ~11s/epoch peak_mem=26544MiB rc=0
+bs=768 epochs=20 wall=240s ~12s/epoch peak_mem=38801MiB rc=0
+done
+bs=512 epochs=3 wall=1118s ~372s/epoch peak_mem=26544MiB rc=0
+bs=1024 epochs=3 wall=1122s ~374s/epoch peak_mem=40738MiB rc=0
+bs=1280 epochs=3 wall=97s ~32s/epoch peak_mem=17421MiB rc=1
+done

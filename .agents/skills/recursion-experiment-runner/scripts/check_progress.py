@@ -15,7 +15,7 @@ from datetime import datetime
 def main():
     ap = argparse.ArgumentParser()
     ap.add_argument('batch')
-    ap.add_argument('--data-base', default='/data/cxm/recursion')
+    ap.add_argument('--data-base', default='/mnt/workspace/hujiachen/recursion_results')
     args = ap.parse_args()
     D = os.path.join(args.data_base, args.batch, 'logs')
     if not os.path.isdir(D):
@@ -36,7 +36,7 @@ def main():
         elif fresh:
             st = '运行'
         elif '[TIMEOUT]' in txt or os.path.exists(os.path.join(
-                '/data/cxm/models', args.batch, f[:-4] + '_resume.pth')):
+                '/mnt/workspace/hujiachen/models', args.batch, f[:-4] + '_resume.pth')):
             st = '存盘待续'
         else:
             st = '中断?'

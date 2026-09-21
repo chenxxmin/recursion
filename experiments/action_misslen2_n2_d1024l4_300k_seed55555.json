@@ -1,0 +1,35 @@
+{
+  "concurrency": 1,
+  "experiments": [
+    {
+      "name": "action_d1024l4r4h4_P127_tr64ood128_N2_randmiss0.1len2_300k_seed55555",
+      "task": "action",
+      "config": {
+        "P": 127,
+        "TRAIN_LEN": 64,
+        "OOD_LEN": 128,
+        "N_HEAD": 4,
+        "MLP_RATIO": 4,
+        "D_MODEL": 1024,
+        "N_LAYER": 4,
+        "MISS_LEN": 2,
+        "MISSING_PROB": 0.1,
+        "AB_PAIRS": [
+          [
+            1,
+            1
+          ],
+          [
+            2,
+            3
+          ]
+        ],
+        "NUM_TRAIN_SAMPLES": 300000,
+        "BATCH_SIZE": 512,
+        "EVAL_INTERVAL": 1,
+        "MAX_TRAIN_HOURS": 6,
+        "RANDOM_SEED": 55555
+      }
+    }
+  ]
+}

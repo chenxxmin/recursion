@@ -410,7 +410,7 @@
 
 ## 29. prepare_rerun.py help 文本与实际默认值不符
 
-**问题**：`--log-dir` 的 help 写 "default: /data/cxm/<exp_name>/logs"，但实际默认由 `DEFAULT_BASE_DIR = '/data/cxm/recursion'` 推出，是 `/data/cxm/recursion/<exp_name>/logs`。按 help 拼路径会找到错误的目录。
+**问题**：`--log-dir` 的 help 写 "default: /data/cxm/<exp_name>/logs"，但实际默认由 `DEFAULT_BASE_DIR = '/mnt/workspace/hujiachen/recursion_results'` 推出，是 `/mnt/workspace/hujiachen/recursion_results/<exp_name>/logs`。按 help 拼路径会找到错误的目录。
 
 **修改**：help 改为 f-string 引用 `DEFAULT_BASE_DIR` 常量，消除两处来源。
 
@@ -434,7 +434,7 @@
 
 ## 31. prepare_rerun.py 与 batch_run.py 的重复定义
 
-**问题**：`load_json`/`save_json` 与 batch_run.py 逐字重复；`DEFAULT_BASE_DIR = '/data/cxm/recursion'` 两处硬编码，改一处忘另一处会导致日志路径错位。
+**问题**：`load_json`/`save_json` 与 batch_run.py 逐字重复；`DEFAULT_BASE_DIR = '/mnt/workspace/hujiachen/recursion_results'` 两处硬编码，改一处忘另一处会导致日志路径错位。
 
 **修改**：prepare_rerun.py 删除本地副本，改为 `from batch_run import load_json, save_json, DEFAULT_BASE_DIR`（batch_run 的 `main()` 有 `__main__` 保护，导入无副作用；唯一代价是会连带导入 visualize→matplotlib，已在注释中说明）。
 

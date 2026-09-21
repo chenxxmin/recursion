@@ -6,7 +6,7 @@ JSON 文件数: 36
 模型目录数: 40
 
 ======================================================================
-一、JSON 文件名与 /data/cxm/recursion 日志目录的对应
+一、JSON 文件名与 /mnt/workspace/hujiachen/recursion_results 日志目录的对应
 ======================================================================
 有同名日志目录的 JSON: 24 个
   ✓ action_p127_tr64_ood128_misslen_d256h4_predict.json
@@ -49,7 +49,7 @@ JSON 文件数: 36
   ⚠ tribonacci.json
 
 ======================================================================
-二、JSON 文件名与 /data/cxm/models 模型目录的对应
+二、JSON 文件名与 /mnt/workspace/hujiachen/models 模型目录的对应
 ======================================================================
 有同名模型目录的 JSON: 28 个
   ✓ action_p127_tr64_ood128_misslen_d256h4_predict.json

@@ -344,7 +344,7 @@ for layer in (1, 2):
     assert stages[0]['gate']['min_best_accuracy'] == 0.99
     # 干跑引用解析（不训练）：T1/T2 的 @phase1 必须各解析出 3 条
     for i in (1, 2):
-        chain_run._resolve_init_from(stages[i]['experiments'], stages[:i], f'curriculum_exposure_p251_l{layer}', '/data/cxm/models')
+        chain_run._resolve_init_from(stages[i]['experiments'], stages[:i], f'curriculum_exposure_p251_l{layer}', '/mnt/workspace/hujiachen/models')
         for e in stages[i]['experiments']:
             p = e['config']['INIT_FROM']
             assert p.endswith(f\"p1_d512l{layer}r8h4_P251_singleB_e0.3_seed{e['config']['RANDOM_SEED']}.pth\"), p

@@ -152,10 +152,14 @@ def _prepare_mixed_recurrence(config, device, order):
             f"MIXED_AB_MAX_UNIQUE_RATIOS length ({len(ratios)}) must equal number of rules ({len(rules)})"
         NUM_TRAIN_SAMPLES = [max(1, int(state_space_size * r)) for r in ratios]
 
-    # NUM_MASK unset (None) means: the first num_mask positions are initial
-    # values and are not evaluated. Default 2, matching the tribonacci task.
+    # NUM_MASK unset (None) means: the first num_mask targets are initial
+    # values and are not evaluated. With a leading rule tag every target
+    # shifts by one (target 0 = x0 predicted from the tag alone), so the
+    # default masks `order` targets; without the tag, order-1 (matching the
+    # single-rule tribonacci default of 2 for order 3).
     num_mask_cfg = cfg.get('NUM_MASK')
-    num_mask = 2 if num_mask_cfg is None else num_mask_cfg
+    default_num_mask = order if cfg.get('USE_AB_TAG', True) else order - 1
+    num_mask = default_num_mask if num_mask_cfg is None else num_mask_cfg
     # An all-zero loss mask yields a grad-less constant loss and crashes
     # backward() far from the cause; require at least one evaluated position.
     assert num_mask < TRAIN_LEN - 1, \

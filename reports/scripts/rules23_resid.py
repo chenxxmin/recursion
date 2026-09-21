@@ -24,7 +24,7 @@ Q = 4
 RULES = [(1, 1), (2, 3)]
 LAG2H = 1  # seed17996 的 lag2 头
 
-path = ('/data/cxm/models/mixed_basic_d256l1r8h2_p127_rules12345/'
+path = ('/mnt/workspace/hujiachen/models/mixed_basic_d256l1r8h2_p127_rules12345/'
         'mixed_basic_d256l1r8h2_P127_N2_e0.7_seed17996.pth')
 model, ck = load_model(path, device=DEV)
 block = model.transformer.h[0]

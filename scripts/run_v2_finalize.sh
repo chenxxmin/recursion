@@ -13,17 +13,17 @@ done
 sleep 30  # 等文件写完
 
 echo "[$(ts)] 全部结束，同步结果库..."
-for b in $(ls /data/cxm/recursion_v2/); do
-    mkdir -p /data/cxm/recursion/action_v2/$b
-    cp -r /data/cxm/recursion_v2/$b/logs /data/cxm/recursion_v2/$b/plots /data/cxm/recursion/action_v2/$b/ 2>/dev/null
+for b in $(ls /mnt/workspace/hujiachen/recursion_results_v2/); do
+    mkdir -p /mnt/workspace/hujiachen/recursion_results/action_v2/$b
+    cp -r /mnt/workspace/hujiachen/recursion_results_v2/$b/logs /mnt/workspace/hujiachen/recursion_results_v2/$b/plots /mnt/workspace/hujiachen/recursion_results/action_v2/$b/ 2>/dev/null
 done
-cd /data/cxm/recursion
+cd /mnt/workspace/hujiachen/recursion_results
 git add action_v2/
 git commit -q -m "v2 final snapshot: all running experiments stopped at checkpoints $(date '+%m-%d %H:%M')" || echo "无新内容"
 git pull --no-rebase --no-edit -q || true
 git push origin HEAD
 
-cd /home/cxm/recursion
+cd /mnt/workspace/hujiachen/recursion
 python scripts/update_v2_status.py
 git add reports/v2/ACTION_V2_STATUS.md scripts/update_v2_status.py
 git commit -q -m "v2 status: final matrix after planned stop $(date '+%m-%d %H:%M')" || echo "无新内容"

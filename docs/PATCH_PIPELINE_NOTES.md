@@ -10,8 +10,8 @@
 | 内容 | 位置 |
 |---|---|
 | 主代码库（本仓库） | `~/recursion`（工作副本）/ GitHub `recursion.git` main |
-| 模型 checkpoint | `/data/cxm/models/<批次名>/` |
-| 训练日志 | `/data/cxm/recursion/<批次名>/logs/`（也是 `recursion_results.git` 的 checkout） |
+| 模型 checkpoint | `/mnt/workspace/hujiachen/models/<批次名>/` |
+| 训练日志 | `/mnt/workspace/hujiachen/recursion_results/<批次名>/logs/`（也是 `recursion_results.git` 的 checkout） |
 | 分析图/报告 | `reports/`（已入 git） |
 | 一次性分析脚本（未固化） | `.chain_tmp/`（gitignored，仅供翻查） |
 
@@ -188,7 +188,7 @@ python src/head_ablation.py model.pth --pairs 256
 - GPU：`get_idle_gpus()`（nvidia-smi 探测）+ 队列分配，**会覆盖外层
   CUDA_VISIBLE_DEVICES**——要钉卡需直接 spawn core.py（curriculum_chain_Ntask.py
   就是这么做的）；
-- 输出：`/data/cxm/recursion/<批次名>/logs|plots`，`/data/cxm/models/<批次名>/`
+- 输出：`/mnt/workspace/hujiachen/recursion_results/<批次名>/logs|plots`，`/mnt/workspace/hujiachen/models/<批次名>/`
   （PATH_CONVENTIONS.md）；
 - **长任务务必 `setsid nohup ... &`**，会话关闭会杀后台任务。
 

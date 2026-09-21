@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """Regenerate the v2 full-matrix table in reports/v2/ACTION_V2_STATUS.md.
 
-Scans /data/cxm/recursion_v2/*/logs and rewrites the '## 全矩阵结果表' section.
+Scans /mnt/workspace/hujiachen/recursion_results_v2/*/logs and rewrites the '## 全矩阵结果表' section.
 Format: bare acc = completed; 'acc @ epoch' = in progress / interrupted at
 checkpoint (cumulative); 未开始 = not scheduled.
 
@@ -12,7 +12,7 @@ import re
 from datetime import datetime
 
 REPO = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-DATA = '/data/cxm/recursion_v2'
+DATA = '/mnt/workspace/hujiachen/recursion_results_v2'
 
 
 def collect():

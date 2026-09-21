@@ -1,0 +1,71 @@
+{
+  "concurrency": 3,
+  "experiments": [
+    {
+      "name": "tribonacci_a72b79c83_d1024l2r4h4_P127_mask2tr16_seed0",
+      "task": "tribonacci",
+      "config": {
+        "P": 127,
+        "A": 72,
+        "B": 79,
+        "C": 83,
+        "NUM_MASK": 2,
+        "TRAIN_LEN": 16,
+        "D_MODEL": 1024,
+        "N_LAYER": 2,
+        "N_HEAD": 4,
+        "MLP_RATIO": 4,
+        "NUM_TRAIN_SAMPLES": 300000,
+        "NUM_TEST_SAMPLES": 256,
+        "FRESH_TEST_PER_EVAL": true,
+        "EVAL_INTERVAL": 1,
+        "MAX_TRAIN_HOURS": 12,
+        "RANDOM_SEED": 0
+      }
+    },
+    {
+      "name": "tribonacci_a72b79c83_d1024l2r4h4_P127_mask4tr18_seed0",
+      "task": "tribonacci",
+      "config": {
+        "P": 127,
+        "A": 72,
+        "B": 79,
+        "C": 83,
+        "NUM_MASK": 4,
+        "TRAIN_LEN": 18,
+        "D_MODEL": 1024,
+        "N_LAYER": 2,
+        "N_HEAD": 4,
+        "MLP_RATIO": 4,
+        "NUM_TRAIN_SAMPLES": 300000,
+        "NUM_TEST_SAMPLES": 256,
+        "FRESH_TEST_PER_EVAL": true,
+        "EVAL_INTERVAL": 1,
+        "MAX_TRAIN_HOURS": 12,
+        "RANDOM_SEED": 0
+      }
+    },
+    {
+      "name": "tribonacci_a72b79c83_d1024l2r4h4_P127_mask6tr20_seed0",
+      "task": "tribonacci",
+      "config": {
+        "P": 127,
+        "A": 72,
+        "B": 79,
+        "C": 83,
+        "NUM_MASK": 6,
+        "TRAIN_LEN": 20,
+        "D_MODEL": 1024,
+        "N_LAYER": 2,
+        "N_HEAD": 4,
+        "MLP_RATIO": 4,
+        "NUM_TRAIN_SAMPLES": 300000,
+        "NUM_TEST_SAMPLES": 256,
+        "FRESH_TEST_PER_EVAL": true,
+        "EVAL_INTERVAL": 1,
+        "MAX_TRAIN_HOURS": 12,
+        "RANDOM_SEED": 0
+      }
+    }
+  ]
+}

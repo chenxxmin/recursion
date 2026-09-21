@@ -1,0 +1,97 @@
+{
+  "concurrency": 4,
+  "experiments": [
+    {
+      "name": "tetranacci_a1b7c6d3_d4096l2r4h16_P127_seed0",
+      "task": "tetranacci",
+      "config": {
+        "RANDOM_SEED": 0,
+        "P": 127,
+        "A": 1,
+        "B": 7,
+        "C": 6,
+        "D": 3,
+        "NUM_MASK": 3,
+        "D_MODEL": 4096,
+        "N_LAYER": 2,
+        "N_HEAD": 16,
+        "MLP_RATIO": 4,
+        "NUM_TRAIN_SAMPLES": 300000,
+        "STATE_SPACE_CAP": 2048383,
+        "NUM_TEST_SAMPLES": 256,
+        "FRESH_TEST_PER_EVAL": true,
+        "EVAL_INTERVAL": 1,
+        "MAX_TRAIN_HOURS": 12
+      }
+    },
+    {
+      "name": "tetranacci_a2b6c7d5_d4096l2r4h16_P127_seed0",
+      "task": "tetranacci",
+      "config": {
+        "RANDOM_SEED": 0,
+        "P": 127,
+        "A": 2,
+        "B": 6,
+        "C": 7,
+        "D": 5,
+        "NUM_MASK": 3,
+        "D_MODEL": 4096,
+        "N_LAYER": 2,
+        "N_HEAD": 16,
+        "MLP_RATIO": 4,
+        "NUM_TRAIN_SAMPLES": 300000,
+        "STATE_SPACE_CAP": 2048383,
+        "NUM_TEST_SAMPLES": 256,
+        "FRESH_TEST_PER_EVAL": true,
+        "EVAL_INTERVAL": 1,
+        "MAX_TRAIN_HOURS": 12
+      }
+    },
+    {
+      "name": "tetranacci_a3b6c1d4_d4096l2r4h16_P127_seed0",
+      "task": "tetranacci",
+      "config": {
+        "RANDOM_SEED": 0,
+        "P": 127,
+        "A": 3,
+        "B": 6,
+        "C": 1,
+        "D": 4,
+        "NUM_MASK": 3,
+        "D_MODEL": 4096,
+        "N_LAYER": 2,
+        "N_HEAD": 16,
+        "MLP_RATIO": 4,
+        "NUM_TRAIN_SAMPLES": 300000,
+        "STATE_SPACE_CAP": 2048383,
+        "NUM_TEST_SAMPLES": 256,
+        "FRESH_TEST_PER_EVAL": true,
+        "EVAL_INTERVAL": 1,
+        "MAX_TRAIN_HOURS": 12
+      }
+    },
+    {
+      "name": "tetranacci_a4b5c2d3_d4096l2r4h16_P127_seed0",
+      "task": "tetranacci",
+      "config": {
+        "RANDOM_SEED": 0,
+        "P": 127,
+        "A": 4,
+        "B": 5,
+        "C": 2,
+        "D": 3,
+        "NUM_MASK": 3,
+        "D_MODEL": 4096,
+        "N_LAYER": 2,
+        "N_HEAD": 16,
+        "MLP_RATIO": 4,
+        "NUM_TRAIN_SAMPLES": 300000,
+        "STATE_SPACE_CAP": 2048383,
+        "NUM_TEST_SAMPLES": 256,
+        "FRESH_TEST_PER_EVAL": true,
+        "EVAL_INTERVAL": 1,
+        "MAX_TRAIN_HOURS": 12
+      }
+    }
+  ]
+}

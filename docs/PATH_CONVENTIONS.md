@@ -7,8 +7,8 @@
 
 | 用途 | 默认值 | 对应代码 |
 |---|---|---|
-| 日志 / 图片 | `/data/cxm/recursion` | `batch_run.py: DEFAULT_BASE_DIR`  <br> `visualize.py: --base-dir`  <br> `prepare_rerun.py: DEFAULT_BASE_DIR` |
-| 模型 | `/data/cxm/models` | `batch_run.py: DEFAULT_MODEL_BASE_DIR` |
+| 日志 / 图片 | `/mnt/workspace/hujiachen/recursion_results` | `batch_run.py: DEFAULT_BASE_DIR`  <br> `visualize.py: --base-dir`  <br> `prepare_rerun.py: DEFAULT_BASE_DIR` |
+| 模型 | `/mnt/workspace/hujiachen/models` | `batch_run.py: DEFAULT_MODEL_BASE_DIR` |
 
 两个目录都通过 `--base-dir` / `--model-base-dir` 参数可覆盖。
 
@@ -17,7 +17,7 @@
 假设 `experiments.json` 的文件名为 `experiments`，则最终结构为：
 
 ```text
-/data/cxm/recursion/experiments/
+/mnt/workspace/hujiachen/recursion_results/experiments/
 ├── logs/
 │   ├── mixed_basic_d1024l2r8_N3_e0.7_seed0.log
 │   ├── mixed_basic_d1024l2r8_N3_e0.7_seed0.err
@@ -26,7 +26,7 @@
     ├── mixed_basic_d1024l2r8_N3_curve.png
     └── ...
 
-/data/cxm/models/experiments/
+/mnt/workspace/hujiachen/models/experiments/
 ├── mixed_basic_d1024l2r8_N3_e0.7_seed0.pth
 └── ...
 ```
@@ -108,13 +108,13 @@
    这是项目相对路径，仅在直接运行 `core.run_experiment()` 而不经过 `batch_run.py` 时生效。正常使用应通过 `batch_run.py` 自动填充为 `<model-base-dir>/<exp-name>/<name>.pth`。
 
 2. **`fix_logs.py` 默认文件夹是 `logs`**  
-   这是项目相对路径。对于默认的 `/data/cxm/recursion/experiments/` 实验，应运行：
+   这是项目相对路径。对于默认的 `/mnt/workspace/hujiachen/recursion_results/experiments/` 实验，应运行：
    ```bash
-   python src/fix_logs.py /data/cxm/recursion/experiments/logs
+   python src/fix_logs.py /mnt/workspace/hujiachen/recursion_results/experiments/logs
    ```
 
 3. **不要混用新旧路径结构**  
    2026-07-17 的 commit `de9b336` 曾把日志直接放到 `<base-dir>/<exp>/` 下（没有 `logs/` 子文件夹），已在后续 commit 中恢复。请确保所有工具版本一致。
 
 4. **权限问题**  
-   `batch_run.py` 会调用 `os.makedirs(..., exist_ok=True)` 创建所需目录。如果运行时报 `Permission denied`，请检查 `/data/cxm/recursion` 和 `/data/cxm/models` 的写入权限。
+   `batch_run.py` 会调用 `os.makedirs(..., exist_ok=True)` 创建所需目录。如果运行时报 `Permission denied`，请检查 `/mnt/workspace/hujiachen/recursion_results` 和 `/mnt/workspace/hujiachen/models` 的写入权限。

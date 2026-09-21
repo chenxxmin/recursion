@@ -32,7 +32,7 @@
           0.7
         ],
         "MAX_TRAIN_HOURS": 6,
-        "RESUME_FROM": "/data/cxm/models/mixed_basic_d1024l6r8h4_p127_rules123/mixed_basic_d1024l6r8h4_P127_rules123_N3_e0.7_seed17996_resume.pth"
+        "RESUME_FROM": "/mnt/workspace/hujiachen/models/mixed_basic_d1024l6r8h4_p127_rules123/mixed_basic_d1024l6r8h4_P127_rules123_N3_e0.7_seed17996_resume.pth"
       }
     },
     {
@@ -66,7 +66,7 @@
           0.7
         ],
         "MAX_TRAIN_HOURS": 6,
-        "RESUME_FROM": "/data/cxm/models/mixed_basic_d1024l6r8h4_p127_rules123/mixed_basic_d1024l6r8h4_P127_rules123_N3_e0.7_seed18318_resume.pth"
+        "RESUME_FROM": "/mnt/workspace/hujiachen/models/mixed_basic_d1024l6r8h4_p127_rules123/mixed_basic_d1024l6r8h4_P127_rules123_N3_e0.7_seed18318_resume.pth"
       }
     }
   ]

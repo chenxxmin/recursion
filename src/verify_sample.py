@@ -10,7 +10,7 @@ Usage (repo root):
     python src/verify_sample.py <name> [--seed N] [--length L] [--clean]
 
 <name> selects experiments/<name>.json; every experiment's model is read from
-/data/cxm/models/<name>/<exp>.pth. Missing/unreadable models are skipped and
+/mnt/workspace/hujiachen/models/<name>/<exp>.pth. Missing/unreadable models are skipped and
 reported at the end. All output is teed to verify_sample_output.log.
 --clean forces an uncorrupted sample even when MISSING_PROB is configured.
 """
@@ -33,7 +33,7 @@ from datasets import corrupt_window, missing_token_id
 from rules import LinearRecurrenceRule, single_rule_from_task, task_from_save_config
 
 COL_W = 5  # display width per position column
-MODEL_BASE = '/data/cxm/models'
+MODEL_BASE = '/mnt/workspace/hujiachen/models'
 
 
 def build_single_rule(task, cfg):
@@ -226,7 +226,7 @@ def run_one(args, exp_cfg, task, exp_name, pth_path):
 def main():
     ap = argparse.ArgumentParser(description='Print random sample(s) with aligned model predictions.')
     ap.add_argument('name', help='experiment batch name (experiments/<name>.json; '
-                                 'models read from /data/cxm/models/<name>/<exp>.pth)')
+                                 'models read from /mnt/workspace/hujiachen/models/<name>/<exp>.pth)')
     ap.add_argument('--seed', type=int, default=None, help='seed for sample generation (default: random)')
     ap.add_argument('--length', type=int, default=None, help='sample length (default: TRAIN_LEN from config)')
     ap.add_argument('--clean', action='store_true', help='do not corrupt the sample even if MISSING_PROB is set')

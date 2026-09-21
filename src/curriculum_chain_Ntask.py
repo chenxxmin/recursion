@@ -14,8 +14,8 @@ Donors:
   others:     mixed_basic_n2_ladder_rules12 batch (must finish first;
               scheduler polls until donor exists)
 
-Logs: /data/cxm/recursion/curriculum_chains/logs/
-State: /data/cxm/recursion/curriculum_chains/chain_state.json
+Logs: /mnt/workspace/hujiachen/recursion_results/curriculum_chains/logs/
+State: /mnt/workspace/hujiachen/recursion_results/curriculum_chains/chain_state.json
 
 Usage:
   setsid nohup python src/curriculum_chain_Ntask.py > .chain_tmp/curriculum_scheduler.log 2>&1 &
@@ -29,9 +29,9 @@ import threading
 import time
 
 REPO = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-BASE_DIR = '/data/cxm/recursion/curriculum_chains'
+BASE_DIR = '/mnt/workspace/hujiachen/recursion_results/curriculum_chains'
 LOG_DIR = os.path.join(BASE_DIR, 'logs')
-MODEL_DIR = '/data/cxm/models/curriculum_chains'
+MODEL_DIR = '/mnt/workspace/hujiachen/models/curriculum_chains'
 STATE_PATH = os.path.join(BASE_DIR, 'chain_state.json')
 
 RULES = [[1, 1], [2, 3], [3, 5], [4, 7], [5, 11]]
@@ -39,29 +39,29 @@ P = 127
 # scale -> (D_MODEL, N_LAYER, N_HEAD, donor glob dir, donor name pattern)
 SCALES = {
     'l1d256r8h2': dict(d=256, l=1, h=2,
-                       donor_dir='/data/cxm/models/mixed_basic_d256l1r8h2_p127_rules12345',
+                       donor_dir='/mnt/workspace/hujiachen/models/mixed_basic_d256l1r8h2_p127_rules12345',
                        donor_pat='mixed_basic_d256l1r8h2_P127_N2_e0.7_seed{s}.pth',
-                       donor_logs='/data/cxm/recursion/mixed_basic_d256l1r8h2_p127_rules12345/logs',
+                       donor_logs='/mnt/workspace/hujiachen/recursion_results/mixed_basic_d256l1r8h2_p127_rules12345/logs',
                        donor_log_pat='mixed_basic_d256l1r8h2_P127_N2_e0.7_seed{s}.log'),
     'l1d512r8h4': dict(d=512, l=1, h=4,
-                       donor_dir='/data/cxm/models/mixed_basic_n2_ladder_rules12',
+                       donor_dir='/mnt/workspace/hujiachen/models/mixed_basic_n2_ladder_rules12',
                        donor_pat='mixed_basic_d512l1r8h4_P127_rules12_N2_e0.7_seed{s}.pth',
-                       donor_logs='/data/cxm/recursion/mixed_basic_n2_ladder_rules12/logs',
+                       donor_logs='/mnt/workspace/hujiachen/recursion_results/mixed_basic_n2_ladder_rules12/logs',
                        donor_log_pat='mixed_basic_d512l1r8h4_P127_rules12_N2_e0.7_seed{s}.log'),
     'l2d256r8h2': dict(d=256, l=2, h=2,
-                       donor_dir='/data/cxm/models/mixed_basic_n2_ladder_rules12',
+                       donor_dir='/mnt/workspace/hujiachen/models/mixed_basic_n2_ladder_rules12',
                        donor_pat='mixed_basic_d256l2r8h2_P127_rules12_N2_e0.7_seed{s}.pth',
-                       donor_logs='/data/cxm/recursion/mixed_basic_n2_ladder_rules12/logs',
+                       donor_logs='/mnt/workspace/hujiachen/recursion_results/mixed_basic_n2_ladder_rules12/logs',
                        donor_log_pat='mixed_basic_d256l2r8h2_P127_rules12_N2_e0.7_seed{s}.log'),
     'l2d512r8h4': dict(d=512, l=2, h=4,
-                       donor_dir='/data/cxm/models/mixed_basic_n2_ladder_rules12',
+                       donor_dir='/mnt/workspace/hujiachen/models/mixed_basic_n2_ladder_rules12',
                        donor_pat='mixed_basic_d512l2r8h4_P127_rules12_N2_e0.7_seed{s}.pth',
-                       donor_logs='/data/cxm/recursion/mixed_basic_n2_ladder_rules12/logs',
+                       donor_logs='/mnt/workspace/hujiachen/recursion_results/mixed_basic_n2_ladder_rules12/logs',
                        donor_log_pat='mixed_basic_d512l2r8h4_P127_rules12_N2_e0.7_seed{s}.log'),
     'l4d512r8h4': dict(d=512, l=4, h=4,
-                       donor_dir='/data/cxm/models/mixed_basic_scale_matrix_h4_rules12',
+                       donor_dir='/mnt/workspace/hujiachen/models/mixed_basic_scale_matrix_h4_rules12',
                        donor_pat='mixed_basic_d512l4r8h4_P127_rules12_N2_e0.7_seed{s}.pth',
-                       donor_logs='/data/cxm/recursion/mixed_basic_scale_matrix_h4_rules12/logs',
+                       donor_logs='/mnt/workspace/hujiachen/recursion_results/mixed_basic_scale_matrix_h4_rules12/logs',
                        donor_log_pat='mixed_basic_d512l4r8h4_P127_rules12_N2_e0.7_seed{s}.log'),
 }
 SEEDS = [17996, 18318, 34789, 44536]

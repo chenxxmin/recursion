@@ -1,6 +1,6 @@
 # AGENTS.md — recursion 实验仓库交接
 
-模运算递推/grokking 实验仓库。代码在 `/home/cxm/recursion`（git main），结果库在 `/data/cxm/recursion`（独立 git master，云同步）。
+模运算递推/grokking 实验仓库。代码在 `/mnt/workspace/hujiachen/recursion`（git main），结果库在 `/mnt/workspace/hujiachen/recursion_results`（独立 git master，云同步）。
 
 ## 0. 必读的现有文档
 
@@ -16,12 +16,12 @@
 - `datasets.py`：RecurrenceDataset（全状态枚举+循环遍历，或 STATE_SPACE_CAP 抽样）、MixedRecurrenceDataset、ActionDataset、所有 collate。
 - `training.py`：训练/评估循环、早停、SIGTERM 优雅退出、checkpoint。
 - `batch_run.py`：批量编排（读 experiments/*.json，合并配置，一卡一实验）；`chain_rounds.sh` + `prepare_chain_round.py`：多轮续跑。`chain_run.py`：通用课程链（分 stage 串行，`INIT_FROM:"@prev"/@<stage>` 暖启动，gate 门槛，顶层 concurrency 透传）；交接文档 `docs/CURRICULUM_NTASK_HANDOVER.md`。`curriculum_chain_Ntask.py` 是旧的 N=2→5 专用调度器（硬编码，勿用作通用 pipeline）。
-- 测试：`tests/test_*.py` 是纯 assert 脚本，**没有 pytest**；运行 `/home/cxm/miniconda3/bin/python tests/test_xxx.py`（test_sample_gen.py 需要 `PYTHONPATH=src`）。
+- 测试：`tests/test_*.py` 是纯 assert 脚本，**没有 pytest**；本机运行 `/usr/bin/python3 tests/test_xxx.py`（test_sample_gen.py 需要 `PYTHONPATH=src`）。
 
 ## 2. 配置合并与实验 JSON
 
 - 合并顺序：`src/config.json` 的 main → task 默认段 → 实验 config 覆盖。实验 JSON 只写与默认不同的键。
-- 命名约定见 SKILL.md §1。**2026-09-11 起不再有 v2 隔离目录**：所有实验输出一律生成在默认的 `/data/cxm/recursion` + `/data/cxm/models`（旧的 `/data/cxm/recursion_v2`、`/data/cxm/models_v2` 已废弃，内容已并入主库）。
+- 命名约定见 SKILL.md §1；本机 v2 制度（30万样本/fresh 256 测试）写 `experiments/v2/` 并用 `--base-dir /mnt/workspace/hujiachen/recursion_results_v2 --model-base-dir /mnt/workspace/hujiachen/models_v2` 启动。（注意：云端机器 2026-09-11 起已废弃 v2 隔离目录并入主库；本机仍保留该目录。）
 
 ## 3. 最近的语义改动（2026-09-08/09，改代码时注意一致性）
 
@@ -35,13 +35,16 @@
 
 ## 4. 本机环境的坑（反复踩过）
 
-- **PATH 里有别人的 venv**（`/home/cxm/Dan/.venv`，CPU 版 torch 且无 matplotlib）：所有启动/测试必须用**绝对路径** `/home/cxm/miniconda3/bin/python`；chain_rounds.sh 内部用裸 `python`，调它前 `export PATH=/home/cxm/miniconda3/bin:$PATH`。
+- **GPU 硬性规定（长期有效）：只能用 GPU 0-3，GPU 4-7 绝对禁用**。启动实验前必须确认 `CUDA_VISIBLE_DEVICES` 或日志里的 `on cuda:N` 只落在 0-3；选卡时先用 `nvidia-smi` 看占用。
+- **队列制度（2026-09-10 起）**：一卡一个队列，用 `scripts/start_queue.sh <gpu 0-3> <experiments.json>` 启动（内部 `BATCH_RUN_GPUS=<gpu>` 钉卡，同卡已有队列会拒绝启动）。batch_run.py 的 GPU 白名单默认就是 0,1,2,3。
+- **BATCH_SIZE 默认 512**：bench 结论（`bench_batch_size/bench_action_bs_results.txt`）——action misslen2 l4 fp32 下 512 与 1024 同速（~372s/epoch @30万样本），显存 26.5GB vs 40.7GB，bs≥1280 OOM。所有实验就用默认 512。
+- **misslen 实验的评估 pipeline（2026-09-15 起固定）**：每条 misslen 实验训练完毕后，结果必须报两个维度——**clean acc**（规则学习能力）：用 `scripts/eval_clean_action.py --eval-len <TRAIN_LEN> --num-samples 1000` 在新生成的无污损 train_len 窗口样本上评（取该实验最后一轮的 `_best.pth`，缺则 `_latest.pth`；先确认该轮没发散——latest 明显比历史 best 差时改用未发散轮的 best）；**total acc**（填补污损能力）：就是训练日志里的 best test acc。已知事实：正常收敛的 action+miss 模型 clean acc 在训练窗内都是 100%，差距全在 total acc；续跑轮可能发散把模型跑废，采用续跑结果前必须先验证。
+- **Python 环境**：用系统 `/usr/bin/python3`（3.10，torch 2.4.0+cu121，matplotlib/numpy 齐全）。旧机器的 `/home/cxm/miniconda3` 不存在；chain_rounds.sh 内部用裸 `python`，调它前确认 `python` 指向正确（必要时 `export PATH` 使 `python` 可用或改脚本）。
+- **GPFS 写坑（2026-09-11 踩过）**：/mnt/workspace 是 GPFS，曾出现约 15 分钟的瞬时写故障，torch.save 写 checkpoint 直接失败（`PytorchStreamWriter failed writing`，stderr 在批次 `logs/*.err`），正在写的 `_resume.pth` 被截断成 4MB 废文件。**教训：resume 前先 torch.load 校验 checkpoint；`_resume.pth` 损坏时改用 `_latest.pth`（滚动全状态，通常完好）；查训练报错要看 logs/ 下的 .err 不是 .log。**
 - **pgrep/pkill 自匹配**：模式会匹配到自己 shell 的命令行，用括号写法 `[c]ore.py` 或先核对 PID。
-- **共享 GPU 机器**（8×46GB，有 liping/yyx/asleepx 等用户）：启动时加 `BATCH_RUN_IDLE_MEM_MB=4096`（或更高）放宽空闲阈值；时刻先 `nvidia-smi` 看占用再选卡。
 - **停止实验**：用 skill 的 stop_experiment.sh（SIGTERM → 下一 eval 点存盘），或 timer.sh 设定时。不要 kill -9 正在跑且进度有用的实验。
 - GPU 检测回退到 CPU 时实际会跑上 cuda:0 撞车——启动后务必核对日志里的 `on cuda:N` 是你要的卡。
 
 ## 5. 当前在跑（会话结束时快照，以 gpu_queue_status.py 为准）
 
-- 卡 1/5：mixed N2 l4 len64 online（len1→len2，各 6h）；卡 3：addition len64 online 系列（len1→8 × 2 种子）；卡 7：mixed N4 l8（12h）。
-- 关键在途结论：在线污损使 addition len3 从 87%→99%+；64 长度让 mixed+miss 变难一个量级；tetra 只有等比系数 (1,2,4,8) 能 grok。
+- 本机（2026-09-10 迁移后）暂无在跑实验；8×L40 当前全空闲，但只可用 0-3 号卡。

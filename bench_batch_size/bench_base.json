@@ -21,7 +21,7 @@
     "BATCH_SIZE": 512,
     "EPOCHS": 6000,
     "LR": 0.0003,
-    "SAVE_PATH": "/data/cxm/models/mixed_basic_scale_matrix_h2_rules12/mixed_basic_d1024l1r8h2_P127_rules12_N2_e0.7_seed44536.pth",
+    "SAVE_PATH": "/mnt/workspace/hujiachen/models/mixed_basic_scale_matrix_h2_rules12/mixed_basic_d1024l1r8h2_P127_rules12_N2_e0.7_seed44536.pth",
     "INIT_FROM": null,
     "USE_LEARNABLE_PE": false,
     "MLP_RATIO": 8,

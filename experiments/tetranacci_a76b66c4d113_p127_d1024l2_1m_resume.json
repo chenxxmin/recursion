@@ -1,0 +1,29 @@
+{
+  "concurrency": 1,
+  "experiments": [
+    {
+      "name": "tetranacci_a76b66c4d113_d1024l2r4h4_P127_1m_seed0_resume",
+      "task": "tetranacci",
+      "config": {
+        "RANDOM_SEED": 0,
+        "P": 127,
+        "A": 76,
+        "B": 66,
+        "C": 4,
+        "D": 113,
+        "NUM_MASK": 3,
+        "D_MODEL": 1024,
+        "N_LAYER": 2,
+        "N_HEAD": 4,
+        "MLP_RATIO": 4,
+        "NUM_TRAIN_SAMPLES": 1000000,
+        "STATE_SPACE_CAP": 2048383,
+        "NUM_TEST_SAMPLES": 256,
+        "FRESH_TEST_PER_EVAL": true,
+        "EVAL_INTERVAL": 1,
+        "MAX_TRAIN_HOURS": 12,
+        "RESUME_FROM": "__RESUME_PATH__"
+      }
+    }
+  ]
+}

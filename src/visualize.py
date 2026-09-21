@@ -540,7 +540,7 @@ def main():
     parser = argparse.ArgumentParser(description='Visualize learning curves from training logs.')
     parser.add_argument('names', nargs='*', help='Experiment name(s) or setting prefix(es).')
     parser.add_argument('--all', action='store_true', help='Visualize all experiments in experiments.json.')
-    parser.add_argument('--base-dir', default='/data/cxm/recursion', help='Base output directory (default: /data/cxm/recursion).')
+    parser.add_argument('--base-dir', default='/mnt/workspace/hujiachen/recursion_results', help='Base output directory (default: /mnt/workspace/hujiachen/recursion_results).')
     parser.add_argument('--log-dir', default=None, help='Directory containing .log files.')
     parser.add_argument('--out-dir', default=None, help='Directory to save plots.')
     parser.add_argument('--no-per-pos', action='store_true', help='Skip per-position plot.')

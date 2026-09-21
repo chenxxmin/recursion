@@ -57,7 +57,7 @@ ENTROPY_PENALTY_WEIGHT=0.0, FIRST_TASK_WEIGHT=1.0。
 - 组文件：`experiments/mixed_ab_exposure_p251_supplement.json`，
   new format `{"concurrency": 8, "experiments": [...]}`（与原组一致）。
   独立补充文件（方案 A）：不修改已完成组的历史文件；日志落在独立目录
-  `/data/cxm/recursion/mixed_ab_exposure_p251_supplement/`。
+  `/mnt/workspace/hujiachen/recursion_results/mixed_ab_exposure_p251_supplement/`。
 - run 名沿用原组模式：`mixed_basic_d512l{L}r8h4_P251_N2_e{r1}_{r2}_seed{seed}`
   例：`mixed_basic_d512l2r8h4_P251_N2_e0.1_0.1_seed0`（子组 A）、
   `mixed_basic_d512l1r8h4_P251_N2_e0.1_0.4_seed999`（子组 B）、

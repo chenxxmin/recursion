@@ -71,7 +71,7 @@
 ## 运行方式备忘
 
 - 每实验 6h 存盘接力（链式 30 轮）；早停 99% + 20ep 缓冲
-- 日志/模型：`/data/cxm/recursion_v2/`、`/data/cxm/models_v2/`
+- 日志/模型：`/mnt/workspace/hujiachen/recursion_results_v2/`、`/mnt/workspace/hujiachen/models_v2/`
 - 每实验速度：l1 ~95s/ep、l2 ~190s/ep、l4 ~360s/ep（accum2）
 
 ## 更新记录

@@ -9,7 +9,7 @@
 和 `activation_patch.rule_targets`；规则约定 (c1,c2) => c1*X(k-1)+c2*X(k-2)）。
 
 **Checkpoint**（3 seeds，best test acc ≈ 99.95%）：
-`/data/cxm/models/mixed_ab_downscale_l1h4/mixed_basic_d256l1r8h4_P127_N2_e0.7_seed{0,999,12345}.pth`
+`/mnt/workspace/hujiachen/models/mixed_ab_downscale_l1h4/mixed_basic_d256l1r8h4_P127_N2_e0.7_seed{0,999,12345}.pth`
 
 **设置**：b ∈ {0,3,4,5,6,7,8,12,16,24,32,48,64,96,126}（+ b=1,2 对照），
 每 b 256 个样本（x1,x2 ∈ 1..p-1，排除 0 退化），prefix 3 / 5 两种条件，

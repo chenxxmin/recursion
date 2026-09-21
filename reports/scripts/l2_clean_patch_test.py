@@ -22,7 +22,7 @@ P = 127
 RA, RB = (1, 1), (1, 2)
 Q = 4  # k=5
 
-path = '/data/cxm/models/mixed_ab_basic_bigP/mixed_basic_d512l2r8h4_P127_N2_e0.7_seed0.pth'
+path = '/mnt/workspace/hujiachen/models/mixed_ab_basic_bigP/mixed_basic_d512l2r8h4_P127_N2_e0.7_seed0.pth'
 model, ck = load_model(path, device=DEV)
 a, b = generate_paired_samples(P, RA, RB, 256, 12, seed=11)
 a, b = a.to(DEV), b.to(DEV)

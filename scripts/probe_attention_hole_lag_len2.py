@@ -17,7 +17,7 @@ import torch
 
 from analyze_attention import get_attention_weights, load_model
 
-DEFAULT_PTH = ('/data/cxm/models/action_p127_tr64_ood128_misslen/'
+DEFAULT_PTH = ('/mnt/workspace/hujiachen/models/action_p127_tr64_ood128_misslen/'
                'action_d1024l2r4h4_P127_tr64ood128_N2_randmiss0.1len2_seed17996.pth')
 N_SAMPLES = 500
 

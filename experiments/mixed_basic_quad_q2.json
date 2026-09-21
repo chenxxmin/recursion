@@ -1,0 +1,121 @@
+{
+  "concurrency": 1,
+  "experiments": [
+    {
+      "name": "mixed_basic_d1024l1r8h4_P127_a47b61_a93b84_seed17996",
+      "task": "mixed_ab",
+      "config": {
+        "RANDOM_SEED": 17996,
+        "P": 127,
+        "D_MODEL": 1024,
+        "N_LAYER": 1,
+        "N_HEAD": 4,
+        "MLP_RATIO": 8,
+        "TRAIN_LEN": 16,
+        "AB_PAIRS": [
+          [
+            47,
+            61
+          ],
+          [
+            93,
+            84
+          ]
+        ],
+        "MIXED_AB_MAX_UNIQUE_RATIOS": [
+          0.7,
+          0.7
+        ],
+        "EVAL_INTERVAL": 1,
+        "MAX_TRAIN_HOURS": 6
+      }
+    },
+    {
+      "name": "mixed_basic_d1024l1r8h4_P127_a47b61_a93b84_seed18318",
+      "task": "mixed_ab",
+      "config": {
+        "RANDOM_SEED": 18318,
+        "P": 127,
+        "D_MODEL": 1024,
+        "N_LAYER": 1,
+        "N_HEAD": 4,
+        "MLP_RATIO": 8,
+        "TRAIN_LEN": 16,
+        "AB_PAIRS": [
+          [
+            47,
+            61
+          ],
+          [
+            93,
+            84
+          ]
+        ],
+        "MIXED_AB_MAX_UNIQUE_RATIOS": [
+          0.7,
+          0.7
+        ],
+        "EVAL_INTERVAL": 1,
+        "MAX_TRAIN_HOURS": 6
+      }
+    },
+    {
+      "name": "mixed_basic_d1024l2r8h4_P127_a47b61_a93b84_seed17996",
+      "task": "mixed_ab",
+      "config": {
+        "RANDOM_SEED": 17996,
+        "P": 127,
+        "D_MODEL": 1024,
+        "N_LAYER": 2,
+        "N_HEAD": 4,
+        "MLP_RATIO": 8,
+        "TRAIN_LEN": 16,
+        "AB_PAIRS": [
+          [
+            47,
+            61
+          ],
+          [
+            93,
+            84
+          ]
+        ],
+        "MIXED_AB_MAX_UNIQUE_RATIOS": [
+          0.7,
+          0.7
+        ],
+        "EVAL_INTERVAL": 1,
+        "MAX_TRAIN_HOURS": 6
+      }
+    },
+    {
+      "name": "mixed_basic_d1024l2r8h4_P127_a47b61_a93b84_seed18318",
+      "task": "mixed_ab",
+      "config": {
+        "RANDOM_SEED": 18318,
+        "P": 127,
+        "D_MODEL": 1024,
+        "N_LAYER": 2,
+        "N_HEAD": 4,
+        "MLP_RATIO": 8,
+        "TRAIN_LEN": 16,
+        "AB_PAIRS": [
+          [
+            47,
+            61
+          ],
+          [
+            93,
+            84
+          ]
+        ],
+        "MIXED_AB_MAX_UNIQUE_RATIOS": [
+          0.7,
+          0.7
+        ],
+        "EVAL_INTERVAL": 1,
+        "MAX_TRAIN_HOURS": 6
+      }
+    }
+  ]
+}

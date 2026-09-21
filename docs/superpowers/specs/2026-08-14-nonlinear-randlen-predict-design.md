@@ -63,7 +63,7 @@ EARLY_STOP_ACCURACY: 0.99, EARLY_STOP_NO_IMPROVE: 1000, PREDICT_MISSING: true
 
 - 组文件：`experiments/nonlinear_p127_tr64_ood128_randmisslen_d256h4_predict.json`
   - new format：`{"concurrency": 8, "experiments": [...]}`（与 randmisslen 组一致）
-  - basename 决定输出目录（/data/cxm/recursion/<name>/{logs,plots} 等，batch_run.py:23-24）
+  - basename 决定输出目录（/mnt/workspace/hujiachen/recursion_results/<name>/{logs,plots} 等，batch_run.py:23-24）
 - run 名：`{task}_d256l{L}r4h4_P127_tr64ood128_randmiss{prob}len{ml}_seed{seed}`
   例：`nonlinear_mul_d256l2r4h4_P127_tr64ood128_randmiss0.3len2_seed44536`，
   对照例：`nonlinear_d256l1r4h4_P127_tr64ood128_randmiss0len1_seed17996`

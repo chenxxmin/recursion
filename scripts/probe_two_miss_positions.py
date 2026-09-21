@@ -17,7 +17,7 @@ import torch
 
 import experiment
 
-CHECKPOINT = ('/data/cxm/models/action_p127_tr64_ood128_misslen/'
+CHECKPOINT = ('/mnt/workspace/hujiachen/models/action_p127_tr64_ood128_misslen/'
               'action_d1024l2r4h4_P127_tr64ood128_N2_randmiss0.1len2_seed17996.pth')
 EXP_NAME = 'action_d1024l2r4h4_P127_tr64ood128_N2_randmiss0.1len2_seed17996'
 

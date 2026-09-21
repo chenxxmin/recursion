@@ -19,9 +19,9 @@ P = 127
 Q = 4
 RUNS = [
     ('h2 (d256 l1 h2)', 1,
-     '/data/cxm/models/mixed_ab_downscale_l1h4/mixed_basic_d256l1r8h2_P127_N2_e0.7_seed0.pth'),
+     '/mnt/workspace/hujiachen/models/mixed_ab_downscale_l1h4/mixed_basic_d256l1r8h2_P127_N2_e0.7_seed0.pth'),
     ('h4 (d256 l1 h4)', 0,
-     '/data/cxm/models/mixed_ab_downscale_l1h4/mixed_basic_d256l1r8h4_P127_N2_e0.7_seed0.pth'),
+     '/mnt/workspace/hujiachen/models/mixed_ab_downscale_l1h4/mixed_basic_d256l1r8h4_P127_N2_e0.7_seed0.pth'),
 ]
 
 fig, axes = plt.subplots(1, 2, figsize=(13, 4.5), sharey=True)

@@ -1,0 +1,40 @@
+{
+  "concurrency": 1,
+  "experiments": [
+    {
+      "name": "mixed_abc_a92b123c21__a39b108c27_d1024l2r4h4_P127_300k_seed17996",
+      "task": "mixed_abc",
+      "config": {
+        "RANDOM_SEED": 17996,
+        "P": 127,
+        "D_MODEL": 1024,
+        "N_LAYER": 2,
+        "N_HEAD": 4,
+        "MLP_RATIO": 4,
+        "TRAIN_LEN": 16,
+        "OOD_LEN": 32,
+        "ABC_PAIRS": [
+          [
+            92,
+            123,
+            21
+          ],
+          [
+            39,
+            108,
+            27
+          ]
+        ],
+        "MIXED_AB_MAX_UNIQUE_RATIOS": [
+          0.14645698582735747,
+          0.14645698582735747
+        ],
+        "NUM_TEST_SAMPLES": 256,
+        "FRESH_TEST_PER_EVAL": true,
+        "EVAL_INTERVAL": 1,
+        "MAX_TRAIN_HOURS": 10,
+        "RESUME_FROM": "/mnt/workspace/hujiachen/mixed_abc_a92b123c21__a39b108c27_d1024l2r4h4_P127_300k_seed17996_resume.pth"
+      }
+    }
+  ]
+}

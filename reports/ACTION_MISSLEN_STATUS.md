@@ -108,7 +108,7 @@ d512 及以下全灭——N3 的边界是**宽度 d1024**，与深度无关（d5
 
 ## 三、数据来源索引
 
-| 批次 | 目录（/data/cxm/recursion/） | 精度 |
+| 批次 | 目录（/mnt/workspace/hujiachen/recursion_results/） | 精度 |
 |---|---|---|
 | 历史 misslen 矩阵（208 实验） | action_p127_tr64_ood128_misslen/ | fp32 |
 | A1 基线 N3/N4/N5 | action_misslen1_n345_baseline/ | fp32 |

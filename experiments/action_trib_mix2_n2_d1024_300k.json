@@ -1,0 +1,81 @@
+{
+  "concurrency": 4,
+  "experiments": [
+    {
+      "name": "action_trib_d1024l2r4h4_P127_tr64ood128_N2_mix_300k_seed17996",
+      "task": "action_trib",
+      "config": {
+        "P": 127,
+        "TRAIN_LEN": 64,
+        "OOD_LEN": 128,
+        "N_HEAD": 4,
+        "MLP_RATIO": 4,
+        "D_MODEL": 1024,
+        "N_LAYER": 2,
+        "ABC_PAIRS": [[14, 7, 13], [27, 108, 39]],
+        "NUM_TRAIN_SAMPLES": 300000,
+        "BATCH_SIZE": 512,
+        "EVAL_INTERVAL": 1,
+        "MAX_TRAIN_HOURS": 9,
+        "RANDOM_SEED": 17996
+      }
+    },
+    {
+      "name": "action_trib_d1024l2r4h4_P127_tr64ood128_N2_mix_300k_seed18318",
+      "task": "action_trib",
+      "config": {
+        "P": 127,
+        "TRAIN_LEN": 64,
+        "OOD_LEN": 128,
+        "N_HEAD": 4,
+        "MLP_RATIO": 4,
+        "D_MODEL": 1024,
+        "N_LAYER": 2,
+        "ABC_PAIRS": [[14, 7, 13], [27, 108, 39]],
+        "NUM_TRAIN_SAMPLES": 300000,
+        "BATCH_SIZE": 512,
+        "EVAL_INTERVAL": 1,
+        "MAX_TRAIN_HOURS": 9,
+        "RANDOM_SEED": 18318
+      }
+    },
+    {
+      "name": "action_trib_d1024l4r4h4_P127_tr64ood128_N2_mix_300k_seed17996",
+      "task": "action_trib",
+      "config": {
+        "P": 127,
+        "TRAIN_LEN": 64,
+        "OOD_LEN": 128,
+        "N_HEAD": 4,
+        "MLP_RATIO": 4,
+        "D_MODEL": 1024,
+        "N_LAYER": 4,
+        "ABC_PAIRS": [[14, 7, 13], [27, 108, 39]],
+        "NUM_TRAIN_SAMPLES": 300000,
+        "BATCH_SIZE": 512,
+        "EVAL_INTERVAL": 1,
+        "MAX_TRAIN_HOURS": 9,
+        "RANDOM_SEED": 17996
+      }
+    },
+    {
+      "name": "action_trib_d1024l4r4h4_P127_tr64ood128_N2_mix_300k_seed18318",
+      "task": "action_trib",
+      "config": {
+        "P": 127,
+        "TRAIN_LEN": 64,
+        "OOD_LEN": 128,
+        "N_HEAD": 4,
+        "MLP_RATIO": 4,
+        "D_MODEL": 1024,
+        "N_LAYER": 4,
+        "ABC_PAIRS": [[14, 7, 13], [27, 108, 39]],
+        "NUM_TRAIN_SAMPLES": 300000,
+        "BATCH_SIZE": 512,
+        "EVAL_INTERVAL": 1,
+        "MAX_TRAIN_HOURS": 9,
+        "RANDOM_SEED": 18318
+      }
+    }
+  ]
+}

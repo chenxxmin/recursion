@@ -5,7 +5,7 @@
 set -u
 cd "$(dirname "$0")/.."
 ts() { date '+%F %T'; }
-export CHAIN_DATA_BASE=/data/cxm/recursion_v2 CHAIN_MODEL_BASE=/data/cxm/models_v2
+export CHAIN_DATA_BASE=/mnt/workspace/hujiachen/recursion_results_v2 CHAIN_MODEL_BASE=/mnt/workspace/hujiachen/models_v2
 
 (
   while pgrep -u "$(id -u)" -f 'chain_rounds\.sh experiments/v2/action_v2_d1024_n2_miss01\.json' > /dev/null 2>&1; do sleep 60; done

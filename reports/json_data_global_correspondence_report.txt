@@ -1,7 +1,7 @@
 ======================================================================
 实验 JSON 条目 name 全局存在性检查
 ======================================================================
-说明：对于每个 JSON 的每个 name，全局搜索 /data/cxm/models 和 /data/cxm/recursion，
+说明：对于每个 JSON 的每个 name，全局搜索 /mnt/workspace/hujiachen/models 和 /mnt/workspace/hujiachen/recursion_results，
       不限于同名目录。
 
 

@@ -78,6 +78,7 @@ X(k) = a * X(k-1) + b * X(k-2)  (mod P)
 - 默认参数：`P = 53`，`AB_PAIRS = [[1,1], [1,2]]`
 - 初始状态长度：`init_len = 2`
 - 每组规则状态空间：`P^2 = 2809`
+- `NUM_MASK` 默认值随阶数与 tag 自适应（2026-09-18 修正）：带 rule tag（`USE_AB_TAG: true`，mixed 默认）时所有 target 因前置 tag 右移一位，默认 mask `order` 个 target（tag 预测的 x0 + 其余初值）；不带 tag 时 mask `order-1` 个。修正前写死 2，三阶 mixed_abc 会多评估一个不可预测的初值位
 - 模型：`MixedABTransformer`（在 `FibonacciTransformer` 基础上扩展多规则能力）
 
 ### 1.6 action
@@ -509,6 +510,6 @@ if mixed_ab:
 - `experiments.json` 中定义的实验会覆盖 `config.json` 的对应字段，`batch_run.py` 负责配置合并与批量执行；实验路由的唯一来源是每个实验条目的顶层 `task` 字段。
 - `src/main.py` 已删除，所有运行必须通过 `src/batch_run.py`。
 - `.gitignore` 已忽略训练产物：`*.log`、`*.err`、`*.pth`、`src/nohup.out`、`config_tmp_*.json` 等。
-- 模型默认保存路径：`/data/cxm/models/{批次名}/{实验名}.pth`（由 `batch_run.py` 自动设置，可在 `experiments.json` 中通过 `SAVE_PATH` 覆盖）。
-- 日志与绘图输出路径：`/data/cxm/recursion/{批次名}/logs/` 与 `/data/cxm/recursion/{批次名}/plots/`（批次名 = 实验 JSON 文件名去扩展名）。
-- 可通过 `--base-dir` 和 `--model-base-dir` 参数修改这两个根目录，默认分别为 `/data/cxm/recursion` 和 `/data/cxm/models`。
+- 模型默认保存路径：`/mnt/workspace/hujiachen/models/{批次名}/{实验名}.pth`（由 `batch_run.py` 自动设置，可在 `experiments.json` 中通过 `SAVE_PATH` 覆盖）。
+- 日志与绘图输出路径：`/mnt/workspace/hujiachen/recursion_results/{批次名}/logs/` 与 `/mnt/workspace/hujiachen/recursion_results/{批次名}/plots/`（批次名 = 实验 JSON 文件名去扩展名）。
+- 可通过 `--base-dir` 和 `--model-base-dir` 参数修改这两个根目录，默认分别为 `/mnt/workspace/hujiachen/recursion_results` 和 `/mnt/workspace/hujiachen/models`。

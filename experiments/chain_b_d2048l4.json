@@ -26,7 +26,7 @@
         ],
         "RANDOM_SEED": 17996,
         "MAX_TRAIN_HOURS": 6,
-        "RESUME_FROM": "/data/cxm/models/chain_b_d2048l4/action_d2048l4r4h4_P127_tr64ood128_N2_randmiss0.1len2_seed17996_resume.pth",
+        "RESUME_FROM": "/mnt/workspace/hujiachen/models/chain_b_d2048l4/action_d2048l4r4h4_P127_tr64ood128_N2_randmiss0.1len2_seed17996_resume.pth",
         "USE_AMP": false
       }
     },
@@ -55,7 +55,7 @@
         ],
         "RANDOM_SEED": 18318,
         "MAX_TRAIN_HOURS": 6,
-        "RESUME_FROM": "/data/cxm/models/chain_b_d2048l4/action_d2048l4r4h4_P127_tr64ood128_N2_randmiss0.1len2_seed18318_resume.pth",
+        "RESUME_FROM": "/mnt/workspace/hujiachen/models/chain_b_d2048l4/action_d2048l4r4h4_P127_tr64ood128_N2_randmiss0.1len2_seed18318_resume.pth",
         "USE_AMP": false
       }
     },
@@ -84,7 +84,7 @@
         ],
         "RANDOM_SEED": 17996,
         "MAX_TRAIN_HOURS": 6,
-        "RESUME_FROM": "/data/cxm/models/chain_b_d2048l4/action_d2048l4r4h4_P127_tr64ood128_N2_randmiss0.3len2_seed17996_resume.pth",
+        "RESUME_FROM": "/mnt/workspace/hujiachen/models/chain_b_d2048l4/action_d2048l4r4h4_P127_tr64ood128_N2_randmiss0.3len2_seed17996_resume.pth",
         "USE_AMP": false
       }
     },
@@ -113,7 +113,7 @@
         ],
         "RANDOM_SEED": 18318,
         "MAX_TRAIN_HOURS": 6,
-        "RESUME_FROM": "/data/cxm/models/chain_b_d2048l4/action_d2048l4r4h4_P127_tr64ood128_N2_randmiss0.3len2_seed18318_resume.pth",
+        "RESUME_FROM": "/mnt/workspace/hujiachen/models/chain_b_d2048l4/action_d2048l4r4h4_P127_tr64ood128_N2_randmiss0.3len2_seed18318_resume.pth",
         "USE_AMP": false
       }
     }

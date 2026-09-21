@@ -17,7 +17,7 @@ import subprocess
 import time
 from datetime import datetime
 
-BASES = ['/data/cxm/recursion']
+BASES = ['/mnt/workspace/hujiachen/recursion_results', '/mnt/workspace/hujiachen/recursion_results_v2']
 REPO = os.path.abspath(os.path.join(os.path.dirname(os.path.abspath(__file__)), '..', '..', '..', '..'))
 TIMER_DIR = os.path.join(REPO, 'logs', 'timers')
 
@@ -164,7 +164,7 @@ def main():
             m2 = re.search(r'chain_rounds\.sh \S+ ([0-9,]+) (\d+)', cmd)
             gpus = m2.group(1) if m2 else None
         gpu_list = [int(g) for g in gpus.split(',')] if gpus else []
-        base = '/data/cxm/recursion_v2' if 'recursion_v2' in cmd else '/data/cxm/recursion'
+        base = '/mnt/workspace/hujiachen/recursion_results_v2' if 'recursion_v2' in cmd else '/mnt/workspace/hujiachen/recursion_results'
         stem = os.path.splitext(os.path.basename(cfg_path))[0]
         try:
             exps = json.load(open(cfg_path))['experiments']

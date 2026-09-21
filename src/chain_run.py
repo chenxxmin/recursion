@@ -29,7 +29,7 @@ Semantics:
 
 Usage (repo root):
     python src/chain_run.py experiments/curriculum_ab_p53.json \
-        [--base-dir /data/cxm/recursion] [--model-base-dir /data/cxm/models]
+        [--base-dir /mnt/workspace/hujiachen/recursion_results] [--model-base-dir /mnt/workspace/hujiachen/models]
     python src/chain_run.py <chain.json> --from-stage T3
         # resume at a named stage: earlier stages are not re-run, but their
         # checkpoints are verified (they anchor the @-references)
@@ -44,8 +44,8 @@ import sys
 SCRIPT_DIR = os.path.dirname(os.path.abspath(__file__))
 REPO_ROOT = os.path.dirname(SCRIPT_DIR)
 
-DEFAULT_BASE_DIR = '/data/cxm/recursion'
-DEFAULT_MODEL_BASE_DIR = '/data/cxm/models'
+DEFAULT_BASE_DIR = '/mnt/workspace/hujiachen/recursion_results'
+DEFAULT_MODEL_BASE_DIR = '/mnt/workspace/hujiachen/models'
 
 SEED_SUFFIX_RE = re.compile(r'_seed(\d+)$')
 BEST_ACC_RE = re.compile(r'Best test accuracy: ([\d.]+)%')

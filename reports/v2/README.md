@@ -20,19 +20,19 @@
 | 内容 | v1 | v2 |
 |---|---|---|
 | 启动配置 | `experiments/*.json` | **`experiments/v2/*.json`** |
-| 日志/图 | `/data/cxm/recursion/<批次名>/` | **`/data/cxm/recursion_v2/<批次名>/`** |
-| 模型/checkpoint | `/data/cxm/models/<批次名>/` | **`/data/cxm/models_v2/<批次名>/`** |
+| 日志/图 | `/mnt/workspace/hujiachen/recursion_results/<批次名>/` | **`/mnt/workspace/hujiachen/recursion_results_v2/<批次名>/`** |
+| 模型/checkpoint | `/mnt/workspace/hujiachen/models/<批次名>/` | **`/mnt/workspace/hujiachen/models_v2/<批次名>/`** |
 | 实验记录文档 | `reports/*.md` | **`reports/v2/*.md`** |
 
 ## 启动方式
 
 ```bash
 # 单批
-python src/batch_run.py --base-dir /data/cxm/recursion_v2 \
-    --model-base-dir /data/cxm/models_v2 experiments/v2/<批次>.json
+python src/batch_run.py --base-dir /mnt/workspace/hujiachen/recursion_results_v2 \
+    --model-base-dir /mnt/workspace/hujiachen/models_v2 experiments/v2/<批次>.json
 
 # 链式多轮（自动续 checkpoint / 跳过已完成）
-CHAIN_DATA_BASE=/data/cxm/recursion_v2 CHAIN_MODEL_BASE=/data/cxm/models_v2 \
+CHAIN_DATA_BASE=/mnt/workspace/hujiachen/recursion_results_v2 CHAIN_MODEL_BASE=/mnt/workspace/hujiachen/models_v2 \
     bash scripts/chain_rounds.sh experiments/v2/<批次>.json <gpus> <rounds>
 ```
 

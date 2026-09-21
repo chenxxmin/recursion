@@ -1,0 +1,38 @@
+{
+  "concurrency": 1,
+  "experiments": [
+    {
+      "name": "mixed_abc_d1024l2r4h4_P127_trib124_13-7-14_N2_e0.15_seed18318",
+      "task": "mixed_abc",
+      "config": {
+        "P": 127,
+        "ABC_PAIRS": [
+          [
+            1,
+            2,
+            4
+          ],
+          [
+            13,
+            7,
+            14
+          ]
+        ],
+        "MIXED_AB_MAX_UNIQUE_RATIOS": [
+          0.1465,
+          0.1465
+        ],
+        "NUM_MASK": 3,
+        "D_MODEL": 1024,
+        "N_LAYER": 2,
+        "N_HEAD": 4,
+        "MLP_RATIO": 4,
+        "USE_AB_TAG": false,
+        "USE_CONDITIONAL_WTE": false,
+        "BATCH_SIZE": 512,
+        "EVAL_INTERVAL": 1,
+        "RANDOM_SEED": 18318
+      }
+    }
+  ]
+}

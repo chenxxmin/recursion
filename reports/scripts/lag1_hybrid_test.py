@@ -20,9 +20,9 @@ DEV = 'cuda'
 P = 127
 RUNS = [
     ('h2_s0', 0,  # lag1 头 = head0
-     '/data/cxm/models/mixed_ab_downscale_l1h4/mixed_basic_d256l1r8h2_P127_N2_e0.7_seed0.pth'),
+     '/mnt/workspace/hujiachen/models/mixed_ab_downscale_l1h4/mixed_basic_d256l1r8h2_P127_N2_e0.7_seed0.pth'),
     ('h4_s0', 3,  # lag1 头 = head3
-     '/data/cxm/models/mixed_ab_downscale_l1h4/mixed_basic_d256l1r8h4_P127_N2_e0.7_seed0.pth'),
+     '/mnt/workspace/hujiachen/models/mixed_ab_downscale_l1h4/mixed_basic_d256l1r8h4_P127_N2_e0.7_seed0.pth'),
 ]
 RA, RB = (1, 1), (1, 2)
 

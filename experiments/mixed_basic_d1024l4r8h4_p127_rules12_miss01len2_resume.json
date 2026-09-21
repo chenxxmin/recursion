@@ -29,7 +29,7 @@
         "MISSING_PROB": 0.1,
         "MISS_LEN": 2,
         "MAX_TRAIN_HOURS": 6,
-        "RESUME_FROM": "/data/cxm/models/mixed_basic_d1024l46r8h4_p127_rules12_miss01len2/mixed_basic_d1024l4r8h4_P127_rules12_N2_e0.7_randmiss0.1len2_seed17996_resume.pth"
+        "RESUME_FROM": "/mnt/workspace/hujiachen/models/mixed_basic_d1024l46r8h4_p127_rules12_miss01len2/mixed_basic_d1024l4r8h4_P127_rules12_N2_e0.7_randmiss0.1len2_seed17996_resume.pth"
       }
     }
   ]

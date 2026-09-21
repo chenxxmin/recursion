@@ -20,7 +20,7 @@
         "FRESH_TEST_PER_EVAL": true,
         "EVAL_INTERVAL": 1,
         "MAX_TRAIN_HOURS": 6,
-        "RESUME_FROM": "/data/cxm/models/tribonacci_p127_d1024l2_300k/tribonacci_a1b2c4_d1024l2r4h4_P127_seed0_resume.pth"
+        "RESUME_FROM": "/mnt/workspace/hujiachen/models/tribonacci_p127_d1024l2_300k/tribonacci_a1b2c4_d1024l2r4h4_P127_seed0_resume.pth"
       }
     }
   ]

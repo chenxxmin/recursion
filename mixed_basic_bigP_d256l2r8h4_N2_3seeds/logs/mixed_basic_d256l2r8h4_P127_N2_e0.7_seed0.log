@@ -130,7 +130,7 @@ Epoch 380 | Train: Loss=0.0039 Acc=100.0% | Test: Acc=99.6% | Best=99.7%(@320)
 ==================================================
 Saving model...
 Training epochs: 380
-[OK] Model saved to: /data/cxm/models/mixed_ab_basic_bigP/mixed_basic_d256l2r8h4_P127_N2_e0.7_seed0.pth
+[OK] Model saved to: /mnt/workspace/hujiachen/models/mixed_ab_basic_bigP/mixed_basic_d256l2r8h4_P127_N2_e0.7_seed0.pth
   File size: 10556.2 KB
   Best test accuracy: 99.71%
 [Memory] after training: device=cuda | CPU RSS=1209.8MB | GPU alloc=57.4MB reserved=648.0MB

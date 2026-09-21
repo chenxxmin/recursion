@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """Regenerate the result tables in reports/ACTION_MISSLEN_STATUS.md.
 
-Scans all fp32-valid log dirs under /data/cxm/recursion, and rewrites the
+Scans all fp32-valid log dirs under /mnt/workspace/hujiachen/recursion_results, and rewrites the
 '## 结果总表' section (A line by N, B line len2-N2). Format: bare acc = run
 completed; 'acc @ epoch' = in progress (cumulative); 未开始 = not scheduled.
 
@@ -12,7 +12,7 @@ import re
 from datetime import datetime
 
 REPO = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-DATA = '/data/cxm/recursion'
+DATA = '/mnt/workspace/hujiachen/recursion_results'
 
 
 def collect(dirs, key_fn, skip=()):

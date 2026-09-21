@@ -22,7 +22,7 @@ import torch
 import experiment
 from analyze_attention import get_attention_weights, load_model
 
-DEFAULT_PTH = ('/data/cxm/models/action_p127_tr64_ood128_misslen/'
+DEFAULT_PTH = ('/mnt/workspace/hujiachen/models/action_p127_tr64_ood128_misslen/'
                'action_d1024l1r4h4_P127_tr64ood128_N2_randmiss0.1len1_seed17996.pth')
 N_SAMPLES = 500  # 测试集前 N 条足够收敛统计
 

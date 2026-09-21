@@ -20,8 +20,8 @@ from protocol import BATCH_RUN_MERGED_FLAG
 
 BASE_CONFIG_PATH = 'src/config.json'
 DEFAULT_EXPERIMENTS_PATH = 'experiments/experiments.json'
-DEFAULT_BASE_DIR = '/data/cxm/recursion'
-DEFAULT_MODEL_BASE_DIR = '/data/cxm/models'
+DEFAULT_BASE_DIR = '/mnt/workspace/hujiachen/recursion_results'
+DEFAULT_MODEL_BASE_DIR = '/mnt/workspace/hujiachen/models'
 
 # Fallback when the merged config has no SAVE_PATH (should not happen since
 # build_merged_config auto-fills it; kept for defensive .get()).
@@ -337,14 +337,14 @@ def main():
 
     print("=" * SEP_WIDTH)
 
-    # Optional GPU whitelist: BATCH_RUN_GPUS="0,1,2,3" restricts which
-    # (physical) GPU ids this batch may use, so two batch_run instances can
-    # partition the machine without landing on the same card.
-    env_gpus = os.environ.get('BATCH_RUN_GPUS')
-    if env_gpus:
-        allowed = {int(x) for x in env_gpus.split(',') if x.strip()}
-        gpu_ids = [g for g in gpu_ids if g in allowed]
-        print(f"BATCH_RUN_GPUS whitelist: {sorted(allowed)} -> usable: {gpu_ids}")
+    # GPU whitelist: BATCH_RUN_GPUS="0,1,2,3" restricts which (physical)
+    # GPU ids this batch may use. On this machine GPUs 0-3 are ours and
+    # 4-7 are forbidden, so the whitelist defaults to 0-3; set
+    # BATCH_RUN_GPUS explicitly only to narrow it further.
+    env_gpus = os.environ.get('BATCH_RUN_GPUS', '0,1,2,3')
+    allowed = {int(x) for x in env_gpus.split(',') if x.strip()}
+    gpu_ids = [g for g in gpu_ids if g in allowed]
+    print(f"GPU whitelist: {sorted(allowed)} -> usable: {gpu_ids}")
 
     if gpu_ids:
         effective_workers = min(concurrency, len(gpu_ids))
