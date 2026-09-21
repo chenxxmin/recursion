@@ -14,15 +14,16 @@ from experiment import _prepare_single_recurrence
 from training import _unpack_batch, _default_loss_mask
 
 
-def _tiny_tetranacci_config():
+def _tiny_tetranacci_config(coeffs):
+    a, b, c, d = coeffs
     return {
         'main': {
             'TASK': 'tetranacci',
             'P': 7,
-            'A': 1,
-            'B': 2,
-            'C': 3,
-            'D': 4,
+            'A': a,
+            'B': b,
+            'C': c,
+            'D': d,
             'D_MODEL': 32,
             'N_HEAD': 1,
             'N_LAYER': 1,
@@ -44,8 +45,8 @@ def _tiny_tetranacci_config():
     }
 
 
-def test_tetranacci_post_collate_targets_and_mask_are_correct():
-    ctx = _prepare_single_recurrence(_tiny_tetranacci_config(), 'tetranacci')
+def _check_tetranacci_pipeline(coeffs):
+    ctx = _prepare_single_recurrence(_tiny_tetranacci_config(coeffs), 'tetranacci')
     batch = next(iter(ctx['train_loader']))
 
     x, loss_mask, kwargs, _, targets_override = _unpack_batch(
@@ -65,7 +66,7 @@ def test_tetranacci_post_collate_targets_and_mask_are_correct():
     assert torch.all(loss_mask[:, 3:] == 1)
 
     p = ctx['p']
-    a, b, c, d = 1, 2, 3, 4
+    a, b, c, d = coeffs
     for row in x.tolist():
         for t in range(4, len(row)):
             expected = (
@@ -93,6 +94,15 @@ def test_tetranacci_post_collate_targets_and_mask_are_correct():
             assert targets[bidx, target_idx].item() == expected
 
 
+def test_tetranacci_a1b2c4d8_pipeline():
+    _check_tetranacci_pipeline((1, 2, 4, 8))
+
+
+def test_tetranacci_a1b3c5d7_pipeline():
+    _check_tetranacci_pipeline((1, 3, 5, 7))
+
+
 if __name__ == '__main__':
-    test_tetranacci_post_collate_targets_and_mask_are_correct()
+    test_tetranacci_a1b2c4d8_pipeline()
+    test_tetranacci_a1b3c5d7_pipeline()
     print('ALL TESTS PASSED: test_tetranacci_pipeline.py')
