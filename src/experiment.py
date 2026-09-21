@@ -682,6 +682,8 @@ def run_experiment(config_path=None):
         amp_dtype=cfg.get('AMP_DTYPE', 'bfloat16'),
         test_loader_fn=ctx.get('test_loader_fn'),
         grad_accum_steps=cfg.get('GRAD_ACCUM_STEPS', 1),
+        grad_clip_norm=cfg.get('GRAD_CLIP_NORM', 1.0),
+        opt_diag_interval=cfg.get('OPT_DIAG_INTERVAL', 0),
         extra_epochs_after_high_acc=cfg.get('EARLY_STOP_EXTRA_EPOCHS', 200)
     )
 
