@@ -180,7 +180,10 @@ def _default_loss_mask(batch_size, target_len, num_mask, first_task_weight=1.0, 
     return mask
 
 
-def train_epoch(model, dataloader, optimizer, device, num_mask=1, extra_kwargs_fn=None, first_task_weight=1.0, frozen_param_states=None, grad_scaler=None, grad_accum_steps=1):
+def train_epoch(model, dataloader, optimizer, device, num_mask=1, extra_kwargs_fn=None,
+                first_task_weight=1.0, frozen_param_states=None, grad_scaler=None,
+                grad_accum_steps=1, grad_clip_norm=1.0, opt_diag_interval=0,
+                epoch=None):
     model.train()
     total_loss = 0
     total_correct = 0
@@ -188,7 +191,14 @@ def train_epoch(model, dataloader, optimizer, device, num_mask=1, extra_kwargs_f
     pos_correct = {}
     pos_total = {}
     n_batches = len(dataloader)
-    
+    # Optimizer diagnostics are accumulated on device and synchronized only at
+    # epoch end (plus optional sparse step logs), so instrumentation does not
+    # add a host sync on every optimizer step.
+    diag_norm_sum = torch.zeros((), device=device)
+    diag_norm_max = torch.zeros((), device=device)
+    diag_clip_count = torch.zeros((), device=device)
+    diag_step_count = 0
+
     for i, batch in enumerate(dataloader):
         x, loss_mask, kwargs, _, targets_override = _unpack_batch(batch, device, extra_kwargs_fn)
         B = x.size(0)
@@ -216,13 +226,36 @@ def train_epoch(model, dataloader, optimizer, device, num_mask=1, extra_kwargs_f
                 (loss / grad_accum_steps).backward()
             if step_now:
                 if grad_scaler is not None:
-                    # fp16 path: unscale before clipping, scaler skips on inf/NaN.
+                    # fp16 path: unscale before measuring/clipping.
                     grad_scaler.unscale_(optimizer)
-                    torch.nn.utils.clip_grad_norm_(model.parameters(), 1.0)
+
+                # clip_grad_norm_ returns the PRE-CLIP global norm. Passing inf
+                # measures it without changing gradients, which lets the same
+                # diagnostics work for a no-clipping ablation.
+                clip_limit = float('inf') if grad_clip_norm is None else float(grad_clip_norm)
+                preclip_norm = torch.nn.utils.clip_grad_norm_(
+                    model.parameters(), clip_limit)
+
+                diag_norm_sum += preclip_norm.detach()
+                diag_norm_max = torch.maximum(diag_norm_max, preclip_norm.detach())
+                if grad_clip_norm is not None:
+                    diag_clip_count += (preclip_norm.detach() > clip_limit)
+                diag_step_count += 1
+
+                if opt_diag_interval and diag_step_count % opt_diag_interval == 0:
+                    lr_now = optimizer.param_groups[0]['lr']
+                    clipped = (grad_clip_norm is not None
+                               and preclip_norm.item() > clip_limit)
+                    epoch_text = '?' if epoch is None else str(epoch)
+                    print(f"[OptDiag] epoch={epoch_text} opt_step={diag_step_count} "
+                          f"preclip_norm={preclip_norm.item():.6g} "
+                          f"clip={grad_clip_norm} clipped={int(clipped)} "
+                          f"lr={lr_now:.8g}")
+
+                if grad_scaler is not None:
                     grad_scaler.step(optimizer)
                     grad_scaler.update()
                 else:
-                    torch.nn.utils.clip_grad_norm_(model.parameters(), 1.0)
                     optimizer.step()
                 # Restore frozen parameters (AdamW weight decay would otherwise drift them)
                 if frozen_param_states:
@@ -240,7 +273,21 @@ def train_epoch(model, dataloader, optimizer, device, num_mask=1, extra_kwargs_f
     
     overall_acc = total_correct / total_samples if total_samples > 0 else 0
     per_pos_acc = {pos: pos_correct[pos] / pos_total[pos] for pos in sorted(pos_total.keys())}
-    return total_loss / len(dataloader), overall_acc, per_pos_acc
+    if diag_step_count:
+        grad_stats = {
+            'preclip_mean': (diag_norm_sum / diag_step_count).item(),
+            'preclip_max': diag_norm_max.item(),
+            'clip_freq': ((diag_clip_count / diag_step_count).item()
+                          if grad_clip_norm is not None else 0.0),
+            'optimizer_steps': diag_step_count,
+            'lr': optimizer.param_groups[0]['lr'],
+        }
+    else:
+        grad_stats = {
+            'preclip_mean': 0.0, 'preclip_max': 0.0, 'clip_freq': 0.0,
+            'optimizer_steps': 0, 'lr': optimizer.param_groups[0]['lr'],
+        }
+    return total_loss / len(dataloader), overall_acc, per_pos_acc, grad_stats
 
 def evaluate(model, dataloader, device, num_mask=1, extra_kwargs_fn=None):
     model.eval()
@@ -339,6 +386,7 @@ def run_training_engine(model, train_loader, test_loader, optimizer, scheduler, 
                         cond_fix_start_a1=None, cond_fix_start_a2=None,
                         max_train_hours=None, resume_state=None, use_amp=False,
                         amp_dtype='bfloat16', test_loader_fn=None, grad_accum_steps=1,
+                        grad_clip_norm=1.0, opt_diag_interval=0,
                         extra_epochs_after_high_acc=200):
     print(f"\nStart training...")
     # Autocast for the forward pass (weights/optimizer stay fp32). bf16 needs
@@ -396,13 +444,16 @@ def run_training_engine(model, train_loader, test_loader, optimizer, scheduler, 
     epoch = start_epoch
     for epoch in range(start_epoch, epochs):
         with amp_ctx():
-            train_loss, train_acc, train_pos_acc = train_epoch(
+            train_loss, train_acc, train_pos_acc, grad_stats = train_epoch(
                 model, train_loader, optimizer, device,
                 num_mask=num_mask, extra_kwargs_fn=extra_kwargs_fn,
                 first_task_weight=first_task_weight,
                 frozen_param_states=frozen_param_states,
                 grad_scaler=grad_scaler,
-                grad_accum_steps=grad_accum_steps)
+                grad_accum_steps=grad_accum_steps,
+                grad_clip_norm=grad_clip_norm,
+                opt_diag_interval=opt_diag_interval,
+                epoch=epoch)
         scheduler.step()
         
         if epoch % eval_interval == 0 or epoch == epochs - 1:
@@ -459,6 +510,11 @@ def run_training_engine(model, train_loader, test_loader, optimizer, scheduler, 
             
             print(f"Epoch {epoch:3d} | Train: Loss={train_loss:.4f} Acc={train_acc:.1%} | "
                   f"Test: Acc={test_acc:.1%} | Best={best_acc:.1%}(@{best_epoch})")
+            print(f"  Opt: LR={grad_stats['lr']:.8g} | "
+                  f"PreClipNorm mean={grad_stats['preclip_mean']:.4g} "
+                  f"max={grad_stats['preclip_max']:.4g} | "
+                  f"Clip={grad_clip_norm} freq={grad_stats['clip_freq']:.1%} "
+                  f"({grad_stats['optimizer_steps']} optimizer steps)")
             
             # Print per-position accuracy for test (compact single line)
             if test_pos_acc:
