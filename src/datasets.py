@@ -151,12 +151,26 @@ class RecurrenceDataset(Dataset):
             print("-" * 50)
             print("-" * 50)
 
+    @staticmethod
+    def _sample_unique_indices(state_space, n, rng):
+        """Uniformly sample n distinct integers from range(state_space).
+
+        Floyd's algorithm uses exactly n iterations and O(n) memory, without
+        materializing the full state space and without rejection loops whose
+        cost grows with sampling coverage.
+        """
+        chosen = set()
+        for j in range(state_space - n, state_space):
+            t = rng.randrange(j + 1)
+            chosen.add(j if t in chosen else t)
+        return chosen
+
     def sample_unique_train(self, num_samples=None, rng=None):
         """SAMPLED_FRESH_TEST train path: sample unique initial states.
 
-        Sampling uses a hash set for duplicate rejection and never materializes
-        the full state space. Each accepted initial state contributes exactly
-        one clean window.
+        Uses Floyd sampling: O(n) iterations and O(n) memory, independent of
+        the fraction of the state space covered. Each initial state contributes
+        exactly one clean rollout window.
         """
         rng = random if rng is None else rng
         state_space = self.p ** self.init_len
@@ -167,18 +181,11 @@ class RecurrenceDataset(Dataset):
 
         self.train_samples = []
         self.test_samples = []
-        self.seen_indices = set()
-        chosen = set()
+        chosen = self._sample_unique_indices(state_space, n, rng)
 
-        while len(chosen) < n:
-            start_idx = rng.randrange(state_space)
-            if start_idx in chosen:
-                continue
-            chosen.add(start_idx)
-            self.train_samples.append(self._rollout_window(start_idx))
-
+        self.train_samples = [self._rollout_window(idx) for idx in chosen]
         rng.shuffle(self.train_samples)
-        self.seen_indices = chosen
+        self.seen_indices = set(chosen)
 
         if self.verbose:
             cov = len(self.train_samples) / state_space
@@ -186,6 +193,7 @@ class RecurrenceDataset(Dataset):
                   f"length {self.length}, mod {self.p}")
             print(f"  - Initial state coverage: {len(self.train_samples)}/{state_space} "
                   f"({cov*100:.3f}%)")
+            print("  - Unique sampling: Floyd algorithm (no rejection loop)")
             print("  - Static test set: disabled (fresh test samples are generated per eval)")
             print(f"Recurrence: {self.recurrence_name}")
             print("-" * 50)
