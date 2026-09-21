@@ -21,6 +21,8 @@
     "DROPOUT": 0.0,
     "MAX_UNIQUE_RATIO": 0.7,
     "WEIGHT_DECAY": 1,
+    "GRAD_CLIP_NORM": 1.0,
+    "OPT_DIAG_INTERVAL": 0,
     "ENTROPY_PENALTY_WEIGHT": 0.0,
     "FIRST_TASK_WEIGHT": 1.0,
     "COND_FIX": null,
