@@ -246,8 +246,6 @@ def _prepare_mixed_recurrence(config, device, order):
         'miss_len': cfg.get('MISS_LEN', 1),
         'miss_second': cfg.get('MISS_SECOND', False),
         'predict_missing': cfg.get('PREDICT_MISSING', False),
-        'data_mode': data_mode,
-        'num_train_samples': NUM_TRAIN_SAMPLES,
     }
     return {
         'post_train_mode': 'mixed_ab',
@@ -534,6 +532,8 @@ def _prepare_single_recurrence(config, task):
         'miss_len': cfg.get('MISS_LEN', 1),
         'miss_second': cfg.get('MISS_SECOND', False),
         'predict_missing': cfg.get('PREDICT_MISSING', False),
+        'data_mode': data_mode,
+        'num_train_samples': NUM_TRAIN_SAMPLES,
     }
     save_config.update(save_extra_config)
     return {
