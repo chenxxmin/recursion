@@ -171,7 +171,8 @@ def _run_mixed_ab_final_test(model, train_dataset, rules, order, p,
 def _run_single_recurrence_final_test(model, train_dataset, recurrence_fn,
                                       init_len, recurrence_name, p,
                                       train_len, ood_len, num_mask, device,
-                                      state_cap=None):
+                                      data_mode='full_split',
+                                      num_test_samples=256):
     """Stage-3 final generation test for single-recurrence tasks.
 
     Verbatim move of the single_recurrence stage-3 block from run_experiment;
@@ -189,17 +190,18 @@ def _run_single_recurrence_final_test(model, train_dataset, recurrence_fn,
         train_seen_inits.add(init_state)
 
     state_space = p ** init_len
-    if state_cap is not None and state_space > state_cap:
-        # Same subsampling as the dataset (STATE_SPACE_CAP): evaluate on a
-        # uniform random subset of initial states instead of the full space.
+    if data_mode == 'sampled_fresh_test':
+        # Match the online evaluation regime: independent draws with replacement.
         all_inits = []
-        for idx in random.sample(range(state_space), state_cap):
+        for _ in range(num_test_samples):
+            idx = random.randrange(state_space)
             vals = []
             for _ in range(init_len):
                 vals.insert(0, idx % p)
                 idx //= p
             all_inits.append(tuple(vals))
-        print(f"[Final test] State space subsampled (STATE_SPACE_CAP): {state_cap}/{state_space} initial states")
+        print(f"[Final test] sampled_fresh_test: {num_test_samples} initial states "
+              f"drawn with replacement from {state_space}")
     else:
         all_inits = list(itertools.product(range(p), repeat=init_len))
     total_states = len(all_inits)
