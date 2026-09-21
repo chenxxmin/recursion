@@ -246,6 +246,8 @@ def _prepare_mixed_recurrence(config, device, order):
         'miss_len': cfg.get('MISS_LEN', 1),
         'miss_second': cfg.get('MISS_SECOND', False),
         'predict_missing': cfg.get('PREDICT_MISSING', False),
+        'data_mode': data_mode,
+        'num_train_samples': NUM_TRAIN_SAMPLES,
     }
     return {
         'post_train_mode': 'mixed_ab',
@@ -423,17 +425,36 @@ def _prepare_single_recurrence(config, task):
     init_len, recurrence_fn, recurrence_name = single_rule_from_task(task, cfg)
     save_extra_config = save_config_extra(task, cfg)
 
-    # STATE_SPACE_CAP: cap the effective state space for high-order recurrences
-    # (e.g. p=127 at init_len=4 -> 2.6e8 states is infeasible to enumerate);
-    # the dataset then subsamples that many distinct initial states uniformly.
-    STATE_SPACE_CAP = cfg.get('STATE_SPACE_CAP')
+    # Explicit data-generation strategy.
+    #   full_split: traverse the full state space, then split into train/test.
+    #   sampled_fresh_test: draw a fixed unique training set without materializing
+    #     the state space; every evaluation draws a fresh test set with replacement.
+    data_mode = cfg.get('DATA_MODE')
+    if data_mode is None:
+        # Backward compatibility for existing experiment files.
+        data_mode = 'sampled_fresh_test' if cfg.get('FRESH_TEST_PER_EVAL', False) else 'full_split'
+    if data_mode not in ('full_split', 'sampled_fresh_test'):
+        raise ValueError(
+            f"DATA_MODE must be 'full_split' or 'sampled_fresh_test', got {data_mode!r}")
+    print(f"[Data mode] {data_mode}")
+
     state_space_size = P ** init_len
-    if STATE_SPACE_CAP is not None:
-        state_space_size = min(state_space_size, STATE_SPACE_CAP)
-    # Explicit NUM_TRAIN_SAMPLES overrides the MAX_UNIQUE_RATIO-derived count.
     NUM_TRAIN_SAMPLES = cfg.get('NUM_TRAIN_SAMPLES')
-    if NUM_TRAIN_SAMPLES is None:
-        NUM_TRAIN_SAMPLES = max(1, int(state_space_size * MAX_UNIQUE_RATIO))
+    if data_mode == 'full_split':
+        if NUM_TRAIN_SAMPLES is None:
+            NUM_TRAIN_SAMPLES = max(1, int(state_space_size * MAX_UNIQUE_RATIO))
+        if NUM_TRAIN_SAMPLES > state_space_size:
+            raise ValueError(
+                f"NUM_TRAIN_SAMPLES ({NUM_TRAIN_SAMPLES}) exceeds state space "
+                f"({state_space_size}) in full_split mode")
+    else:
+        if NUM_TRAIN_SAMPLES is None:
+            raise ValueError(
+                "sampled_fresh_test mode requires explicit NUM_TRAIN_SAMPLES")
+        if NUM_TRAIN_SAMPLES > state_space_size:
+            raise ValueError(
+                f"NUM_TRAIN_SAMPLES ({NUM_TRAIN_SAMPLES}) exceeds state space "
+                f"({state_space_size}); unique training sampling is impossible")
     # NUM_MASK unset (None) falls back to the task's default mask count.
     num_mask_cfg = cfg.get('NUM_MASK')
     num_mask = default_num_mask if num_mask_cfg is None else num_mask_cfg
@@ -448,11 +469,14 @@ def _prepare_single_recurrence(config, task):
         p=P, recurrence_fn=recurrence_fn, recurrence_name=recurrence_name,
         init_len=init_len, num_samples=NUM_TRAIN_SAMPLES,
         length=TRAIN_LEN,
-        state_cap=STATE_SPACE_CAP
     )
-    ds.run()
-    train_dataset = ds.train_samples
-    test_dataset = ds.test_samples
+    if data_mode == 'full_split':
+        ds.run_full_split()
+        train_dataset = ds.train_samples
+        test_dataset = ds.test_samples
+    else:
+        train_dataset = ds.sample_unique_train()
+        test_dataset = []
 
     _print_task_banner(BLOCK_SIZE, TRAIN_LEN, recurrence_name)
 
@@ -469,31 +493,25 @@ def _prepare_single_recurrence(config, task):
             predict_missing=predict_missing)
     else:
         collate = collate_fn              # plain tensors -> PLAIN
-    train_loader, test_loader = _make_loaders(train_dataset, test_dataset, BATCH_SIZE, collate)
+    train_sampler = BucketBatchSampler(train_dataset, batch_size=BATCH_SIZE, shuffle=True)
+    train_loader = DataLoader(train_dataset, batch_sampler=train_sampler, collate_fn=collate)
 
-    # FRESH_TEST_PER_EVAL: rebuild the test set at every eval from fresh random
-    # initial states (NUM_TEST_SAMPLES windows of length OOD_LEN, drawn from
-    # the full state space via the dataset's subsampling path; num_samples=0
-    # sends them all to the test split). The fresh seed stream is reproducible
-    # per run but distinct per eval, and the global RNG state is preserved.
+    test_loader = None
     test_loader_fn = None
-    if cfg.get('FRESH_TEST_PER_EVAL', False):
+    if data_mode == 'full_split':
+        test_loader = _make_test_loader(test_dataset, BATCH_SIZE, collate)
+    else:
         NUM_TEST_SAMPLES = cfg.get('NUM_TEST_SAMPLES', 256)
         fresh_rng = random.Random(cfg.get('RANDOM_SEED', 42) + 10 ** 6 + 7)
 
         def test_loader_fn():  # noqa: F811 (intentional closure name)
             fresh_seed = fresh_rng.randrange(2 ** 31)
-            rng_state = random.getstate()
-            random.seed(fresh_seed)
-            fresh_ds = RecurrenceDataset(
-                p=P, recurrence_fn=recurrence_fn, recurrence_name=recurrence_name,
-                init_len=init_len, num_samples=0, length=OOD_LEN, verbose=False,
-                state_cap=NUM_TEST_SAMPLES,
-            )
-            fresh_ds.run()
-            random.setstate(rng_state)
-            print(f"[FreshTest] rebuilt test set: n={NUM_TEST_SAMPLES}, len={OOD_LEN}, seed={fresh_seed}")
-            return _make_test_loader(fresh_ds.test_samples, BATCH_SIZE, collate)
+            eval_rng = random.Random(fresh_seed)
+            fresh_samples = ds.sample_random_windows(
+                NUM_TEST_SAMPLES, length=OOD_LEN, rng=eval_rng)
+            print(f"[FreshTest] sampled with replacement: "
+                  f"n={NUM_TEST_SAMPLES}, len={OOD_LEN}, seed={fresh_seed}")
+            return _make_test_loader(fresh_samples, BATCH_SIZE, collate)
 
     model = FibonacciTransformer(
         p=P, d_model=D_MODEL, n_head=N_HEAD, n_layer=N_LAYER,
@@ -536,7 +554,8 @@ def _prepare_single_recurrence(config, task):
         'recurrence_fn': recurrence_fn,
         'init_len': init_len,
         'recurrence_name': recurrence_name,
-        'state_cap': STATE_SPACE_CAP,
+        'data_mode': data_mode,
+        'num_test_samples': cfg.get('NUM_TEST_SAMPLES', 256),
     }
 
 
@@ -676,4 +695,5 @@ def run_experiment(config_path=None):
                                           ctx['recurrence_fn'], ctx['init_len'],
                                           ctx['recurrence_name'], P, TRAIN_LEN,
                                           OOD_LEN, num_mask, device,
-                                          state_cap=ctx.get('state_cap'))
+                                          data_mode=ctx.get('data_mode', 'full_split'),
+                                          num_test_samples=ctx.get('num_test_samples', 256))
