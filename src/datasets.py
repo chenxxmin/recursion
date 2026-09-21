@@ -98,6 +98,114 @@ class RecurrenceDataset(Dataset):
         # trailing init_len-1 values are needed as seed context for extending.
         return cycle_vals
 
+    def _rollout_window(self, start_idx, length=None):
+        """Roll one initial state forward to a fixed-length clean window."""
+        target_len = self.length if length is None else length
+        seq = self.index_to_values(start_idx)
+        while len(seq) < target_len:
+            seq.append(self.recurrence_fn(seq[-self.init_len:], self.p))
+        return torch.tensor(seq[:target_len], dtype=torch.long)
+
+    def run_full_split(self):
+        """FULL_SPLIT mode: traverse the whole state space and split states.
+
+        This preserves the trajectory-aware behavior of the original uncapped
+        path: complete trajectories are traversed, one sliding window is made
+        per newly visited state, and only a boundary trajectory can straddle
+        the train/test quota.
+        """
+        state_space = self.p ** self.init_len
+        all_indices = list(range(state_space))
+        random.shuffle(all_indices)
+
+        self.train_samples = []
+        self.test_samples = []
+        self.seen_indices = set()
+
+        for start_idx in all_indices:
+            if start_idx in self.seen_indices:
+                continue
+
+            n_before = len(self.seen_indices)
+            self.seen_indices.add(start_idx)
+            seq = self.generate_cycle(start_idx)
+            num_inits = len(seq) - (self.init_len - 1)
+
+            while len(seq) < num_inits + self.length - 1:
+                seq.append(self.recurrence_fn(seq[-self.init_len:], self.p))
+
+            for i in range(num_inits):
+                is_train = n_before + i < self.num_samples
+                target = self.train_samples if is_train else self.test_samples
+                target.append(torch.tensor(seq[i:i + self.length], dtype=torch.long))
+
+        random.shuffle(self.train_samples)
+
+        if self.verbose:
+            cov = len(self.train_samples) / state_space
+            print(f"[Dataset][full_split] {len(self.train_samples)} train + "
+                  f"{len(self.test_samples)} test samples, length {self.length}, mod {self.p}")
+            print(f"  - Initial state coverage: {len(self.train_samples)}/{state_space} "
+                  f"({cov*100:.1f}%)")
+            print(f"Recurrence: {self.recurrence_name}")
+            print("-" * 50)
+            print("-" * 50)
+
+    def sample_unique_train(self, num_samples=None, rng=None):
+        """SAMPLED_FRESH_TEST train path: sample unique initial states.
+
+        Sampling uses a hash set for duplicate rejection and never materializes
+        the full state space. Each accepted initial state contributes exactly
+        one clean window.
+        """
+        rng = random if rng is None else rng
+        state_space = self.p ** self.init_len
+        n = self.num_samples if num_samples is None else int(num_samples)
+        if n < 0 or n > state_space:
+            raise ValueError(
+                f"unique train sample count {n} must be in [0, {state_space}]")
+
+        self.train_samples = []
+        self.test_samples = []
+        self.seen_indices = set()
+        chosen = set()
+
+        while len(chosen) < n:
+            start_idx = rng.randrange(state_space)
+            if start_idx in chosen:
+                continue
+            chosen.add(start_idx)
+            self.train_samples.append(self._rollout_window(start_idx))
+
+        rng.shuffle(self.train_samples)
+        self.seen_indices = chosen
+
+        if self.verbose:
+            cov = len(self.train_samples) / state_space
+            print(f"[Dataset][sampled_fresh_test] {len(self.train_samples)} unique train samples, "
+                  f"length {self.length}, mod {self.p}")
+            print(f"  - Initial state coverage: {len(self.train_samples)}/{state_space} "
+                  f"({cov*100:.3f}%)")
+            print("  - Static test set: disabled (fresh test samples are generated per eval)")
+            print(f"Recurrence: {self.recurrence_name}")
+            print("-" * 50)
+            print("-" * 50)
+
+        return self.train_samples
+
+    def sample_random_windows(self, num_samples, length=None, rng=None):
+        """Sample clean windows with replacement from the full state space.
+
+        No duplicate check is intentional: fresh evaluation samples are
+        independent draws and may overlap with one another or with training.
+        """
+        rng = random if rng is None else rng
+        state_space = self.p ** self.init_len
+        return [
+            self._rollout_window(rng.randrange(state_space), length=length)
+            for _ in range(int(num_samples))
+        ]
+
     def run(self):
         state_space = self.p ** self.init_len
         capped = self.state_cap is not None and state_space > self.state_cap
