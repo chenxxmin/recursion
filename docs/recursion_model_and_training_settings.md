@@ -138,6 +138,7 @@ x_k = a * x_{k-3} + b * x_{k-2} + c * x_{k-1}  (mod P)
 | `N_HEAD` | 注意力头数 |
 | `N_LAYER` | Transformer block 层数 |
 | `BATCH_SIZE` | 每个 batch 的序列数 |
+| `RESHUFFLE_EACH_EPOCH` | 默认 false 保留历史固定 batch/顺序。true 时训练 sampler 每次 epoch 迭代都会在各长度桶内重洗所有样本，再重新分 batch 并打乱 batch 顺序；同长度 batch、每条样本恰好一次、不丢尾 batch 均保持。测试 sampler 不受影响。使用 checkpoint 已保存的 Python RNG，使 epoch 边界续跑可复现。仅改配置不改变训练样本集合（2026-09-22） |
 | `EPOCHS` | 最大训练 epoch 数 |
 | `LR` | AdamW 学习率 |
 | `WEIGHT_DECAY` | AdamW weight decay |
@@ -165,7 +166,7 @@ x_k = a * x_{k-3} + b * x_{k-2} + c * x_{k-1}  (mod P)
 | `SAVE_PATH` | 模型保存路径；由 `batch_run.py` 自动覆盖为 `{model-base-dir}/{批次名}/{实验名}.pth` |
 | `INIT_FROM` | 课程/迁移学习：从指定 checkpoint 初始化权重（仅拷贝名字与形状都匹配的张量，其余保持随机初始化，日志打印加载/跳过报告）；`null` 为不启用。优化器与调度器始终全新开始 |
 | `MAX_TRAIN_HOURS` | 墙钟时间上限（小时），`null` 为不限。在每个 eval 点检查，超时则把完整训练状态（模型+优化器+调度器+RNG）存到 `{SAVE_PATH去后缀}_resume.pth` 并以退出码 42 退出（batch_run 记为 timed out，不写最终模型、不跑 post-train 测试） |
-| `RESUME_FROM` | 续跑：从 `MAX_TRAIN_HOURS` 超时保存的 resume checkpoint 恢复完整训练状态（模型/优化器/调度器/RNG/当前 epoch/best 等），`null` 为不启用。与 `INIT_FROM` 同时设置时 `RESUME_FROM` 后生效 |
+| `RESUME_FROM` | 续跑：从 `MAX_TRAIN_HOURS` 超时保存的 resume checkpoint 恢复完整训练状态（模型/优化器/调度器/RNG/当前 epoch/best 等），`null` 为不启用。与 `INIT_FROM` 同时设置时 `RESUME_FROM` 后生效。存档会覆盖配置里的 LR；若要在保留 Adam 状态与 cosine 进度的同时降低 LR，先用 `scripts/fork_training_lr.py <source> <new-checkpoint> --scale 0.2` 生成独立完整存档，再以它为 `RESUME_FROM`（同时把配置 LR 写成对应值以便记录）。该脚本仅缩放 optimizer/scheduler 的 LR 字段，保留 epoch、T_max、权重、moments 和 RNG，不覆盖源存档 |
 | `ALLOW_TF32` | true 时开启张量核 TF32 matmul 加速（`src/config.json` 默认 true；仅 CUDA 生效）。数值差异极小（尾数 23→10 位），L20 上约 1.3x |
 | `USE_AMP` | true 时 train/eval 前向使用 autocast（权重与优化器保持 fp32；仅 CUDA 生效），L20 上约 2x。**`src/config.json` 默认 true（2026-08-30 起，探索期默认加速）**；需要与历史 fp32 实验严格对齐时显式设 `false` 复跑。**警告（2026-08-31 实证）：16-bit autocast 会摧毁接近收敛的模型**——低 loss 区训练 1 epoch 掉 6 个点，20 epoch 归零；**bf16 与 fp16 表现几乎相同（89.4% vs 89.3%），多 3 位尾数无济于事**，说明破坏机制不是单纯的尾数噪声。**续跑（RESUME_FROM）已接近收敛的实验必须设 `false`**；从零训练可用于扫点，但 bf16 的假阴性（未 grok）不可作为“不可行”证据 |
 | `AMP_DTYPE` | autocast 精度：`bfloat16`（默认，无需 scaler）或 `float16`（自动启用 GradScaler）。2026-08-31 实证二者对收敛模型的破坏相同，fp16 不构成有效的中间档 |
@@ -191,7 +192,7 @@ x_k = a * x_{k-3} + b * x_{k-2} + c * x_{k-1}  (mod P)
 - **优化器**：`torch.optim.AdamW(model.parameters(), lr=LR, weight_decay=WEIGHT_DECAY)`
 - **学习率调度**：`CosineAnnealingLR(optimizer, T_max=EPOCHS)`
 - **梯度裁剪**：`clip_grad_norm_(model.parameters(), 1.0)`
-- **滚动 checkpoint**：每个 eval 点覆盖写 `<model>_latest.pth`（完整训练状态，可直接 `RESUME_FROM`）；best 更新时覆盖写 `<model>_best.pth`（纯权重，与最终保存同格式）。崩溃最多损失一个 eval 间隔的进度（2026-09-08 新增）
+- **滚动 checkpoint**：每个 eval 点更新 `<model>_latest.pth`（完整训练状态，可直接 `RESUME_FROM`）；best 更新时写 `<model>_best.pth`（按 test accuracy 选择的纯权重，与最终保存同格式）。latest、resume、best 和最终权重均先写同目录临时文件，成功后原子替换；写入失败最多尝试 3 次，保留上一次完整存档（2026-09-21）。已经启动的旧进程不会自动采用这项保存修复。
 - **损失函数**：每个时间步的交叉熵，按 `loss_mask` 平均后加上可选的熵惩罚和 rule loss
 - **mask 策略**：
   - `addition` / `multiplication` / `nonlinear`：默认屏蔽前 `1` 个位置（从预测第 3 项开始）
@@ -451,7 +452,7 @@ if mixed_ab:
 
 训练过程中每个评估 epoch 输出：
 
-- 训练 loss 与 overall accuracy
+- 训练 loss 与 overall accuracy，以及 `TrainPos` 逐位置训练准确率（`target[i]` 为 `x[:,1:]` 中的零基索引；普通 tetra 的 `target[3]` 对应首个预测项 x4）
 - 测试 overall accuracy
 - 每个预测位置（per-position）的准确率
 - `mixed_ab` 任务额外输出每条规则的 per-rule accuracy
@@ -513,3 +514,5 @@ if mixed_ab:
 - 模型默认保存路径：`/mnt/workspace/hujiachen/models/{批次名}/{实验名}.pth`（由 `batch_run.py` 自动设置，可在 `experiments.json` 中通过 `SAVE_PATH` 覆盖）。
 - 日志与绘图输出路径：`/mnt/workspace/hujiachen/recursion_results/{批次名}/logs/` 与 `/mnt/workspace/hujiachen/recursion_results/{批次名}/plots/`（批次名 = 实验 JSON 文件名去扩展名）。
 - 可通过 `--base-dir` 和 `--model-base-dir` 参数修改这两个根目录，默认分别为 `/mnt/workspace/hujiachen/recursion_results` 和 `/mnt/workspace/hujiachen/models`。
+
+跨机定时运行包：每个常规 eval 保留 latest 完整状态；定时、手动停止、正常完成和早停均保存 resume 完整状态。保存先写临时文件，再原子替换，避免写失败覆盖旧存档。

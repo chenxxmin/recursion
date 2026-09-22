@@ -20,7 +20,9 @@
 
 ## 2. 配置合并与实验 JSON
 
-- 合并顺序：`src/config.json` 的 main → task 默认段 → 实验 config 覆盖。实验 JSON 只写与默认不同的键。
+- **实验交付流程（用户要求，2026-09-22）**：用户提出实验及参数后，先按 `docs/EXPERIMENT_DELIVERY_PIPELINE.md` 打印完整实际参数表（包括默认/参考来源、样本数、mask、seed、初始化/续跑、LR/WD/clip、重洗牌、精度、scheduler horizon、评估间隔和定时），等待用户明确确认该版本；确认后才生成可执行实验 JSON 与可分发运行包。参数或代码版本变化后重新出表确认。默认交付给用户在其他机器运行，不在本机自动启动实验。构建 pipeline 本身和 CPU 测试不属于批准新的正式实验。
+
+- 合并顺序：`src/config.json` 的 main → task 默认段 → 实验 config 覆盖。仓库内传统实验 JSON 只写与默认不同的键；跨机交付包展开完整有效配置，避免目标机器默认值改变实验。
 - 命名约定见 SKILL.md §1；本机 v2 制度（30万样本/fresh 256 测试）写 `experiments/v2/` 并用 `--base-dir /mnt/workspace/hujiachen/recursion_results_v2 --model-base-dir /mnt/workspace/hujiachen/models_v2` 启动。（注意：云端机器 2026-09-11 起已废弃 v2 隔离目录并入主库；本机仍保留该目录。）
 
 ## 3. 最近的语义改动（2026-09-08/09，改代码时注意一致性）
