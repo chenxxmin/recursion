@@ -411,7 +411,7 @@ def run_training_engine(model, train_loader, test_loader, optimizer, scheduler, 
                         max_train_hours=None, resume_state=None, use_amp=False,
                         amp_dtype='bfloat16', test_loader_fn=None, grad_accum_steps=1,
                         grad_clip_norm=1.0, opt_diag_interval=0,
-                        extra_epochs_after_high_acc=200):
+                        extra_epochs_after_high_acc=200, epoch_cap=None):
     print(f"\nStart training...")
     # Autocast for the forward pass (weights/optimizer stay fp32). bf16 needs
     # no scaler (fp32-range exponent); fp16 needs GradScaler (5-bit exponent).
@@ -465,8 +465,11 @@ def run_training_engine(model, train_loader, test_loader, optimizer, scheduler, 
         cond_fix_triggered = True
         print(f"[CondFix] frozen from start (cond_fix_start=0): {cond_fix}")
 
+    # EPOCH_CAP: optional hard stop before `epochs` (LR schedule keeps its
+    # full T_max). Normal completion/early-stop/timeout paths unchanged.
+    end_epoch = min(epochs, epoch_cap) if epoch_cap else epochs
     epoch = start_epoch
-    for epoch in range(start_epoch, epochs):
+    for epoch in range(start_epoch, end_epoch):
         with amp_ctx():
             train_loss, train_acc, train_pos_acc, grad_stats = train_epoch(
                 model, train_loader, optimizer, device,
@@ -480,7 +483,7 @@ def run_training_engine(model, train_loader, test_loader, optimizer, scheduler, 
                 epoch=epoch)
         scheduler.step()
         
-        if epoch % eval_interval == 0 or epoch == epochs - 1:
+        if epoch % eval_interval == 0 or epoch == end_epoch - 1:
             eval_loader = test_loader_fn() if test_loader_fn is not None else test_loader
             with amp_ctx():
                 _, test_acc, test_pos_acc, test_group_acc = evaluate(

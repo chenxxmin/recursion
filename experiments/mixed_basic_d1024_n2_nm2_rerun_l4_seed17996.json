@@ -1,0 +1,36 @@
+{
+  "concurrency": 1,
+  "experiments": [
+    {
+      "name": "mixed_basic_d1024l4r8h4_P127_rules12_N2_e0.7_nm2_seed17996",
+      "task": "mixed_ab",
+      "config": {
+        "RANDOM_SEED": 17996,
+        "P": 127,
+        "D_MODEL": 1024,
+        "N_LAYER": 4,
+        "N_HEAD": 4,
+        "MLP_RATIO": 8,
+        "TRAIN_LEN": 16,
+        "AB_PAIRS": [
+          [
+            1,
+            1
+          ],
+          [
+            2,
+            3
+          ]
+        ],
+        "MIXED_AB_MAX_UNIQUE_RATIOS": [
+          0.7,
+          0.7
+        ],
+        "NUM_MASK": 2,
+        "EPOCHS": 6000,
+        "EPOCH_CAP": 1000,
+        "MAX_TRAIN_HOURS": 3
+      }
+    }
+  ]
+}

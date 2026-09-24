@@ -112,6 +112,16 @@ def run_stage(seed, tag, pairs, donor, gpu):
     return save_path, acc
 
 
+def donor_ckpt(save_path):
+    """Existing donor for the next stage: final SAVE_PATH if the stage
+    completed, else the rolling _best.pth (covers timer-killed stages whose
+    SAVE_PATH is never written)."""
+    if os.path.exists(save_path):
+        return save_path
+    best = save_path.replace('.pth', '_best.pth')
+    return best if os.path.exists(best) else None
+
+
 def run_chain(seed):
     gpu = SEED_GPUS[seed]
     with _state_lock:
@@ -121,16 +131,17 @@ def run_chain(seed):
     for i, (tag, pairs) in enumerate(STAGES):
         need = DONOR_MIN if i == 0 else THRESHOLD
         ckpt, acc = run_stage(seed, tag, pairs, donor, gpu)
-        ok = acc is not None and acc >= need
+        donor_next = donor_ckpt(ckpt)
+        ok = acc is not None and acc >= need and donor_next is not None
         with _state_lock:
-            _state[str(seed)]['stages'][tag] = {'ckpt': ckpt, 'acc': acc,
+            _state[str(seed)]['stages'][tag] = {'ckpt': donor_next, 'acc': acc,
                                                 'success': ok}
         save_state()
         if not ok:
-            log(f'seed{seed}: {tag} FAILED (acc={acc} < {need}); chain stops')
+            log(f'seed{seed}: {tag} FAILED (acc={acc} < {need} or no ckpt); chain stops')
             return
-        donor = ckpt
-        log(f'seed{seed}: {tag} OK (acc={acc:.4f}), continue')
+        donor = donor_next
+        log(f'seed{seed}: {tag} OK (acc={acc:.4f}, donor={os.path.basename(donor)}), continue')
     log(f'seed{seed}: N5 succeeded; chain complete')
 
 

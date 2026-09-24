@@ -609,6 +609,16 @@ def run_experiment(config_path=None):
         print("[Error] Config not merged. Please run via batch_run.py or merge config manually.")
         sys.exit(2)  # non-zero so batch_run records failure instead of a silent "success"
 
+    # Print the effective config table so direct core.py runs (launched
+    # without the batch_run wrapper) still carry a full parameter table in
+    # their logs.
+    print("=" * 60)
+    print("Merged Config (all keys)")
+    print("=" * 60)
+    for key in sorted(cfg_main):
+        print(f"{key:<25} {cfg_main[key]}")
+    print("=" * 60)
+
     # ========================================================================
     # Stage 1: Task branch -- prepare dataset, model, loader, training params
     # ========================================================================
@@ -693,7 +703,8 @@ def run_experiment(config_path=None):
         grad_accum_steps=cfg.get('GRAD_ACCUM_STEPS', 1),
         grad_clip_norm=cfg.get('GRAD_CLIP_NORM', 1.0),
         opt_diag_interval=cfg.get('OPT_DIAG_INTERVAL', 0),
-        extra_epochs_after_high_acc=cfg.get('EARLY_STOP_EXTRA_EPOCHS', 200)
+        extra_epochs_after_high_acc=cfg.get('EARLY_STOP_EXTRA_EPOCHS', 200),
+        epoch_cap=cfg.get('EPOCH_CAP')
     )
 
     if timed_out:
