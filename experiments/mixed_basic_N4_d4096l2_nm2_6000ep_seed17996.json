@@ -1,0 +1,86 @@
+{
+  "concurrency": 1,
+  "experiments": [
+    {
+      "name": "mixed_basic_d4096l2r8h16_P127_rules1234_N4_tr16ood32_nm2_lr3e4_wd1_clip1_bs512_6000ep_seed17996",
+      "task": "mixed_ab",
+      "config": {
+        "P": 127,
+        "TASK": "mixed_ab",
+        "NUM_MASK": 2,
+        "A": 1,
+        "B": 1,
+        "AB_PAIRS": [
+          [
+            1,
+            1
+          ],
+          [
+            2,
+            3
+          ],
+          [
+            3,
+            5
+          ],
+          [
+            4,
+            7
+          ]
+        ],
+        "D_MODEL": 4096,
+        "N_HEAD": 16,
+        "N_LAYER": 2,
+        "BATCH_SIZE": 512,
+        "RESHUFFLE_EACH_EPOCH": false,
+        "EPOCHS": 6000,
+        "LR": 0.0003,
+        "INIT_FROM": null,
+        "USE_LEARNABLE_PE": false,
+        "MLP_RATIO": 8,
+        "TRAIN_LEN": 16,
+        "OOD_LEN": 32,
+        "DROPOUT": 0.0,
+        "MAX_UNIQUE_RATIO": 0.7,
+        "WEIGHT_DECAY": 1,
+        "GRAD_CLIP_NORM": 1.0,
+        "OPT_DIAG_INTERVAL": 0,
+        "ENTROPY_PENALTY_WEIGHT": 0.0,
+        "FIRST_TASK_WEIGHT": 1.0,
+        "COND_FIX": null,
+        "COND_FIX_START": null,
+        "COND_FIX_START_A1": null,
+        "COND_FIX_START_A2": null,
+        "RANDOM_SEED": 17996,
+        "EVAL_INTERVAL": 20,
+        "EARLY_STOP_NO_IMPROVE": 3000,
+        "EARLY_STOP_ACCURACY": 0.99,
+        "EARLY_STOP_EXTRA_EPOCHS": 200,
+        "MAX_TRAIN_HOURS": null,
+        "RESUME_FROM": null,
+        "ALLOW_TF32": true,
+        "USE_AMP": false,
+        "AMP_DTYPE": "bfloat16",
+        "DATA_MODE": null,
+        "FRESH_TEST_PER_EVAL": false,
+        "STATE_SPACE_CAP": null,
+        "USE_AB_TAG": false,
+        "USE_CONDITIONAL_WTE": false,
+        "COND_WTE_SHARED_RATIO": 0.0,
+        "MIXED_AB_MAX_UNIQUE_RATIOS": [
+          0.7,
+          0.7,
+          0.7,
+          0.7
+        ],
+        "MAX_TRAIN_EPOCHS": 6000,
+        "MISSING_PROB": 0.0,
+        "NUM_TRAIN_SAMPLES": null,
+        "GRAD_ACCUM_STEPS": 1,
+        "MISS_LEN": 0,
+        "PREDICT_MISSING": false,
+        "MISS_SECOND": false
+      }
+    }
+  ]
+}
