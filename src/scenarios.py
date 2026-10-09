@@ -62,6 +62,45 @@ def _is_new_format(task, cfg):
     return False
 
 
+def _check_removed_features(cfg):
+    """规格 §1.5：旧配置显式启用已删除/写死功能 -> 明确报错（含替代写法）；
+    与写死值一致的旧键警告后忽略。SKIP_FINAL_GENERATION_TEST 功能整体消失，
+    直接忽略（没有需要保护的语义）。"""
+    def err(key, replacement):
+        raise ValueError(
+            f"{key}={cfg[key]!r} 请求了已删除的功能（2026-10-08 场景统一）。{replacement}")
+
+    if cfg.get('PREDICT_MISSING') is False:
+        err('PREDICT_MISSING', '污损位恒以原值为目标（predict 口径），mask 模式已删除；'
+                               '去掉该键即可。')
+    if cfg.get('MISS_SECOND'):
+        err('MISS_SECOND', '改用 MISSING_PROB + MISS_LEN。')
+    if cfg.get('USE_LEARNABLE_PE'):
+        err('USE_LEARNABLE_PE', '位置编码恒为 RoPE，wpe 已删除。')
+    if cfg.get('USE_AB_TAG'):
+        err('USE_AB_TAG', 'mixed 只剩 basic 模式，rule token / 词表扩展已删除。')
+    if cfg.get('USE_CONDITIONAL_WTE'):
+        err('USE_CONDITIONAL_WTE', 'cond_wte 已删除。')
+    if cfg.get('COND_WTE_SHARED_RATIO'):
+        err('COND_WTE_SHARED_RATIO', 'cond_wte 已删除。')
+    for key in ('COND_FIX', 'COND_FIX_START', 'COND_FIX_START_A1', 'COND_FIX_START_A2'):
+        if cfg.get(key) is not None:
+            err(key, '参数冻结（freeze_partial）已删除。')
+    if cfg.get('USE_AMP'):
+        err('USE_AMP', 'AMP 已移除，训练恒为 fp32（依据 docs/AMP_PRECISION_NOTES.md）。')
+    if cfg.get('AMP_DTYPE') is not None:
+        err('AMP_DTYPE', 'AMP 已移除，训练恒为 fp32。')
+    if cfg.get('ALLOW_TF32') is False:
+        err('ALLOW_TF32', 'TF32 恒开。')
+    if cfg.get('ENTROPY_PENALTY_WEIGHT'):
+        err('ENTROPY_PENALTY_WEIGHT', '注意力熵惩罚已移除（恒 0）。')
+    for key in ('PREDICT_MISSING', 'MISS_SECOND', 'USE_LEARNABLE_PE', 'USE_AB_TAG',
+                'USE_CONDITIONAL_WTE', 'COND_WTE_SHARED_RATIO', 'USE_AMP',
+                'ALLOW_TF32', 'ENTROPY_PENALTY_WEIGHT'):
+        if cfg.get(key) is not None:
+            warnings.warn(f"{key} 已写死/删除，与写死值一致，忽略", stacklevel=2)
+
+
 def _validate_new_format(task, cfg):
     """New-format task (single/mixed/action): ORDER + RULES are mandatory."""
     p = cfg['P']
@@ -86,6 +125,81 @@ def _validate_new_format(task, cfg):
     return order, rules
 
 
+def _legacy_rules(task, cfg):
+    """(order, canonical rules) for a legacy task name.
+
+    mixed_ab/mixed_abc 的 AB_PAIRS/ABC_PAIRS 本就是 canonical（第一个系数乘
+    最新的值），直接用；action/action_trib/dynamic_mixed 的旧键约定相反
+    （第一个系数乘最老的值），逐条 reverse —— 全仓库仅有的两处反转之一，
+    另一处在 experiment._prepare_action 入口（canonical -> action 内部约定）。
+    """
+    if task == 'addition':
+        order, rules = 2, [[int(cfg.get('A', 1)), int(cfg.get('B', 1))]]
+    elif task == 'tribonacci':
+        order, rules = 3, [[int(cfg.get(k, 1)) for k in 'ABC']]
+    elif task == 'tetranacci':
+        order, rules = 4, [[int(cfg.get(k, 1)) for k in 'ABCD']]
+    elif task == 'mixed_ab':
+        order, rules = 2, [list(map(int, p))
+                           for p in (cfg.get('AB_PAIRS') or _DEFAULT_AB_PAIRS)]
+    elif task == 'mixed_abc':
+        order, rules = 3, [list(map(int, p))
+                           for p in (cfg.get('ABC_PAIRS') or _DEFAULT_ABC_PAIRS)]
+    elif task in ('action', 'dynamic_mixed'):
+        pairs = cfg.get('AB_PAIRS') or _DEFAULT_AB_PAIRS
+        order, rules = 2, [list(map(int, reversed(pair))) for pair in pairs]
+    elif task == 'action_trib':
+        pairs = cfg.get('ABC_PAIRS') or _DEFAULT_ABC_PAIRS
+        order, rules = 3, [list(map(int, reversed(pair))) for pair in pairs]
+    else:
+        raise ValueError(f"unknown legacy task: {task}")
+    for r in rules:
+        if len(r) != order:
+            raise ValueError(
+                f"规则 {r} 长度 {len(r)} != order {order}（旧 task {task!r}）")
+    return order, rules
+
+
+def _legacy_exposure(scenario, n_rules, cfg):
+    if scenario == 'single':
+        return float(cfg.get('MAX_UNIQUE_RATIO', DEFAULT_RATIO))
+    if scenario == 'mixed':
+        ratios = cfg.get('MIXED_AB_MAX_UNIQUE_RATIOS')
+        if ratios is None:
+            ratios = cfg.get('MAX_UNIQUE_RATIO', DEFAULT_RATIO)
+        return ratios
+    return None  # action
+
+
+def _resolve_conflicts(scenario, order, rules, cfg):
+    """新格式 task 里新旧键同时出现：一致 -> warning + 新键优先；不一致 -> 报错。"""
+    pairs_key = {2: 'AB_PAIRS', 3: 'ABC_PAIRS'}.get(order)
+    if pairs_key and cfg.get(pairs_key):
+        old = [list(map(int, r)) for r in cfg[pairs_key]]
+        if scenario == 'action':
+            # 旧键是 action 约定，反转成 canonical 再比（反转规则见 _legacy_rules）
+            old = [list(reversed(r)) for r in old]
+        if old != rules:
+            raise ValueError(f"{pairs_key} 与 RULES 不一致"
+                             f"{'（action 旧键按反转后比较）' if scenario == 'action' else ''}："
+                             f"{old} != {rules}")
+        warnings.warn(f"{pairs_key} 与 RULES 一致，以 RULES 为准", stacklevel=3)
+    if scenario == 'single':
+        letters = 'ABCD'[:order]
+        for i, k in enumerate(letters):
+            if k in cfg and cfg[k] is not None and int(cfg[k]) != rules[0][i]:
+                raise ValueError(f"{k}={cfg[k]} 与 RULES[0][{i}]={rules[0][i]} 不一致")
+        if any(k in cfg and cfg[k] is not None for k in letters):
+            warnings.warn("A/B/C/D 与 RULES 一致，以 RULES 为准", stacklevel=3)
+    for old_key in ('MAX_UNIQUE_RATIO', 'MIXED_AB_MAX_UNIQUE_RATIOS'):
+        if cfg.get(old_key) is not None and cfg.get('EXPOSURE_RATIOS') is not None:
+            if cfg[old_key] != cfg['EXPOSURE_RATIOS']:
+                raise ValueError(f"{old_key}={cfg[old_key]} 与 "
+                                 f"EXPOSURE_RATIOS={cfg['EXPOSURE_RATIOS']} 不一致")
+            warnings.warn(f"{old_key} 与 EXPOSURE_RATIOS 一致，以 EXPOSURE_RATIOS 为准",
+                          stacklevel=3)
+
+
 def _normalize_exposure(scenario, n_rules, cfg, legacy_value):
     """EXPOSURE_RATIOS（新键，优先）或旧键翻译值 -> float | list[float] | None."""
     raw = cfg.get('EXPOSURE_RATIOS', legacy_value)
@@ -104,7 +218,7 @@ def _normalize_exposure(scenario, n_rules, cfg, legacy_value):
 
 def normalize_task_config(task, cfg):
     """See module docstring. cfg is the merged main section (must contain P)."""
-    # Task 2 在这里插入：_check_removed_features(cfg)
+    _check_removed_features(cfg)
     if scenario_of(task) is None:
         raise ValueError(
             f"未知 TASK {task!r}；合法值：新场景 {SCENARIOS}，例外 {EXCEPTION_TASKS}，"
@@ -114,21 +228,42 @@ def normalize_task_config(task, cfg):
                 'exposure_ratios': None, 'source': task}
     scenario = scenario_of(task)
     if _is_new_format(task, cfg):
-        # Task 2 在这里插入：_resolve_conflicts(scenario, order, rules, cfg)
         order, rules = _validate_new_format(task, cfg)
+        _resolve_conflicts(scenario, order, rules, cfg)
         source = 'new'
         legacy_exposure = None
     else:
-        # Task 2 在这里实现旧 task 名翻译（_legacy_rules / 冲突检查）；
-        # Task 1 先不走到这里（旧名暂由 Task 2 补全）。
-        raise NotImplementedError(f"legacy task {task!r} lands in Task 2")
-    exposure = _normalize_exposure(scenario, len(rules), cfg, legacy_exposure)
-    if scenario in ('single', 'mixed') and exposure is None:
-        exposure = DEFAULT_RATIO if scenario == 'single' else [DEFAULT_RATIO] * len(rules)
+        order, rules = _legacy_rules(task, cfg)
+        p = cfg['P']
+        for r in rules:
+            if any(not 0 <= c < p for c in r):
+                raise ValueError(f"规则 {r} 系数越界 [0, {p})")
+        # 旧 task 名与新键同时出现：一致 -> warning + 新键优先；不一致 -> 报错。
+        if cfg.get('RULES') is not None:
+            new_rules = [list(map(int, r)) for r in cfg['RULES']]
+            if new_rules != rules:
+                raise ValueError(
+                    f"RULES={new_rules} 与旧 task {task!r} 推出的规则 {rules} 不一致")
+            warnings.warn(f"旧 task {task!r} 与 RULES 同时出现且一致，以 RULES 为准",
+                          stacklevel=2)
+            rules = new_rules
+        if cfg.get('ORDER') is not None and cfg['ORDER'] != order:
+            raise ValueError(
+                f"ORDER={cfg['ORDER']} 与旧 task {task!r} 的阶数 {order} 不一致")
+        source = task
+        legacy_exposure = _legacy_exposure(scenario, len(rules), cfg)
+        if task == 'dynamic_mixed':
+            warnings.warn("task 'dynamic_mixed' 已废弃，按 'action' 处理", stacklevel=2)
     if scenario == 'action':
+        # action 收到任何形状的 EXPOSURE_RATIOS（含长度不匹配的列表）都 warn 后
+        # 忽略，不做长度校验；exposure_ratios 恒 None（规则逐步随机选择，无曝光比例概念）。
         if cfg.get('EXPOSURE_RATIOS') is not None:
             warnings.warn("action 场景不使用 EXPOSURE_RATIOS（规则逐步随机选择），已忽略",
                           stacklevel=2)
-        exposure = None  # action 恒 None（规则逐步随机选择，无曝光比例概念）
+        exposure = None
+    else:
+        exposure = _normalize_exposure(scenario, len(rules), cfg, legacy_exposure)
+        if exposure is None:
+            exposure = DEFAULT_RATIO if scenario == 'single' else [DEFAULT_RATIO] * len(rules)
     return {'scenario': scenario, 'order': order, 'rules': rules,
             'exposure_ratios': exposure, 'source': source}
