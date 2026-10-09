@@ -17,7 +17,7 @@
 - `datasets.py`：RecurrenceDataset（全状态枚举+循环遍历，或 STATE_SPACE_CAP 抽样）、MixedRecurrenceDataset、ActionDataset、所有 collate。
 - `training.py`：训练/评估循环、早停、SIGTERM 优雅退出、checkpoint。
 - `batch_run.py`：批量编排（读 experiments/*.json，合并配置，一卡一实验）；`chain_rounds.sh` + `prepare_chain_round.py`：多轮续跑。`chain_run.py`：通用课程链（分 stage 串行，`INIT_FROM:"@prev"/@<stage>` 暖启动，gate 门槛，顶层 concurrency 透传）；交接文档 `docs/CURRICULUM_NTASK_HANDOVER.md`。`curriculum_chain_Ntask.py` 是旧的 N=2→5 专用调度器（硬编码，勿用作通用 pipeline）。
-- 测试：`tests/test_*.py` 是纯 assert 脚本，**没有 pytest**；本机运行 `/usr/bin/python3 tests/test_xxx.py`（test_sample_gen.py 需要 `PYTHONPATH=src`）。
+- 测试：`tests/test_*.py` 是纯 assert 脚本，**没有 pytest**；本机运行 `python tests/test_xxx.py`（test_sample_gen.py 等需要 `PYTHONPATH=src`）。
 
 ## 2. 配置合并与实验 JSON
 
@@ -43,7 +43,7 @@
 - **队列制度（2026-09-10 起）**：一卡一个队列，用 `scripts/start_queue.sh <gpu 0-3> <experiments.json>` 启动（内部 `BATCH_RUN_GPUS=<gpu>` 钉卡，同卡已有队列会拒绝启动）。batch_run.py 的 GPU 白名单默认就是 0,1,2,3。
 - **BATCH_SIZE 默认 512**：bench 结论（`bench_batch_size/bench_action_bs_results.txt`）——action misslen2 l4 fp32 下 512 与 1024 同速（~372s/epoch @30万样本），显存 26.5GB vs 40.7GB，bs≥1280 OOM。所有实验就用默认 512。
 - **misslen 实验的评估 pipeline（2026-09-15 起固定）**：每条 misslen 实验训练完毕后，结果必须报两个维度——**clean acc**（规则学习能力）：用 `scripts/eval_clean_action.py --eval-len <TRAIN_LEN> --num-samples 1000` 在新生成的无污损 train_len 窗口样本上评（取该实验最后一轮的 `_best.pth`，缺则 `_latest.pth`；先确认该轮没发散——latest 明显比历史 best 差时改用未发散轮的 best）；**total acc**（填补污损能力）：就是训练日志里的 best test acc。已知事实：正常收敛的 action+miss 模型 clean acc 在训练窗内都是 100%，差距全在 total acc；续跑轮可能发散把模型跑废，采用续跑结果前必须先验证。
-- **Python 环境**：用系统 `/usr/bin/python3`（3.10，torch 2.4.0+cu121，matplotlib/numpy 齐全）。旧机器的 `/home/cxm/miniconda3` 不存在；chain_rounds.sh 内部用裸 `python`，调它前确认 `python` 指向正确（必要时 `export PATH` 使 `python` 可用或改脚本）。
+- **Python 环境（2026-10-09 更新）**：用 conda base `/home/cxm/miniconda3/bin/python`（3.13，torch 2.6.0+cu124，cuda 可用，matplotlib/numpy 齐全），裸 `python`/`python3` 默认就指向它。**系统 `/usr/bin/python3`（3.10）已无 torch，别再用**。另有 `torch_env` 环境有 torch 但缺 matplotlib，测试/画图不要用。chain_rounds.sh 内部的裸 `python` 现在直接可用。
 - **GPFS 写坑（2026-09-11 踩过）**：/mnt/workspace 是 GPFS，曾出现约 15 分钟的瞬时写故障，torch.save 写 checkpoint 直接失败（`PytorchStreamWriter failed writing`，stderr 在批次 `logs/*.err`），正在写的 `_resume.pth` 被截断成 4MB 废文件。**教训：resume 前先 torch.load 校验 checkpoint；`_resume.pth` 损坏时改用 `_latest.pth`（滚动全状态，通常完好）；查训练报错要看 logs/ 下的 .err 不是 .log。**
 - **pgrep/pkill 自匹配**：模式会匹配到自己 shell 的命令行，用括号写法 `[c]ore.py` 或先核对 PID。
 - **停止实验**：用 skill 的 stop_experiment.sh（SIGTERM → 下一 eval 点存盘），或 timer.sh 设定时。不要 kill -9 正在跑且进度有用的实验。
