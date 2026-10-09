@@ -11,8 +11,9 @@
 ## 1. 代码结构（src/）
 
 - `core.py`：薄入口（re-export），实际逻辑在 `experiment.py`（run_experiment 主流程 + 三个 prepare）。
-- `experiment.py`：`_prepare_single_recurrence`（addition/multiplication/tribonacci/tetranacci/nonlinear*）、`_prepare_mixed_recurrence`（mixed_ab/mixed_abc）、`_prepare_action`（action/action_trib，order 参数区分阶数）。
-- `rules.py`：递推规则。`LinearRecurrenceRule`（任意阶任意系数的通用入口）、`single_rule_from_task`（task 名 → (init_len, next_fn, name)）。
+- `experiment.py`：`run_experiment` 开头经 `scenarios.normalize_task_config` 归一化后按 scenario 分派（`_prepare_single_recurrence`（single + 三个非线性例外）/ `_prepare_mixed_recurrence`（mixed）/ `_prepare_action`（action，order 参数区分阶数））。
+- `scenarios.py`：归一化层 `normalize_task_config`（纯配置翻译，无 torch 依赖）：旧 task 名映射（addition/tribonacci/tetranacci→single、mixed_ab/mixed_abc→mixed、action_trib/dynamic_mixed→action）、action 旧键 AB_PAIRS/ABC_PAIRS 反转为 canonical RULES、旧暴露率键→EXPOSURE_RATIOS、已删功能显式启用则报错。
+- `rules.py`：递推规则。`LinearRecurrenceRule`（任意阶任意系数的通用入口，canonical 方向）、`single_rule_from_task`（task 名 → (init_len, next_fn, name)）、`rules_from_config(rules_raw, p)`（新签名：消费归一化结果的 canonical 系数列表）。
 - `datasets.py`：RecurrenceDataset（全状态枚举+循环遍历，或 STATE_SPACE_CAP 抽样）、MixedRecurrenceDataset、ActionDataset、所有 collate。
 - `training.py`：训练/评估循环、早停、SIGTERM 优雅退出、checkpoint。
 - `batch_run.py`：批量编排（读 experiments/*.json，合并配置，一卡一实验）；`chain_rounds.sh` + `prepare_chain_round.py`：多轮续跑。`chain_run.py`：通用课程链（分 stage 串行，`INIT_FROM:"@prev"/@<stage>` 暖启动，gate 门槛，顶层 concurrency 透传）；交接文档 `docs/CURRICULUM_NTASK_HANDOVER.md`。`curriculum_chain_Ntask.py` 是旧的 N=2→5 专用调度器（硬编码，勿用作通用 pipeline）。
@@ -25,15 +26,16 @@
 - 合并顺序：`src/config.json` 的 main → task 默认段 → 实验 config 覆盖。仓库内传统实验 JSON 只写与默认不同的键；跨机交付包展开完整有效配置，避免目标机器默认值改变实验。
 - 命名约定见 SKILL.md §1；本机 v2 制度（30万样本/fresh 256 测试）写 `experiments/v2/` 并用 `--base-dir /mnt/workspace/hujiachen/recursion_results_v2 --model-base-dir /mnt/workspace/hujiachen/models_v2` 启动。（注意：云端机器 2026-09-11 起已废弃 v2 隔离目录并入主库；本机仍保留该目录。）
 
-## 3. 最近的语义改动（2026-09-08/09，改代码时注意一致性）
+## 3. 最近的语义改动（改代码时注意一致性）
 
+0. **场景统一（2026-10-08）**：task 体系收敛为 TASK ∈ {single, mixed, action} + 三个非线性例外 task（multiplication/nonlinear/nonlinear_mul），新键 ORDER / RULES（canonical：第一个系数乘最新的值）/ EXPOSURE_RATIOS（标量或逐规则列表）；写死 PREDICT_MISSING=true / USE_LEARNABLE_PE=false（RoPE）/ ALLOW_TF32=true / USE_AMP=false / ENTROPY_PENALTY_WEIGHT=0；删除 MixedABTransformer/rule_head/USE_AB_TAG/cond_wte/MISS_SECOND/COND_FIX 系列/final generation test（final_eval.py）/mask 污损口径。旧 task 名与旧键全部经归一化层（scenarios.py）兼容，已删功能显式启用则报错；config.json 新增场景默认段（查找顺序：场景段→旧 task 段）；checkpoint save_config 追加 scenario/order/rules 三键。设计规格：`docs/superpowers/specs/2026-10-08-scenario-unification-design.md`。**已知语义变化四条**：①污损恒 predict 口径（single/mixed 历史默认 mask，新旧 test acc 口径不可直接比较）；②mixed 无 rule_head/tag/cond_wte（同配置新跑与历史 mixed 有架构差异）；③无 final generation test（Exposed/Unexposed × ID/OOD 表格不再产出，结果口径 = 训练日志 best acc + `eval_clean_action.py`）；④OOD_LEN 默认 32→16（EARLY_STOP_EXTRA_EPOCHS 默认 200→0）。
 1. **污损全面改为在线模式**：数据集只存干净样本，`make_missing_collate` / `make_mixed_missing_collate` / `make_action_missing_collate` 逐 batch 新鲜随机污损（每 epoch 缺失位置都不同，train/test 同样）。旧的"生成时固定污损"已删除，无开关。
-2. **早停分两制**：静态切分制（无 fresh test）测试 ≥ `EARLY_STOP_ACCURACY`(0.99) 直接停；新鲜测试制（`FRESH_TEST_PER_EVAL`）最近 10 个 eval 均值 >99% 才停。`EARLY_STOP_EXTRA_EPOCHS` 已废弃。
+2. **早停分两制**：静态切分制（无 fresh test）测试 ≥ `EARLY_STOP_ACCURACY`(0.99) 直接停；新鲜测试制（`FRESH_TEST_PER_EVAL`）最近 10 个 eval 均值 >99% 才停。`EARLY_STOP_EXTRA_EPOCHS` 保留但默认 0、当前无作用（`high_acc_epoch` 仅为 resume checkpoint 兼容保留）。
 3. **滚动 checkpoint**：每个 eval 点覆盖写 `<model>_latest.pth`（完整状态可 RESUME_FROM），best 更新时写 `<model>_best.pth`（纯权重）。
-4. **tetranacci task**：4 阶递推（A/B/C/D 键，init_len=4）。**P⁴ 状态空间必须配 `STATE_SPACE_CAP`**（否则枚举爆炸），抽样路径同时用于数据集和 final eval。
-5. **单规则任务支持** `NUM_TRAIN_SAMPLES` 显式覆盖 和 `FRESH_TEST_PER_EVAL`（每 eval 从全状态空间抽 NUM_TEST_SAMPLES 个全新状态生成 OOD_LEN 窗口）。**mixed_ab/mixed_abc 也支持 `NUM_TRAIN_SAMPLES` 显式覆盖**（2026-09-10）：标量=每规则同样数量，列表=逐规则数量，设置后覆盖 `MIXED_AB_MAX_UNIQUE_RATIOS` 的反推。
+4. **tetranacci task**：4 阶递推（旧写法 A/B/C/D 键，init_len=4；新写法 `single` + `ORDER:4` + `RULES`）。**P⁴ 状态空间必须配 `STATE_SPACE_CAP` 或 `DATA_MODE: sampled_fresh_test`**（否则枚举爆炸）。
+5. **单规则任务支持** `NUM_TRAIN_SAMPLES` 显式覆盖 和 `FRESH_TEST_PER_EVAL`（每 eval 从全状态空间抽 NUM_TEST_SAMPLES 个全新状态生成 OOD_LEN 窗口）。**mixed 也支持 `NUM_TRAIN_SAMPLES` 显式覆盖**（2026-09-10）：标量=每规则同样数量，列表=逐规则数量，设置后覆盖 `EXPOSURE_RATIOS`（旧键 `MIXED_AB_MAX_UNIQUE_RATIOS`）的反推。
 6. **batch_run 直接文件重定向**（不再管道转发）：杀编排器不会误杀训练进程。
-7. **action_trib task**（2026-09-10）：action 家族三阶版，`[x0 x1 x2 flag1 x3 flag2 x4 ...]` 逐位置插 flag，`x_k = a·x_{k-3}+b·x_{k-2}+c·x_{k-1}`。与 action 共用 `ActionDataset`/`_prepare_action`（新增 `order` 参数，默认 2 保持原行为逐样本一致），规则读 `ABC_PAIRS`。⚠ action 家族系数约定：第一个系数乘**最老**的值，与 `LinearRecurrenceRule` 相反（文档见 docs/recursion_model_and_training_settings.md §1.7）。attention 分析暂不支持 action_trib（batch_run 跳过，TODO）。
+7. **action_trib task**（2026-09-10，现为 action 场景的 order=3 兼容别名）：`[x0 x1 x2 flag1 x3 flag2 x4 ...]` 逐位置插 flag，`x_k = a·x_{k-3}+b·x_{k-2}+c·x_{k-1}`。与 action 共用 `ActionDataset`/`_prepare_action`（`order` 参数），旧 JSON 规则读 `ABC_PAIRS`（反向约定，归一化层反转；文档见 docs/recursion_model_and_training_settings.md §1.6）。attention 分析已按 order 参数化，action 家族全阶数可用。
 
 ## 4. 本机环境的坑（反复踩过）
 

@@ -22,6 +22,7 @@ description: 在本仓库（/mnt/workspace/hujiachen/recursion，模运算递推
 - 参考模板：`experiments/` 下现有 JSON。
 
 **命名约定**（从现有实验沿用，保证日志可分组成图）：
+- 新体系（2026-10-08 场景统一后）：`{scenario}_o{order}_...`（如 `single_o3_d1024l2_P127_tr64_miss0.1len1_seed17996`），seed 后缀规则不变（课程链 `@prev` 配对依赖）；旧 task 名（tribonacci/mixed_ab/action_trib 等）仍可跑（归一化层兼容），但新实验一律用场景名。
 - v1 制度：`{task}_d{D}l{L}r{R}h{H}_P{P}_tr{T}ood{O}_{N规则}_randmiss{prob}len{len}_seed{S}`
 - v2 命名（30万训练集/新鲜测试）：`action_v2_d{D}l{L}r{R}h{H}_P127_tr127_{N}_miss{prob}len{len}_seed{S}`（只是命名风格，输出目录与其他实验相同）
 
@@ -44,7 +45,7 @@ setsid nohup bash scripts/chain_rounds.sh experiments/<批次>.json <gpus> <roun
 - **6h 存盘**：`MAX_TRAIN_HOURS` 到点后写 `<model>_resume.pth`（含优化器/调度器/RNG），退出码 42，batch 标记 timed out。
 - **滚动 checkpoint**：每个 eval 点覆盖写 `<model>_latest.pth`（完整状态可续跑），best 更新时写 `<model>_best.pth`（纯权重）。意外死亡也能保住最佳权重和最新进度（2026-09-08 起）。
 - **手动关停保存**：对 core.py 进程 `kill <pid>`（SIGTERM）→ 下一个 eval 点存盘退出（码 42）。不要 kill -9（丢进度）。**教训：永远先等存盘/用 SIGTERM，不要在存盘点前强杀。**
-- **精度**：默认 fp32+TF32。bf16（`USE_AMP=true`）只能从零粗筛取阳性，续跑接近收敛的模型会摧毁它；结论性实验必须 fp32。细节见 `docs/AMP_PRECISION_NOTES.md`。
+- **精度**：恒为 fp32+TF32（AMP 代码路径已于 2026-10-08 随场景统一移除，`USE_AMP` 显式启用会报错）。历史教训仍有效：bf16 只能从零粗筛取阳性，续跑接近收敛的模型会摧毁它；结论性实验必须 fp32。细节见 `docs/AMP_PRECISION_NOTES.md`。
 - **曲线密度**：要画学习曲线就设 `EVAL_INTERVAL=1`（评估便宜）；默认 20 太稀。
 - 显存：bs2048 时 l2 已贴边（44GB 卡），l4 必须 `BATCH_SIZE=1024 + GRAD_ACCUM_STEPS=2`（等效 2048）。OOM 即照此处理。
 
