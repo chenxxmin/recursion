@@ -37,7 +37,7 @@ def request():
         LR=0.001, WEIGHT_DECAY=0, GRAD_CLIP_NORM=5,
         RESHUFFLE_EACH_EPOCH=True, MAX_TRAIN_HOURS=0,
         EVAL_INTERVAL=1, EARLY_STOP_ACCURACY=2.0,
-        SKIP_FINAL_GENERATION_TEST=True, OPT_DIAG_INTERVAL=1),
+        OPT_DIAG_INTERVAL=1),
         experiments=[dict(name='tiny_seed0', task='addition', config=dict(RANDOM_SEED=0)),
                      dict(name='tiny_seed1', task='addition', config=dict(RANDOM_SEED=1))])
 
@@ -214,7 +214,9 @@ def test_effective_data_counts():
     plan = pipeline.prepare(spec)
     e = plan['experiments'][0]
     with contextlib.redirect_stdout(io.StringIO()):
-        actual = _prepare_mixed_recurrence({'main': e['config']}, 'cpu', order=2)
+        from scenarios import normalize_task_config
+        actual = _prepare_mixed_recurrence({'main': e['config']}, 'cpu',
+                                           normalize_task_config('mixed_ab', e['config']))
     assert e['effective']['actual_train_samples']['total'] == len(actual['train_dataset']) == 57
     assert e['effective']['actual_test_samples']['total'] == len(actual['test_dataset']) == 90
     assert e['config']['NUM_TRAIN_SAMPLES'] == [14, 19, 24]
@@ -222,17 +224,15 @@ def test_effective_data_counts():
     spec['experiments'][0]['config'].update(FRESH_TEST_PER_EVAL=True, NUM_TEST_SAMPLES=7)
     e = pipeline.prepare(spec)['experiments'][0]
     with contextlib.redirect_stdout(io.StringIO()):
-        actual = _prepare_mixed_recurrence({'main': e['config']}, 'cpu', order=2)
+        from scenarios import normalize_task_config
+        actual = _prepare_mixed_recurrence({'main': e['config']}, 'cpu',
+                                           normalize_task_config('mixed_ab', e['config']))
         loader = actual['test_loader_fn']()
     assert e['effective']['actual_test_samples']['total'] == len(loader.dataset) == 21
     assert e['effective']['eval_base_length'] == 8
     spec['experiments'][0]['config']['USE_AB_TAG'] = True
-    e = pipeline.prepare(spec)['experiments'][0]
-    with contextlib.redirect_stdout(io.StringIO()):
-        actual = _prepare_mixed_recurrence({'main': e['config']}, 'cpu', order=2)
-        loader = actual['test_loader_fn']()
-    assert e['effective']['eval_sequence_tokens'] == len(loader.dataset[0][0]) == 8
-    assert any('rule tag' in note for note in e['effective']['notes'])
+    expect_failure(lambda: pipeline.prepare(spec), 'USE_AB_TAG')  # 已删除功能必须报错
+    del spec['experiments'][0]['config']['USE_AB_TAG']
     spec['experiments'][0]['config']['NUM_TRAIN_SAMPLES'] = 50
     expect_failure(lambda: pipeline.prepare(spec), 'per rule exceeds state space')
 
@@ -240,7 +240,8 @@ def test_effective_data_counts():
     spec['common']['DATA_MODE'] = 'full_split'
     e = pipeline.prepare(spec)['experiments'][0]
     with contextlib.redirect_stdout(io.StringIO()):
-        actual = _prepare_single_recurrence({'main': e['config']}, 'addition')
+        actual = _prepare_single_recurrence({'main': e['config']},
+                                            normalize_task_config('addition', e['config']))
     assert e['effective']['actual_test_samples'] == len(actual['test_dataset']) == 17
     assert e['effective']['eval_base_length'] == 6
     assert e['config']['FRESH_TEST_PER_EVAL'] is False

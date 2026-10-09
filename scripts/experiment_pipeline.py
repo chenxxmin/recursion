@@ -20,11 +20,10 @@ import tempfile
 REPO = Path(__file__).resolve().parents[1]
 SINGLE = {'addition': 2, 'multiplication': 2, 'nonlinear': 2,
           'nonlinear_mul': 2, 'tribonacci': 3, 'tetranacci': 4}
-TASKS = set(SINGLE) | {'mixed_ab', 'mixed_abc', 'action', 'action_trib'}
+TASKS = set(SINGLE) | {'mixed_ab', 'mixed_abc', 'action', 'action_trib',
+                       'single', 'mixed'}
 FALLBACKS = dict(NUM_TRAIN_SAMPLES=None, NUM_TEST_SAMPLES=256,
-                 MISSING_PROB=0.0, MISS_LEN=1, MISS_SECOND=False,
-                 PREDICT_MISSING=False, GRAD_ACCUM_STEPS=1,
-                 SKIP_FINAL_GENERATION_TEST=False)
+                 MISSING_PROB=0.0, MISS_LEN=1, GRAD_ACCUM_STEPS=1)
 SAFE_NAME = re.compile(r'[A-Za-z0-9][A-Za-z0-9_-]{0,159}\Z')
 SNAPSHOT = re.compile(r'<!-- PIPELINE_SNAPSHOT ([A-Za-z0-9+/=]+) -->')
 
@@ -99,28 +98,35 @@ def normalize(task, cfg, origins):
             'Use GRAD_CLIP_NORM=null for no clipping')
     require(not (cfg.get('INIT_FROM') and cfg.get('RESUME_FROM')),
             'INIT_FROM and RESUME_FROM cannot both be set')
+    sys.path.insert(0, str(REPO / 'src')) if str(REPO / 'src') not in sys.path else None
+    from scenarios import normalize_task_config
+    norm = normalize_task_config(task, cfg)
+    scenario = norm['scenario']
+    order = norm['order']
     notes = []
     positive_int(cfg['NUM_TEST_SAMPLES'], 'NUM_TEST_SAMPLES')
     positive_int(cfg['MISS_LEN'], 'MISS_LEN')
     require(isinstance(cfg['MISSING_PROB'], (int, float)) and 0 <= cfg['MISSING_PROB'] <= 1,
             'MISSING_PROB must be in [0, 1]')
-    if task in SINGLE:
-        order = SINGLE[task]
+    if scenario in SINGLE or scenario == 'single':
+        order = norm['order'] or SINGLE[scenario]
         mode = cfg['DATA_MODE']
         if mode is None:
             mode = 'sampled_fresh_test' if cfg['FRESH_TEST_PER_EVAL'] or cfg['STATE_SPACE_CAP'] is not None else 'full_split'
         require(mode in ('sampled_fresh_test', 'full_split'), 'Invalid DATA_MODE')
         derived('DATA_MODE', mode)
         derived('FRESH_TEST_PER_EVAL', mode == 'sampled_fresh_test')
+        exposure_scalar = (norm['exposure_ratios'] if norm['exposure_ratios'] is not None
+                           else cfg.get('MAX_UNIQUE_RATIO', 0.7))
         if cfg['NUM_TRAIN_SAMPLES'] is None:
             require(mode == 'full_split', 'sampled_fresh_test requires NUM_TRAIN_SAMPLES')
-            derived('NUM_TRAIN_SAMPLES', max(1, int(cfg['P'] ** order * cfg['MAX_UNIQUE_RATIO'])))
+            derived('NUM_TRAIN_SAMPLES', max(1, int(cfg['P'] ** order * exposure_scalar)))
         positive_int(cfg['NUM_TRAIN_SAMPLES'], 'NUM_TRAIN_SAMPLES')
         require(cfg['NUM_TRAIN_SAMPLES'] <= cfg['P'] ** order, 'Training count exceeds state space')
         if cfg['NUM_MASK'] is None:
             derived('NUM_MASK', order - 1)
         count = cfg['NUM_TRAIN_SAMPLES']
-        rules = [cfg[k] for k in 'ABCD'[:order]] if task in ('addition', 'tribonacci', 'tetranacci') else task
+        rules = (norm['rules'][0] if scenario == 'single' else task)
         if isinstance(rules, list):
             require(all(isinstance(c, int) and not isinstance(c, bool) for c in rules),
                     'Recurrence coefficients must be integers')
@@ -129,23 +135,18 @@ def normalize(task, cfg, origins):
         exposure = count / cfg['P'] ** order
         data_mode = mode
         train_tokens = cfg['TRAIN_LEN']
-    elif task.startswith('mixed_'):
-        order = 3 if task == 'mixed_abc' else 2
-        key = 'ABC_PAIRS' if order == 3 else 'AB_PAIRS'
-        rules = cfg.get(key)
-        require(isinstance(rules, list) and rules, key + ' must contain rules')
+    elif scenario == 'mixed':
+        rules = norm['rules']
+        require(isinstance(rules, list) and rules, 'RULES must contain rules')
         require(all(isinstance(p, list) and len(p) == order and
                     all(isinstance(c, int) and 0 <= c < cfg['P'] for c in p) for p in rules),
                 'Invalid recurrence coefficients')
         require(len({tuple(p) for p in rules}) == len(rules), 'Duplicate mixed rules')
-        cfg.setdefault('USE_AB_TAG', True)
-        origins.setdefault('USE_AB_TAG', '代码默认')
         if cfg['NUM_MASK'] is None:
-            derived('NUM_MASK', order if cfg['USE_AB_TAG'] else order - 1)
+            derived('NUM_MASK', order - 1)
         counts = cfg['NUM_TRAIN_SAMPLES']
         if counts is None:
-            ratios = cfg.get('MIXED_AB_MAX_UNIQUE_RATIOS', cfg['MAX_UNIQUE_RATIO'])
-            ratios = [ratios] * len(rules) if isinstance(ratios, (int, float)) else ratios
+            ratios = norm['exposure_ratios']
             require(len(ratios) == len(rules), 'Exposure ratios must match rule count')
             counts = [max(1, int(cfg['P'] ** order * r)) for r in ratios]
         elif isinstance(counts, int):
@@ -161,51 +162,41 @@ def normalize(task, cfg, origins):
         test_count = {'per_rule': per_rule_test, 'total': sum(per_rule_test)}
         exposure = [n / cfg['P'] ** order for n in counts]
         data_mode = 'full_split + fresh_test' if cfg['FRESH_TEST_PER_EVAL'] else 'full_split'
-        train_tokens = cfg['TRAIN_LEN'] + int(cfg['USE_AB_TAG'])
+        train_tokens = cfg['TRAIN_LEN']
         notes.append('mixed 的 NUM_TRAIN_SAMPLES 标量表示每规则数量；表中展开逐规则和总量。DATA_MODE/STATE_SPACE_CAP 不控制 mixed 数据生成。')
         convention = '第一个系数乘最新值'
     else:
-        order = 3 if task == 'action_trib' else 2
-        key = 'ABC_PAIRS' if order == 3 else 'AB_PAIRS'
-        rules = cfg.get(key)
+        rules = norm['rules']
         require(isinstance(rules, list) and rules and all(
             isinstance(p, list) and len(p) == order and all(isinstance(c, int) and 0 <= c < cfg['P'] for c in p)
             for p in rules), 'Invalid action rules')
         positive_int(cfg['NUM_TRAIN_SAMPLES'], 'NUM_TRAIN_SAMPLES')
         count = cfg['NUM_TRAIN_SAMPLES']
         notes.append('action 使用数据集的逐位置 loss_mask；NUM_MASK 配置不参与 loss。')
-        require(not cfg['MISS_SECOND'], 'MISS_SECOND is unsupported for action tasks')
-        convention = '第一个系数乘最老值；flag 在每一步选择规则'
+        convention = 'RULES 为 canonical（第一个系数乘最新值）；旧 AB_PAIRS/ABC_PAIRS 约定相反，归一化层已反转；flag 在每一步选择规则'
         test_count = cfg['NUM_TEST_SAMPLES']
         exposure = 'action 动态生成；规则逐步随机选择，无固定每规则样本配额'
         data_mode = 'generated + fresh_test' if cfg['FRESH_TEST_PER_EVAL'] else 'generated + fixed_test'
         train_tokens = 2 * cfg['TRAIN_LEN'] - order
     require(cfg['TRAIN_LEN'] > order and cfg['OOD_LEN'] > order, 'Sequence lengths must exceed recurrence order')
-    if not task.startswith('action'):
+    if scenario != 'action':
         require(isinstance(cfg['NUM_MASK'], int) and 0 <= cfg['NUM_MASK'] < cfg['TRAIN_LEN'] - 1,
                 'NUM_MASK leaves no evaluated positions or is invalid')
     if cfg['MAX_TRAIN_HOURS'] is not None:
         notes.append('每条实验独立计时，从训练循环开始；每 ' + str(cfg['EVAL_INTERVAL']) +
                      ' epoch 的评估点检查，到时保存完整存档退出，可能超过名义时限；不改变 cosine horizon。')
-    if cfg['USE_AMP']:
-        notes.append('精度为 AMP/' + cfg['AMP_DTYPE'] + '；需在确认表中明确接受该精度。')
-    eval_len = cfg['OOD_LEN'] if cfg['FRESH_TEST_PER_EVAL'] or task.startswith('action') else cfg['TRAIN_LEN']
-    # The current mixed fresh-test closure returns untagged windows, even
-    # when training prepends a rule tag. Report the actual code behavior.
-    eval_tag = task.startswith('mixed_') and cfg.get('USE_AB_TAG', False) and not cfg['FRESH_TEST_PER_EVAL']
-    eval_tokens = 2 * eval_len - order if task.startswith('action') else eval_len + int(eval_tag)
-    if task.startswith('mixed_') and cfg.get('USE_AB_TAG', False) and cfg['FRESH_TEST_PER_EVAL']:
-        notes.append('当前代码的 mixed fresh test 未前置 rule tag，训练与测试 token 布局不一致；正式采用该组合前应先修复代码并重新审阅。')
-    max_tokens = (2 * max(cfg['TRAIN_LEN'], cfg['OOD_LEN']) - order if task.startswith('action') else
-                  max(cfg['TRAIN_LEN'], cfg['OOD_LEN']) + int(task.startswith('mixed_') and cfg.get('USE_AB_TAG', False)))
+    eval_len = cfg['OOD_LEN'] if cfg['FRESH_TEST_PER_EVAL'] or scenario == 'action' else cfg['TRAIN_LEN']
+    eval_tokens = 2 * eval_len - order if scenario == 'action' else eval_len
+    max_tokens = (2 * max(cfg['TRAIN_LEN'], cfg['OOD_LEN']) - order if scenario == 'action' else
+                  max(cfg['TRAIN_LEN'], cfg['OOD_LEN']))
     notes.append('静态测试在达到 EARLY_STOP_ACCURACY 时停止；fresh test 在最近 10 次评估均值超过阈值时停止。EARLY_STOP_EXTRA_EPOCHS 已废弃，不生效。')
-    notes.append('正常完成后沿用代码中的 final generation（除非 SKIP_FINAL_GENERATION_TEST=true）和 attention 分析；存档退出码 42 跳过这些后处理。定时约束训练循环。')
+    notes.append('训练结束不再跑 final generation test（2026-10-08 删除）；结果口径 = 训练日志 best acc + eval_clean_action.py。正常完成后跑 attention 分析；存档退出码 42 跳过后处理。')
     return dict(actual_train_samples=count, actual_test_samples=test_count,
                 recurrence_order=order, effective_data_mode=data_mode, train_exposure=exposure,
                 train_sequence_tokens=train_tokens, eval_base_length=eval_len,
                 eval_sequence_tokens=eval_tokens, block_size=2 ** (max_tokens - 1).bit_length(),
                 rules=rules, coefficient_convention=convention,
-                actual_num_mask='数据集 loss_mask' if task.startswith('action') else cfg['NUM_MASK'],
+                actual_num_mask='数据集 loss_mask' if scenario == 'action' else cfg['NUM_MASK'],
                 initialization='resume' if cfg.get('RESUME_FROM') else 'weights_only' if cfg.get('INIT_FROM') else 'fresh',
                 optimizer='AdamW', scheduler='CosineAnnealingLR', scheduler_T_max=cfg['EPOCHS'],
                 output_path='<output>/models/<experiment>/<experiment>.pth', notes=notes)

@@ -1,7 +1,7 @@
 """Curriculum chain scheduler: warm-start N=2 -> N=3 -> N=4 -> N=5.
 
 For each scale chain, serially:
-  stage N: train mixed_ab on rules[:N] with INIT_FROM = previous stage's
+  stage N: train mixed on rules[:N] with INIT_FROM = previous stage's
   best checkpoint; success = best test acc >= --threshold; on success the
   stage's checkpoint becomes the next stage's donor; on failure the chain
   stops.
@@ -125,18 +125,18 @@ def run_stage(scale, n, donor, donor_seed, gpu):
     save_path = os.path.join(MODEL_DIR, f'{name}.pth')
     base = json.load(open(os.path.join(REPO, 'src', 'config.json')))
     override = {
-        'TASK': 'mixed_ab',
+        'TASK': 'mixed', 'ORDER': 2, 'RULES': RULES[:n],
+        'EXPOSURE_RATIOS': [0.7] * n,
         'RANDOM_SEED': donor_seed, 'P': P, 'D_MODEL': cfg['d'],
         'N_LAYER': cfg['l'], 'N_HEAD': cfg['h'], 'MLP_RATIO': 8,
-        'AB_PAIRS': RULES[:n],
-        'MIXED_AB_MAX_UNIQUE_RATIOS': [0.7] * n,
-        'USE_AB_TAG': False, 'USE_CONDITIONAL_WTE': False, 'NUM_MASK': 2,
+        # 历史课程实验用 NUM_MASK=2（tag 时代的默认），显式保留以维持可比性
+        'NUM_MASK': 2,
         'INIT_FROM': donor, 'SAVE_PATH': save_path,
     }
     from protocol import BATCH_RUN_MERGED_FLAG
     merged = dict(base)
     merged_main = dict(base.get('main', {}))
-    merged_main.update(base.get('mixed_ab', {}))
+    merged_main.update(base.get('mixed', {}))
     merged_main.update(override)
     merged['main'] = merged_main
     merged[BATCH_RUN_MERGED_FLAG] = True

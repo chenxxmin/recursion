@@ -79,12 +79,12 @@ def run_stage(seed, tag, pairs, donor, gpu):
     save_path = os.path.join(MODEL_DIR, f'{name}.pth')
     base = json.load(open(os.path.join(REPO, 'src', 'config.json')))
     override = {
-        'TASK': 'mixed_ab',
+        'TASK': 'mixed', 'ORDER': 2, 'RULES': pairs,
+        'EXPOSURE_RATIOS': [0.7] * len(pairs),
         'RANDOM_SEED': seed, 'P': P, 'D_MODEL': D_MODEL,
         'N_LAYER': N_LAYER, 'N_HEAD': N_HEAD, 'MLP_RATIO': MLP_RATIO,
-        'AB_PAIRS': pairs,
-        'MIXED_AB_MAX_UNIQUE_RATIOS': [0.7] * len(pairs),
-        'USE_AB_TAG': False, 'USE_CONDITIONAL_WTE': False, 'NUM_MASK': 2,
+        # 历史课程实验用 NUM_MASK=2（tag 时代的默认），显式保留以维持可比性
+        'NUM_MASK': 2,
         'SAVE_PATH': save_path, 'MAX_TRAIN_HOURS': 6,
     }
     if donor:
@@ -92,7 +92,7 @@ def run_stage(seed, tag, pairs, donor, gpu):
     from protocol import BATCH_RUN_MERGED_FLAG
     merged = dict(base)
     merged_main = dict(base.get('main', {}))
-    merged_main.update(base.get('mixed_ab', {}))
+    merged_main.update(base.get('mixed', {}))
     merged_main.update(override)
     merged['main'] = merged_main
     merged[BATCH_RUN_MERGED_FLAG] = True

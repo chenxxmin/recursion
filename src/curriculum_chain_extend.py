@@ -4,7 +4,7 @@ Rules 6-10 continue the (i, 2i-1) pattern: (6,11),(7,13),(8,15),(9,17),(10,19).
 Donors are the completed N5 checkpoints of the original forward chains.
 Stage N warm-starts from stage N-1's checkpoint (INIT_FROM); success =
 best test acc >= 0.95, otherwise the chain stops. Same training regime as
-the original chains (see REPRODUCE_l2d512r8h4_chain.md): mixed_ab, P=127,
+the original chains (see REPRODUCE_l2d512r8h4_chain.md): mixed, P=127,
 r8, e0.7, NUM_MASK=2, online missing 0.1/len1, TRAIN_LEN=16.
 
 Logs:   /data/cxm/recursion/mixed_ab/curriculum/curriculum_chains_extend/logs/
@@ -86,18 +86,18 @@ def run_stage(scale, tag, pairs, donor, seed, gpu):
     save_path = os.path.join(MODEL_DIR, f'{name}.pth')
     base = json.load(open(os.path.join(REPO, 'src', 'config.json')))
     override = {
-        'TASK': 'mixed_ab',
+        'TASK': 'mixed', 'ORDER': 2, 'RULES': pairs,
+        'EXPOSURE_RATIOS': [0.7] * len(pairs),
         'RANDOM_SEED': seed, 'P': P, 'D_MODEL': cfg['d'],
         'N_LAYER': cfg['l'], 'N_HEAD': N_HEAD, 'MLP_RATIO': MLP_RATIO,
-        'AB_PAIRS': pairs,
-        'MIXED_AB_MAX_UNIQUE_RATIOS': [0.7] * len(pairs),
-        'USE_AB_TAG': False, 'USE_CONDITIONAL_WTE': False, 'NUM_MASK': 2,
+        # 历史课程实验用 NUM_MASK=2（tag 时代的默认），显式保留以维持可比性
+        'NUM_MASK': 2,
         'INIT_FROM': donor, 'SAVE_PATH': save_path, 'MAX_TRAIN_HOURS': 6,
     }
     from protocol import BATCH_RUN_MERGED_FLAG
     merged = dict(base)
     merged_main = dict(base.get('main', {}))
-    merged_main.update(base.get('mixed_ab', {}))
+    merged_main.update(base.get('mixed', {}))
     merged_main.update(override)
     merged['main'] = merged_main
     merged[BATCH_RUN_MERGED_FLAG] = True
