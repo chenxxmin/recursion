@@ -18,7 +18,10 @@ from torch.utils.data import DataLoader
 
 from rules import rules_from_config, single_rule_from_task, save_config_extra
 from protocol import BATCH_RUN_MERGED_FLAG
-from models import FibonacciTransformer, MixedABTransformer
+# MixedABTransformer was deleted (Task 4); _prepare_mixed_recurrence still
+# references it at call time and is repaired in Task 7. Dropped from the import
+# here so the module stays importable for _load_partial_checkpoint.
+from models import FibonacciTransformer
 from datasets import (RecurrenceDataset, MixedRecurrenceDataset,
                       ActionDataset, BucketBatchSampler,
                       collate_fn, make_missing_collate,

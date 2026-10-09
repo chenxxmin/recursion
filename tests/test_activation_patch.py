@@ -13,8 +13,7 @@ from activation_patch import (generate_paired_samples, rule_targets,
 
 def make_model(seed=0):
     torch.manual_seed(seed)
-    return models.MixedABTransformer(
-        num_ab_pairs=2, use_ab_tag=False, order=2,
+    return models.FibonacciTransformer(
         p=11, d_model=32, n_head=2, n_layer=2, block_size=32,
         mlp_ratio=4).eval()
 

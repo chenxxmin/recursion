@@ -11,7 +11,7 @@ sys.path.insert(0, os.path.join(os.path.dirname(os.path.abspath(__file__)), '..'
 import torch
 
 from experiment import _load_partial_checkpoint
-from models import FibonacciTransformer, MixedABTransformer
+from models import FibonacciTransformer
 
 
 def test_load_partial_checkpoint():
@@ -23,23 +23,22 @@ def test_load_partial_checkpoint():
                     'config': {'p': p, 'a': 1, 'b': 1, 'recurrence': 'addition'}}, ckpt)
 
         torch.manual_seed(123)
-        dst = MixedABTransformer(num_ab_pairs=2, order=2, p=p, d_model=32, n_head=1,
-                                 n_layer=1, block_size=32, use_ab_tag=False)
-        rule_head_before = dst.rule_head[0].weight.detach().clone()
+        # action 式词表扩展模型：wte/lm_head 形状不同，必须被跳过
+        dst = FibonacciTransformer(p=p, d_model=32, n_head=1, n_layer=1,
+                                   block_size=32, vocab_size=p + 3,
+                                   pad_token_id=p)
+        wte_before = dst.transformer.wte.weight.detach().clone()
 
         buf = io.StringIO()
         with contextlib.redirect_stdout(buf):
             _load_partial_checkpoint(dst, ckpt, 'cpu')
         out = buf.getvalue()
 
-        # shared tensors copied, rule_head untouched (still its own fresh init)
-        assert torch.equal(dst.transformer.wte.weight, src.transformer.wte.weight)
+        # 同形同名的 backbone 权重被拷贝；形状不符的 wte/lm_head 保持初始化
         assert torch.equal(dst.transformer.h[0].attn.c_attn.weight,
                            src.transformer.h[0].attn.c_attn.weight)
-        assert torch.equal(dst.rule_head[0].weight, rule_head_before)
-        # source (single-rule model) is a strict subset of the target: all its
-        # tensors load, nothing is skipped
-        assert 'loaded' in out and 'skipped 0' in out
+        assert torch.equal(dst.transformer.wte.weight, wte_before)
+        assert 'loaded' in out and 'skipped' in out
 
 
 def _tiny_chain(tmpdir, gate):
