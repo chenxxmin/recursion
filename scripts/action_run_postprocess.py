@@ -12,6 +12,40 @@ import torch
 sys.path.insert(0, str(Path(__file__).resolve().parents[1] / 'src'))
 
 
+def _legacy_task_for(pairs):
+    """action-convention coefficient rows -> (legacy task name, config key)."""
+    return ('action', 'AB_PAIRS') if len(pairs[0]) == 2 else ('action_trib', 'ABC_PAIRS')
+
+
+def _canonical_rules_from_save_config(sc):
+    """Checkpoint save_config -> canonical rules.
+
+    No reversal here: new checkpoints already carry canonical 'rules'; legacy
+    'ab_pairs' are translated by scenarios.normalize_task_config, whose
+    _legacy_rules owns the action-convention reversal.
+    """
+    if sc.get('rules'):
+        return [list(map(int, r)) for r in sc['rules']]
+    pairs = [list(p) for p in sc['ab_pairs']]
+    task, key = _legacy_task_for(pairs)
+    from scenarios import normalize_task_config
+    return normalize_task_config(task, {'P': sc['p'], key: pairs})['rules']
+
+
+def _canonical_rules_from_experiment_config(cfg):
+    """Experiment config (main section) -> canonical rules.
+
+    Legacy AB_PAIRS/ABC_PAIRS are action-convention; the normalization layer
+    reverses them internally, so the comparison stays canonical-vs-canonical.
+    """
+    if cfg.get('RULES') is not None:
+        return [list(map(int, r)) for r in cfg['RULES']]
+    pairs = cfg.get('ABC_PAIRS') or cfg['AB_PAIRS']
+    task, _ = _legacy_task_for(pairs)
+    from scenarios import normalize_task_config
+    return normalize_task_config(task, cfg)['rules']
+
+
 def load_full(path, cfg=None):
     state = torch.load(path, map_location='cpu', weights_only=False)
     required = {'model_state_dict', 'optimizer_state_dict', 'scheduler_state_dict',
@@ -26,9 +60,8 @@ def load_full(path, cfg=None):
                            ('MISS_LEN', 'miss_len'), ('MISSING_PROB', 'missing_prob')]:
             if cfg[key] != sc[saved]:
                 raise ValueError('Resume config mismatch: ' + key)
-        saved_pairs = ([list(reversed(r)) for r in sc['rules']] if sc.get('rules')
-                       else [list(p) for p in sc['ab_pairs']])
-        if saved_pairs != [list(p) for p in cfg['AB_PAIRS']]:
+        if (_canonical_rules_from_save_config(sc)
+                != _canonical_rules_from_experiment_config(cfg)):
             raise ValueError('Resume rules mismatch')
         if sc.get('reshuffle_each_epoch', False) != cfg['RESHUFFLE_EACH_EPOCH']:
             raise ValueError('Resume sampler mismatch')

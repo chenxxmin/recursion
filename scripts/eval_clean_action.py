@@ -87,14 +87,19 @@ def build_model(sc):
         'NUM_TEST_SAMPLES': 8,
     })
     if sc.get('rules'):  # 新块优先（canonical）
+        task = 'action'
         mm['ORDER'] = sc['order']
         mm['RULES'] = [list(r) for r in sc['rules']]
-    else:                # 旧 checkpoint：action 约定的 ab_pairs，归一化层负责反转
-        mm['AB_PAIRS'] = [list(pair) for pair in sc['ab_pairs']]
+    else:                # 旧 checkpoint：action 约定的 ab_pairs，按行长度区分
+                         # order-2/3，归一化层负责反转
+        rows = [list(pair) for pair in sc['ab_pairs']]
+        task, key = ('action', 'AB_PAIRS') if len(rows[0]) == 2 \
+            else ('action_trib', 'ABC_PAIRS')
+        mm[key] = rows
     cfg = dict(base)
     cfg['main'] = mm
     cfg['_BATCH_RUN_MERGED'] = True
-    return experiment._prepare_action(cfg, normalize_task_config('action', mm))
+    return experiment._prepare_action(cfg, normalize_task_config(task, mm))
 
 
 def main():
