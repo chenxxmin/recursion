@@ -40,18 +40,18 @@ SCRIPT_DIR = os.path.dirname(os.path.abspath(__file__))
 if SCRIPT_DIR not in sys.path:
     sys.path.insert(0, SCRIPT_DIR)
 
-import models
 from analyze_attention import load_model, _forward_per_layer, HEADER_WIDTH
+from rules import task_from_save_config
 
 
-def extract_hidden_after_attention(model, input_ids, ab_label=None):
+def extract_hidden_after_attention(model, input_ids):
     """Return per-layer post-attention residuals from the shared manual forward.
 
     input_ids: (B, T). Returns a list with one (B, T, d) tensor per layer,
     each the residual stream right after x = x + attn(ln_1(x)).
     """
     return [layer['hidden_post_attn']
-            for layer in _forward_per_layer(model, input_ids, ab_label=ab_label)]
+            for layer in _forward_per_layer(model, input_ids)]
 
 
 def _held_out_coherence(H, k_star):
@@ -206,10 +206,9 @@ def main():
     config = checkpoint['config']
     p = config['p']
 
-    if isinstance(model, models.MixedABTransformer):
-        print("[Warning] verify_circle targets single-recurrence checkpoints; "
-              "mixed_ab models have rule tokens in the input layout and the "
-              "results will not be meaningful.")
+    if task_from_save_config(checkpoint['config']) is None:
+        print("[Warning] verify_circle targets single-rule checkpoints; "
+              "mixed/action checkpoints are not meaningful here.")
 
     print("=" * HEADER_WIDTH)
     print(f"Circle structure verification: {os.path.basename(args.pth_path)}")

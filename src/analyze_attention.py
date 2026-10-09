@@ -37,21 +37,23 @@ def load_model(pth_path, device='cpu'):
     checkpoint = torch.load(pth_path, map_location=device)
     config = checkpoint['config']
     # Filter out params not accepted by FibonacciTransformer (e.g. a, b)
-    valid_keys = {'p', 'd_model', 'n_head', 'n_layer', 'block_size', 'dropout', 'use_learnable_pe', 'mlp_ratio', 'vocab_size', 'pad_token_id', 'cond_wte_shared_ratio'}
-    # backward compat: old checkpoints saved 'recurrence' or 'a','b' in config
+    valid_keys = {'p', 'd_model', 'n_head', 'n_layer', 'block_size', 'dropout', 'mlp_ratio', 'vocab_size', 'pad_token_id'}
     filtered_config = {k: v for k, v in config.items() if k in valid_keys}
-    
-    # backward compat: old checkpoints without use_learnable_pe, infer from state_dict keys.
-    # The two position-encoding schemes leave different fingerprints in the checkpoint:
-    # learnable PE (or its alibi variant) stores per-position parameters ('alibi_slopes'),
-    # while RoPE registers its frequency table as a buffer ('rope.inv_freq').
+
     state_keys = set(checkpoint['model_state_dict'].keys())
-    if 'use_learnable_pe' not in filtered_config:
-        if any('alibi_slopes' in k for k in state_keys):
-            filtered_config['use_learnable_pe'] = True
-        elif any('rope.inv_freq' in k for k in state_keys):
-            filtered_config['use_learnable_pe'] = False
-    
+
+    # 旧 MixedABTransformer / 可学习 PE checkpoint：架构已删除，明确报错而不是
+    # 让 load_state_dict 以 mismatch 崩在半截。
+    if any('rule_head' in k or 'cond_wte' in k or 'ab_emb' in k for k in state_keys):
+        raise RuntimeError(
+            f"{pth_path} 是旧 MixedABTransformer checkpoint（state_dict 含 "
+            f"rule_head/cond_wte/ab_emb 键）；该架构已在 2026-10-08 场景统一中删除。"
+            f"请用重构前的代码分析，或用新代码重训。")
+    if any(k.endswith('wpe.weight') for k in state_keys) or config.get('use_learnable_pe'):
+        raise RuntimeError(
+            f"{pth_path} 使用已删除的可学习位置编码（wpe/USE_LEARNABLE_PE）；"
+            f"RoPE 现在是唯一位置编码。请用重构前的代码分析。")
+
     # backward compat: old checkpoints without mlp_ratio, infer from first MLP weight shape
     if 'mlp_ratio' not in filtered_config:
         for k in state_keys:
@@ -60,64 +62,25 @@ def load_model(pth_path, device='cpu'):
                 if in_dim > 0:
                     filtered_config['mlp_ratio'] = out_dim // in_dim
                 break
-    
-    # Detect MixedABTransformer checkpoint and instantiate accordingly
-    if any('ab_emb' in k or 'rule_head' in k or 'cond_wte' in k for k in state_keys):
-        num_ab_pairs = len(config.get('ab_pairs', [])) if config.get('ab_pairs') else 1
-        mixedab_config = dict(filtered_config)
-        mixedab_config['use_ab_tag'] = config.get('use_ab_tag', True)
-        mixedab_config['use_conditional_wte'] = config.get('use_conditional_wte', any('cond_wte' in k for k in state_keys))
-        mixedab_config['cond_wte_shared_ratio'] = config.get('cond_wte_shared_ratio', 0.0)
-        mixedab_config['order'] = config.get('order', 2)
-        model = models.MixedABTransformer(num_ab_pairs=num_ab_pairs, **mixedab_config)
-    else:
-        model = models.FibonacciTransformer(**filtered_config)
+
+    model = models.FibonacciTransformer(**filtered_config)
     model.load_state_dict(checkpoint['model_state_dict'])
     model = model.to(device)
     model.eval()
     return model, checkpoint
 
 
-def _build_input_embedding(model, input_ids, ab_label=None):
+def _build_input_embedding(model, input_ids):
+    """Build the input embedding used by the model during forward pass.
+
+    Only the standard wte path remains: conditional WTE (MixedABTransformer)
+    and learnable position embeddings (wpe) were removed 2026-10-08, and
+    load_model rejects checkpoints of those architectures up front.
     """
-    Build the input embedding used by the model during forward pass.
-
-    Handles standard wte, learnable position embeddings, and conditional WTE
-    (used by MixedABTransformer in cond_wte mode).
-    """
-    device = input_ids.device
-    b, t = input_ids.size()
-
-    if getattr(model, 'use_conditional_wte', False):
-        if ab_label is None:
-            # Default to the first rule. For attention analysis the rule choice
-            # only affects which conditional embedding segment is used.
-            ab_label = torch.zeros(b, dtype=torch.long, device=device)
-        tok_emb = torch.zeros(b, t, model.d_model, device=device)
-        shared_size = model.cond_wte_shared_size
-        shared_mask = (input_ids < shared_size)
-        if shared_mask.any():
-            tok_emb[shared_mask] = model.cond_wte(input_ids[shared_mask])
-        rule_mask = ~shared_mask
-        if rule_mask.any():
-            rule_idx = input_ids[rule_mask] - shared_size
-            shifted_rule_idx = (
-                rule_idx
-                + ab_label.unsqueeze(1).expand(b, t)[rule_mask] * model.cond_wte_rule_size
-                + shared_size
-            )
-            tok_emb[rule_mask] = model.cond_wte(shifted_rule_idx)
-    else:
-        tok_emb = model.transformer.wte(input_ids)
-
-    if getattr(model, 'wpe', None) is not None:
-        pos = torch.arange(0, t, dtype=torch.long, device=device)
-        tok_emb = tok_emb + model.wpe(pos)
-
-    return model.transformer.drop(tok_emb)
+    return model.transformer.drop(model.transformer.wte(input_ids))
 
 
-def get_attention_weights(model, input_ids, ab_label=None):
+def get_attention_weights(model, input_ids):
     """
     Manually compute attention map for each layer and head given input.
 
@@ -125,11 +88,11 @@ def get_attention_weights(model, input_ids, ab_label=None):
     """
     # extract_qk_raw_scores runs the same manual forward pass and its
     # 'attn_weights' field is exactly this function's output.
-    layer_outputs = extract_qk_raw_scores(model, input_ids, ab_label=ab_label)
+    layer_outputs = extract_qk_raw_scores(model, input_ids)
     return [layer['attn_weights'] for layer in layer_outputs]
 
 
-def _forward_per_layer(model, input_ids, ab_label=None):
+def _forward_per_layer(model, input_ids):
     """Single-source manual forward pass for analysis scripts.
 
     Replays the model layer by layer (LN -> QKV -> RoPE -> causal mask ->
@@ -140,7 +103,7 @@ def _forward_per_layer(model, input_ids, ab_label=None):
         - 'hidden_post_attn': (B, T, C) residual stream right after attention
     Tensors keep the batch dimension and stay on the model's device.
     """
-    x = _build_input_embedding(model, input_ids, ab_label=ab_label)
+    x = _build_input_embedding(model, input_ids)
 
     layer_outputs = []
 
@@ -188,7 +151,7 @@ def _forward_per_layer(model, input_ids, ab_label=None):
     return layer_outputs
 
 
-def extract_qk_raw_scores(model, input_ids, ab_label=None):
+def extract_qk_raw_scores(model, input_ids):
     """
     Extract Q, K and raw QK scores (before softmax) for each layer.
 
@@ -199,7 +162,7 @@ def extract_qk_raw_scores(model, input_ids, ab_label=None):
         - 'attn_weights': (n_head, T, T), attention after softmax
     """
     return [{key: layer[key][0].detach().cpu() for key in ('q', 'k', 'raw_scores', 'attn_weights')}
-            for layer in _forward_per_layer(model, input_ids, ab_label=ab_label)]
+            for layer in _forward_per_layer(model, input_ids)]
 
 
 def summarize_attention_for_sequence(model, seq, query_mask=None):
@@ -388,27 +351,27 @@ def _resolve_recurrence(config):
       init_len:         number of initial values the recurrence needs
       next_val:         callable seq -> next value (None for action/mixed)
       is_action:        whether the rule can change at every step
-      ab_pairs, flag_start_id, action_seq_len: only for action
-      is_mixed, rules, order, use_ab_tag: only for mixed_ab/mixed_abc
+      ab_pairs, flag_start_id, action_seq_len, order: only for action
+      is_mixed, rules, order: only for mixed_ab/mixed_abc
         (mixed checkpoints save ab_pairs + order and no 'recurrence' key)
     """
     p = config['p']
     recurrence = config.get('recurrence', 'addition')
 
-    if recurrence in ('action', 'dynamic_mixed'):
-        print(f"Model config: action, ab_pairs={config['ab_pairs']}, p={p}")
-        return {'init_len': 2, 'is_action': True, 'next_val': None,
+    if recurrence in ('action', 'dynamic_mixed') or config.get('scenario') == 'action':
+        order = config.get('order') or len(config['ab_pairs'][0])
+        print(f"Model config: action order-{order}, ab_pairs={config['ab_pairs']}, p={p}")
+        return {'init_len': order, 'is_action': True, 'next_val': None, 'order': order,
                 'ab_pairs': config['ab_pairs'], 'flag_start_id': p + 1,
-                'action_seq_len': config.get('train_len') or config.get('ood_len', 32)}
-    if 'ab_pairs' in config and 'order' in config:
+                'action_seq_len': config.get('train_len') or config.get('ood_len', 16)}
+    if ('ab_pairs' in config and 'order' in config) or config.get('scenario') == 'mixed':
         # mixed_ab / mixed_abc checkpoint: one analysis per rule (see
         # _analyze_mixed_rules); there is no single next_val.
         order = config['order']
         rules = [tuple(pair) for pair in config['ab_pairs']]
-        use_tag = config.get('use_ab_tag', False)
-        print(f"Model config: mixed order-{order}, rules={rules}, p={p}, use_ab_tag={use_tag}")
+        print(f"Model config: mixed order-{order}, rules={rules}, p={p}")
         return {'init_len': order, 'is_action': False, 'is_mixed': True,
-                'next_val': None, 'rules': rules, 'order': order, 'use_ab_tag': use_tag}
+                'next_val': None, 'rules': rules, 'order': order, 'use_ab_tag': False}
     # Single-rule checkpoint (addition/multiplication/tribonacci/nonlinear/
     # nonlinear_mul, including old a/b-only or minimal configs defaulting to
     # addition).
@@ -419,32 +382,29 @@ def _resolve_recurrence(config):
             'next_val': lambda seq: next_fn(seq, p)}
 
 
-def _make_action_seq(p, ab_pairs, flag_start_id, length, seed):
-    """Generate one action sequence: [x1, x2, flag_3, x3, ..., flag_L, x_L]."""
+def _make_action_seq(p, ab_pairs, flag_start_id, length, seed, order=2):
+    """Generate one action sequence: [x1..x_order, flag, x_{order+1}, ..., flag, x_L]."""
     return datasets.generate_action_sample(p, ab_pairs, flag_start_id, length,
-                                           random.Random(seed))
+                                           random.Random(seed), order=order)
 
 
-def _make_action_query_mask(length):
-    # Attention matrix is over the input sequence, which has length 2*length - 2.
-    # Valid prediction queries for x_k are the input positions of x_{k-1} and flag_k
-    # immediately preceding x_k. For x3 (k=3), x3 is at input index 3 (0-based),
-    # so we use input position 3 as the query for predicting x3.
-    # General: x_k is at input index 2*(k-1) - 1, so the query position is 2*(k-1) - 1.
-    total_len = 2 * length - 2
+def _make_action_query_mask(length, order=2):
+    # Attention matrix is over the input sequence, length 2*length - order.
+    # x_k (k > order) sits at input index 2*(k-1) - order + 1; consistent with
+    # the legacy order-2 layout (query 2*(k-1)-1), we analyze that row.
+    total_len = 2 * length - order
     mask = [0] * total_len
-    for k in range(3, length + 1):
-        query_pos = 2 * (k - 1) - 1
-        mask[query_pos] = 1
+    for k in range(order + 1, length + 1):
+        mask[2 * (k - 1) - order + 1] = 1
     return mask
 
 
 def _make_mixed_seq(p, coeffs, rule_idx, n_rules, order, use_ab_tag, length, config):
     """Generate one mixed-task sequence following a single rule.
 
-    Mirrors MixedRecurrenceDataset's sample layout: missing-value corruption
-    (when configured) is applied first, then the flag token p + rule_idx is
-    prepended in tag mode.
+    Mirrors MixedRecurrenceDataset's sample layout (basic mode: no leading
+    flag token); missing-value corruption (when configured) uses the missing
+    token p, same as the training collate.
     """
     rule = LinearRecurrenceRule(coeffs=tuple(coeffs), p=p)
     next_fn = rule.next_fn()
@@ -456,11 +416,8 @@ def _make_mixed_seq(p, coeffs, rule_idx, n_rules, order, use_ab_tag, length, con
         datasets.corrupt_window(window, True, p=p, init_len=order,
                                 missing_prob=config['missing_prob'],
                                 miss_len=config.get('miss_len', 1),
-                                miss_second=config.get('miss_second', False),
-                                missing_token=datasets.missing_token_id(config, p, is_mixed=True))
+                                missing_token=p)
         seq = window.tolist()
-    if use_ab_tag:
-        seq = [p + rule_idx] + seq
     return rule.name, seq
 
 
@@ -528,8 +485,8 @@ def analyze_model_attention(pth_path, device=None, log_path=None):
     # (QK property verification was removed; use verify_circle.py instead.)
     if rec['is_action']:
         test_seq = _make_action_seq(p, rec['ab_pairs'], rec['flag_start_id'],
-                                    rec['action_seq_len'], seed=0)
-        query_mask = _make_action_query_mask(rec['action_seq_len'])
+                                    rec['action_seq_len'], seed=0, order=rec['order'])
+        query_mask = _make_action_query_mask(rec['action_seq_len'], order=rec['order'])
     else:
         # In-distribution length only (train_len); old checkpoints without it
         # fall back to block_size.
@@ -540,21 +497,16 @@ def analyze_model_attention(pth_path, device=None, log_path=None):
         # Missing-value experiments: corrupt the analysis input with the same
         # rule as the dataset (RecurrenceDataset._corrupt).
         if config.get('missing_prob', 0.0) > 0:
-            n_rules = len(config.get('ab_pairs') or [1])
-            use_tag = config.get('use_ab_tag', False)
-            missing_token = p + n_rules if use_tag else p
             helper = datasets.RecurrenceDataset(
                 p=p, init_len=rec['init_len'], length=len(test_seq), verbose=False,
                 missing_prob=config['missing_prob'],
                 miss_len=config.get('miss_len', 1),
-                miss_second=config.get('miss_second', False),
-                missing_token=missing_token)
+                missing_token=p)
             window = torch.tensor(test_seq, dtype=torch.long)
             helper._corrupt(window, True)
             test_seq = window.tolist()
             print(f"Missing-value corruption applied to the analysis input: "
-                  f"prob={config['missing_prob']}, miss_len={config.get('miss_len', 1)}, "
-                  f"miss_second={config.get('miss_second', False)}")
+                  f"prob={config['missing_prob']}, miss_len={config.get('miss_len', 1)}")
         query_mask = None
 
     # Attention visualization uses this single sequence

@@ -63,7 +63,13 @@ def load_checkpoint(path):
 
 
 def build_model(sc):
-    """Rebuild the exact model via the repo's own prepare path (MISSING_PROB=0)."""
+    """Rebuild the exact model via the repo's own prepare path (MISSING_PROB=0).
+
+    order comes from the checkpoint's new block first ('order'), then from the
+    legacy ab_pairs row length. New checkpoints carry canonical 'rules'; older
+    ones only the action-convention 'ab_pairs'.
+    """
+    from scenarios import normalize_task_config
     base = json.load(open(os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))),
                                        'src', 'config.json')))
     mm = dict(base['main'])
@@ -73,25 +79,28 @@ def build_model(sc):
         'D_MODEL': sc['d_model'],
         'N_HEAD': sc['n_head'],
         'N_LAYER': sc['n_layer'],
-        'USE_LEARNABLE_PE': sc.get('use_learnable_pe', False),
         'MLP_RATIO': sc.get('mlp_ratio', 4),
-        'AB_PAIRS': [list(pair) for pair in sc['ab_pairs']],
         'TRAIN_LEN': sc['train_len'],
         'OOD_LEN': sc['ood_len'],
         'MISSING_PROB': 0.0,
         'NUM_TRAIN_SAMPLES': 8,  # unused here; keep dataset construction cheap
         'NUM_TEST_SAMPLES': 8,
     })
+    if sc.get('rules'):  # 新块优先（canonical）
+        mm['ORDER'] = sc['order']
+        mm['RULES'] = [list(r) for r in sc['rules']]
+    else:                # 旧 checkpoint：action 约定的 ab_pairs，归一化层负责反转
+        mm['AB_PAIRS'] = [list(pair) for pair in sc['ab_pairs']]
     cfg = dict(base)
     cfg['main'] = mm
     cfg['_BATCH_RUN_MERGED'] = True
-    ctx = experiment._prepare_action(cfg)
-    return ctx
+    return experiment._prepare_action(cfg, normalize_task_config('action', mm))
 
 
 def main():
     state_dict, sc = load_checkpoint(args.checkpoint)
     print(f"checkpoint config: {sc}")
+    order = sc.get('order') or len(sc['ab_pairs'][0])
     ctx = build_model(sc)
     model = ctx['model'].to('cuda').eval()
     model.load_state_dict(state_dict)
@@ -101,23 +110,24 @@ def main():
     eval_len = args.eval_len if args.eval_len is not None else sc['ood_len']
     eval_ds = ActionDataset(p=sc['p'], ab_pairs=sc['ab_pairs'],
                             num_samples=args.num_samples, length=eval_len,
-                            seed=args.sample_seed)
+                            seed=args.sample_seed, order=order)
     # Same collate family as training, but missing_prob=0 -> no corruption.
     collate = make_action_missing_collate(p=sc['p'], missing_prob=args.missing_prob,
-                                          miss_len=sc.get('miss_len', 1))
+                                          miss_len=sc.get('miss_len', 1), order=order)
     loader = DataLoader(eval_ds, batch_size=args.batch_size, shuffle=False,
                         collate_fn=collate)
 
     loss, acc, per_pos_acc, _ = evaluate(model, loader, 'cuda',
                                          num_mask=ctx['num_mask'])
 
-    # Per-position summary: target index t predicts value x_k with k = t/2 + 2.
+    # Per-position summary: target index t predicts value x_j with
+    # j = (t + order) // 2 + 1 (order=2 reduces to the legacy t // 2 + 2).
     pos_items = sorted(per_pos_acc.items())
-    summary = {f'x{t // 2 + 2}': round(a, 6) for t, a in pos_items}
+    summary = {f'x{(t + order) // 2 + 1}': round(a, 6) for t, a in pos_items}
     worst = min(pos_items, key=lambda kv: kv[1])
     print(f"\nclean-input eval: n={args.num_samples}, len={eval_len}, seed={args.sample_seed}")
-    print(f"positions evaluated per sample: {len(pos_items)} (x3..x{eval_len})")
-    print(f"worst position: x{worst[0] // 2 + 2} acc={worst[1]:.4f}")
+    print(f"positions evaluated per sample: {len(pos_items)} (x{order + 1}..x{eval_len})")
+    print(f"worst position: x{(worst[0] + order) // 2 + 1} acc={worst[1]:.4f}")
     print('per-position acc:', json.dumps(summary))
     print('RESULT ' + json.dumps({
         'checkpoint': args.checkpoint,
@@ -126,7 +136,7 @@ def main():
         'sample_seed': args.sample_seed,
         'clean_acc': acc,
         'loss': loss,
-        'worst_pos': {'pos': f"x{worst[0] // 2 + 2}", 'acc': worst[1]},
+        'worst_pos': {'pos': f"x{(worst[0] + order) // 2 + 1}", 'acc': worst[1]},
         'per_pos_acc': summary,
     }))
 

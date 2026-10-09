@@ -340,7 +340,7 @@ def run_missing_categories(args, model, cfg, next_fn, init_len, p, exp_name, des
         window = torch.tensor(seq, dtype=torch.long)
         # single-rule only here, so the missing token is plain p
         corrupt_window(window, True, p=p, init_len=init_len, missing_prob=missing_prob,
-                       miss_len=miss_len, miss_second=cfg.get('MISS_SECOND', False))
+                       miss_len=miss_len)
         view = window.tolist()
         x = torch.tensor([view], dtype=torch.long)
         with torch.no_grad():
@@ -357,8 +357,7 @@ def run_missing_categories(args, model, cfg, next_fn, init_len, p, exp_name, des
 
     print(f'Model: {exp_name}')
     print(f'Rule : {desc} | length={length}, missing prob={missing_prob}, '
-          f'miss_len={miss_len}, miss_second={cfg.get("MISS_SECOND", False)}, '
-          f'max pattern depth={d_max}')
+          f'miss_len={miss_len}, max pattern depth={d_max}')
 
     # --- pass 2: BFS over patterns, starting from all length-init_len patterns
     root = (False,) * init_len
@@ -441,15 +440,16 @@ def run_one(args, exp_cfg, task, exp_name, pth_path, log_path):
     cfg = dict(exp_cfg)
     cfg['P'] = cfg.get('P', cfg.get('p'))
     if task is None:
-        # checkpoint fallback: task_from_save_config normalizes the checkpoint
-        # vocabulary ('multiplicative' -> 'multiplication'); None means a
-        # mixed/dynamic checkpoint
+        # checkpoint fallback: task_from_save_config 新块优先；None = mixed/action
         task = task_from_save_config(checkpoint['config'])
         if task is None:
             task = checkpoint['config'].get('recurrence') or 'mixed_ab'
-    if task in ('mixed_ab', 'mixed_abc'):
-        print('[skip] mixed tasks are not supported by rule_fit (single-rule only)')
+    if task in ('mixed', 'mixed_ab', 'mixed_abc', 'action', 'action_trib', 'dynamic_mixed'):
+        print('[skip] rule_fit supports single-rule scenarios only')
         return
+    if task == 'single' and 'RULES' not in cfg and 'rules' not in cfg:
+        # 新 checkpoint 的系数在 save_config 的 rules 键里
+        cfg['rules'] = checkpoint['config'].get('rules')
 
     init_len, next_fn, desc = build_single_rule(task, cfg)
     p = cfg['P']

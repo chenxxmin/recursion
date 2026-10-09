@@ -218,9 +218,7 @@ def run_single(exp, base_config, dirs, concurrency=1, gpu_id=None):
             f.write(f"\n--- Return code: {returncode} ---\n")
 
         # After experiment succeeds, run attention analysis and append to the same log
-        # TODO: analyze_attention.py hardcodes the order-2 action layout; skip
-        # action_trib (order-3) until the analysis is generalized.
-        if returncode == 0 and task != 'action_trib':
+        if returncode == 0:
             pth_path = merged_main.get('SAVE_PATH', DEFAULT_SAVE_PATH)
             if os.path.exists(pth_path):
                 run_attention_analysis(name, pth_path, log_path, env)

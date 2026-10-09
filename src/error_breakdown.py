@@ -32,7 +32,7 @@ if SCRIPT_DIR not in sys.path:
     sys.path.insert(0, SCRIPT_DIR)
 
 from analyze_attention import load_model
-from datasets import corrupt_window, missing_token_id
+from datasets import corrupt_window
 from rules import LinearRecurrenceRule
 from verify_sample import (build_single_rule, dispatch_and_log, find_exp_config,
                            resolve_experiment_cfg)
@@ -45,9 +45,7 @@ def corrupt_view(seq, cfg, p, init_len, is_mixed):
     window = torch.tensor(seq, dtype=torch.long)
     token = corrupt_window(window, True, p=p, init_len=init_len,
                            missing_prob=cfg['MISSING_PROB'],
-                           miss_len=cfg.get('MISS_LEN', 1),
-                           miss_second=cfg.get('MISS_SECOND', False),
-                           missing_token=missing_token_id(cfg, p, is_mixed))
+                           miss_len=cfg.get('MISS_LEN', 1))
     return window.tolist(), token
 
 
@@ -130,8 +128,7 @@ def run_one(args, pth_path):
     print(f"Model: {os.path.basename(pth_path)}")
     print(f"samples={args.samples}, length={length}, corrupted={corrupted} ({miss_desc})")
     if corrupted:
-        print(f"missing rule: prob={missing_prob}, miss_len={cfg.get('MISS_LEN', 1)}, "
-              f"miss_second={cfg.get('MISS_SECOND', False)}")
+        print(f"missing rule: prob={missing_prob}, miss_len={cfg.get('MISS_LEN', 1)}")
     print('=' * 64)
     print(f"{'category':<14}{'correct':>10}{'wrong':>10}{'total':>10}{'acc':>10}")
     tot_c = tot_w = 0

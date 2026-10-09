@@ -26,7 +26,9 @@ def load_full(path, cfg=None):
                            ('MISS_LEN', 'miss_len'), ('MISSING_PROB', 'missing_prob')]:
             if cfg[key] != sc[saved]:
                 raise ValueError('Resume config mismatch: ' + key)
-        if [list(p) for p in sc['ab_pairs']] != cfg['AB_PAIRS']:
+        saved_pairs = ([list(reversed(r)) for r in sc['rules']] if sc.get('rules')
+                       else [list(p) for p in sc['ab_pairs']])
+        if saved_pairs != [list(p) for p in cfg['AB_PAIRS']]:
             raise ValueError('Resume rules mismatch')
         if sc.get('reshuffle_each_epoch', False) != cfg['RESHUFFLE_EACH_EPOCH']:
             raise ValueError('Resume sampler mismatch')
@@ -53,6 +55,7 @@ def evaluate_run(args):
 
     root = args.run_dir.resolve()
     cfg = json.loads((root / 'configs/experiment.json').read_text())['main']
+    order = cfg.get('ORDER') or len(cfg['AB_PAIRS'][0])
     full_path = root / 'checkpoints/model_resume.pth'
     if not full_path.is_file():
         full_path = root / 'checkpoints/model_latest.pth'
@@ -92,21 +95,23 @@ def evaluate_run(args):
     if device == 'cuda' and (not torch.cuda.is_available() or torch.cuda.device_count() != 1):
         raise RuntimeError('Clean evaluation requires the reserved GPU; no CPU fallback')
     torch.manual_seed(args.sample_seed)
-    if device == 'cuda' and cfg['ALLOW_TF32']:
+    if device == 'cuda':
         torch.backends.cuda.matmul.allow_tf32 = True
         torch.backends.cudnn.allow_tf32 = True
     small = dict(cfg, NUM_TRAIN_SAMPLES=1, NUM_TEST_SAMPLES=1,
                  MISSING_PROB=0.0, FRESH_TEST_PER_EVAL=False)
-    model = _prepare_action({'main': small, '_BATCH_RUN_MERGED': True})['model']
+    from scenarios import normalize_task_config
+    model = _prepare_action({'main': small, '_BATCH_RUN_MERGED': True},
+                            normalize_task_config('action', small))['model']
     model.load_state_dict(weights)
     del weights
     model = model.to(device).eval()
     ds = ActionDataset(p=cfg['P'], ab_pairs=cfg['AB_PAIRS'], num_samples=args.num_samples,
-                       length=cfg['TRAIN_LEN'], seed=args.sample_seed)
+                       length=cfg['TRAIN_LEN'], seed=args.sample_seed, order=order)
     loader = DataLoader(ds, batch_size=cfg['BATCH_SIZE'], shuffle=False, collate_fn=action_collate_fn)
     loss, acc, positions, _ = evaluate(model, loader, device, num_mask=0)
     metrics.update(clean_loss=float(loss), clean_acc=float(acc),
-                   clean_per_position={f'x{k // 2 + 2}': float(v) for k, v in positions.items()})
+                   clean_per_position={f'x{(k + order) // 2 + 1}': float(v) for k, v in positions.items()})
     summary.write_text(json.dumps(metrics, indent=2) + '\n')
     print('RESULT ' + json.dumps(metrics), flush=True)
 

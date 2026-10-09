@@ -29,7 +29,7 @@ if SCRIPT_DIR not in sys.path:
     sys.path.insert(0, SCRIPT_DIR)
 
 from analyze_attention import load_model
-from datasets import corrupt_window, missing_token_id
+from datasets import corrupt_window
 from rules import LinearRecurrenceRule, single_rule_from_task, task_from_save_config
 
 COL_W = 5  # display width per position column
@@ -125,7 +125,9 @@ def resolve_experiment_cfg(ckpt_cfg, exp_cfg, task):
         task = task_from_save_config(cfg)
         if task is None:  # mixed / dynamic checkpoint
             task = cfg.get('recurrence') or ('mixed_ab' if cfg.get('ab_pairs') else 'addition')
-    is_mixed = task in ('mixed_ab', 'mixed_abc') or (cfg.get('ab_pairs') and 'recurrence' not in cfg)
+    is_mixed = (task in ('mixed', 'mixed_ab', 'mixed_abc')
+                or (cfg.get('ab_pairs') and 'recurrence' not in cfg
+                    and cfg.get('scenario') not in ('action', 'single')))
     return cfg, task, is_mixed
 
 
@@ -169,25 +171,18 @@ def run_one(args, exp_cfg, task, exp_name, pth_path):
         window = torch.tensor(seq, dtype=torch.long)
         missing_token = corrupt_window(
             window, True, p=p, init_len=init_len, missing_prob=missing_prob,
-            miss_len=cfg.get('MISS_LEN', 1), miss_second=cfg.get('MISS_SECOND', False),
-            missing_token=missing_token_id(cfg, p, is_mixed))
+            miss_len=cfg.get('MISS_LEN', 1))
         view = window.tolist()
     else:
         view = list(seq)
         missing_token = None
 
-    # model input: mixed tag mode prepends the rule flag token
-    use_ab_tag = bool(is_mixed and cfg.get('use_ab_tag', cfg.get('USE_AB_TAG', False)))
-    use_cond = bool(is_mixed and cfg.get('use_conditional_wte', cfg.get('USE_CONDITIONAL_WTE', False)))
+    # model input: the (possibly corrupted) view as-is (mixed tag mode and
+    # cond_wte were removed in the 2026-10-08 scenario unification).
     model_in = list(view)
-    if use_ab_tag:
-        model_in = [p + rule_idx] + model_in
     x = torch.tensor([model_in], dtype=torch.long)
     with torch.no_grad():
-        if use_cond:
-            logits = model(x, ab_labels=torch.tensor([rule_idx]))[0]
-        else:
-            logits = model(x)[0]
+        logits = model(x)[0]
     preds = logits[0].argmax(dim=-1).tolist()  # preds[t] = prediction for token t+1
 
     def fmt(v):
@@ -197,19 +192,15 @@ def run_one(args, exp_cfg, task, exp_name, pth_path):
     print(f"Model : {os.path.basename(pth_path)}")
     print(f"Task  : {desc}")
     print(f"Seed  : {used_seed}  | length {length}  | corrupted: {corrupted}"
-          + (f" (prob={missing_prob}, miss_len={cfg.get('MISS_LEN', 1)}, "
-             f"miss_second={cfg.get('MISS_SECOND', False)})" if corrupted else ""))
+          + (f" (prob={missing_prob}, miss_len={cfg.get('MISS_LEN', 1)})" if corrupted else ""))
     print('=' * 70)
 
     n = len(model_in) - 1  # predictions cover targets 1..len-1
-    if use_ab_tag:
-        print(f"rule flag token: {model_in[0]} (= p + rule_idx)")
     print('true seq :' + ''.join(f'{fmt(v):>{COL_W}}' for v in seq))
     print('model in :' + ''.join(f'{fmt(v):>{COL_W}}' for v in model_in))
     print()
-    # display true values from the CLEAN sequence (tag mode prepends the flag,
-    # whose first target is x0)
-    clean_targets = (([seq[0]] if use_ab_tag else []) + seq[1:])[:n]
+    # display true values from the CLEAN sequence
+    clean_targets = seq[1:][:n]
     print('t        :' + ''.join(f'{t:>{COL_W}}' for t in range(n)))
     print('true next:' + ''.join(f'{v:>{COL_W}}' for v in clean_targets))
     print('pred     :' + ''.join(f'{fmt(v):>{COL_W}}' for v in preds[:n]))
