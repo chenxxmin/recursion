@@ -2,7 +2,7 @@
 
 Extracted from core.py (core.py split, step 3). Depends on datasets (BatchTag)
 only; never imports core. core.py re-exports the externally referenced
-symbols defined here (_unpack_batch, _sample_seq), so existing
+symbols defined here (_unpack_batch), so existing
 `from core import ...` users (tests) are unaffected.
 """
 import os
@@ -81,17 +81,6 @@ def _unpack_batch(batch, device, extra_kwargs_fn):
         kwargs = extra_kwargs_fn(ab_labels) if extra_kwargs_fn is not None else {}
         return x, None, kwargs, ab_labels, batch[3].to(device)
     raise ValueError(f"Unknown batch tag: {tag}")
-
-
-def _sample_seq(item):
-    """Extract the sequence tensor from a dataset item.
-
-    Items are plain tensors normally, but become (seq, loss_mask) /
-    (seq, loss_mask, rule_idx) tuples when MISSING_PROB is enabled. Consumers
-    that index the raw sample lists directly (post-training generation tests)
-    must normalize through this helper.
-    """
-    return item[0] if isinstance(item, tuple) else item
 
 
 def _print_nan_diagnostics(x, logits, loss_mask, targets):

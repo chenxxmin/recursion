@@ -1,9 +1,8 @@
 """End-to-end training smoke test: run_experiment on tiny configs (CPU).
 
 Covers the main pipeline that unit tests don't reach: config routing,
-dataset build, train_epoch/evaluate loop, checkpoint saving, and the
-stage-3 final generation test output. Kept tiny (p=7, 2 epochs) so the
-whole file runs in seconds.
+dataset build, train_epoch/evaluate loop, and checkpoint saving. Kept
+tiny (p=7, 2 epochs) so the whole file runs in seconds.
 """
 import contextlib
 import io
@@ -43,8 +42,7 @@ def _run(tmpdir, overrides):
 def _check_common(out, save_path):
     assert os.path.exists(save_path), "checkpoint was not saved"
     assert 'Train: Loss=' in out, "training loop output missing"
-    assert 'Final generation test' in out, "stage-3 final test did not run"
-    assert 'Exposed' in out and 'Unexposed' in out, "exposure stats missing"
+    assert 'Final generation test' not in out, "stage-3 final test was removed"
     assert 'nan' not in out.lower(), "NaN appeared in training"
     # Rolling checkpoints: best (weights only) and latest (full resume state)
     base = os.path.splitext(save_path)[0]
@@ -68,7 +66,7 @@ def test_run_experiment_mixed_ab():
             'TASK': 'mixed_ab', 'AB_PAIRS': [[1, 1], [1, 2]], 'USE_AB_TAG': False,
             'MIXED_AB_MAX_UNIQUE_RATIOS': [0.7, 0.7]})
         _check_common(out, save_path)
-        assert 'Rule 1' in out and 'Rule 2' in out, "per-rule final test missing"
+        assert 'per-rule acc' in out, "per-rule eval stats missing"
 
 
 def test_run_experiment_nonlinear_mul():

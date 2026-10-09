@@ -1,11 +1,9 @@
 """Compatibility shell for the recurrence experiment entry point.
 
-Implementation lives in models.py / datasets.py / training.py / final_eval.py /
-experiment.py (core.py split, steps 1-4). This module re-exports only the
-symbols the test suite still references via `from core import ...` / `core.<name>`
-(analysis scripts import models/datasets directly since the post-split
-convergence), and keeps the __main__ entry that batch_run.py spawns as
-`python src/core.py <merged_config.json>`.
+Implementation lives in models.py / datasets.py / training.py / scenarios.py /
+experiment.py. This module re-exports only the symbols the test suite still
+references via `from core import ...` / `core.<name>`, and keeps the __main__
+entry that batch_run.py spawns as `python src/core.py <merged_config.json>`.
 """
 import sys
 
@@ -13,7 +11,7 @@ from datasets import (RecurrenceDataset, BatchTag, collate_fn,
                       make_missing_collate, make_mixed_missing_collate,
                       make_action_missing_collate,
                       mixed_ab_collate_fn)
-from training import _unpack_batch, _sample_seq
+from training import _unpack_batch
 from experiment import _prepare_mixed_recurrence, run_experiment
 
 

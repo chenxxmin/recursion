@@ -90,19 +90,24 @@ def test_corruption_flags_untouched():
 
 
 def test_prepare_wiring():
-    cfg = {'main': {
+    from scenarios import normalize_task_config
+    main = {
         'P': P, 'D_MODEL': 16, 'N_HEAD': 1, 'N_LAYER': 1, 'BATCH_SIZE': 16,
         'DROPOUT': 0.0, 'ABC_PAIRS': [list(p) for p in PAIRS],
         'NUM_TRAIN_SAMPLES': 20, 'NUM_TEST_SAMPLES': 10,
         'TRAIN_LEN': 8, 'OOD_LEN': 10,
-    }}
+    }
+    cfg = {'main': main}
     random.seed(0)
     torch.manual_seed(0)
-    ctx = _prepare_action(cfg, order=3)
+    ctx = _prepare_action(cfg, normalize_task_config('action_trib', main))
     assert ctx['model'].vocab_size == P + 1 + len(PAIRS)
     assert ctx['model'].pad_token_id == P
     assert ctx['save_config']['order'] == 3
-    assert ctx['save_config']['ab_pairs'] == PAIRS
+    assert ctx['save_config']['scenario'] == 'action'
+    # canonical（第一个系数乘最新值）= action 旧约定逐条 reverse
+    assert ctx['save_config']['rules'] == [[1, 1, 1], [3, 2, 1]]
+    assert ctx['save_config']['ab_pairs'] == [list(p) for p in PAIRS]  # action 约定照写
     # block_size covers 2*OOD_LEN - 3 = 17 -> 32
     assert ctx['save_config']['block_size'] == 32
     seq, mask = ctx['train_dataset'][0]
@@ -110,11 +115,11 @@ def test_prepare_wiring():
     assert len(ctx['train_dataset']) == 20
     assert len(ctx['test_dataset']) == 10
 
-    # Wrong coefficient count must raise.
-    cfg['main']['ABC_PAIRS'] = [[1, 1], [1, 2]]
+    # 系数条数与 order 不符必须报（校验在归一化层 _legacy_rules 的尾部统一
+    # 长度检查，Task 2 已实现）
     try:
-        _prepare_action(cfg, order=3)
-        assert False, "2-coefficient rules under order=3 must raise"
+        normalize_task_config('action_trib', {'P': P, 'ABC_PAIRS': [[1, 1], [1, 2]]})
+        assert False, "2-coefficient rules under order-3 must raise"
     except ValueError:
         pass
 

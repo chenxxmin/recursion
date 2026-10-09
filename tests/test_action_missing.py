@@ -116,10 +116,10 @@ def test_run_experiment_action_missing_smoke():
         'P': 7, 'D_MODEL': 32, 'N_HEAD': 1, 'N_LAYER': 1,
         'BATCH_SIZE': 32, 'EPOCHS': 2, 'LR': 0.001, 'RANDOM_SEED': 42,
         'TRAIN_LEN': 8, 'OOD_LEN': 10, 'DROPOUT': 0.0,
-        'WEIGHT_DECAY': 0.1, 'ENTROPY_PENALTY_WEIGHT': 0.0,
+        'WEIGHT_DECAY': 0.1,
         'EVAL_INTERVAL': 1, 'EARLY_STOP_ACCURACY': 2.0,
         'EARLY_STOP_NO_IMPROVE': 3000,
-        'USE_LEARNABLE_PE': False, 'MLP_RATIO': 4,
+        'MLP_RATIO': 4,
         'TASK': 'action', 'AB_PAIRS': [[1, 1], [1, 2]],
         'NUM_TRAIN_SAMPLES': 200, 'NUM_TEST_SAMPLES': 50,
         'MISSING_PROB': 0.3, 'MISS_LEN': 2,
@@ -127,10 +127,13 @@ def test_run_experiment_action_missing_smoke():
     # On-the-fly regime: the prepared dataset stores CLEAN (seq, mask) pairs;
     # corruption happens in the collate.
     from experiment import _prepare_action
-    prep = _prepare_action({'main': dict(main), '_BATCH_RUN_MERGED': True})
+    from scenarios import normalize_task_config
+    prep = _prepare_action({'main': dict(main), '_BATCH_RUN_MERGED': True},
+                           normalize_task_config(main['TASK'], main))
     sample = prep['train_dataset'].samples[0]
     assert isinstance(sample, tuple) and len(sample) == 2, (
         f"dataset must store clean (seq, mask) pairs, got {len(sample)}-tuple")
+    assert prep['save_config']['scenario'] == 'action'
     assert prep['save_config']['missing_prob'] == 0.3
     assert prep['save_config']['miss_len'] == 2
     with tempfile.TemporaryDirectory() as tmpdir:

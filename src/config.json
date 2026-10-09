@@ -39,7 +39,6 @@
     "RESUME_FROM": null,
     "ALLOW_TF32": true,
     "USE_AMP": false,
-    "AMP_DTYPE": "bfloat16",
     "DATA_MODE": null,
     "FRESH_TEST_PER_EVAL": false,
     "STATE_SPACE_CAP": null
