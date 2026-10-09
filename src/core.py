@@ -9,7 +9,6 @@ convergence), and keeps the __main__ entry that batch_run.py spawns as
 """
 import sys
 
-from models import MixedABTransformer
 from datasets import (RecurrenceDataset, BatchTag, collate_fn,
                       make_missing_collate, make_mixed_missing_collate,
                       make_action_missing_collate,

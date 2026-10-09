@@ -17,8 +17,7 @@ from torch.utils.data import Dataset, Sampler
 class RecurrenceDataset(Dataset):
     def __init__(self, p=127, recurrence_fn=None, recurrence_name="X(k)=?", init_len=2, num_samples=1000, length=10,
                  verbose=True, missing_prob=0.0, num_mask=0, first_task_weight=1.0,
-                 missing_token=None, miss_len=1, miss_second=False,
-                 predict_missing=False, state_cap=None):
+                 missing_token=None, miss_len=1, state_cap=None):
         self.length = length
         self.p = p
         self.recurrence_fn = recurrence_fn
@@ -39,13 +38,6 @@ class RecurrenceDataset(Dataset):
         self.first_task_weight = first_task_weight
         self.missing_token = p if missing_token is None else missing_token
         self.miss_len = miss_len
-        self.miss_second = miss_second
-        # PREDICT_MISSING: when true, items are (corrupted_view, clean_seq)
-        # tuples — the model trains on the corrupted input but the loss/accuracy
-        # targets are the clean values (missing positions must be filled in).
-        # When false (default), items are (corrupted_seq, loss_mask) and the
-        # missing positions are masked out of the metrics.
-        self.predict_missing = predict_missing
         # STATE_SPACE_CAP: when p**init_len exceeds this, subsample state_cap
         # distinct initial states uniformly (one window per state, rolled out
         # step by step) instead of full cycle traversal; the train/test quota
@@ -281,7 +273,7 @@ class RecurrenceDataset(Dataset):
             if self.missing_prob > 0:
                 print(f"  - Missing-value corruption: ON THE FLY in collate (fresh randomness per "
                       f"batch), prob={self.missing_prob}, miss_len={self.miss_len}, "
-                      f"miss_second={self.miss_second}, positions >= {self.init_len}, token id {self.missing_token}")
+                      f"positions >= {self.init_len}, token id {self.missing_token}")
             print(f"Recurrence: {self.recurrence_name}")
             print("-" * 50)
             print("-" * 50)
@@ -296,17 +288,13 @@ class RecurrenceDataset(Dataset):
         after, first_task_weight at num_mask); a corrupted token at position pos
         additionally zeroes its prediction target at index pos-1.
 
-        Corruption model: when miss_second is set, positions 1..miss_len are
-        corrupted unconditionally, the position right after that forced run
-        stays clean, and scanning starts at position miss_len+2 (or init_len
-        if later). Otherwise scanning starts at init_len. During the scan each
+        Corruption model: scanning starts at init_len. During the scan each
         position independently hits with probability missing_prob; a hit
         corrupts a RUN of random length in [1, miss_len], the position right
         after a run is always left clean, and scanning resumes from the
         position after that. A run may be truncated at the end of the window.
         If no random run in the window reaches length miss_len, the whole
-        random scan is redone until it does (miss_second's forced run already
-        satisfies this, so no redo happens in that mode).
+        random scan is redone until it does.
         """
         mask = torch.zeros(self.length - 1, dtype=torch.float)
         if self.length - 1 > self.num_mask:
@@ -314,21 +302,12 @@ class RecurrenceDataset(Dataset):
             if self.first_task_weight != 1.0:
                 mask[self.num_mask] = self.first_task_weight
         pos = self.init_len
-        if self.miss_second:
-            end = min(1 + self.miss_len, self.length)
-            for q in range(1, end):
-                window[q] = self.missing_token
-                mask[q - 1] = 0.0
-            # like any corrupted run, the forced run is followed by one
-            # guaranteed-clean position, so blocks never merge
-            pos = max(pos, end + 1)
         # random scan; redo until the longest random run equals miss_len
-        # (miss_second's forced run already counts as that maximum)
         retries = 0
         while True:
             trial_w = window.clone()
             trial_m = mask.clone()
-            max_run = self.miss_len if self.miss_second else 0
+            max_run = 0
             scan = pos
             while scan < self.length:
                 if random.random() < self.missing_prob:
@@ -360,21 +339,8 @@ class RecurrenceDataset(Dataset):
         return data[idx]
 
 
-def missing_token_id(config, p, is_mixed):
-    """Missing-token id for a (merged or save) config dict.
-
-    Follows MixedRecurrenceDataset's convention: p + n_rules in mixed tag
-    mode (plain p would collide with rule 0's flag token), else p.
-    """
-    use_tag = config.get('use_ab_tag', config.get('USE_AB_TAG', False))
-    if not (is_mixed and use_tag):
-        return p
-    pairs = config.get('ab_pairs') or config.get('AB_PAIRS') or config.get('ABC_PAIRS') or [1]
-    return p + len(pairs)
-
-
 def corrupt_window(window, is_train, *, p, init_len, missing_prob, miss_len=1,
-                   miss_second=False, missing_token=None):
+                   missing_token=None):
     """Corrupt `window` (LongTensor) in place with the dataset's missing-value
     rule, without constructing a full dataset. Returns the missing token id.
 
@@ -384,7 +350,7 @@ def corrupt_window(window, is_train, *, p, init_len, missing_prob, miss_len=1,
     token = p if missing_token is None else missing_token
     helper = RecurrenceDataset(p=p, init_len=init_len, length=len(window), verbose=False,
                                missing_prob=missing_prob, miss_len=miss_len,
-                               miss_second=miss_second, missing_token=token)
+                               missing_token=token)
     helper._corrupt(window, is_train)
     return token
 
@@ -449,7 +415,6 @@ class BatchTag(IntEnum):
     MIXED_AB = 0       # payload: (ab_indices,)  -- per-sample rule index
     LOSS_MASK = 1      # payload: (loss_mask,)   -- per-position loss mask
     PLAIN = 2          # payload: ()             -- sequences only
-    MIXED_AB_MASKED = 3  # payload: (ab_indices, loss_mask) -- rule index + per-position loss mask
     PLAIN_TARGET = 4     # payload: (clean_seqs,) -- clean sequences; targets = clean[:, 1:]
     MIXED_AB_TARGET = 5  # payload: (ab_indices, clean_seqs) -- rule index + clean sequences
     ACTION_MISS = 6    # payload: (clean_seqs, loss_mask) -- action + missing (predict mode)
@@ -460,41 +425,36 @@ def collate_fn(batch):
     return torch.stack(batch, dim=0), BatchTag.PLAIN
 
 
-def _corrupt_helper(p, init_len, length, missing_prob, miss_len, miss_second,
-                    num_mask, first_task_weight, missing_token):
+def _corrupt_helper(p, init_len, length, missing_prob, miss_len,
+                    num_mask=0, first_task_weight=1.0, missing_token=None):
     """A RecurrenceDataset instance used only for its _corrupt implementation."""
     return RecurrenceDataset(p=p, init_len=init_len, length=length, verbose=False,
                              missing_prob=missing_prob, miss_len=miss_len,
-                             miss_second=miss_second, missing_token=missing_token,
+                             missing_token=missing_token,
                              num_mask=num_mask, first_task_weight=first_task_weight)
 
 
-def make_missing_collate(*, p, init_len, missing_prob, miss_len=1, miss_second=False,
-                         num_mask=0, first_task_weight=1.0, missing_token=None,
-                         predict_missing=False):
-    """Collate with ON-THE-FLY missing-value corruption (2026-09-09 regime).
+def make_missing_collate(*, p, init_len, missing_prob, miss_len=1, missing_token=None):
+    """Collate with ON-THE-FLY missing-value corruption (predict regime).
 
     Input: a batch of CLEAN windows (plain LongTensors). Every call corrupts
-    with fresh randomness, so each epoch and each eval sees different missing
-    positions. Mask mode -> (views, LOSS_MASK, masks); predict mode ->
-    (views, PLAIN_TARGET, cleans).
+    with fresh randomness. Always predict mode: (views, PLAIN_TARGET, cleans)
+    — the loss/accuracy targets are the clean values, so corrupted positions
+    must be filled in. num_mask/first_task_weight are applied by the training
+    loop's _default_loss_mask, not here.
     """
     token = p if missing_token is None else missing_token
 
     def collate(batch):
         helper = _corrupt_helper(p, init_len, len(batch[0]), missing_prob,
-                                 miss_len, miss_second, num_mask,
-                                 first_task_weight, token)
-        views, cleans, masks = [], [], []
+                                 miss_len, missing_token=token)
+        views, cleans = [], []
         for seq in batch:
             view = seq.clone()
-            mask = helper._corrupt(view, True)
+            helper._corrupt(view, True)
             views.append(view)
-            masks.append(mask)
             cleans.append(seq)
-        if predict_missing:
-            return torch.stack(views), BatchTag.PLAIN_TARGET, torch.stack(cleans)
-        return torch.stack(views), BatchTag.LOSS_MASK, torch.stack(masks)
+        return torch.stack(views), BatchTag.PLAIN_TARGET, torch.stack(cleans)
 
     return collate
 
@@ -508,51 +468,25 @@ def mixed_ab_collate_fn(batch):
     return torch.stack(sequences, dim=0), BatchTag.MIXED_AB, ab_indices
 
 
-def make_mixed_missing_collate(*, p, order, n_rules, use_ab_tag, missing_prob,
-                               miss_len=1, miss_second=False, num_mask=2,
-                               first_task_weight=1.0, predict_missing=False):
-    """Mixed-rule on-the-fly corruption: (clean_seq, rule_idx) batches.
-
-    With use_ab_tag the leading flag token stays clean; corruption and the
-    mask prefix are computed in pre-tag coordinates (inner num_mask =
-    num_mask - 1, mask regrown with a leading 0), matching the legacy
-    semantics exactly. Mask mode -> (views, MIXED_AB_MASKED, labels, masks);
-    predict mode -> (views, MIXED_AB_TARGET, labels, cleans).
-    """
-    token = p + n_rules if use_ab_tag else p
-    inner_num_mask = max(0, num_mask - 1) if use_ab_tag else num_mask
+def make_mixed_missing_collate(*, p, order, n_rules, missing_prob, miss_len=1):
+    """Mixed-rule on-the-fly corruption (predict regime): (clean_seq, rule_idx)
+    batches -> (views, MIXED_AB_TARGET, labels, cleans). Tag mode is gone, so
+    the missing token is always plain p."""
+    token = p
 
     def collate(batch):
         seqs = [item[0] for item in batch]
         labels = torch.tensor([item[1] for item in batch], dtype=torch.long)
-        core_len = len(seqs[0]) - (1 if use_ab_tag else 0)
-        helper = _corrupt_helper(p, order, core_len, missing_prob, miss_len,
-                                 miss_second, inner_num_mask, first_task_weight,
-                                 token)
-        views, cleans, masks = [], [], []
-        zero = torch.zeros(1, dtype=torch.float)
+        helper = _corrupt_helper(p, order, len(seqs[0]), missing_prob, miss_len,
+                                 missing_token=token)
+        views, cleans = [], []
         for seq in seqs:
-            tag, core = (seq[:1], seq[1:]) if use_ab_tag else (None, seq)
-            view_core = core.clone()
-            mask_core = helper._corrupt(view_core, True)
-            if tag is not None:
-                # The prepended flag shifts every target by one; grow the mask
-                # with a leading 0 (predicting x0 from the flag alone is
-                # unsupervisable).
-                view = torch.cat([tag, view_core], dim=0)
-                mask = torch.cat([zero, mask_core], dim=0)
-            else:
-                view, mask = view_core, mask_core
+            view = seq.clone()
+            helper._corrupt(view, True)
             views.append(view)
-            masks.append(mask)
             cleans.append(seq)
-        if predict_missing:
-            # clean target sequences keep the leading flag so that
-            # targets = clean[:, 1:] stay aligned with the input view
-            return (torch.stack(views), BatchTag.MIXED_AB_TARGET, labels,
-                    torch.stack(cleans))
-        return (torch.stack(views), BatchTag.MIXED_AB_MASKED, labels,
-                torch.stack(masks))
+        return (torch.stack(views), BatchTag.MIXED_AB_TARGET, labels,
+                torch.stack(cleans))
 
     return collate
 
@@ -721,17 +655,14 @@ def make_action_missing_collate(*, p, missing_prob, miss_len=1, order=2):
 class MixedRecurrenceDataset(Dataset):
     """Dataset mixed from several linear recurrence rules over Z/pZ.
 
-    Samples are CLEAN (seq, rule_idx) pairs; with use_ab_tag=True a leading
-    flag token p + rule_idx is prepended to every sequence. The prepare
-    function (experiment._prepare_mixed_recurrence) selects the collate:
+    Samples are CLEAN (seq, rule_idx) pairs in the basic layout (no leading
+    rule flag token). The prepare function
+    (experiment._prepare_mixed_recurrence) selects the collate:
     mixed_ab_collate_fn, or make_mixed_missing_collate when MISSING_PROB > 0
-    (on-the-fly corruption per batch; missing token id is p, or
-    p + len(rules) in tag mode where plain p would collide with rule 0's
-    flag token).
+    (on-the-fly corruption per batch; missing token id is p).
     """
 
-    def __init__(self, rules, num_samples=1000, length=10, verbose=True,
-                 use_ab_tag=False):
+    def __init__(self, rules, num_samples=1000, length=10, verbose=True):
         assert len(rules) >= 1, "MixedRecurrenceDataset needs at least one rule"
         self.p = rules[0].p
         self.order = rules[0].order
@@ -743,7 +674,6 @@ class MixedRecurrenceDataset(Dataset):
             "duplicate rule coeffs are not allowed"
         self.rules = list(rules)
         self.length = length
-        self.use_ab_tag = use_ab_tag
         self.split = 'train'
 
         if isinstance(num_samples, (list, tuple)):
@@ -770,13 +700,6 @@ class MixedRecurrenceDataset(Dataset):
             all_labels_train.extend([idx] * len(train_seqs))
             all_labels_test.extend([idx] * len(test_seqs))
             per_rule_stats.append((rule, len(train_seqs), len(test_seqs)))
-
-        # Prepend rule token if use_ab_tag (DataLoader indexes the flat lists, not __getitem__)
-        if self.use_ab_tag:
-            def _prepend(seq, l):
-                return torch.cat([torch.tensor([self.p + l], dtype=torch.long), seq], dim=0)
-            all_train = [_prepend(seq, l) for seq, l in zip(all_train, all_labels_train)]
-            all_test = [_prepend(seq, l) for seq, l in zip(all_test, all_labels_test)]
 
         # One global shuffle of train (seq, rule_idx) pairs (same seed semantics
         # as the legacy MixedABDataset).

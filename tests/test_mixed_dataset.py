@@ -35,23 +35,6 @@ def test_sequences_follow_their_rule():
             assert vals[k] == fn(vals[k - rules[idx].order:k], p)
 
 
-def test_use_ab_tag_prepends_flag_token():
-    p = 7
-    rules = [LinearRecurrenceRule(coeffs=(1, 1), p=p),
-             LinearRecurrenceRule(coeffs=(1, 2), p=p)]
-    random.seed(2)
-    ds = MixedRecurrenceDataset(rules=rules, num_samples=[20, 20], length=8,
-                                verbose=False, use_ab_tag=True)
-    for seq, idx in ds.train_data + ds.test_data:
-        vals = seq.tolist()
-        assert vals[0] == p + idx
-        assert len(vals) == 9  # length 8 + 1 flag token
-        fn = rules[idx].next_fn()
-        body = vals[1:]
-        for k in range(rules[idx].order, len(body)):
-            assert body[k] == fn(body[k - rules[idx].order:k], p)
-
-
 def test_getitem_matches_flat_lists():
     p = 5
     rules = [LinearRecurrenceRule(coeffs=(1, 1), p=p)]
@@ -98,7 +81,6 @@ def test_mismatched_rules_rejected():
 if __name__ == '__main__':
     test_train_quota_and_labels()
     test_sequences_follow_their_rule()
-    test_use_ab_tag_prepends_flag_token()
     test_getitem_matches_flat_lists()
     test_mismatched_rules_rejected()
     print("ALL TESTS PASSED: test_mixed_dataset.py")

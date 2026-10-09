@@ -1,11 +1,14 @@
-"""Unit tests for on-the-fly MISSING_PROB corruption (2026-09-09 regime).
+"""Unit tests for on-the-fly MISSING_PROB corruption (predict-only regime).
 
 Datasets store CLEAN windows only; make_missing_collate /
 make_mixed_missing_collate corrupt each batch with fresh randomness, so every
-epoch sees different missing positions. Covers: clean storage, mask alignment
-(target index = position - 1), run structure (MISS_LEN, MISS_SECOND),
-deterministic patterns at prob=1.0, per-call fresh randomness, tag-mode token
-avoidance, PREDICT_MISSING mode, and unpack routing.
+epoch sees different missing positions. Predict mode is the ONLY regime now:
+collates return (views, PLAIN_TARGET, cleans) / (views, MIXED_AB_TARGET,
+labels, cleans) — the loss/accuracy targets are the clean values, so corrupted
+positions must be filled in. num_mask/first_task_weight are applied by the
+training loop's _default_loss_mask, not by the collate. Covers: clean storage,
+run structure (MISS_LEN), deterministic patterns at prob=1.0, per-call fresh
+randomness, and unpack routing.
 
 Requires torch (run on the training server): python tests/test_missing_values.py
 """
@@ -34,13 +37,9 @@ def _make_ds(seed=0, p=P, init_len=INIT_LEN, length=LEN, num_samples=20):
     return ds
 
 
-def _collate(missing_prob=0.5, p=P, init_len=INIT_LEN, num_mask=1,
-             first_task_weight=1.0, miss_len=1, miss_second=False,
-             predict_missing=False):
+def _collate(missing_prob=0.5, p=P, init_len=INIT_LEN, miss_len=1):
     return make_missing_collate(p=p, init_len=init_len, missing_prob=missing_prob,
-                                miss_len=miss_len, miss_second=miss_second,
-                                num_mask=num_mask, first_task_weight=first_task_weight,
-                                predict_missing=predict_missing)
+                                miss_len=miss_len)
 
 
 def test_dataset_always_stores_clean_windows():
@@ -53,25 +52,24 @@ def test_dataset_always_stores_clean_windows():
     assert batch[1] == BatchTag.PLAIN
 
 
-def test_collate_corrupts_and_masks():
-    p, init_len, num_mask = 7, 2, 1
+def test_collate_corrupts_predict_mode():
+    """predict 口径（唯一保留的模式）：返回 (views, PLAIN_TARGET, cleans)，
+    污损位以干净值为目标；初始值永不污损。"""
+    p, init_len = 7, 2
     ds = _make_ds(p=p, init_len=init_len)
-    collate = _collate(0.5, p=p, init_len=init_len, num_mask=num_mask)
-    views, tag, masks = collate(ds.train_samples[:8])
-    assert tag == BatchTag.LOSS_MASK
-    assert views.shape == (8, ds.length) and masks.shape == (8, ds.length - 1)
+    collate = _collate(0.5, p=p, init_len=init_len)
+    views, tag, cleans = collate(ds.train_samples[:8])
+    assert tag == BatchTag.PLAIN_TARGET
+    assert views.shape == (8, ds.length) and cleans.shape == (8, ds.length)
     saw = False
-    for view, clean, mask in zip(views, ds.train_samples[:8], masks):
-        assert (view[:init_len] < p).all()           # init values never corrupted
-        assert (mask[:num_mask] == 0).all()          # mask prefix follows num_mask
+    for view, clean in zip(views, cleans):
+        assert (view[:init_len] < p).all()
+        assert (clean < p).all()
         for pos in range(init_len, ds.length):
             if view[pos].item() == p:
                 saw = True
-                assert clean[pos].item() < p         # clean side holds true value
-                assert mask[pos - 1].item() == 0.0
-            elif pos - 1 >= num_mask:
+            else:
                 assert view[pos].item() == clean[pos].item()
-                assert mask[pos - 1].item() == 1.0
     assert saw
 
 
@@ -89,17 +87,15 @@ def test_full_corruption_when_prob_one():
     # prob=1.0 + miss_len=1: deterministic alternation — corrupt one, skip one.
     p, init_len = 7, 3
     ds = _make_ds(p=p, init_len=init_len)
-    collate = _collate(1.0, p=p, init_len=init_len, num_mask=2)
-    views, _, masks = collate(ds.train_samples[:8])
-    expected_mask = torch.tensor([0., 0., 0., 1., 0., 1., 0.])
-    for view, mask in zip(views, masks):
+    collate = _collate(1.0, p=p, init_len=init_len)
+    views, _, cleans = collate(ds.train_samples[:8])
+    for view in views:
         assert (view[:init_len] < p).all()
         for pos in range(init_len, ds.length):
             if pos % 2 == 1:  # 3,5,7
-                assert view[pos].item() == p and mask[pos - 1].item() == 0.0
+                assert view[pos].item() == p
             else:             # 4,6 forced clean after each run
-                assert view[pos].item() < p and mask[pos - 1].item() == 1.0
-        assert torch.equal(mask, expected_mask)
+                assert view[pos].item() < p
 
 
 def _check_runs(seq, p, init_len, miss_len, start_pos=None):
@@ -130,50 +126,26 @@ def test_miss_len_run_structure():
     """prob=1.0, miss_len=3: run lengths in [1,3], clean separators, longest
     run equals 3 (redo guarantee)."""
     ds = _make_ds(length=12, num_samples=40, p=11)
-    collate = _collate(1.0, p=11, miss_len=3, num_mask=1)
-    views, _, masks = collate(ds.train_samples[:20])
-    for view, mask in zip(views, masks):
+    collate = _collate(1.0, p=11, miss_len=3)
+    views, _, cleans = collate(ds.train_samples[:20])
+    for view in views:
         assert (view[:INIT_LEN] < 11).all()
         _check_runs(view, 11, INIT_LEN, 3)
-        for pos in range(INIT_LEN, 12):
-            if view[pos].item() == 11:
-                assert mask[pos - 1].item() == 0.0
-            elif pos - 1 >= 1:
-                assert mask[pos - 1].item() == 1.0
 
 
-def test_miss_second_forced_run_deterministic():
-    """miss_second=True: positions 1..miss_len always missing, position
-    miss_len+1 always clean, random scan resumes at miss_len+2."""
-    ds = _make_ds(length=10, num_samples=40, p=11)
-    collate = _collate(1.0, p=11, miss_len=2, num_mask=1, miss_second=True)
-    views, _, masks = collate(ds.train_samples[:20])
-    for view, mask in zip(views, masks):
-        assert view[0].item() != 11
-        assert view[1].item() == 11 and view[2].item() == 11  # forced run
-        assert view[3].item() != 11                            # guaranteed clean
-        assert mask[0].item() == 0.0 and mask[1].item() == 0.0
-        _check_runs(view, 11, 1, 2)
-
-
-def test_first_task_weight_passthrough():
-    ds = _make_ds(p=11, length=12, num_samples=40)
-    collate = _collate(0.5, p=11, num_mask=2, first_task_weight=30.0)
-    _, _, masks = collate(ds.train_samples[:40])
-    seen_weighted = False
-    for mask in masks:
-        if mask[2].item() == 30.0:
-            seen_weighted = True
-        else:
-            assert mask[2].item() == 0.0
-    assert seen_weighted
+def test_default_loss_mask_first_task_weight():
+    from training import _default_loss_mask
+    mask = _default_loss_mask(4, 7, num_mask=2, first_task_weight=30.0)
+    assert mask.shape == (4, 7)
+    assert (mask[:, :2] == 0).all() and mask[0, 2].item() == 30.0
+    assert (mask[:, 3:] == 1).all()
 
 
 def test_predict_missing_returns_clean_targets():
     from core import _unpack_batch
     p = 7
     ds = _make_ds(p=p)
-    collate = _collate(0.5, p=p, predict_missing=True)
+    collate = _collate(0.5, p=p)
     views, tag, cleans = collate(ds.train_samples[:8])
     assert tag == BatchTag.PLAIN_TARGET
     saw = False
@@ -193,21 +165,20 @@ def test_predict_missing_returns_clean_targets():
 
 # ---------------- mixed_ab / mixed_abc (MixedRecurrenceDataset) ----------------
 
-def _make_mixed(use_ab_tag, seed=0, p=7, length=8, num_samples=20):
+def _make_mixed(use_ab_tag=False, seed=0, p=7, length=8, num_samples=20):
+    # use_ab_tag is accepted for call-site compatibility and ignored: tag mode
+    # is deleted; MixedRecurrenceDataset is always basic layout.
     from datasets import MixedRecurrenceDataset
     rules = [LinearRecurrenceRule(coeffs=(1, 1), p=p),
              LinearRecurrenceRule(coeffs=(1, 2), p=p)]
     random.seed(seed)
     return MixedRecurrenceDataset(rules=rules, num_samples=num_samples,
-                                  length=length, verbose=False, use_ab_tag=use_ab_tag)
+                                  length=length, verbose=False)
 
 
-def _mixed_collate(missing_prob=0.5, p=7, order=2, n_rules=2, use_ab_tag=False,
-                   num_mask=2, miss_len=1, predict_missing=False):
+def _mixed_collate(missing_prob=0.5, p=7, order=2, n_rules=2):
     return make_mixed_missing_collate(p=p, order=order, n_rules=n_rules,
-                                      use_ab_tag=use_ab_tag, missing_prob=missing_prob,
-                                      miss_len=miss_len, num_mask=num_mask,
-                                      predict_missing=predict_missing)
+                                      missing_prob=missing_prob)
 
 
 def test_mixed_disabled_keeps_pairs():
@@ -220,70 +191,17 @@ def test_mixed_disabled_keeps_pairs():
 
 def test_mixed_missing_alignment():
     from core import _unpack_batch
-    p, num_mask = 7, 2  # basic mode: missing token id == p
+    p = 7  # basic 模式（唯一模式）：missing token id == p
     ds = _make_mixed(use_ab_tag=False, p=p)
-    collate = _mixed_collate(0.5, p=p, use_ab_tag=False, num_mask=num_mask)
-    views, tag, labels, masks = collate(ds.train_data[:8])
-    assert tag == BatchTag.MIXED_AB_MASKED
-    assert labels.shape == (8,) and masks.shape == (8, ds.length - 1)
-    saw = False
-    for (clean, _), view, mask in zip(ds.train_data[:8], views, masks):
-        assert (view[:ds.order] < p).all()  # first `order` values stay clean
-        for pos in range(ds.order, ds.length):
-            corrupted = view[pos].item() == p
-            saw = saw or corrupted
-            expected = 0.0 if (corrupted or pos - 1 < num_mask) else 1.0
-            assert mask[pos - 1].item() == expected, (pos, corrupted, mask)
-    assert saw
-    x, loss_mask, kwargs, ab_labels, t_override = _unpack_batch(
-        (views, tag, labels, masks), 'cpu', None)
-    assert loss_mask is not None and ab_labels is not None and kwargs == {} and t_override is None
-
-
-def test_mixed_tag_missing_alignment():
-    p, num_mask, n_rules = 7, 2, 2
-    miss = p + n_rules  # tag mode: missing id avoids the flag tokens p..p+N-1
-    ds = _make_mixed(use_ab_tag=True, p=p)
-    collate = _mixed_collate(0.5, p=p, use_ab_tag=True, num_mask=num_mask)
-    views, tag, labels, masks = collate(ds.train_data[:8])
-    saw = False
-    for (clean, label), view, mask in zip(ds.train_data[:8], views, masks):
-        assert view.shape == (ds.length + 1,) and mask.shape == (ds.length,)
-        assert view[0].item() == p + label  # leading flag token stays clean
-        assert (view[1:ds.order + 1] < p).all()
-        for pos in range(1, ds.length + 1):
-            corrupted = view[pos].item() == miss
-            saw = saw or corrupted
-            expected = 0.0 if (corrupted or pos - 1 < num_mask) else 1.0
-            assert mask[pos - 1].item() == expected, (pos, corrupted, mask)
-    assert saw
-
-
-def test_mixed_fresh_randomness_per_call():
-    ds = _make_mixed(use_ab_tag=False)
-    collate = _mixed_collate(0.5, use_ab_tag=False)
-    b1 = collate(ds.train_data[:8])
-    b2 = collate(ds.train_data[:8])
-    assert not torch.equal(b1[0], b2[0])
-
-
-def test_predict_missing_mixed_tag_mode():
-    """Tag mode with PREDICT_MISSING: the flag token is kept on BOTH the
-    corrupted view and the clean target sequence."""
-    from core import _unpack_batch
-    p, n_rules = 7, 2
-    miss = p + n_rules
-    ds = _make_mixed(use_ab_tag=True, p=p)
-    collate = _mixed_collate(0.5, p=p, use_ab_tag=True, predict_missing=True)
+    collate = _mixed_collate(0.5, p=p)
     views, tag, labels, cleans = collate(ds.train_data[:8])
     assert tag == BatchTag.MIXED_AB_TARGET and labels.shape == (8,)
     saw = False
-    for view, clean, label in zip(views, cleans, labels):
-        assert view[0].item() == p + label and clean[0].item() == p + label
-        for pos in range(1, ds.length + 1):
-            if view[pos].item() == miss:
+    for (clean, _), view in zip(ds.train_data[:8], views):
+        assert (view[:ds.order] < p).all()
+        for pos in range(ds.order, ds.length):
+            if view[pos].item() == p:
                 saw = True
-                assert clean[pos].item() != miss
             else:
                 assert view[pos].item() == clean[pos].item()
     assert saw
@@ -292,16 +210,12 @@ def test_predict_missing_mixed_tag_mode():
     assert loss_mask is None and ab_labels is not None and torch.equal(t_override, cleans)
 
 
-def test_post_train_init_state_extraction():
-    """The post-training generation test indexes raw sample lists; clean
-    windows make initial-state reads trivially correct."""
-    from core import _sample_seq
-    ds = _make_ds()
-    for split_data in (ds.train_samples, ds.test_samples):
-        for item in split_data:
-            init_state = tuple(_sample_seq(item)[:INIT_LEN].tolist())
-            assert len(init_state) == INIT_LEN
-            assert all(v < ds.p for v in init_state)
+def test_mixed_fresh_randomness_per_call():
+    ds = _make_mixed(use_ab_tag=False)
+    collate = _mixed_collate(0.5)
+    b1 = collate(ds.train_data[:8])
+    b2 = collate(ds.train_data[:8])
+    assert not torch.equal(b1[0], b2[0])
 
 
 if __name__ == '__main__':
