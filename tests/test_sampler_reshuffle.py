@@ -51,8 +51,8 @@ def run(directory,**overrides):
               OOD_LEN=10,DROPOUT=0.,MAX_UNIQUE_RATIO=.7,WEIGHT_DECAY=.1,
               ENTROPY_PENALTY_WEIGHT=0.,FIRST_TASK_WEIGHT=1.,EVAL_INTERVAL=1,
               EARLY_STOP_ACCURACY=2.,EARLY_STOP_NO_IMPROVE=3000,
-              USE_LEARNABLE_PE=False,MLP_RATIO=2,NUM_MASK=None,USE_AMP=False,
-              RESHUFFLE_EACH_EPOCH=True,SKIP_FINAL_GENERATION_TEST=True,
+              MLP_RATIO=2,NUM_MASK=None,
+              RESHUFFLE_EACH_EPOCH=True,
               SAVE_PATH=str(directory/'model.pth'))
     main.update(overrides)
     path=directory/'config.json'

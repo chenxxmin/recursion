@@ -59,10 +59,10 @@ def test_fresh_test_single_recurrence():
     NUM_TRAIN_SAMPLES rather than the MAX_UNIQUE_RATIO-derived count."""
     with tempfile.TemporaryDirectory() as tmpdir:
         out = _run(tmpdir, fresh=True, task='tribonacci')
-        seeds = re.findall(r'\[FreshTest\] rebuilt test set: n=32, len=8, seed=(\d+)', out)
+        seeds = re.findall(r'\[FreshTest\] sampled with replacement: n=32, len=8, seed=(\d+)', out)
         assert len(seeds) >= 3, f"expected >=3 fresh rebuilds, got {len(seeds)}"
         assert len(set(seeds)) == len(seeds), f"seeds must differ per eval: {seeds}"
-        assert '200 + ' in out, "train set should be NUM_TRAIN_SAMPLES=200"
+        assert '200 unique train samples' in out, "train set should be NUM_TRAIN_SAMPLES=200"
 
 
 def test_fresh_test_mixed_recurrence():

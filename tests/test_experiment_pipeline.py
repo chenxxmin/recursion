@@ -15,6 +15,15 @@ REPO = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(REPO / 'scripts'))
 import experiment_pipeline as pipeline
 
+try:
+    import fcntl  # noqa: F401
+    BUNDLE_RUNNER_OK = True
+except ImportError:
+    # The frozen bundle runner (scripts/experiment_package_runner.py) imports
+    # fcntl, so the shell-integration checks (`bash run.sh ...`) only work on
+    # Linux. Pure-Python prepare/review/build checks still run everywhere.
+    BUNDLE_RUNNER_OK = False
+
 ENV = dict(os.environ, CUDA_VISIBLE_DEVICES='', OMP_NUM_THREADS='2', MKL_NUM_THREADS='2',
            EXPERIMENT_PYTHON=sys.executable)
 
@@ -86,17 +95,18 @@ def test_review_and_freeze(root):
     bundle, archive = pipeline.build(review, pipeline.review_id(plan), root / 'bundle with spaces')
     assert archive.is_file()
     assert 'TIMERS_JSON=' in (bundle / 'run.sh').read_text()
-    assert shell(bundle, 'check').returncode == 0
-    data_path = bundle / 'experiments.json'
-    original = data_path.read_text()
-    data = json.loads(original)
-    assert data['experiments'][0]['config']['NUM_MASK'] == 1
-    assert data['experiments'][0]['config']['EPOCHS'] == 4
-    data['experiments'][0]['config']['MAX_TRAIN_HOURS'] = 100
-    data_path.write_text(json.dumps(data))
-    check = shell(bundle, 'check')
-    assert check.returncode != 0 and 'Package file changed' in check.stderr
-    data_path.write_text(original)
+    if BUNDLE_RUNNER_OK:
+        assert shell(bundle, 'check').returncode == 0
+        data_path = bundle / 'experiments.json'
+        original = data_path.read_text()
+        data = json.loads(original)
+        assert data['experiments'][0]['config']['NUM_MASK'] == 1
+        assert data['experiments'][0]['config']['EPOCHS'] == 4
+        data['experiments'][0]['config']['MAX_TRAIN_HOURS'] = 100
+        data_path.write_text(json.dumps(data))
+        check = shell(bundle, 'check')
+        assert check.returncode != 0 and 'Package file changed' in check.stderr
+        data_path.write_text(original)
     return bundle
 
 
@@ -254,12 +264,15 @@ if __name__ == '__main__':
         print('PASS effective mixed/single counts match actual datasets', flush=True)
         bundle = test_review_and_freeze(root)
         print('PASS review, confirmation, integrity, packaging', flush=True)
-        test_timed_cpu_and_resume(root, bundle)
-        print('PASS portable CPU timeout/full resume', flush=True)
-        test_untimed_completion_and_subset(root)
-        print('PASS untimed completion, subset selection, status', flush=True)
-        test_manual_stop_cancels_queue(root)
-        print('PASS background start, graceful stop, pending cancellation', flush=True)
+        if BUNDLE_RUNNER_OK:
+            test_timed_cpu_and_resume(root, bundle)
+            print('PASS portable CPU timeout/full resume', flush=True)
+            test_untimed_completion_and_subset(root)
+            print('PASS untimed completion, subset selection, status', flush=True)
+            test_manual_stop_cancels_queue(root)
+            print('PASS background start, graceful stop, pending cancellation', flush=True)
+        else:
+            print('SKIP bundle shell integration (bash run.sh requires Linux/fcntl)', flush=True)
         test_gpu_fallback_is_rejected(root)
         print('PASS explicit GPU failure; no CPU/cuda:0 fallback', flush=True)
     print('ALL TESTS PASSED: test_experiment_pipeline.py', flush=True)
