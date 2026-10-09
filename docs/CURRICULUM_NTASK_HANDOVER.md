@@ -81,10 +81,10 @@ for t in tests/test_*.py; do echo "== $t"; PYTHONPATH=src python "$t" | tail -1;
 ```
 
 机制要点（接收方理解用，不用改）：
-- 配置合并顺序：`src/config.json` 的 main → task 默认段 → 实验 config。JSON 里只写与默认不同的键。
+- 配置合并顺序：`src/config.json` 的 main → 场景默认段 →（旧 task 同名段）→ 实验 config 覆盖；默认段查找顺序为场景段 → 旧 task 段，同名时去重（batch_run.py:126-135）。JSON 里只写与默认不同的键。
 - 暖启动是**部分加载**（`experiment.py::_load_partial_checkpoint`）：按名字+shape 匹配拷贝。
-  addition 与 mixed_ab（`USE_AB_TAG=false`）词表都是 P+1=128，WTE/主干全部迁移；
-  mixed 的 rule_head 形状不符自动跳过、重新初始化，属预期行为。
+  addition 与 mixed_ab 词表都是 P+1=128，WTE/主干全部迁移；rule_head 已随
+  场景统一（2026-10-08）删除，暖启动不再涉及。
 - 早停：静态切分制，某次 eval 测试正确率 ≥ `EARLY_STOP_ACCURACY`（默认 0.99）即停并存最终模型。
 - 完整配置键表见 `docs/recursion_model_and_training_settings.md`。
 

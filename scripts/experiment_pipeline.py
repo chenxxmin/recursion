@@ -47,7 +47,7 @@ def source_files(repo, delivery=None):
     if delivery:
         paths += [repo / 'scripts/remote_experiment_runner.py',
                   repo / 'scripts/action_run_postprocess.py']
-    return {str(path.relative_to(repo)): sha_file(path) for path in paths}
+    return {path.relative_to(repo).as_posix(): sha_file(path) for path in paths}
 
 
 def known_keys(repo, base):
@@ -57,7 +57,7 @@ def known_keys(repo, base):
             keys.update(section)
     # Recognize keys actually consumed by training/model code; reject typos.
     for path in (repo / 'src').glob('*.py'):
-        for node in ast.walk(ast.parse(path.read_text())):
+        for node in ast.walk(ast.parse(path.read_text(encoding='utf-8'))):
             if isinstance(node, ast.Constant) and isinstance(node.value, str):
                 value = node.value
                 if re.fullmatch(r'[A-Z][A-Z_0-9]*', value):

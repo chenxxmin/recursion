@@ -17,6 +17,25 @@ def _legacy_task_for(pairs):
     return ('action', 'AB_PAIRS') if len(pairs[0]) == 2 else ('action_trib', 'ABC_PAIRS')
 
 
+def _action_eval_context(cfg):
+    """Experiment main config -> (pairs, order, task) for clean evaluation.
+
+    pairs follow the action internal convention (first coefficient multiplies
+    the OLDEST value) that ActionDataset consumes. New-format cfg['RULES'] is
+    canonical and is reversed once here — the same translation class as the
+    reversal at experiment._prepare_action's entry; the only other reversal
+    site is scenarios._legacy_rules (legacy AB_PAIRS/ABC_PAIRS -> canonical).
+    task picks the normalization route: legacy action_trib configs carry only
+    ABC_PAIRS, so passing 'action' would make _legacy_rules silently fall back
+    to the default AB_PAIRS; the legacy task name must follow the row length.
+    """
+    pairs = cfg.get('AB_PAIRS') or cfg.get('ABC_PAIRS') or \
+        [list(reversed(r)) for r in cfg['RULES']]
+    order = cfg.get('ORDER') or len(pairs[0])
+    task = 'action' if cfg.get('RULES') is not None else _legacy_task_for(pairs)[0]
+    return pairs, order, task
+
+
 def _canonical_rules_from_save_config(sc):
     """Checkpoint save_config -> canonical rules.
 
@@ -88,7 +107,7 @@ def evaluate_run(args):
 
     root = args.run_dir.resolve()
     cfg = json.loads((root / 'configs/experiment.json').read_text())['main']
-    order = cfg.get('ORDER') or len(cfg['AB_PAIRS'][0])
+    pairs, order, task = _action_eval_context(cfg)
     full_path = root / 'checkpoints/model_resume.pth'
     if not full_path.is_file():
         full_path = root / 'checkpoints/model_latest.pth'
@@ -135,11 +154,11 @@ def evaluate_run(args):
                  MISSING_PROB=0.0, FRESH_TEST_PER_EVAL=False)
     from scenarios import normalize_task_config
     model = _prepare_action({'main': small, '_BATCH_RUN_MERGED': True},
-                            normalize_task_config('action', small))['model']
+                            normalize_task_config(task, small))['model']
     model.load_state_dict(weights)
     del weights
     model = model.to(device).eval()
-    ds = ActionDataset(p=cfg['P'], ab_pairs=cfg['AB_PAIRS'], num_samples=args.num_samples,
+    ds = ActionDataset(p=cfg['P'], ab_pairs=pairs, num_samples=args.num_samples,
                        length=cfg['TRAIN_LEN'], seed=args.sample_seed, order=order)
     loader = DataLoader(ds, batch_size=cfg['BATCH_SIZE'], shuffle=False, collate_fn=action_collate_fn)
     loss, acc, positions, _ = evaluate(model, loader, device, num_mask=0)

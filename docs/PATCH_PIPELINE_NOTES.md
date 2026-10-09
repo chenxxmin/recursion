@@ -182,7 +182,7 @@ python src/head_ablation.py model.pth --pairs 256
 
 - 输入：`experiments/*.json`（`{"concurrency": N, "experiments": [...]}`，
   每条含 name/task/config 覆盖）；
-- `build_merged_config`：main → task 默认段 → 实验覆盖，自动填 SAVE_PATH，
+- `build_merged_config`：main → 场景默认段 →（旧 task 同名段去重）→ 实验覆盖，自动填 SAVE_PATH，
   打 `_BATCH_RUN_MERGED` 标记（`protocol.py`）；写出 `config_tmp_<name>.json`
   后 spawn `core.py`；
 - GPU：`get_idle_gpus()`（nvidia-smi 探测）+ 队列分配，**会覆盖外层

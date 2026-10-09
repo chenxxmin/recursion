@@ -112,6 +112,27 @@ def test_eval_clean_action_build_model_legacy_order3():
     assert ctx['model'].vocab_size == 7 + 1 + 2
 
 
+def test_action_run_postprocess_eval_context_key_fallback():
+    # action_run_postprocess.evaluate_run 的键回退：新格式（ORDER+RULES）与
+    # legacy action_trib（仅 ABC_PAIRS）都不得在 cfg['AB_PAIRS'] 处 KeyError，
+    # 且 legacy action_trib 必须按 pairs 行长走 'action_trib' 归一化（否则
+    # _legacy_rules 静默落到默认 AB_PAIRS，rules 错误）。
+    scripts_dir = os.path.join(os.path.dirname(os.path.abspath(__file__)), '..', 'scripts')
+    sys.path.insert(0, scripts_dir)
+    import action_run_postprocess as arp
+    # 新格式：RULES 是 canonical，反转一次成 action 内部约定
+    pairs, order, task = arp._action_eval_context(
+        {'ORDER': 3, 'RULES': [[1, 1, 1], [3, 2, 1]]})
+    assert pairs == [[1, 1, 1], [1, 2, 3]] and order == 3 and task == 'action'
+    # legacy action（AB_PAIRS）：原样使用，无反转
+    pairs, order, task = arp._action_eval_context({'AB_PAIRS': [[2, 1]]})
+    assert pairs == [[2, 1]] and order == 2 and task == 'action'
+    # legacy action_trib（仅 ABC_PAIRS）
+    pairs, order, task = arp._action_eval_context(
+        {'ABC_PAIRS': [[1, 1, 1], [1, 2, 3]]})
+    assert pairs == [[1, 1, 1], [1, 2, 3]] and order == 3 and task == 'action_trib'
+
+
 if __name__ == '__main__':
     test_action_query_mask_any_order()
     test_load_model_rejects_legacy_mixed_checkpoint()
@@ -119,4 +140,5 @@ if __name__ == '__main__':
     test_load_model_new_action_checkpoint()
     test_resolve_recurrence_new_single_checkpoint()
     test_eval_clean_action_build_model_legacy_order3()
+    test_action_run_postprocess_eval_context_key_fallback()
     print("ALL TESTS PASSED: test_scenario_tools.py")
