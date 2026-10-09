@@ -17,7 +17,7 @@ description: 在本仓库（/mnt/workspace/hujiachen/recursion，模运算递推
  "experiments": [{"name": "...", "task": "action", "config": {...覆盖键...}}]}
 ```
 
-- 合并顺序：`src/config.json` 的 main → task 默认段 → 实验 config 覆盖。只写与默认不同的键。
+- 合并顺序：`src/config.json` 的 main → 场景默认段（场景段→旧 task 同名段去重）→ 实验 config 覆盖。只写与默认不同的键。
 - 配置键完整表：读 `docs/recursion_model_and_training_settings.md`（含 MISS_LEN/MISSING_PROB/MAX_TRAIN_HOURS/RESUME_FROM/GRAD_ACCUM_STEPS 等）。
 - 参考模板：`experiments/` 下现有 JSON。
 

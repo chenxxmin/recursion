@@ -57,14 +57,14 @@ X(k) = c1*X(k-1) + c2*X(k-2) + ... + c_o*X(k-o)  (mod P)   # 每条样本取 RUL
 每步规则可变的线性递推。序列格式（o = ORDER，L = 窗口长度）：
 
 ```
-[x0, x1, ..., x_{o-1}, flag_o, x_o, flag_{o+1}, x_{o+1}, ..., flag_L, x_L]
+[x0, x1, ..., x_{o-1}, flag_o, x_o, flag_{o+1}, x_{o+1}, ..., flag_{L-1}, x_{L-1}]
 ```
 
-其中 `flag_k` 表示生成 `x_k` 所用的规则索引，每步从 `RULES` 中随机选一条。**实际输入序列长度为 `2L - order`**。
+其中 `flag_k` 表示生成 `x_k` 所用的规则索引，每步从 `RULES` 中随机选一条。窗口共 **L 个值**（`x0..x_{L-1}`，含 o 个初值 + L−o 个生成值），**实际输入序列长度为 `2L - order`**。
 
 - 训练/测试样本数：`NUM_TRAIN_SAMPLES`（默认 10000）、`NUM_TEST_SAMPLES`（默认 2000）；不枚举状态空间。
 - 词表：`P+1+N规则`（值 0..P-1，missing token = `P`，flag token = `P+1..P+N`）；`run_experiment` 中扩展 `wte`/`lm_head`（保持权重共享，见 §3.3）。
-- loss 只计算 `x_o..x_L`（数据集生成 loss_mask），flag token 与初值被 mask；逐位置 loss mask 语义不随场景统一改变。
+- loss 只计算 `x_o..x_{L-1}`（数据集生成 loss_mask），flag token 与初值被 mask；逐位置 loss mask 语义不随场景统一改变。
 - 污损：`MISSING_PROB > 0` 时经 `make_action_missing_collate` 在线污损——每个值位置独立以 `MISSING_PROB` 概率命中并污损随机长度 ∈ [1, `MISS_LEN`] 的连续段，段后第一个值强制干净；若整段扫描没有任何 run 达到 `MISS_LEN` 则重摇（全净样本也接受）。flag token 永不污损；predict 口径（污损位以原值为目标并计入损失）。
 - 旧 task 名兼容别名：`action`（order=2，旧键 `AB_PAIRS`，⚠ 反向约定见 §1.6）、`action_trib`（order=3，旧键 `ABC_PAIRS`，同上）、`dynamic_mixed`（已废弃，按 `action` 处理）。
 
@@ -91,7 +91,7 @@ X(k) = c1*X(k-1) + c2*X(k-2) + ... + c_o*X(k-o)  (mod P)   # 每条样本取 RUL
 | `action_trib` | action | 3 | `ABC_PAIRS` **逐条 reverse** |
 
 - **新键 `RULES` 三场景同一方向（canonical）：第一个系数乘最新的值。**
-- **action 家族旧 JSON 的 `AB_PAIRS`/`ABC_PAIRS` 是相反约定（第一个系数乘最老的值），仅作兼容输入**，归一化层负责反转。全仓库的反转只有两处：`scenarios._legacy_rules`（旧键 → canonical）与 `experiment._prepare_action` 入口（canonical → action 内部约定）；`scenarios._resolve_conflicts` 内另有一处仅用于新旧键一致性比较的反转，不产生新语义。不要增加第三处。
+- **action 家族旧 JSON 的 `AB_PAIRS`/`ABC_PAIRS` 是相反约定（第一个系数乘最老的值），仅作兼容输入**，归一化层负责反转。全仓库的语义反转只有两处：`scenarios._legacy_rules`（旧键 → canonical）与 `experiment._prepare_action` 入口（canonical → action 内部约定）；另有一处反转仅用于新旧键一致性比较（`scenarios._resolve_conflicts`），不产生新语义。不要再增加新的反转点。
 - 新旧键同时出现：一致 → warning + 新键优先；不一致 → 报错。
 - 显式启用已删除功能（如 `PREDICT_MISSING: false`、`USE_AB_TAG: true`、`USE_AMP: true`、`COND_FIX*`）→ 启动时报错并指出替代写法（完整清单见 §2.3）。
 
