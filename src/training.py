@@ -12,7 +12,6 @@ import sys
 import tempfile
 import time
 from collections import deque
-from contextlib import nullcontext
 
 import torch
 
@@ -31,35 +30,6 @@ def _sigterm_handler(signum, frame):
 
 
 # ==================== Training Functions ====================
-def freeze_partial(model, cond_fix):
-    """
-    Freeze part of the model for conditional_wte analysis.
-    cond_fix: 'WTE'    -> freeze embedding-related params (cond_wte, wte, wpe)
-              'LINEAR' -> freeze transformer backbone + rule head
-    Returns a list of (param, saved_value) for restoring after optimizer steps.
-    """
-    if cond_fix is None:
-        return []
-    
-    frozen = []
-    for name, param in model.named_parameters():
-        freeze = False
-        if cond_fix == "WTE":
-            if any(k in name for k in ('cond_wte', 'transformer.wte', 'transformer.wpe')):
-                freeze = True
-        elif cond_fix == "LINEAR":
-            if (name.startswith('transformer.h.') or 
-                name.startswith('transformer.ln_f.') or
-                name.startswith('rule_head.')):
-                freeze = True
-        if freeze:
-            param.requires_grad = False
-            frozen.append((param, param.detach().clone()))
-    
-    print(f"[CondFix] Frozen {cond_fix}: {len(frozen)} param groups")
-    return frozen
-
-
 def _unpack_batch(batch, device, extra_kwargs_fn):
     """Unpack a dataloader batch of the form (x, tag, *payload).
 
@@ -69,7 +39,6 @@ def _unpack_batch(batch, device, extra_kwargs_fn):
       MIXED_AB       -> (ab_indices,)
       LOSS_MASK      -> (loss_mask,)
       ACTION_MISS    -> (clean_seqs, loss_mask); targets_override = clean_seqs
-      MIXED_AB_MASKED -> (ab_indices, loss_mask)
       PLAIN_TARGET   -> (clean_seqs,); targets_override = clean_seqs
       MIXED_AB_TARGET -> (ab_indices, clean_seqs)
     ab_indices are passed through extra_kwargs_fn and also returned as
@@ -97,12 +66,6 @@ def _unpack_batch(batch, device, extra_kwargs_fn):
         if len(batch) != 3:
             raise ValueError(f"LOSS_MASK batch must carry exactly (loss_mask,), got {len(batch) - 2} payload item(s)")
         return x, batch[2].to(device), {}, None, None
-    if tag == BatchTag.MIXED_AB_MASKED:
-        if len(batch) != 4:
-            raise ValueError(f"MIXED_AB_MASKED batch must carry exactly (ab_indices, loss_mask), got {len(batch) - 2} payload item(s)")
-        ab_labels = batch[2].to(device)
-        kwargs = extra_kwargs_fn(ab_labels) if extra_kwargs_fn is not None else {}
-        return x, batch[3].to(device), kwargs, ab_labels, None
     if tag == BatchTag.PLAIN_TARGET:
         if len(batch) != 3:
             raise ValueError(f"PLAIN_TARGET batch must carry exactly (clean_seqs,), got {len(batch) - 2} payload item(s)")
@@ -182,9 +145,8 @@ def _default_loss_mask(batch_size, target_len, num_mask, first_task_weight=1.0, 
 
 
 def train_epoch(model, dataloader, optimizer, device, num_mask=1, extra_kwargs_fn=None,
-                first_task_weight=1.0, frozen_param_states=None, grad_scaler=None,
-                grad_accum_steps=1, grad_clip_norm=1.0, opt_diag_interval=0,
-                epoch=None):
+                first_task_weight=1.0, grad_accum_steps=1, grad_clip_norm=1.0,
+                opt_diag_interval=0, epoch=None):
     model.train()
     total_loss = 0
     total_correct = 0
@@ -213,23 +175,16 @@ def train_epoch(model, dataloader, optimizer, device, num_mask=1, extra_kwargs_f
         
         if i % grad_accum_steps == 0:
             optimizer.zero_grad()
-        logits, loss, *_ = model(x, targets, loss_mask, **kwargs)
-        
+        logits, loss = model(x, targets, loss_mask, **kwargs)
+
         if loss is not None and torch.isnan(loss):
             # NaN diagnostic: print to stderr so it shows up in .err logs
             _print_nan_diagnostics(x, logits, loss_mask, targets)
-        
+
         step_now = ((i + 1) % grad_accum_steps == 0) or (i == n_batches - 1)
         if loss is not None and not torch.isnan(loss):
-            if grad_scaler is not None:
-                grad_scaler.scale(loss / grad_accum_steps).backward()
-            else:
-                (loss / grad_accum_steps).backward()
+            (loss / grad_accum_steps).backward()
             if step_now:
-                if grad_scaler is not None:
-                    # fp16 path: unscale before measuring/clipping.
-                    grad_scaler.unscale_(optimizer)
-
                 # clip_grad_norm_ returns the PRE-CLIP global norm. Passing inf
                 # measures it without changing gradients, which lets the same
                 # diagnostics work for a no-clipping ablation.
@@ -253,16 +208,7 @@ def train_epoch(model, dataloader, optimizer, device, num_mask=1, extra_kwargs_f
                           f"clip={grad_clip_norm} clipped={int(clipped)} "
                           f"lr={lr_now:.8g}")
 
-                if grad_scaler is not None:
-                    grad_scaler.step(optimizer)
-                    grad_scaler.update()
-                else:
-                    optimizer.step()
-                # Restore frozen parameters (AdamW weight decay would otherwise drift them)
-                if frozen_param_states:
-                    with torch.no_grad():
-                        for param, saved_value in frozen_param_states:
-                            param.copy_(saved_value)
+                optimizer.step()
         
         with torch.no_grad():
             _, batch_correct, batch_samples = _accumulate_accuracy(
@@ -313,7 +259,7 @@ def evaluate(model, dataloader, device, num_mask=1, extra_kwargs_fn=None):
                 # comparable across runs; see _default_loss_mask.
                 loss_mask = _default_loss_mask(B, targets.size(1), num_mask, device=device)
             
-            logits, loss, *_ = model(x, targets, loss_mask, **kwargs)
+            logits, loss = model(x, targets, loss_mask, **kwargs)
 
             match, batch_correct, batch_samples = _accumulate_accuracy(
                 logits, targets, loss_mask, pos_correct, pos_total)
@@ -405,26 +351,11 @@ def save_resume_checkpoint(path, model, optimizer, scheduler, next_epoch,
 
 def run_training_engine(model, train_loader, test_loader, optimizer, scheduler, device,
                         epochs, eval_interval, early_stop_accuracy, early_stop_no_improve,
-                        save_path, save_config, num_mask=1, extra_kwargs_fn=None, first_task_weight=1.0,
-                        cond_fix=None, cond_fix_start=None,
-                        cond_fix_start_a1=None, cond_fix_start_a2=None,
-                        max_train_hours=None, resume_state=None, use_amp=False,
-                        amp_dtype='bfloat16', test_loader_fn=None, grad_accum_steps=1,
-                        grad_clip_norm=1.0, opt_diag_interval=0,
-                        extra_epochs_after_high_acc=200, epoch_cap=None):
+                        save_path, save_config, num_mask=1, extra_kwargs_fn=None,
+                        first_task_weight=1.0, max_train_hours=None, resume_state=None,
+                        test_loader_fn=None, grad_accum_steps=1, grad_clip_norm=1.0,
+                        opt_diag_interval=0, extra_epochs_after_high_acc=0, epoch_cap=None):
     print(f"\nStart training...")
-    # Autocast for the forward pass (weights/optimizer stay fp32). bf16 needs
-    # no scaler (fp32-range exponent); fp16 needs GradScaler (5-bit exponent).
-    use_fp16 = use_amp and amp_dtype == 'float16' and device == 'cuda'
-    amp_ctx = nullcontext
-    grad_scaler = None
-    if use_amp and device == 'cuda':
-        torch_dtype = torch.float16 if use_fp16 else torch.bfloat16
-        amp_ctx = lambda: torch.autocast('cuda', dtype=torch_dtype)
-        if use_fp16:
-            grad_scaler = torch.amp.GradScaler('cuda')
-        print(f"[Config] USE_AMP enabled: {amp_dtype} autocast for train/eval forward"
-              f"{' (GradScaler on)' if use_fp16 else ''}")
     best_acc = 0.0
     best_epoch = 0
     no_improve = 0
@@ -449,77 +380,32 @@ def run_training_engine(model, train_loader, test_loader, optimizer, scheduler, 
     # Graceful stop: SIGTERM (e.g. kill <pid>) triggers checkpoint-save+exit
     # at the next eval point instead of losing in-round progress.
     previous_handler = signal.signal(signal.SIGTERM, _sigterm_handler)
-    frozen_param_states = None
-    cond_fix_triggered = False
     # Early-stop rule (2026-09-07): static-split regimes stop DIRECTLY at
     # early_stop_accuracy; fresh-test regimes (test_loader_fn set) stop when
-    # the last-10-eval mean exceeds it. EARLY_STOP_EXTRA_EPOCHS / high_acc_epoch
-    # are legacy and no longer affect stopping (high_acc_epoch is kept in
-    # resume checkpoints for backward compatibility).
-
-    # cond_fix_start == 0: freeze BEFORE the first gradient step. (Any other
-    # start value keeps the threshold semantics: freeze at the first eval
-    # whose accuracy reaches it.)
-    if cond_fix is not None and cond_fix_start == 0:
-        frozen_param_states = freeze_partial(model, cond_fix)
-        cond_fix_triggered = True
-        print(f"[CondFix] frozen from start (cond_fix_start=0): {cond_fix}")
+    # the last-10-eval mean exceeds it. high_acc_epoch no longer affects
+    # stopping and is kept only for resume-checkpoint compatibility.
 
     # EPOCH_CAP: optional hard stop before `epochs` (LR schedule keeps its
     # full T_max). Normal completion/early-stop/timeout paths unchanged.
     end_epoch = min(epochs, epoch_cap) if epoch_cap else epochs
     epoch = start_epoch
     for epoch in range(start_epoch, end_epoch):
-        with amp_ctx():
-            train_loss, train_acc, train_pos_acc, grad_stats = train_epoch(
-                model, train_loader, optimizer, device,
-                num_mask=num_mask, extra_kwargs_fn=extra_kwargs_fn,
-                first_task_weight=first_task_weight,
-                frozen_param_states=frozen_param_states,
-                grad_scaler=grad_scaler,
-                grad_accum_steps=grad_accum_steps,
-                grad_clip_norm=grad_clip_norm,
-                opt_diag_interval=opt_diag_interval,
-                epoch=epoch)
+        train_loss, train_acc, train_pos_acc, grad_stats = train_epoch(
+            model, train_loader, optimizer, device,
+            num_mask=num_mask, extra_kwargs_fn=extra_kwargs_fn,
+            first_task_weight=first_task_weight,
+            grad_accum_steps=grad_accum_steps,
+            grad_clip_norm=grad_clip_norm,
+            opt_diag_interval=opt_diag_interval,
+            epoch=epoch)
         scheduler.step()
-        
+
         if epoch % eval_interval == 0 or epoch == end_epoch - 1:
             eval_loader = test_loader_fn() if test_loader_fn is not None else test_loader
-            with amp_ctx():
-                _, test_acc, test_pos_acc, test_group_acc = evaluate(
-                    model, eval_loader, device,
-                    num_mask=num_mask, extra_kwargs_fn=extra_kwargs_fn)
+            _, test_acc, test_pos_acc, test_group_acc = evaluate(
+                model, eval_loader, device,
+                num_mask=num_mask, extra_kwargs_fn=extra_kwargs_fn)
 
-            # Conditional freeze: freeze cond_fix params when the start condition is met.
-            # New behavior: max per-rule acc >= a1 AND min per-rule acc >= a2.
-            # Old behavior (backward compat): any per-rule acc >= cond_fix_start.
-            if cond_fix is not None and not cond_fix_triggered:
-                use_new_cond = (cond_fix_start_a1 is not None) and (cond_fix_start_a2 is not None)
-                use_old_cond = cond_fix_start is not None
-
-                if use_new_cond and test_group_acc:
-                    max_acc = max(test_group_acc.values())
-                    min_acc = min(test_group_acc.values())
-                    trigger = (max_acc >= cond_fix_start_a1) and (min_acc >= cond_fix_start_a2)
-                    trigger_desc = f"max>=a1 ({cond_fix_start_a1:.2f}) & min>=a2 ({cond_fix_start_a2:.2f})"
-                elif use_old_cond:
-                    if test_group_acc:
-                        trigger = any(acc >= cond_fix_start for acc in test_group_acc.values())
-                    else:
-                        trigger = test_acc >= cond_fix_start
-                    trigger_desc = f"threshold {cond_fix_start:.2f}"
-                else:
-                    trigger = False
-                    trigger_desc = ""
-
-                if trigger:
-                    frozen_param_states = freeze_partial(model, cond_fix)
-                    cond_fix_triggered = True
-                    no_improve = 0  # reset patience after freeze
-                    print(f"[CondFix] Epoch {epoch}: triggered at {trigger_desc}")
-                    accs = ' '.join(f"{test_group_acc[g]:.2f}" for g in sorted(test_group_acc.keys()))
-                    print(f"  per-rule acc: {accs}")
-            
             if test_acc > best_acc:
                 best_acc = test_acc
                 best_epoch = epoch
@@ -556,8 +442,7 @@ def run_training_engine(model, train_loader, test_loader, optimizer, scheduler, 
                 positions = [p for p in positions if p >= num_mask]
                 if positions:
                     start_pos = positions[0]
-                    # use_ab_tag=True: targets[pos] predicts x_pos; otherwise predicts x_{pos+1}
-                    offset = 0 if getattr(model, 'use_ab_tag', False) else 1
+                    offset = 1  # targets[pos] predicts x_{pos+1}
                     start_x = start_pos + offset
                     accs = ' '.join(f"{test_pos_acc[p]:.2f}" for p in positions)
                     print(f"  from x{start_x}: {accs}")

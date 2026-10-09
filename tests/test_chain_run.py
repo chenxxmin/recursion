@@ -107,36 +107,6 @@ def test_chain_gate_aborts():
         assert not os.path.exists(ckpt2), 'stage 2 ran despite the gate abort'
 
 
-def test_freeze_from_start():
-    """COND_FIX_START=0 must freeze WTE before the first gradient step."""
-    import experiment
-    from training import run_training_engine
-    cfg = {'main': {'P': 7, 'A': 1, 'B': 1, 'D_MODEL': 32, 'N_HEAD': 1, 'N_LAYER': 1,
-                    'BATCH_SIZE': 32, 'TRAIN_LEN': 8, 'OOD_LEN': 10, 'DROPOUT': 0.0,
-                    'ENTROPY_PENALTY_WEIGHT': 0.0, 'WEIGHT_DECAY': 0.1,
-                    'MAX_UNIQUE_RATIO': 0.7}}
-    ctx = experiment._prepare_single_recurrence(cfg, 'addition')
-    model = ctx['model']
-    wte_before = model.transformer.wte.weight.detach().clone()
-    attn_before = model.transformer.h[0].attn.c_attn.weight.detach().clone()
-    optimizer = torch.optim.AdamW(model.parameters(), lr=0.01, weight_decay=0.1)
-    scheduler = torch.optim.lr_scheduler.CosineAnnealingLR(optimizer, T_max=2)
-    with tempfile.TemporaryDirectory() as tmpdir:
-        with contextlib.redirect_stdout(io.StringIO()):
-            run_training_engine(
-                model, ctx['train_loader'], ctx['test_loader'], optimizer, scheduler, 'cpu',
-                epochs=2, eval_interval=1, early_stop_accuracy=2.0,
-                early_stop_no_improve=3000,
-                save_path=os.path.join(tmpdir, 'm.pth'), save_config=ctx['save_config'],
-                num_mask=ctx['num_mask'], extra_kwargs_fn=ctx['extra_kwargs_fn'],
-                first_task_weight=1.0,
-                cond_fix='WTE', cond_fix_start=0)
-    # WTE frozen from the start: unchanged (lm_head is tied, same tensor);
-    # attention weights must still have trained
-    assert torch.equal(model.transformer.wte.weight, wte_before)
-    assert not torch.equal(model.transformer.h[0].attn.c_attn.weight, attn_before)
-
-
 def test_chain_named_stage_ref():
     """INIT_FROM '@<stage>' resolves to the named earlier stage, not just the
     previous one (stage 3 referencing stage 1)."""
@@ -219,7 +189,6 @@ if __name__ == '__main__':
     test_load_partial_checkpoint()
     test_chain_end_to_end()
     test_chain_gate_aborts()
-    test_freeze_from_start()
     test_chain_named_stage_ref()
     test_chain_from_stage_resume()
     print('ALL TESTS PASSED: test_chain_run.py')
