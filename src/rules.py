@@ -51,6 +51,17 @@ def single_rule_from_task(task, cfg):
     """
     p = cfg.get('P', cfg.get('p'))
     get = lambda k: cfg.get(k.upper(), cfg.get(k.lower(), 1))
+    if task == 'single':
+        # Scenario-unification single task: canonical rules live in
+        # cfg['RULES'] (merged config) or cfg['rules'] (checkpoint save_config).
+        rules = cfg.get('RULES', cfg.get('rules'))
+        if not rules or len(rules) != 1:
+            raise ValueError("task 'single' needs exactly one rule in RULES/rules")
+        coeffs = [int(c) for c in rules[0]]
+        name = ('X(k)=(' + '+'.join(f"{c}*X(k-{i + 1})" for i, c in enumerate(coeffs))
+                + f") mod {p}")
+        rule = LinearRecurrenceRule(coeffs=tuple(coeffs), p=p)
+        return len(coeffs), rule.next_fn(), name
     if task == 'addition':
         a, b = get('a'), get('b')
         name = f"X(k)=({a}*X(k-1)+{b}*X(k-2)) mod {p}"
@@ -78,33 +89,54 @@ def single_rule_from_task(task, cfg):
     raise ValueError(f"unknown single-rule task: {task}")
 
 
-def save_config_extra(task, cfg):
-    """Checkpoint save_config entries for a single-rule task (the checkpoint
-    vocabulary: lowercase a/b/c and the 'recurrence' name)."""
-    get = lambda k: cfg.get(k.upper(), cfg.get(k.lower(), 1))
-    if task == 'addition':
-        return {'a': get('a'), 'b': get('b'), 'recurrence': 'addition'}
-    if task == 'multiplication':
-        return {'recurrence': 'multiplicative'}
-    if task == 'tribonacci':
-        return {'a': get('a'), 'b': get('b'), 'c': get('c'), 'recurrence': 'tribonacci'}
-    if task == 'tetranacci':
-        return {'a': get('a'), 'b': get('b'), 'c': get('c'), 'd': get('d'), 'recurrence': 'tetranacci'}
-    if task == 'nonlinear':
-        return {'recurrence': 'nonlinear'}
-    if task == 'nonlinear_mul':
-        return {'recurrence': 'nonlinear_mul'}
-    raise ValueError(f"unknown single-rule task: {task}")
+# Legacy recurrence names still written for single-scenario checkpoints so old
+# analysis tools can read them; order >= 5 has no legacy name.
+_RECURRENCE_NAMES = {2: 'addition', 3: 'tribonacci', 4: 'tetranacci'}
+
+
+def save_config_extra(norm, cfg):
+    """Checkpoint save_config entries for a single-scenario or exception task.
+
+    The new block (scenario/order/rules, canonical) is always written; legacy
+    fields (lowercase a/b/c/d, the 'recurrence' name) are written alongside
+    while they remain unambiguous, so old analysis tools read new checkpoints.
+    """
+    scenario = norm['scenario']
+    if scenario == 'single':
+        coeffs = [int(c) for c in norm['rules'][0]]
+        order = norm['order']
+        extra = {'scenario': 'single', 'order': order, 'rules': [coeffs],
+                 'recurrence': _RECURRENCE_NAMES.get(order, f'single_o{order}')}
+        for letter, c in zip('abcd', coeffs):
+            extra[letter] = c
+        return extra
+    # Exception tasks: legacy behavior + scenario tag.
+    legacy = {'multiplication': {'recurrence': 'multiplicative'},
+              'nonlinear': {'recurrence': 'nonlinear'},
+              'nonlinear_mul': {'recurrence': 'nonlinear_mul'}}[scenario]
+    return {**legacy, 'scenario': scenario}
 
 
 def task_from_save_config(config):
     """Map a checkpoint save_config to its single-rule task name.
 
-    Returns None for mixed_ab/mixed_abc/action checkpoints (those save
-    ab_pairs instead of a single recurrence spec). The old name
-    'dynamic_mixed' (pre-rename checkpoints) is accepted for compatibility.
-    Defaults to 'addition' for old a/b-only or minimal configs.
+    New checkpoints (2026-10-08+) carry an explicit scenario/order/rules
+    block which takes priority over the legacy fields: 'single' and the
+    exception task names are returned as-is; 'mixed'/'action' return None.
+    Legacy checkpoints (no 'scenario' key) keep the old inference: returns
+    None for mixed_ab/mixed_abc/action checkpoints (those save ab_pairs
+    instead of a single recurrence spec). The old name 'dynamic_mixed'
+    (pre-rename checkpoints) is accepted for compatibility. Defaults to
+    'addition' for old a/b-only or minimal configs.
     """
+    scenario = config.get('scenario')
+    if scenario is not None:
+        # New checkpoints (2026-10-08+): the explicit block wins.
+        # 'single' is returned as-is (callers read coefficients from
+        # config['rules']); mixed/action are not single-rule tasks.
+        if scenario in ('mixed', 'action'):
+            return None
+        return scenario
     recurrence = config.get('recurrence')
     if recurrence in ('action', 'dynamic_mixed'):
         return None
@@ -123,22 +155,21 @@ def task_from_save_config(config):
     return 'addition'
 
 
-def rules_from_config(cfg, order):
-    """Build the rule list for a mixed task from a merged config dict.
+def rules_from_config(rules_raw, p):
+    """Build the rule list from canonical coefficient lists.
 
-    order=2 reads AB_PAIRS, order=3 reads ABC_PAIRS; p comes from cfg['P'].
-    Raises ValueError if the key is missing/empty or a rule's coefficient
-    count differs from `order`.
+    rules_raw: list of coefficient lists in canonical order (first
+    coefficient multiplies the newest value), all of the same length >= 2 —
+    i.e. the 'rules' field of scenarios.normalize_task_config's output. The
+    legacy {2: 'AB_PAIRS', 3: 'ABC_PAIRS'} key mapping is gone.
     """
-    key = {2: 'AB_PAIRS', 3: 'ABC_PAIRS'}.get(order)
-    if key is None:
-        raise ValueError(f"rules_from_config supports order 2 or 3, got {order}")
-    raw = cfg.get(key)
-    if not raw:
-        raise ValueError(f"config key {key} must contain at least one rule")
-    p = cfg['P']
+    if not rules_raw:
+        raise ValueError("rules must contain at least one rule")
+    order = len(rules_raw[0])
+    if order < 2:
+        raise ValueError(f"recurrence order must be >= 2, got {order}")
     rules = []
-    for entry in raw:
+    for entry in rules_raw:
         coeffs = tuple(int(c) for c in entry)
         if len(coeffs) != order:
             raise ValueError(

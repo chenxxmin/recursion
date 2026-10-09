@@ -120,7 +120,9 @@ def _prepare_mixed_recurrence(config, device, order):
     OOD_LEN = cfg['OOD_LEN']
     DROPOUT = cfg['DROPOUT']
     MAX_UNIQUE_RATIO = cfg.get('MAX_UNIQUE_RATIO', 0.7)  # default matches src/config.json
-    rules = rules_from_config(cfg, order)
+    # Temporary call-site adaptation (Task 3); Task 7 replaces this with
+    # rules_from_config(norm['rules'], P) once the normalized config flows in.
+    rules = rules_from_config(cfg.get({2: 'AB_PAIRS', 3: 'ABC_PAIRS'}[order]), P)
     state_space_size = P ** order
 
     # block_size must accommodate max sequence length plus an optional leading rule token

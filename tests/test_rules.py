@@ -41,28 +41,24 @@ def test_next_fn_matches_legacy_order3():
 
 
 def test_rules_from_config_order2():
-    cfg = {'P': 23, 'AB_PAIRS': [[3, 5], [7, 11]]}
-    rules = rules_from_config(cfg, 2)
+    rules = rules_from_config([[3, 5], [7, 11]], 23)
     assert [r.coeffs for r in rules] == [(3, 5), (7, 11)]
     assert all(r.p == 23 for r in rules)
     assert rules[0].name == "a3b5"
 
 
-def test_rules_from_config_order3():
-    cfg = {'P': 23, 'ABC_PAIRS': [[1, 1, 1], [1, 2, 3]]}
-    rules = rules_from_config(cfg, 3)
-    assert [r.coeffs for r in rules] == [(1, 1, 1), (1, 2, 3)]
+def test_rules_from_config_any_order():
+    rules = rules_from_config([[1, 2, 3]], 23)
+    assert [r.coeffs for r in rules] == [(1, 2, 3)]
+    rules = rules_from_config([[1, 2, 3, 4, 5]], 23)  # 任意 order，不再有 2/3 写死映射
+    assert rules[0].order == 5
 
 
 def test_rules_from_config_validation():
-    for bad_cfg, order in [
-        ({'P': 23}, 2),                       # missing AB_PAIRS
-        ({'P': 23, 'AB_PAIRS': []}, 2),       # empty rule list
-        ({'P': 23, 'AB_PAIRS': [[1, 1, 1]]}, 2),  # wrong coefficient count
-    ]:
+    for bad in (None, [], [[1, 1], [1, 2, 3]], [[1, 99]], [[1]]):
         try:
-            rules_from_config(bad_cfg, order)
-            assert False, f"expected ValueError for {bad_cfg}"
+            rules_from_config(bad, 23)
+            assert False, f"expected ValueError for {bad}"
         except ValueError:
             pass
 
@@ -97,19 +93,52 @@ def test_single_rule_from_task():
         pass
 
 
+def test_single_rule_from_task_single_scenario():
+    p = 23
+    init_len, fn, name = single_rule_from_task('single', {'P': p, 'RULES': [[2, 3, 1]]})
+    assert init_len == 3 and fn([1, 2, 3], p) == (2 * 3 + 3 * 2 + 1 * 1) % p
+    assert 'mod 23' in name
+    # checkpoint 小写键
+    init_len, fn, _ = single_rule_from_task('single', {'p': p, 'rules': [[5, 6]]})
+    assert init_len == 2 and fn([4, 5], p) == (5 * 5 + 6 * 4) % p
+    try:
+        single_rule_from_task('single', {'P': p, 'RULES': [[1, 1], [2, 2]]})
+        assert False, "single 多规则必须报"
+    except ValueError:
+        pass
+
+
 def test_save_config_round_trip():
-    """save_config_extra (writer) and task_from_save_config (reader) must agree,
-    including the multiplication/multiplicative vocabulary split."""
-    for task in ('addition', 'multiplication', 'tribonacci', 'tetranacci', 'nonlinear', 'nonlinear_mul'):
+    """save_config_extra（写）与 task_from_save_config（读）必须一致：
+    线性 single -> 'single'；例外 task 名原样往返；新块优先于旧字段。"""
+    import sys as _sys, os as _os
+    _sys.path.insert(0, _os.path.join(_os.path.dirname(_os.path.abspath(__file__)), '..', 'src'))
+    from scenarios import normalize_task_config
+    for task in ('addition', 'tribonacci', 'tetranacci'):
         cfg = {'P': 23, 'A': 2, 'B': 3, 'C': 4, 'D': 5}
-        extra = save_config_extra(task, cfg)
-        assert task_from_save_config(extra) == task, (task, extra)
-    # mixed / action checkpoints are not single-rule (old name kept for compat)
+        norm = normalize_task_config(task, cfg)
+        extra = save_config_extra(norm, cfg)
+        assert task_from_save_config(extra) == 'single', (task, extra)
+        assert extra['scenario'] == 'single' and extra['order'] == norm['order']
+        assert extra['rules'] == [list(norm['rules'][0])]
+    for task in ('multiplication', 'nonlinear', 'nonlinear_mul'):
+        extra = save_config_extra(normalize_task_config(task, {'P': 23}), {'P': 23})
+        assert task_from_save_config(extra) == task
+    # 旧 checkpoint（无 scenario 块）反推不变
+    assert task_from_save_config({'a': 1, 'b': 2, 'c': 3,
+                                  'recurrence': 'tribonacci'}) == 'tribonacci'
     assert task_from_save_config({'ab_pairs': [[1, 1]], 'order': 2}) is None
     assert task_from_save_config({'recurrence': 'action', 'ab_pairs': [[1, 1]]}) is None
     assert task_from_save_config({'recurrence': 'dynamic_mixed', 'ab_pairs': [[1, 1]]}) is None
-    # old minimal config defaults to addition
     assert task_from_save_config({'p': 23}) == 'addition'
+    # 新块优先：scenario 与旧字段不一致时以 scenario 为准
+    assert task_from_save_config({'scenario': 'single', 'order': 3,
+                                  'rules': [[1, 2, 3]],
+                                  'recurrence': 'addition'}) == 'single'
+    assert task_from_save_config({'scenario': 'mixed', 'order': 2,
+                                  'rules': [[1, 1]], 'ab_pairs': [[1, 1]]}) is None
+    assert task_from_save_config({'scenario': 'action', 'order': 2,
+                                  'rules': [[2, 1]]}) is None
 
 
 if __name__ == '__main__':
@@ -118,8 +147,9 @@ if __name__ == '__main__':
     test_next_fn_matches_legacy_order2()
     test_next_fn_matches_legacy_order3()
     test_rules_from_config_order2()
-    test_rules_from_config_order3()
+    test_rules_from_config_any_order()
     test_rules_from_config_validation()
     test_single_rule_from_task()
+    test_single_rule_from_task_single_scenario()
     test_save_config_round_trip()
     print("ALL TESTS PASSED: test_rules.py")
