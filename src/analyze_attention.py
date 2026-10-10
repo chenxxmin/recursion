@@ -42,13 +42,26 @@ def load_model(pth_path, device='cpu'):
 
     state_keys = set(checkpoint['model_state_dict'].keys())
 
-    # 旧 MixedABTransformer / 可学习 PE checkpoint：架构已删除，明确报错而不是
-    # 让 load_state_dict 以 mismatch 崩在半截。
-    if any('rule_head' in k or 'cond_wte' in k or 'ab_emb' in k for k in state_keys):
+    # cond_wte / ab_emb 已永久删除：含这些键的 checkpoint 明确报错而不是
+    # 让 load_state_dict 以 mismatch 崩在半截。rule_head 已以可选形式恢复
+    # （AUX_CLASSIFY）：save_config 声明 aux_classify 或 state_dict 含
+    # rule_head 键时按 n_rules 重建（n_rules 从 rule_head 权重形状推断）。
+    if any('cond_wte' in k or 'ab_emb' in k for k in state_keys):
         raise RuntimeError(
             f"{pth_path} 是旧 MixedABTransformer checkpoint（state_dict 含 "
-            f"rule_head/cond_wte/ab_emb 键）；该架构已在 2026-10-08 场景统一中删除。"
+            f"cond_wte/ab_emb 键）；该架构已在 2026-10-08 场景统一中删除。"
             f"请用重构前的代码分析，或用新代码重训。")
+    has_rule_head = any('rule_head' in k for k in state_keys)
+    if has_rule_head or config.get('aux_classify'):
+        if has_rule_head:
+            n_rules = checkpoint['model_state_dict']['rule_head.2.weight'].shape[0]
+        else:
+            n_rules = len(config.get('rules') or config.get('ab_pairs'))
+        order = config.get('order')
+        if order is None:
+            order = len((config.get('rules') or config.get('ab_pairs'))[0])
+        filtered_config['n_rules'] = n_rules
+        filtered_config['order'] = order
     if any(k.endswith('wpe.weight') for k in state_keys) or config.get('use_learnable_pe'):
         raise RuntimeError(
             f"{pth_path} 使用已删除的可学习位置编码（wpe/USE_LEARNABLE_PE）；"
@@ -75,7 +88,9 @@ def _build_input_embedding(model, input_ids):
 
     Only the standard wte path remains: conditional WTE (MixedABTransformer)
     and learnable position embeddings (wpe) were removed 2026-10-08, and
-    load_model rejects checkpoints of those architectures up front.
+    load_model rejects checkpoints of those architectures up front (rule_head
+    checkpoints are fine: the head only adds an auxiliary loss at training
+    time and does not change the embedding path).
     """
     return model.transformer.drop(model.transformer.wte(input_ids))
 

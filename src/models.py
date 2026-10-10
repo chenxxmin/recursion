@@ -132,9 +132,15 @@ def _lm_loss(logits, targets, loss_mask):
     return loss
 
 
+# Weight of the rule-classification auxiliary loss relative to the LM loss
+# (AUX_CLASSIFY, mixed scenario only; restored from pre-2026-10-08
+# MixedABTransformer, tag/cond_wte variants stay removed).
+RULE_LOSS_WEIGHT = 0.5
+
+
 class FibonacciTransformer(nn.Module):
     def __init__(self, p=53, d_model=64, n_head=1, n_layer=1, block_size=128, dropout=0.0,
-                 mlp_ratio=4, pad_token_id=None, vocab_size=None):
+                 mlp_ratio=4, pad_token_id=None, vocab_size=None, n_rules=0, order=None):
         super().__init__()
         self.p = p
         self.pad_token_id = pad_token_id if pad_token_id is not None else p
@@ -155,7 +161,24 @@ class FibonacciTransformer(nn.Module):
         self.lm_head = nn.Linear(d_model, self.vocab_size, bias=False)
         
         self.transformer.wte.weight = self.lm_head.weight
-        
+
+        # Optional rule-classification head (n_rules > 0). Created before
+        # self.apply so _init_weights initializes it with the same scheme as
+        # everything else (normal 0.02 / zero bias), matching the historical
+        # MixedABTransformer rule_head init.
+        self.n_rules = n_rules
+        if n_rules > 0:
+            if order is None:
+                raise ValueError("n_rules > 0 requires order (rule_head read offset = order + 1)")
+            self.order = order
+            self.rule_head = nn.Sequential(
+                nn.Linear(self.d_model, self.d_model // 2),
+                nn.ReLU(),
+                nn.Linear(self.d_model // 2, n_rules)
+            )
+        else:
+            self.rule_head = None
+
         self.apply(self._init_weights)
     
     def _init_weights(self, module):
@@ -166,7 +189,8 @@ class FibonacciTransformer(nn.Module):
         elif isinstance(module, nn.Embedding):
             torch.nn.init.normal_(module.weight, mean=0.0, std=0.02)
     
-    def forward(self, idx, targets=None, loss_mask=None):
+    def forward(self, idx, targets=None, loss_mask=None, ab_labels=None):
+        t = idx.size(1)
         tok_emb = self.transformer.wte(idx)
         
         x = self.transformer.drop(tok_emb)
@@ -174,7 +198,23 @@ class FibonacciTransformer(nn.Module):
             x = block(x)
         x = self.transformer.ln_f(x)
         logits = self.lm_head(x)
+
+        # Rule head reads positions from the first transition that reveals the
+        # recurrence rule: x_{order+1} onward. Tag mode is permanently removed,
+        # so the offset never shifts by a leading rule token.
+        rule_logits = None
+        if self.rule_head is not None and ab_labels is not None:
+            rule_start_offset = self.order + 1
+            if t > rule_start_offset:
+                rule_logits = self.rule_head(x[:, rule_start_offset:, :])
+
         loss = None
         if targets is not None:
             loss = _lm_loss(logits, targets, loss_mask)
+            if rule_logits is not None:
+                B, num_pos, _ = rule_logits.shape
+                rule_logits_flat = rule_logits.reshape(-1, self.n_rules)
+                ab_labels_expanded = ab_labels.unsqueeze(1).expand(B, num_pos).reshape(-1)
+                rule_loss = F.cross_entropy(rule_logits_flat, ab_labels_expanded)
+                loss = loss + RULE_LOSS_WEIGHT * rule_loss
         return logits, loss

@@ -223,6 +223,12 @@ def normalize_task_config(task, cfg):
         raise ValueError(
             f"未知 TASK {task!r}；合法值：新场景 {SCENARIOS}，例外 {EXCEPTION_TASKS}，"
             f"旧名 {tuple(_LEGACY_SCENARIO)}")
+    # AUX_CLASSIFY 只做合法性校验（仅 mixed 合法），不进归一化结果；
+    # false / 不写 -> 无行为。
+    if cfg.get('AUX_CLASSIFY') and scenario_of(task) != 'mixed':
+        raise ValueError(
+            f"AUX_CLASSIFY=true 仅 mixed 场景支持（TASK={task!r} 属于 "
+            f"{scenario_of(task)!r} 场景）；去掉该键即可。")
     if task in EXCEPTION_TASKS:
         return {'scenario': task, 'order': None, 'rules': None,
                 'exposure_ratios': None, 'source': task}

@@ -27,17 +27,18 @@ def _save_ckpt(state_dict, config):
     return path
 
 
-def test_load_model_rejects_legacy_mixed_checkpoint():
-    model = FibonacciTransformer(p=7, d_model=16, n_head=1, n_layer=1, block_size=16)
-    state = model.state_dict()
-    state['rule_head.0.weight'] = torch.zeros(8, 16)  # 伪造旧 mixed 指纹
-    path = _save_ckpt(state, {'p': 7, 'd_model': 16, 'n_head': 1, 'n_layer': 1,
-                              'block_size': 16, 'ab_pairs': [[1, 1]], 'order': 2})
+def test_load_model_loads_legacy_rule_head_checkpoint():
+    # rule_head 已以可选形式（AUX_CLASSIFY）恢复：带 rule_head 键的旧 mixed
+    # checkpoint 可再次加载，n_rules 从 rule_head 权重形状推断；
+    # cond_wte/ab_emb 指纹仍报错（见 tests/test_aux_classify.py）。
+    model = FibonacciTransformer(p=7, d_model=16, n_head=1, n_layer=1,
+                                 block_size=16, n_rules=2, order=2)
+    path = _save_ckpt(model.state_dict(),
+                      {'p': 7, 'd_model': 16, 'n_head': 1, 'n_layer': 1,
+                       'block_size': 16, 'ab_pairs': [[1, 1], [1, 2]], 'order': 2})
     try:
-        analyze_attention.load_model(path)
-        assert False, "legacy mixed checkpoint must raise"
-    except RuntimeError as exc:
-        assert 'rule_head' in str(exc)
+        loaded, _ = analyze_attention.load_model(path)
+        assert loaded.rule_head is not None
     finally:
         os.remove(path)
 
@@ -135,7 +136,7 @@ def test_action_run_postprocess_eval_context_key_fallback():
 
 if __name__ == '__main__':
     test_action_query_mask_any_order()
-    test_load_model_rejects_legacy_mixed_checkpoint()
+    test_load_model_loads_legacy_rule_head_checkpoint()
     test_load_model_rejects_learnable_pe_checkpoint()
     test_load_model_new_action_checkpoint()
     test_resolve_recurrence_new_single_checkpoint()

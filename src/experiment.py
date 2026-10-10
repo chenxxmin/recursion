@@ -113,8 +113,9 @@ def _prepare_mixed_recurrence(config, device, norm):
     """Prepare dataset, model, loaders and training params for the mixed
     scenario (any order >= 2; canonical rules from the normalized config).
 
-    Model is always FibonacciTransformer, vocab always P+1 (tag mode,
-    cond_wte and rule_head were removed 2026-10-08). NUM_MASK default is
+    Model is always FibonacciTransformer, vocab always P+1 (tag mode and
+    cond_wte were removed 2026-10-08; the rule_head auxiliary classifier is
+    available again as an opt-in via AUX_CLASSIFY). NUM_MASK default is
     order-1. Old spellings (mixed_ab/mixed_abc + AB_PAIRS/ABC_PAIRS +
     MAX_UNIQUE_RATIO/MIXED_AB_MAX_UNIQUE_RATIOS) arrive already translated
     by scenarios.normalize_task_config.
@@ -204,9 +205,21 @@ def _prepare_mixed_recurrence(config, device, norm):
             return _make_test_loader(list(zip(fresh_samples, fresh_labels)),
                                      BATCH_SIZE, mixed_collate)
 
+    # AUX_CLASSIFY (mixed only, validated by the normalization layer): attach
+    # the optional rule-classification head and feed per-sample rule labels
+    # (ab_indices) to the model via extra_kwargs_fn. rule_head init consumes
+    # torch RNG, so the AUX_CLASSIFY=false path passes no extra kwargs and
+    # stays bitwise identical to pre-feature runs.
+    aux_classify = cfg.get('AUX_CLASSIFY', False)
+    model_kwargs = {'n_rules': len(rules), 'order': order} if aux_classify else {}
     model = FibonacciTransformer(p=P, d_model=D_MODEL, n_head=N_HEAD,
                                  n_layer=N_LAYER, block_size=BLOCK_SIZE,
-                                 dropout=DROPOUT, mlp_ratio=cfg.get('MLP_RATIO', 4))
+                                 dropout=DROPOUT, mlp_ratio=cfg.get('MLP_RATIO', 4),
+                                 **model_kwargs)
+    if aux_classify:
+        extra_kwargs_fn = lambda ab_indices: {'ab_labels': ab_indices.to(device)}
+    else:
+        extra_kwargs_fn = None
     save_config = {
         'p': P,
         'scenario': 'mixed',
@@ -215,6 +228,7 @@ def _prepare_mixed_recurrence(config, device, norm):
         # canonical == legacy mixed convention, safe for old analysis tools
         'ab_pairs': [list(r.coeffs) for r in rules],
         'exposure_ratios': ratios,
+        'aux_classify': aux_classify,
         'd_model': D_MODEL,
         'n_head': N_HEAD,
         'n_layer': N_LAYER,
@@ -235,6 +249,7 @@ def _prepare_mixed_recurrence(config, device, norm):
         'test_loader': test_loader,
         'test_loader_fn': test_loader_fn,
         'num_mask': num_mask,
+        'extra_kwargs_fn': extra_kwargs_fn,
         'save_config': save_config,
         'cfg': cfg,
         'p': P,
@@ -638,6 +653,7 @@ def run_experiment(config_path=None):
         early_stop_no_improve=cfg.get('EARLY_STOP_NO_IMPROVE', 3000),  # default matches src/config.json
         save_path=SAVE_PATH, save_config=save_config,
         num_mask=num_mask,
+        extra_kwargs_fn=ctx.get('extra_kwargs_fn'),
         first_task_weight=cfg.get('FIRST_TASK_WEIGHT', 1.0),
         max_train_hours=cfg.get('MAX_TRAIN_HOURS'),
         resume_state=resume_state,
