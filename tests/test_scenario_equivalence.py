@@ -2,9 +2,10 @@
 
 Same seed, tiny CPU runs (2 epochs). single/action: the two spellings of the
 same experiment must produce bitwise-identical model weights (normalization
-is pure translation and consumes no RNG). mixed: the model differs by design
-(rule_head removed), so only the datasets are compared sample-for-sample;
-this doubles as the coefficient-reversal check for action_o3 vs action_trib.
+is pure translation and consumes no RNG). mixed: the legacy run may carry the
+optional rule_head (AUX_CLASSIFY, off by default), so only the datasets are
+compared sample-for-sample; this doubles as the coefficient-reversal check
+for action_o3 vs action_trib.
 """
 import contextlib
 import io
@@ -80,7 +81,7 @@ def test_action_o3_equals_action_trib():
 
 
 def test_mixed_o2_dataset_equals_mixed_ab():
-    # 模型结构不同（rule_head 已删），只比数据集逐点相同与样本数（规格 §5）。
+    # 模型结构可能不同（rule_head 现为可选组件 AUX_CLASSIFY），只比数据集逐点相同与样本数（规格 §5）。
     old_cfg = {'P': 7, 'D_MODEL': 16, 'N_HEAD': 1, 'N_LAYER': 1, 'BATCH_SIZE': 8,
                'TRAIN_LEN': 8, 'OOD_LEN': 8, 'DROPOUT': 0.0,
                'AB_PAIRS': [[1, 1], [2, 3]], 'MIXED_AB_MAX_UNIQUE_RATIOS': [0.4, 0.4]}
