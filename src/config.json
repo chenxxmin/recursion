@@ -37,7 +37,7 @@
     "NUM_TEST_SAMPLES": 256
   },
   "single": {},
-  "mixed": {},
+  "mixed": {"AUX_CLASSIFY": true},
   "action": {
     "P": 53,
     "NUM_TRAIN_SAMPLES": 10000,

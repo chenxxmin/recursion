@@ -115,7 +115,8 @@ def _prepare_mixed_recurrence(config, device, norm):
 
     Model is always FibonacciTransformer, vocab always P+1 (tag mode and
     cond_wte were removed 2026-10-08; the rule_head auxiliary classifier is
-    available again as an opt-in via AUX_CLASSIFY). NUM_MASK default is
+    on by default for mixed, AUX_CLASSIFY=false turns it off). NUM_MASK
+    default is
     order-1. Old spellings (mixed_ab/mixed_abc + AB_PAIRS/ABC_PAIRS +
     MAX_UNIQUE_RATIO/MIXED_AB_MAX_UNIQUE_RATIOS) arrive already translated
     by scenarios.normalize_task_config.
@@ -206,11 +207,12 @@ def _prepare_mixed_recurrence(config, device, norm):
                                      BATCH_SIZE, mixed_collate)
 
     # AUX_CLASSIFY (mixed only, validated by the normalization layer): attach
-    # the optional rule-classification head and feed per-sample rule labels
-    # (ab_indices) to the model via extra_kwargs_fn. rule_head init consumes
-    # torch RNG, so the AUX_CLASSIFY=false path passes no extra kwargs and
-    # stays bitwise identical to pre-feature runs.
-    aux_classify = cfg.get('AUX_CLASSIFY', False)
+    # the rule-classification head and feed per-sample rule labels
+    # (ab_indices) to the model via extra_kwargs_fn. Default ON for mixed
+    # (2026-10-10, user decision); AUX_CLASSIFY=false passes no extra kwargs
+    # and stays bitwise identical to pre-feature runs (rule_head init
+    # consumes torch RNG).
+    aux_classify = cfg.get('AUX_CLASSIFY', True)
     model_kwargs = {'n_rules': len(rules), 'order': order} if aux_classify else {}
     model = FibonacciTransformer(p=P, d_model=D_MODEL, n_head=N_HEAD,
                                  n_layer=N_LAYER, block_size=BLOCK_SIZE,

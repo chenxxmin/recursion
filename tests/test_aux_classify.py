@@ -1,11 +1,13 @@
-"""AUX_CLASSIFY: optional rule-classification auxiliary head (mixed scenario only).
+"""AUX_CLASSIFY: rule-classification auxiliary head (mixed scenario only).
 
-Covers the four layers the feature touches:
+Default ON for mixed since 2026-10-10 (user decision); AUX_CLASSIFY=false
+turns it off. Covers the four layers the feature touches:
   1. scenarios.normalize_task_config validation (mixed-only legality; the key
      is validated but never copied into the normalized dict);
   2. models.FibonacciTransformer rule_head (n_rules > 0) and its rule loss;
-  3. end-to-end smoke: mixed + AUX_CLASSIFY=true trains on CPU, and the
-     AUX_CLASSIFY=false path stays bitwise identical to not writing the key;
+  3. end-to-end smoke: mixed trains on CPU with the head; the default-on path
+     (key absent) is bitwise identical to explicit AUX_CLASSIFY=true, and
+     AUX_CLASSIFY=false produces a head-less checkpoint;
   4. analyze_attention.load_model checkpoint compatibility (rule_head loads,
      cond_wte/ab_emb still rejected).
 """
@@ -41,7 +43,8 @@ def test_scenarios_aux_classify_legality():
                                  {'P': 5, 'ABC_PAIRS': [[1, 1, 1]], 'AUX_CLASSIFY': True})
     assert norm['scenario'] == 'mixed' and 'AUX_CLASSIFY' not in norm
 
-    # false / absent: no behavior anywhere
+    # 归一化层只校验 true 的合法性；false / 不写在归一化层都无行为
+    # （默认开是 experiment._prepare_mixed_recurrence 的兜底，不在这一层）
     normalize_task_config('single', {'P': 5, 'ORDER': 2, 'RULES': [[1, 1]],
                                      'AUX_CLASSIFY': False})
     normalize_task_config('addition', {'P': 5, 'A': 1, 'B': 1})
@@ -146,19 +149,30 @@ def test_smoke_mixed_aux_classify_true():
         assert 'per-rule acc' in out, "per-rule eval stats missing"
 
 
-def test_aux_classify_false_matches_absent():
-    # AUX_CLASSIFY=false must be bitwise identical to not writing the key
-    # (rule_head init consumes torch RNG, so only the false path is pinned).
-    # separate tmpdirs so checkpoints don't collide
+def test_aux_classify_default_on_matches_explicit_true():
+    # 默认开（2026-10-10）：不写 AUX_CLASSIFY 与显式 true 必须逐位一致
+    # （同 seed 下 checkpoint 完全相同，且都含 rule_head 权重）。
     with tempfile.TemporaryDirectory() as d1, tempfile.TemporaryDirectory() as d2:
-        _, p1 = _run(d1, {'AUX_CLASSIFY': False})
-        _, p2 = _run(d2, {})
-        s1 = torch.load(p1, weights_only=False)['model_state_dict']
-        s2 = torch.load(p2, weights_only=False)['model_state_dict']
+        _, p1 = _run(d1, {})
+        _, p2 = _run(d2, {'AUX_CLASSIFY': True})
+        c1 = torch.load(p1, weights_only=False)
+        c2 = torch.load(p2, weights_only=False)
+        s1, s2 = c1['model_state_dict'], c2['model_state_dict']
+        assert any(k.startswith('rule_head.') for k in s1), \
+            "mixed default must build the rule head"
+        assert c1['config']['aux_classify'] is True
         assert set(s1) == set(s2)
-        assert not any(k.startswith('rule_head.') for k in s1)
         for k in s1:
-            assert torch.equal(s1[k], s2[k]), f"false path diverged at {k}"
+            assert torch.equal(s1[k], s2[k]), f"default path diverged at {k}"
+
+
+def test_aux_classify_false_disables_head():
+    # 显式 false：无 rule_head，且与 pre-feature 架构一致（无额外参数）。
+    with tempfile.TemporaryDirectory() as tmpdir:
+        _, save_path = _run(tmpdir, {'AUX_CLASSIFY': False})
+        ckpt = torch.load(save_path, weights_only=False)
+        assert not any(k.startswith('rule_head.') for k in ckpt['model_state_dict'])
+        assert ckpt['config']['aux_classify'] is False
 
 
 # ==================== 4. load_model checkpoint compatibility ====================
@@ -214,7 +228,8 @@ if __name__ == '__main__':
     test_model_rule_head_aux_loss()
     test_model_no_rule_head_ignores_ab_labels()
     test_smoke_mixed_aux_classify_true()
-    test_aux_classify_false_matches_absent()
+    test_aux_classify_default_on_matches_explicit_true()
+    test_aux_classify_false_disables_head()
     test_load_model_rule_head_checkpoint()
     test_load_model_cond_wte_still_rejected()
     print("ALL TESTS PASSED: test_aux_classify.py")

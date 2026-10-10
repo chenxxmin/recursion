@@ -49,7 +49,7 @@ X(k) = c1*X(k-1) + c2*X(k-2) + ... + c_o*X(k-o)  (mod P)   # 每条样本取 RUL
 
 - `ORDER` ≥2，`RULES` ≥1 条（canonical）；每条规则状态空间 `P^order`。
 - 每规则样本数由 `EXPOSURE_RATIOS`（标量 = 各规则同一比例；列表 = 逐规则，长度必须等于规则数；默认各 0.7）控制；`NUM_TRAIN_SAMPLES`（标量或逐规则列表）显式设置时覆盖。
-- 词表恒 `P+1`；模型直接用 `FibonacciTransformer`（rule token、cond_wte 均已于 2026-10-08 删除；rule_head 规则分类辅助头可通过 `AUX_CLASSIFY: true` 可选启用，见 §2.1）。样本仍带逐样本规则标签（`ab_indices`），评估输出 per-rule accuracy。
+- 词表恒 `P+1`；模型直接用 `FibonacciTransformer`（rule token、cond_wte 均已于 2026-10-08 删除；rule_head 规则分类辅助头默认开启，可用 `AUX_CLASSIFY: false` 关闭，见 §2.1）。样本仍带逐样本规则标签（`ab_indices`），评估输出 per-rule accuracy。
 - 旧 task 名兼容别名：`mixed_ab`（order=2，旧键 `AB_PAIRS`，本就是 canonical 直接用）、`mixed_abc`（order=3，旧键 `ABC_PAIRS`，同上）。
 
 ### 1.4 action
@@ -177,7 +177,7 @@ X(k) = c1*X(k-1) + c2*X(k-2) + ... + c_o*X(k-o)  (mod P)   # 每条样本取 RUL
 | 配置项 | 说明 |
 |--------|------|
 | `FIRST_TASK_WEIGHT` | 第一个预测位置的损失权重 |
-| `AUX_CLASSIFY` | **仅 mixed**（默认 false）。true 时模型加规则分类辅助头 rule_head（`Linear(d_model, d_model//2) → ReLU → Linear(d_model//2, n_rules)`，读 `x_{order+1}` 起的位置），辅助交叉熵以权重 0.5 加进训练 loss；其他场景写 `true` 会在归一化层报错。checkpoint 的 save_config 记录 `aux_classify` |
+| `AUX_CLASSIFY` | **仅 mixed**（默认 **true**，2026-10-10 起）。true 时模型加规则分类辅助头 rule_head（`Linear(d_model, d_model//2) → ReLU → Linear(d_model//2, n_rules)`，读 `x_{order+1}` 起的位置），辅助交叉熵以权重 0.5 加进训练 loss；其他场景写 `true` 会在归一化层报错。checkpoint 的 save_config 记录 `aux_classify` |
 
 **诊断**
 
@@ -226,7 +226,7 @@ X(k) = c1*X(k-1) + c2*X(k-2) + ... + c_o*X(k-o)  (mod P)   # 每条样本取 RUL
 | `ENTROPY_PENALTY_WEIGHT` | 注意力熵惩罚 | 恒 0 |
 | `SKIP_FINAL_GENERATION_TEST` | final generation test 整体消失 | 直接忽略（无需替代） |
 
-连带删除的实现：`MixedABTransformer` 类（rule_head 后以可选形式恢复为 `FibonacciTransformer` 的 `n_rules` 参数，由 `AUX_CLASSIFY` 开关控制；tag/cond_wte 变体不恢复）、`src/final_eval.py`、`training.py::freeze_partial`、AMP/autocast/GradScaler 路径。
+连带删除的实现：`MixedABTransformer` 类（rule_head 后以可选形式恢复为 `FibonacciTransformer` 的 `n_rules` 参数，由 `AUX_CLASSIFY` 开关控制、mixed 默认开；tag/cond_wte 变体不恢复）、`src/final_eval.py`、`training.py::freeze_partial`、AMP/autocast/GradScaler 路径。
 
 ### 2.4 `src/config.json` 的场景默认段
 
@@ -242,7 +242,7 @@ X(k) = c1*X(k-1) + c2*X(k-2) + ... + c_o*X(k-o)  (mod P)   # 每条样本取 RUL
 - **梯度裁剪**：`clip_grad_norm_(model.parameters(), GRAD_CLIP_NORM)`（默认 1.0）
 - **滚动 checkpoint**：每个 eval 点更新 `<model>_latest.pth`（完整训练状态，可直接 `RESUME_FROM`）；best 更新时写 `<model>_best.pth`（按 test accuracy 选择的纯权重，与最终保存同格式）。latest、resume、best 和最终权重均先写同目录临时文件，成功后原子替换；写入失败最多尝试 3 次，保留上一次完整存档（2026-09-21）。
 - **checkpoint save_config**：2026-10-08 起新 checkpoint 在原有字段外追加 `scenario` / `order` / `rules`（canonical）三键；仍能无歧义表达的旧字段（`ab_pairs`、小写 `a/b/c/d`、`recurrence` 名）照写，方便旧分析工具读取新 checkpoint。`rules.py::task_from_save_config` 优先读新块，没有则走旧反推逻辑（旧 checkpoint 全兼容）。
-- **损失函数**：每个时间步的交叉熵，按 `loss_mask` 平均（熵惩罚已于 2026-10-08 移除；mixed 的 rule loss 仅在 `AUX_CLASSIFY: true` 时以权重 0.5 加回）。
+- **损失函数**：每个时间步的交叉熵，按 `loss_mask` 平均（熵惩罚已于 2026-10-08 移除；mixed 的 rule loss 默认启用——`AUX_CLASSIFY: false` 时关闭——以权重 0.5 加回）。
 - **mask 策略**：
   - `single` / 例外 task：默认屏蔽前 `order-1` 个位置（例外 task 固定 1）
   - `mixed`：默认屏蔽前 `order-1` 个位置
@@ -324,7 +324,7 @@ Input token ids (B, T)
 | `transformer.h` | `ModuleList[TransformerBlock]` | N_LAYER 个 Transformer block |
 | `transformer.ln_f` | `nn.LayerNorm(d_model)` | 最终层归一化 |
 | `lm_head` | `nn.Linear(d_model, vocab_size, bias=False)` | 输出分类头，与 `wte` 共享权重 |
-| `rule_head`（可选） | `Linear(d_model, d_model//2) → ReLU → Linear(d_model//2, n_rules)` | 仅 `AUX_CLASSIFY: true` 的 mixed 实验创建（构造参数 `n_rules>0` + `order`）；读 `x_{order+1}` 起的隐状态做规则分类，辅助损失权重 0.5 |
+| `rule_head`（mixed 默认） | `Linear(d_model, d_model//2) → ReLU → Linear(d_model//2, n_rules)` | mixed 实验默认创建（构造参数 `n_rules>0` + `order`；`AUX_CLASSIFY: false` 关闭）；读 `x_{order+1}` 起的隐状态做规则分类，辅助损失权重 0.5 |
 
 #### 3.2.1 TransformerBlock
 
@@ -432,7 +432,7 @@ loss = masked_cross_entropy(logits, targets, loss_mask)
 
 - `targets = x[:, 1:]`，即输入序列右移一位
 - `loss_mask` 默认屏蔽前 `num_mask` 个位置，只计算后续生成位置的损失
-- 注意力熵惩罚已于 2026-10-08 移除；mixed 的规则分类辅助损失（rule loss，权重 0.5）仅在 `AUX_CLASSIFY: true` 时启用
+- 注意力熵惩罚已于 2026-10-08 移除；mixed 的规则分类辅助损失（rule loss，权重 0.5）默认启用（`AUX_CLASSIFY: false` 关闭）
 - NaN 检测：`train_epoch` 中检测到 NaN loss 时，会将诊断信息打印到 stderr（进入 `.err` 日志），该 batch 不计入 epoch 平均 loss。
 
 ### 5.2 batch 类型区分

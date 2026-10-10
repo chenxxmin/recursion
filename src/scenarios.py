@@ -224,7 +224,8 @@ def normalize_task_config(task, cfg):
             f"未知 TASK {task!r}；合法值：新场景 {SCENARIOS}，例外 {EXCEPTION_TASKS}，"
             f"旧名 {tuple(_LEGACY_SCENARIO)}")
     # AUX_CLASSIFY 只做合法性校验（仅 mixed 合法），不进归一化结果；
-    # false / 不写 -> 无行为。
+    # mixed 场景默认开（experiment._prepare_mixed_recurrence 兜底默认 true），
+    # 其他场景不写 -> 无行为。
     if cfg.get('AUX_CLASSIFY') and scenario_of(task) != 'mixed':
         raise ValueError(
             f"AUX_CLASSIFY=true 仅 mixed 场景支持（TASK={task!r} 属于 "

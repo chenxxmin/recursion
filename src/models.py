@@ -162,10 +162,13 @@ class FibonacciTransformer(nn.Module):
         
         self.transformer.wte.weight = self.lm_head.weight
 
-        # Optional rule-classification head (n_rules > 0). Created before
-        # self.apply so _init_weights initializes it with the same scheme as
-        # everything else (normal 0.02 / zero bias), matching the historical
-        # MixedABTransformer rule_head init.
+        self.apply(self._init_weights)
+
+        # Optional rule-classification head (n_rules > 0). Created AFTER
+        # self.apply on purpose: this preserves the historical
+        # MixedABTransformer RNG consumption order (trunk normal-init first,
+        # then rule_head creation + normal-init), so same-seed runs with
+        # AUX_CLASSIFY=true are bitwise comparable with pre-2026-10-08 runs.
         self.n_rules = n_rules
         if n_rules > 0:
             if order is None:
@@ -176,10 +179,9 @@ class FibonacciTransformer(nn.Module):
                 nn.ReLU(),
                 nn.Linear(self.d_model // 2, n_rules)
             )
+            self.rule_head.apply(self._init_weights)
         else:
             self.rule_head = None
-
-        self.apply(self._init_weights)
     
     def _init_weights(self, module):
         if isinstance(module, nn.Linear):
