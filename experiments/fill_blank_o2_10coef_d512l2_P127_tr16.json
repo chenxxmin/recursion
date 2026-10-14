@@ -2,7 +2,7 @@
   "concurrency": 2,
   "experiments": [
     {
-      "name": "single_o2_fillblank_a117b27_d512l2r8h1_P127_tr16_seed42",
+      "name": "single_o2_fillblank_a117b27_d512l2r8h4_P127_tr16_seed42",
       "task": "single",
       "config": {
         "TASK_VARIANT": "fill_blank",
@@ -16,6 +16,7 @@
         "P": 127,
         "D_MODEL": 512,
         "N_LAYER": 2,
+        "N_HEAD": 4,
         "TRAIN_LEN": 16,
         "EVAL_INTERVAL": 20,
         "TEST_ALL_POSITIONS": true,
@@ -23,7 +24,7 @@
       }
     },
     {
-      "name": "single_o2_fillblank_a25b56_d512l2r8h1_P127_tr16_seed42",
+      "name": "single_o2_fillblank_a25b56_d512l2r8h4_P127_tr16_seed42",
       "task": "single",
       "config": {
         "TASK_VARIANT": "fill_blank",
@@ -37,6 +38,7 @@
         "P": 127,
         "D_MODEL": 512,
         "N_LAYER": 2,
+        "N_HEAD": 4,
         "TRAIN_LEN": 16,
         "EVAL_INTERVAL": 20,
         "TEST_ALL_POSITIONS": true,
@@ -44,7 +46,7 @@
       }
     },
     {
-      "name": "single_o2_fillblank_a61b1_d512l2r8h1_P127_tr16_seed42",
+      "name": "single_o2_fillblank_a61b1_d512l2r8h4_P127_tr16_seed42",
       "task": "single",
       "config": {
         "TASK_VARIANT": "fill_blank",
@@ -58,6 +60,7 @@
         "P": 127,
         "D_MODEL": 512,
         "N_LAYER": 2,
+        "N_HEAD": 4,
         "TRAIN_LEN": 16,
         "EVAL_INTERVAL": 20,
         "TEST_ALL_POSITIONS": true,
@@ -65,7 +68,7 @@
       }
     },
     {
-      "name": "single_o2_fillblank_a104b105_d512l2r8h1_P127_tr16_seed42",
+      "name": "single_o2_fillblank_a104b105_d512l2r8h4_P127_tr16_seed42",
       "task": "single",
       "config": {
         "TASK_VARIANT": "fill_blank",
@@ -79,6 +82,7 @@
         "P": 127,
         "D_MODEL": 512,
         "N_LAYER": 2,
+        "N_HEAD": 4,
         "TRAIN_LEN": 16,
         "EVAL_INTERVAL": 20,
         "TEST_ALL_POSITIONS": true,
@@ -86,7 +90,7 @@
       }
     },
     {
-      "name": "single_o2_fillblank_a5b3_d512l2r8h1_P127_tr16_seed42",
+      "name": "single_o2_fillblank_a5b3_d512l2r8h4_P127_tr16_seed42",
       "task": "single",
       "config": {
         "TASK_VARIANT": "fill_blank",
@@ -100,6 +104,7 @@
         "P": 127,
         "D_MODEL": 512,
         "N_LAYER": 2,
+        "N_HEAD": 4,
         "TRAIN_LEN": 16,
         "EVAL_INTERVAL": 20,
         "TEST_ALL_POSITIONS": true,
@@ -107,7 +112,7 @@
       }
     },
     {
-      "name": "single_o2_fillblank_a78b24_d512l2r8h1_P127_tr16_seed42",
+      "name": "single_o2_fillblank_a78b24_d512l2r8h4_P127_tr16_seed42",
       "task": "single",
       "config": {
         "TASK_VARIANT": "fill_blank",
@@ -121,6 +126,7 @@
         "P": 127,
         "D_MODEL": 512,
         "N_LAYER": 2,
+        "N_HEAD": 4,
         "TRAIN_LEN": 16,
         "EVAL_INTERVAL": 20,
         "TEST_ALL_POSITIONS": true,
@@ -128,7 +134,7 @@
       }
     },
     {
-      "name": "single_o2_fillblank_a67b105_d512l2r8h1_P127_tr16_seed42",
+      "name": "single_o2_fillblank_a67b105_d512l2r8h4_P127_tr16_seed42",
       "task": "single",
       "config": {
         "TASK_VARIANT": "fill_blank",
@@ -142,6 +148,7 @@
         "P": 127,
         "D_MODEL": 512,
         "N_LAYER": 2,
+        "N_HEAD": 4,
         "TRAIN_LEN": 16,
         "EVAL_INTERVAL": 20,
         "TEST_ALL_POSITIONS": true,
@@ -149,7 +156,7 @@
       }
     },
     {
-      "name": "single_o2_fillblank_a54b113_d512l2r8h1_P127_tr16_seed42",
+      "name": "single_o2_fillblank_a54b113_d512l2r8h4_P127_tr16_seed42",
       "task": "single",
       "config": {
         "TASK_VARIANT": "fill_blank",
@@ -163,6 +170,7 @@
         "P": 127,
         "D_MODEL": 512,
         "N_LAYER": 2,
+        "N_HEAD": 4,
         "TRAIN_LEN": 16,
         "EVAL_INTERVAL": 20,
         "TEST_ALL_POSITIONS": true,
@@ -170,7 +178,7 @@
       }
     },
     {
-      "name": "single_o2_fillblank_a50b73_d512l2r8h1_P127_tr16_seed42",
+      "name": "single_o2_fillblank_a50b73_d512l2r8h4_P127_tr16_seed42",
       "task": "single",
       "config": {
         "TASK_VARIANT": "fill_blank",
@@ -184,6 +192,7 @@
         "P": 127,
         "D_MODEL": 512,
         "N_LAYER": 2,
+        "N_HEAD": 4,
         "TRAIN_LEN": 16,
         "EVAL_INTERVAL": 20,
         "TEST_ALL_POSITIONS": true,
@@ -191,7 +200,7 @@
       }
     },
     {
-      "name": "single_o2_fillblank_a83b88_d512l2r8h1_P127_tr16_seed42",
+      "name": "single_o2_fillblank_a83b88_d512l2r8h4_P127_tr16_seed42",
       "task": "single",
       "config": {
         "TASK_VARIANT": "fill_blank",
@@ -205,6 +214,7 @@
         "P": 127,
         "D_MODEL": 512,
         "N_LAYER": 2,
+        "N_HEAD": 4,
         "TRAIN_LEN": 16,
         "EVAL_INTERVAL": 20,
         "TEST_ALL_POSITIONS": true,
