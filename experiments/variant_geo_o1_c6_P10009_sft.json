@@ -1,0 +1,33 @@
+{
+  "concurrency": 2,
+  "experiments": [
+    {
+      "name": "single_o1_fillblank_a6_d512l2r8h4_P10009_tr16_sft_e30k_seed42",
+      "task": "single",
+      "config": {
+        "TASK_VARIANT": "fill_blank",
+        "ORDER": 1, "RULES": [[6]], "CONST": 0,
+        "P": 10009, "D_MODEL": 512, "N_LAYER": 2, "N_HEAD": 4,
+        "TRAIN_LEN": 16, "OOD_LEN": 16,
+        "DATA_MODE": "sampled_fresh_test",
+        "NUM_TRAIN_SAMPLES": 7000, "NUM_TEST_SAMPLES": 1000,
+        "EPOCHS": 30000, "EARLY_STOP_NO_IMPROVE": 10000,
+        "MAX_TRAIN_HOURS": 1.5, "EVAL_INTERVAL": 20
+      }
+    },
+    {
+      "name": "single_o1_corruptfix_a6_d512l2r8h4_P10009_tr16_sft_e30k_seed42",
+      "task": "single",
+      "config": {
+        "TASK_VARIANT": "corrupt_fix",
+        "ORDER": 1, "RULES": [[6]], "CONST": 0,
+        "P": 10009, "D_MODEL": 512, "N_LAYER": 2, "N_HEAD": 4,
+        "TRAIN_LEN": 16, "OOD_LEN": 16,
+        "DATA_MODE": "sampled_fresh_test",
+        "NUM_TRAIN_SAMPLES": 7000, "NUM_TEST_SAMPLES": 1000,
+        "EPOCHS": 30000, "EARLY_STOP_NO_IMPROVE": 10000,
+        "MAX_TRAIN_HOURS": 1.5, "EVAL_INTERVAL": 20
+      }
+    }
+  ]
+}
