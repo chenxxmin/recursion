@@ -1,0 +1,29 @@
+{
+  "concurrency": 2,
+  "experiments": [
+    {
+      "name": "single_o1_fillblank_a1const1_d64l2r8h1_P1009_tr16_e30k_seed42",
+      "task": "single",
+      "config": {
+        "TASK_VARIANT": "fill_blank",
+        "ORDER": 1, "RULES": [[1]], "CONST": 1,
+        "P": 1009, "D_MODEL": 64, "N_LAYER": 2,
+        "TRAIN_LEN": 16, "EPOCHS": 30000,
+        "EARLY_STOP_NO_IMPROVE": 10000, "MAX_TRAIN_HOURS": 1.5,
+        "EVAL_INTERVAL": 20
+      }
+    },
+    {
+      "name": "single_o1_fillblank_a1const1_d512l2r8h1_P1009_tr16_wd10_e30k_seed42",
+      "task": "single",
+      "config": {
+        "TASK_VARIANT": "fill_blank",
+        "ORDER": 1, "RULES": [[1]], "CONST": 1,
+        "P": 1009, "D_MODEL": 512, "N_LAYER": 2,
+        "TRAIN_LEN": 16, "WEIGHT_DECAY": 10, "EPOCHS": 30000,
+        "EARLY_STOP_NO_IMPROVE": 10000, "MAX_TRAIN_HOURS": 1.5,
+        "EVAL_INTERVAL": 20
+      }
+    }
+  ]
+}
