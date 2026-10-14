@@ -133,14 +133,19 @@ def _normalize_variant(scenario, cfg):
 
 
 def _validate_new_format(task, cfg):
-    """New-format task (single/mixed/action): ORDER + RULES are mandatory."""
+    """New-format task (single/mixed/action): ORDER + RULES are mandatory.
+
+    ORDER >= 2 in general; ORDER = 1（等比递推 x_k = c*x_{k-1}）仅 single 场景
+    合法（状态空间 P^1，mixed/action 的多规则/flag 语义不覆盖一阶）。"""
     p = cfg['P']
     order = cfg.get('ORDER')
     if order is None:
         raise ValueError(
-            f"TASK={task!r}（新格式）必须显式写 ORDER（>=2 的整数）")
-    if not isinstance(order, int) or isinstance(order, bool) or order < 2:
-        raise ValueError(f"ORDER 必须是 >=2 的整数，got {order!r}")
+            f"TASK={task!r}（新格式）必须显式写 ORDER（>=2 的整数；single 允许 1）")
+    if not isinstance(order, int) or isinstance(order, bool) or order < 1:
+        raise ValueError(f"ORDER 必须是 >=1 的整数，got {order!r}")
+    if order == 1 and task != 'single':
+        raise ValueError(f"ORDER=1 仅 single 场景支持（TASK={task!r}）")
     raw = cfg.get('RULES')
     if not raw:
         raise ValueError(

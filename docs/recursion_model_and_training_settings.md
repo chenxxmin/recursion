@@ -35,7 +35,7 @@
 X(k) = c1*X(k-1) + c2*X(k-2) + ... + c_o*X(k-o)  (mod P)
 ```
 
-- `ORDER` ≥2，`RULES` 恰好 1 条（canonical）。
+- `ORDER` ≥2，`RULES` 恰好 1 条（canonical）。**ORDER=1 合法**（2026-10-14 起，等比递推 `x_k = c·x_{k-1}`，仅 single；状态空间 `P^1 = P`，建议配大 P）；mixed/action 不接受 ORDER=1。
 - 初始状态长度 `init_len = ORDER`；状态空间大小 `P^order`。
 - 暴露率由 `EXPOSURE_RATIOS`（标量，默认 0.7）控制；`NUM_TRAIN_SAMPLES` 显式设置时覆盖。
 - 高阶大 P（如 order=4 @ P=127，`P^4 ≈ 2.6 亿`）必须配 `STATE_SPACE_CAP` 或用 `DATA_MODE: sampled_fresh_test`（见 §4.1），否则全状态枚举爆炸。
@@ -146,7 +146,7 @@ loss_mask    = 仅最后两个 target 位为 1（EOS 槽预测位置 token，位
 | `TASK` | 场景名（`single`/`mixed`/`action`）或三个非线性例外 task 名；旧 task 名经归一化层兼容（见 §1.6），新实验一律用场景名 |
 | `TASK_VARIANT` | 场景下一级的任务变体（正交于 `TASK`，2026-10-14）。`null`（默认）= 标准 next-token 预测；`corrupt_fix` = 找错改值任务（恰好一位污损成随机错误值 + 尾部 EOS + 输出位置 token 与正确值，见 §1.7），目前仅 single 场景开放 |
 | `P` | 模数 |
-| `ORDER` | 递推阶数，≥2 整数；新格式必须显式写 |
+| `ORDER` | 递推阶数，≥2 整数（single 允许 1，等比递推）；新格式必须显式写 |
 | `RULES` | 系数列表，canonical 方向（第一个系数乘最新的值）。`single` 恰好 1 条；`mixed`/`action` ≥1 条；每条长度 == `ORDER`，系数 ∈ [0, P) |
 | `NUM_MASK` | `null` 表示场景默认（single/mixed = `order-1`；action 由数据集生成 loss_mask）。**注意：`0` 是字面值**（首位置也计入损失与评估）；旧代码（≤2026-07-08）把 `0` 当"未设置"。**今后配置不要再写 `NUM_MASK: 0`**——想排除"只看 x0 预测 x1"这个不可预测的首位置时，应显式写 `1` |
 

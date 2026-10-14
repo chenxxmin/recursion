@@ -68,8 +68,17 @@ def test_new_format_errors():
                   'ORDER')
     _expect_error(lambda: normalize_task_config('single', {'P': 53, 'ORDER': 3}),
                   'RULES')
-    _expect_error(lambda: normalize_task_config('single', {'P': 53, 'ORDER': 1, 'RULES': [[1]]}),
+    _expect_error(lambda: normalize_task_config('single', {'P': 53, 'ORDER': 0, 'RULES': [[]]}),
                   'ORDER')
+    # ORDER=1 仅 single 合法（等比递推）；mixed/action 报错
+    norm = normalize_task_config('single', {'P': 53, 'ORDER': 1, 'RULES': [[3]]})
+    assert norm['order'] == 1 and norm['rules'] == [[3]]
+    _expect_error(lambda: normalize_task_config('mixed', {'P': 53, 'ORDER': 1,
+                                                          'RULES': [[1], [2]]}),
+                  'ORDER=1')
+    _expect_error(lambda: normalize_task_config('action', {'P': 53, 'ORDER': 1,
+                                                           'RULES': [[1]]}),
+                  'ORDER=1')
     _expect_error(lambda: normalize_task_config('mixed', {'P': 53, 'ORDER': 2,
                                                           'RULES': [[1, 1], [1, 2, 3]]}),
                   '长度')

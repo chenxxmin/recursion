@@ -1,0 +1,19 @@
+{
+  "concurrency": 1,
+  "experiments": [
+    {
+      "name": "single_o1_corruptfix_a746_d512l2r8h1_P1009_tr16_seed42",
+      "task": "single",
+      "config": {
+        "TASK_VARIANT": "corrupt_fix",
+        "ORDER": 1,
+        "RULES": [[746]],
+        "P": 1009,
+        "D_MODEL": 512,
+        "N_LAYER": 2,
+        "TRAIN_LEN": 16,
+        "EVAL_INTERVAL": 1
+      }
+    }
+  ]
+}

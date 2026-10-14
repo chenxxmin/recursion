@@ -38,6 +38,7 @@
 7. **action_trib task**（2026-09-10，现为 action 场景的 order=3 兼容别名）：`[x0 x1 x2 flag1 x3 flag2 x4 ...]` 逐位置插 flag，`x_k = a·x_{k-3}+b·x_{k-2}+c·x_{k-1}`。与 action 共用 `ActionDataset`/`_prepare_action`（`order` 参数），旧 JSON 规则读 `ABC_PAIRS`（反向约定，归一化层反转；文档见 docs/recursion_model_and_training_settings.md §1.6）。attention 分析已按 order 参数化，action 家族全阶数可用。
 8. **corrupt_fix 任务变体**（2026-10-14）：新正交键 `TASK_VARIANT`（场景下一级，默认 null）。`corrupt_fix` 目前仅 single：collate 在线把恰好一个位置（含初值）改成随机错误值（≠原值，非 missing token），尾部接 EOS（id=P+1），模型自回归输出位置 token（id=P+2+k）与正确值（teacher forcing）；词表 `P+2+max(TRAIN_LEN,OOD_LEN)`，loss/acc 只算最后两个输出位（复用 targets_override 约定，training.py 零改动）。与 `MISSING_PROB>0` 互斥（报错），`NUM_MASK` 无意义（警告忽略）；mixed/action 组合报“尚未实现”。规格见 docs/recursion_model_and_training_settings.md §1.7。
 9. **MLP_RATIO 默认 4→8**（2026-10-14）：`src/config.json` main 段与代码内全部 fallback（experiment.py / models.py / eval_clean_action.py）同步改为 8。未显式写 MLP_RATIO 的旧实验 JSON 重跑会得到更宽的 MLP（历史实验 JSON 多数显式写了 8，不受影响）。
+10. **ORDER=1 开放给 single**（2026-10-14）：等比递推 `x_k = c·x_{k-1}`（注意不是等差——框架无常数项）。状态空间 `P^1 = P`，建议大 P；mixed/action 仍要求 ORDER≥2（归一化层报错）。
 
 ## 4. 本机环境的坑（反复踩过）
 

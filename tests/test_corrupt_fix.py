@@ -157,6 +157,21 @@ def test_run_experiment_corrupt_fix_rejects_missing_prob():
             raise AssertionError("expected SystemExit(2) for MISSING_PROB conflict")
 
 
+def test_run_experiment_corrupt_fix_order1_smoke():
+    # ORDER=1（等比递推 x_k = c*x_{k-1}）：init_len=1，状态空间 = P。
+    with tempfile.TemporaryDirectory() as tmpdir:
+        out, save_path = _run_experiment(tmpdir, {'TASK_VARIANT': 'corrupt_fix',
+                                                  'P': 17, 'ORDER': 1,
+                                                  'RULES': [[3]]})
+        assert os.path.exists(save_path), "checkpoint was not saved"
+        assert 'Train: Loss=' in out and 'nan' not in out.lower()
+        latest = torch.load(os.path.splitext(save_path)[0] + '_latest.pth',
+                            weights_only=False)
+        sc = latest['config']
+        assert sc['variant'] == 'corrupt_fix' and sc['order'] == 1
+        assert sc['rules'] == [[3]]
+
+
 if __name__ == '__main__':
     test_collate_layout()
     print('PASS test_collate_layout')
@@ -168,4 +183,6 @@ if __name__ == '__main__':
     print('PASS test_run_experiment_corrupt_fix_smoke')
     test_run_experiment_corrupt_fix_rejects_missing_prob()
     print('PASS test_run_experiment_corrupt_fix_rejects_missing_prob')
+    test_run_experiment_corrupt_fix_order1_smoke()
+    print('PASS test_run_experiment_corrupt_fix_order1_smoke')
     print('ALL TESTS PASSED: test_corrupt_fix.py')
