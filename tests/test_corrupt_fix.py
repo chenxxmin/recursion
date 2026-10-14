@@ -134,6 +134,11 @@ def test_run_experiment_corrupt_fix_smoke():
         assert 'Train: Loss=' in out, "training loop output missing"
         assert 'nan' not in out.lower(), "NaN appeared in training"
         assert '[corrupt_fix]' in out, "task banner missing variant tag"
+        # POS_PROBE：corrupt_fix 每个 eval 打 pos/val 两行，各 16 个 k
+        pos_lines = [l for l in out.splitlines() if l.startswith('  PosProbe pos|')]
+        val_lines = [l for l in out.splitlines() if l.startswith('  PosProbe val|')]
+        assert pos_lines and val_lines, "PosProbe lines missing"
+        assert pos_lines[0].count('k') == 8 and val_lines[0].count('k') == 8  # TRAIN_LEN=8
         # 0.0% acc on a fresh model never beats best=0.0, so _best.pth is not
         # written this early; check the rolling full-state checkpoint instead.
         latest = torch.load(os.path.splitext(save_path)[0] + '_latest.pth',
@@ -202,9 +207,25 @@ def test_run_experiment_corrupt_fix_parallel_smoke():
         assert sc['variant'] == 'corrupt_fix' and sc['parallel_decode'] is True
 
 
+def test_collate_fixed_position_tuples():
+    # (seq, k) 元组样本（探针/枚举用）：污损位置由样本携带
+    p, eos_id, pos_base, L = 7, 8, 9, 6
+    seqs = _addition_windows(p=p, n=4, length=L)
+    batch = [(seq, k) for seq in seqs for k in range(L)]
+    collate = make_corrupt_fix_collate(p=p, eos_id=eos_id, pos_base=pos_base)
+    x, tag, targets, mask = collate(batch)
+    for j, (seq, k) in enumerate(batch):
+        diff = (x[j, :L] != seq).nonzero().flatten().tolist()
+        assert diff == [k], f"corruption must be at carried k: {diff}"
+        assert int(targets[j, L + 1]) == pos_base + k
+        assert int(targets[j, L + 2]) == int(seq[k])
+
+
 if __name__ == '__main__':
     test_collate_layout()
     print('PASS test_collate_layout')
+    test_collate_fixed_position_tuples()
+    print('PASS test_collate_fixed_position_tuples')
     test_collate_fresh_randomness()
     print('PASS test_collate_fresh_randomness')
     test_unpack_and_evaluate_integration()

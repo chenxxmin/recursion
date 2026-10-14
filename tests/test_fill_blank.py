@@ -93,6 +93,9 @@ def test_run_experiment_fill_blank_smoke():
         assert 'Train: Loss=' in out, "training loop output missing"
         assert 'nan' not in out.lower(), "NaN appeared in training"
         assert '[fill_blank]' in out, "task banner missing variant tag"
+        # POS_PROBE：fill_blank 每个 eval 打一行 val，16 个 k
+        probe_lines = [l for l in out.splitlines() if l.startswith('  PosProbe val|')]
+        assert probe_lines and probe_lines[0].count('k') == 8, "PosProbe line missing"  # TRAIN_LEN=8
         latest = torch.load(os.path.splitext(save_path)[0] + '_latest.pth',
                             weights_only=False)
         sc = latest['config']

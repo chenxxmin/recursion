@@ -464,7 +464,8 @@ def make_missing_collate(*, p, init_len, missing_prob, miss_len=1, missing_token
 def make_corrupt_fix_collate(*, p, eos_id, pos_base, parallel=False):
     """Collate for the corrupt_fix task variant (TASK_VARIANT='corrupt_fix').
 
-    Input: a batch of CLEAN windows (plain LongTensors, any length L).
+    Input: a batch of CLEAN windows (plain LongTensors, any length L), or
+    (seq, k) tuples carrying the corruption position (probe/eval use).
     Every call corrupts with fresh randomness (train and test alike): exactly
     ONE uniformly chosen position k in [0, L) — initial values included — is
     replaced by a uniformly random WRONG value in [0, p) \\ {original} (a real
@@ -488,9 +489,13 @@ def make_corrupt_fix_collate(*, p, eos_id, pos_base, parallel=False):
     """
     def collate(batch):
         xs, targets, masks = [], [], []
-        for seq in batch:
+        for item in batch:
+            if isinstance(item, (list, tuple)):
+                seq, k = item[0], int(item[1])
+            else:
+                seq = item
+                k = random.randrange(seq.numel())
             L = seq.numel()
-            k = random.randrange(L)
             orig = int(seq[k])
             wrong = random.randrange(p - 1)
             if wrong >= orig:

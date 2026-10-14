@@ -244,6 +244,7 @@ loss_mask    = 仅 EOS 槽一位为 1（acc 只有 target[L] 一个输出位）
 | 配置项 | 说明 |
 |--------|------|
 | `OPT_DIAG_INTERVAL` | 优化器诊断（裁剪前梯度范数等）打印间隔，0 = 关闭 |
+| `POS_PROBE` | **仅 corrupt_fix/fill_blank**（默认 **true**，2026-10-14 起）。每个 eval 点在固定探针窗口集（256 窗口，seed 固定）上按挖空/污损位置 k 分桶统计 acc，打 `PosProbe pos|/val|` 行到日志（corrupt_fix 两行 = 位置/值；fill_blank 一行 = 值）。是“epoch × 位置”热力图的数据源；静态切分取测试窗口子集，fresh test 模式取固定抽样子集 |
 
 **其他**
 

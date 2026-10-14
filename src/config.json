@@ -22,6 +22,7 @@
     "WEIGHT_DECAY": 1,
     "GRAD_CLIP_NORM": 1.0,
     "OPT_DIAG_INTERVAL": 0,
+    "POS_PROBE": true,
     "FIRST_TASK_WEIGHT": 1.0,
     "RANDOM_SEED": 42,
     "EVAL_INTERVAL": 20,

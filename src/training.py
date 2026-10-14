@@ -353,7 +353,8 @@ def run_training_engine(model, train_loader, test_loader, optimizer, scheduler, 
                         save_path, save_config, num_mask=1, extra_kwargs_fn=None,
                         first_task_weight=1.0, max_train_hours=None, resume_state=None,
                         test_loader_fn=None, grad_accum_steps=1, grad_clip_norm=1.0,
-                        opt_diag_interval=0, extra_epochs_after_high_acc=0, epoch_cap=None):
+                        opt_diag_interval=0, extra_epochs_after_high_acc=0, epoch_cap=None,
+                        extra_eval_fn=None):
     print(f"\nStart training...")
     best_acc = 0.0
     best_epoch = 0
@@ -450,6 +451,11 @@ def run_training_engine(model, train_loader, test_loader, optimizer, scheduler, 
             if test_group_acc:
                 accs = ' '.join(f"{test_group_acc[g]:.2f}" for g in sorted(test_group_acc.keys()))
                 print(f"  per-rule acc: {accs}")
+            # Optional extra eval hook (e.g. POS_PROBE per-blank-position stats
+            # for the corrupt_fix/fill_blank variants); returns log lines.
+            if extra_eval_fn is not None:
+                for line in extra_eval_fn(model, device):
+                    print(line, flush=True)
 
             if fresh_test:
                 recent_test_accs.append(test_acc)

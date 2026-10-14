@@ -30,7 +30,7 @@ from datasets import (RecurrenceDataset, MixedRecurrenceDataset,
                       mixed_ab_collate_fn, make_mixed_missing_collate,
                       action_collate_fn, make_action_missing_collate,
                       make_corrupt_fix_collate, make_fill_blank_collate)
-from training import run_training_engine, resume_checkpoint_path
+from training import run_training_engine, resume_checkpoint_path, evaluate
 
 
 # ==================== Unified Experiment Entry ====================
@@ -109,6 +109,39 @@ def _print_task_banner(block_size, train_len, number_theory_msg):
     print(f"[Model config] block_size: {block_size}, train length: {train_len}")
     print(f"[Number theory] {number_theory_msg}")
     print()
+
+
+def _make_pos_probe(windows, collate, length, batch_size):
+    """POS_PROBE: 固定探针窗口集上按挖空/污损位置 k 分桶的评估钩子。
+
+    返回 fn(model, device) -> list[str]（每 eval 点由引擎打印）。
+    对每个 k 用 (seq, k) 元组固定挖空位置，跑 evaluate 取 per_pos_acc：
+    fill_blank 只有值槽（target[L]）；corrupt_fix 有位置槽 target[L] 和
+    值槽 target[L+1]，分两行打印。corrupt_fix 的错误值仍逐次随机
+    （位置 acc 对错值不敏感）；fill_blank 探针完全确定。
+    """
+    def probe(model, device):
+        model.eval()
+        first_slot, second_slot = {}, {}
+        with torch.no_grad():
+            for k in range(length):
+                batch = [(seq, k) for seq in windows]
+                loader = DataLoader(batch, batch_size=batch_size, collate_fn=collate)
+                _, _, per_pos, _ = evaluate(model, loader, device, num_mask=0)
+                if length in per_pos:
+                    first_slot[k] = per_pos[length]
+                if length + 1 in per_pos:
+                    second_slot[k] = per_pos[length + 1]
+
+        def fmt(d):
+            return ' '.join(f"k{k:02d}={d[k] * 100:.1f}" for k in sorted(d))
+
+        if second_slot:
+            return ['  PosProbe pos| ' + fmt(first_slot),
+                    '  PosProbe val| ' + fmt(second_slot)]
+        return ['  PosProbe val| ' + fmt(first_slot)]
+
+    return probe
 
 
 def _prepare_mixed_recurrence(config, device, norm):
@@ -697,6 +730,27 @@ def _prepare_single_variant(config, norm):
                   f"n={NUM_TEST_SAMPLES}, len={OOD_LEN}, seed={fresh_seed}")
             return _make_test_loader(fresh_samples, BATCH_SIZE, collate)
 
+    # POS_PROBE（变体默认开，`POS_PROBE: false` 关闭）：固定探针窗口集，
+    # 每个 eval 点按挖空/污损位置 k 分桶统计 acc 并打进日志（逐位置热力图
+    # 的数据源）。探针集固定，跨 epoch 可比。
+    probe_fn = None
+    if cfg.get('POS_PROBE', True):
+        probe_n = min(256, cfg.get('NUM_TEST_SAMPLES', 256) * 16)
+        if data_mode == 'full_split':
+            pool = [item[0] if isinstance(item, (list, tuple)) else item
+                    for item in test_dataset]
+            probe_windows = random.Random(cfg.get('RANDOM_SEED', 42) + 55).sample(
+                pool, min(probe_n, len(pool)))
+            probe_len = TRAIN_LEN
+        else:
+            probe_windows = ds.sample_random_windows(
+                probe_n, length=OOD_LEN,
+                rng=random.Random(cfg.get('RANDOM_SEED', 42) + 56))
+            probe_len = OOD_LEN
+        probe_fn = _make_pos_probe(probe_windows, collate, probe_len, BATCH_SIZE)
+        print(f"[Probe] POS_PROBE: {len(probe_windows)} windows x "
+              f"{probe_len} positions, fixed across evals")
+
     model = FibonacciTransformer(
         p=P, d_model=D_MODEL, n_head=N_HEAD, n_layer=N_LAYER,
         block_size=BLOCK_SIZE, dropout=DROPOUT,
@@ -729,6 +783,7 @@ def _prepare_single_variant(config, norm):
         'test_loader': test_loader,
         'test_loader_fn': test_loader_fn,
         'num_mask': 0,  # unused; loss_mask comes from the collate
+        'extra_eval_fn': probe_fn,
         'save_config': save_config,
         'cfg': cfg,
         'p': P,
@@ -866,7 +921,8 @@ def run_experiment(config_path=None):
         grad_clip_norm=cfg.get('GRAD_CLIP_NORM', 1.0),
         opt_diag_interval=cfg.get('OPT_DIAG_INTERVAL', 0),
         extra_epochs_after_high_acc=cfg.get('EARLY_STOP_EXTRA_EPOCHS', 0),
-        epoch_cap=cfg.get('EPOCH_CAP')
+        epoch_cap=cfg.get('EPOCH_CAP'),
+        extra_eval_fn=ctx.get('extra_eval_fn')
     )
 
     if timed_out:
