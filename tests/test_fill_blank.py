@@ -156,8 +156,14 @@ def test_run_experiment_fill_blank_test_all_positions():
             'P': 17, 'ORDER': 1, 'RULES': [[1]], 'CONST': 1})
         assert os.path.exists(save_path)
         # 6 个测试窗口 × TRAIN_LEN=8 位置 = 48 条确定性测试样本
-        assert 'TEST_ALL_POSITIONS: test set -> 48 samples' in out
+        assert 'TEST_ALL_POSITIONS: 6 windows -> 48 deterministic test samples' in out
         assert 'FILL_BLANK_ALL_POSITIONS' not in out  # 训练侧未开枚举
+        # NUM_TEST_SAMPLES 作为测试窗口数上限（确定性子抽样）
+        out2, _ = _run_experiment(tmpdir, {
+            'TASK_VARIANT': 'fill_blank', 'TEST_ALL_POSITIONS': True,
+            'NUM_TEST_SAMPLES': 4,
+            'P': 17, 'ORDER': 1, 'RULES': [[1]], 'CONST': 1})
+        assert 'TEST_ALL_POSITIONS: 4 windows -> 32 deterministic test samples' in out2
 
 
 if __name__ == '__main__':

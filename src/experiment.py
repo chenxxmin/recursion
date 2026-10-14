@@ -643,12 +643,19 @@ def _prepare_single_variant(config, norm):
               f"{len(train_dataset)} train samples (x{TRAIN_LEN})")
     # TEST_ALL_POSITIONS（仅 fill_blank）：只把测试集改成逐位置枚举挖空
     # （确定性评估口径），训练侧保持在线随机挖空。blank_all 时测试已枚举，跳过。
+    # 静态切分下 NUM_TEST_SAMPLES 作为测试窗口数上限（默认 256）：确定性子抽样，
+    # 控制 ×16 后的 eval 开销。
     test_all = (variant == 'fill_blank' and not blank_all
                 and cfg.get('TEST_ALL_POSITIONS', False))
     if test_all and data_mode == 'full_split':
-        test_dataset = [(seq, k) for seq in test_dataset for k in range(len(seq))]
-        print(f"[Variant] TEST_ALL_POSITIONS: test set -> "
-              f"{len(test_dataset)} samples (every window x every position)")
+        test_windows = test_dataset
+        cap = cfg.get('NUM_TEST_SAMPLES', 256)
+        if cap is not None and len(test_windows) > cap:
+            sub_rng = random.Random(cfg.get('RANDOM_SEED', 42) + 77)
+            test_windows = sub_rng.sample(test_windows, cap)
+        print(f"[Variant] TEST_ALL_POSITIONS: {len(test_windows)} windows -> "
+              f"{len(test_windows) * TRAIN_LEN} deterministic test samples")
+        test_dataset = [(seq, k) for seq in test_windows for k in range(len(seq))]
 
     eos_id = P + 1
     if variant == 'corrupt_fix':

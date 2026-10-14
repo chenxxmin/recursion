@@ -149,7 +149,7 @@ loss_mask    = 仅 EOS 槽一位为 1（acc 只有 target[L] 一个输出位）
 
 **`FILL_BLANK_ALL_POSITIONS`**（2026-10-14，默认 false，仅 fill_blank）：true 时数据侧枚举式挖空——每条序列的每个位置挖空各成一条样本（`(seq, k)` 元组，样本数 × 窗口长度，train/test 同样），collate 使用样本携带的位置不再随机选位。适合小状态空间任务（如等差数列）保证位置覆盖。
 
-**`TEST_ALL_POSITIONS`**（2026-10-14，默认 false，仅 fill_blank）：只把**测试集**改成逐位置枚举挖空（每窗口 × 窗口长度条确定性样本），训练侧保持在线随机挖空。消除位置抽样噪声，使 best acc/早停/横向通过率对比口径干净；代价是 eval 计算量 × 窗口长度。与 `FILL_BLANK_ALL_POSITIONS` 同开时冗余（测试已枚举），警告提示。
+**`TEST_ALL_POSITIONS`**（2026-10-14，默认 false，仅 fill_blank）：只把**测试集**改成逐位置枚举挖空（每窗口 × 窗口长度条确定性样本），训练侧保持在线随机挖空。消除位置抽样噪声，使 best acc/早停/横向通过率对比口径干净；代价是 eval 计算量 × 窗口长度。**静态切分制下 `NUM_TEST_SAMPLES` 变为测试窗口数上限**（默认 256，确定性子抽样），用于控制枚举后的 eval 规模，如 1000 窗口 × 16 位置 = 16000 条。与 `FILL_BLANK_ALL_POSITIONS` 同开时冗余（测试已枚举），警告提示。
 
 ---
 

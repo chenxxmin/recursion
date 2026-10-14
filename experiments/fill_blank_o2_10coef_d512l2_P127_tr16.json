@@ -17,8 +17,9 @@
         "D_MODEL": 512,
         "N_LAYER": 2,
         "TRAIN_LEN": 16,
-        "EVAL_INTERVAL": 1,
-        "TEST_ALL_POSITIONS": true
+        "EVAL_INTERVAL": 20,
+        "TEST_ALL_POSITIONS": true,
+        "NUM_TEST_SAMPLES": 1000
       }
     },
     {
@@ -37,8 +38,9 @@
         "D_MODEL": 512,
         "N_LAYER": 2,
         "TRAIN_LEN": 16,
-        "EVAL_INTERVAL": 1,
-        "TEST_ALL_POSITIONS": true
+        "EVAL_INTERVAL": 20,
+        "TEST_ALL_POSITIONS": true,
+        "NUM_TEST_SAMPLES": 1000
       }
     },
     {
@@ -57,8 +59,9 @@
         "D_MODEL": 512,
         "N_LAYER": 2,
         "TRAIN_LEN": 16,
-        "EVAL_INTERVAL": 1,
-        "TEST_ALL_POSITIONS": true
+        "EVAL_INTERVAL": 20,
+        "TEST_ALL_POSITIONS": true,
+        "NUM_TEST_SAMPLES": 1000
       }
     },
     {
@@ -77,8 +80,9 @@
         "D_MODEL": 512,
         "N_LAYER": 2,
         "TRAIN_LEN": 16,
-        "EVAL_INTERVAL": 1,
-        "TEST_ALL_POSITIONS": true
+        "EVAL_INTERVAL": 20,
+        "TEST_ALL_POSITIONS": true,
+        "NUM_TEST_SAMPLES": 1000
       }
     },
     {
@@ -97,8 +101,9 @@
         "D_MODEL": 512,
         "N_LAYER": 2,
         "TRAIN_LEN": 16,
-        "EVAL_INTERVAL": 1,
-        "TEST_ALL_POSITIONS": true
+        "EVAL_INTERVAL": 20,
+        "TEST_ALL_POSITIONS": true,
+        "NUM_TEST_SAMPLES": 1000
       }
     },
     {
@@ -117,8 +122,9 @@
         "D_MODEL": 512,
         "N_LAYER": 2,
         "TRAIN_LEN": 16,
-        "EVAL_INTERVAL": 1,
-        "TEST_ALL_POSITIONS": true
+        "EVAL_INTERVAL": 20,
+        "TEST_ALL_POSITIONS": true,
+        "NUM_TEST_SAMPLES": 1000
       }
     },
     {
@@ -137,8 +143,9 @@
         "D_MODEL": 512,
         "N_LAYER": 2,
         "TRAIN_LEN": 16,
-        "EVAL_INTERVAL": 1,
-        "TEST_ALL_POSITIONS": true
+        "EVAL_INTERVAL": 20,
+        "TEST_ALL_POSITIONS": true,
+        "NUM_TEST_SAMPLES": 1000
       }
     },
     {
@@ -157,8 +164,9 @@
         "D_MODEL": 512,
         "N_LAYER": 2,
         "TRAIN_LEN": 16,
-        "EVAL_INTERVAL": 1,
-        "TEST_ALL_POSITIONS": true
+        "EVAL_INTERVAL": 20,
+        "TEST_ALL_POSITIONS": true,
+        "NUM_TEST_SAMPLES": 1000
       }
     },
     {
@@ -177,8 +185,9 @@
         "D_MODEL": 512,
         "N_LAYER": 2,
         "TRAIN_LEN": 16,
-        "EVAL_INTERVAL": 1,
-        "TEST_ALL_POSITIONS": true
+        "EVAL_INTERVAL": 20,
+        "TEST_ALL_POSITIONS": true,
+        "NUM_TEST_SAMPLES": 1000
       }
     },
     {
@@ -197,8 +206,9 @@
         "D_MODEL": 512,
         "N_LAYER": 2,
         "TRAIN_LEN": 16,
-        "EVAL_INTERVAL": 1,
-        "TEST_ALL_POSITIONS": true
+        "EVAL_INTERVAL": 20,
+        "TEST_ALL_POSITIONS": true,
+        "NUM_TEST_SAMPLES": 1000
       }
     }
   ]

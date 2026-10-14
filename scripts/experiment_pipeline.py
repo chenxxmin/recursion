@@ -146,8 +146,12 @@ def normalize(task, cfg, origins):
             test_count = {'windows': test_count, 'total': test_count * eval_win_len}
         elif variant == 'fill_blank' and cfg.get('TEST_ALL_POSITIONS'):
             eval_win_len = cfg['OOD_LEN'] if cfg['FRESH_TEST_PER_EVAL'] else cfg['TRAIN_LEN']
+            if not cfg['FRESH_TEST_PER_EVAL']:
+                # 静态切分下 NUM_TEST_SAMPLES 是测试窗口数上限
+                test_count = min(test_count, cfg['NUM_TEST_SAMPLES'])
             notes.append('TEST_ALL_POSITIONS：测试集逐位置枚举挖空（确定性评估），'
-                         'test 样本数 = 窗口数 × 窗口长度；训练侧保持在线随机挖空。')
+                         'test 样本数 = 窗口数 × 窗口长度（静态切分下窗口数上限 = NUM_TEST_SAMPLES）；'
+                         '训练侧保持在线随机挖空。')
             test_count = {'windows': test_count, 'total': test_count * eval_win_len}
         data_mode = mode
         # 变体尾部 token：corrupt_fix = EOS + 位置 token；fill_blank = EOS
