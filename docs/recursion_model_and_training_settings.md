@@ -25,6 +25,8 @@
 
 `RULES` 方向三场景统一为 **canonical：第一个系数乘最新的值**（`x_k = c1·x_{k-1} + c2·x_{k-2} + ...`，与 `LinearRecurrenceRule` 一致），详见 §1.6。
 
+另有与场景正交的**任务变体**键 `TASK_VARIANT`（场景下一级）：默认 `null` = 标准 next-token 预测；`corrupt_fix` = 找错改值任务（见 §1.7），目前仅 single 场景开放。
+
 ### 1.2 single
 
 任意阶单条线性递推：
@@ -95,6 +97,37 @@ X(k) = c1*X(k-1) + c2*X(k-2) + ... + c_o*X(k-o)  (mod P)   # 每条样本取 RUL
 - 新旧键同时出现：一致 → warning + 新键优先；不一致 → 报错。
 - 显式启用已删除功能（如 `PREDICT_MISSING: false`、`USE_AB_TAG: true`、`USE_AMP: true`、`COND_FIX*`）→ 启动时报错并指出替代写法（完整清单见 §2.3）。
 
+### 1.7 corrupt_fix 任务变体（`TASK_VARIANT`，2026-10-14）
+
+`TASK_VARIANT` 是场景**下一级**的正交键（默认 `null` = 标准 next-token 预测）。目前唯一取值 `corrupt_fix`，且**仅 single 场景开放**（与 mixed/action/例外 task 组合在归一化层报“尚未实现”错误，留有扩展位）。
+
+任务流程（污损在线完成，collate 内逐 batch 新鲜随机，train/test 同样）：
+
+1. 照常生成干净递推窗口（复用 `RecurrenceDataset`，DATA_MODE/暴露率逻辑与 single 完全一致）；
+2. **恰好一个位置** k uniform 选自 [0, L)（含初始值位置），其值替换为 [0, P) \ {原值} 中 uniform 的随机错误值（真错误值，**不是** missing token）；
+3. 序列尾部追加 EOS token，模型自回归输出两个 token：**位置 token**（错误位置 k）→ **值 token**（该位置的正确值；teacher forcing，输入中回填位置 token）。
+
+词表布局（构造时直接传 `vocab_size`，无需 action 式的事后扩表）：
+
+```
+[0..P-1] 值 token | P = missing（保留不用，布局一致） | P+1 = EOS | P+2+k = 位置 token（k < max(TRAIN_LEN, OOD_LEN)）
+vocab_size = P + 2 + max(TRAIN_LEN, OOD_LEN)；BLOCK_SIZE = round_up_pow2(max(TRAIN_LEN, OOD_LEN) + 2)
+```
+
+序列/target 布局（L = 窗口长度，复用 `targets_override[:, 1:]` 约定）：
+
+```
+x            = [污损窗口(L), EOS, pos_tok(k)]            # 长 L+2
+targets_override = [污损窗口(L), EOS, pos_tok(k), 正确值]   # 长 L+3
+loss_mask    = 仅最后两个 target 位为 1（EOS 槽预测位置 token，位置槽预测正确值）
+```
+
+- 配置约束：与 `MISSING_PROB > 0` 互斥（污损是任务内生的），同时设置报错；`NUM_MASK` 无意义（loss_mask 来自 collate），设置则警告忽略。
+- 训练/评估零改动：mask 后 CE 只落在两个输出位；acc 为两个输出位的 token 级准确率，per-position acc 自动拆出位置 acc（`target[L]`）与值 acc（`target[L+1]`）；早停两制（静态 / fresh test 10 次均值）直接适用。
+- 结果口径：训练日志 best acc（污损是任务本体，无 clean/total 之分）。
+- checkpoint save_config 追加 `variant` / `eos_token_id` / `pos_token_base` / `vocab_size` 四键。
+- collate：`src/datasets.py::make_corrupt_fix_collate`；BatchTag：`CORRUPT_FIX`（payload = `target_seqs` + `loss_mask`）。
+
 ---
 
 ## 2. 配置
@@ -111,6 +144,7 @@ X(k) = c1*X(k-1) + c2*X(k-2) + ... + c_o*X(k-o)  (mod P)   # 每条样本取 RUL
 | 配置项 | 说明 |
 |--------|------|
 | `TASK` | 场景名（`single`/`mixed`/`action`）或三个非线性例外 task 名；旧 task 名经归一化层兼容（见 §1.6），新实验一律用场景名 |
+| `TASK_VARIANT` | 场景下一级的任务变体（正交于 `TASK`，2026-10-14）。`null`（默认）= 标准 next-token 预测；`corrupt_fix` = 找错改值任务（恰好一位污损成随机错误值 + 尾部 EOS + 输出位置 token 与正确值，见 §1.7），目前仅 single 场景开放 |
 | `P` | 模数 |
 | `ORDER` | 递推阶数，≥2 整数；新格式必须显式写 |
 | `RULES` | 系数列表，canonical 方向（第一个系数乘最新的值）。`single` 恰好 1 条；`mixed`/`action` ≥1 条；每条长度 == `ORDER`，系数 ∈ [0, P) |
@@ -141,7 +175,7 @@ X(k) = c1*X(k-1) + c2*X(k-2) + ... + c_o*X(k-o)  (mod P)   # 每条样本取 RUL
 
 | 配置项 | 说明 |
 |--------|------|
-| `D_MODEL` / `N_HEAD` / `N_LAYER` / `MLP_RATIO` / `DROPOUT` | 模型隐藏维度 / 注意力头数 / Transformer block 层数 / MLP 隐藏层相对 d_model 的倍数 / Dropout 概率 |
+| `D_MODEL` / `N_HEAD` / `N_LAYER` / `MLP_RATIO` / `DROPOUT` | 模型隐藏维度 / 注意力头数 / Transformer block 层数 / MLP 隐藏层相对 d_model 的倍数（**默认 8**，2026-10-14 起；此前为 4） / Dropout 概率 |
 
 **优化**
 
@@ -447,6 +481,7 @@ loss = masked_cross_entropy(logits, targets, loss_mask)
 | `BatchTag.MIXED_AB` | `mixed_ab_collate_fn` | `ab_indices`（逐样本规则标签） |
 | `BatchTag.MIXED_AB_TARGET` | `make_mixed_missing_collate` | `ab_indices` + 干净目标序列 |
 | `BatchTag.ACTION_MISS` | `make_action_missing_collate` | 干净目标序列 + `loss_mask` |
+| `BatchTag.CORRUPT_FIX` | `make_corrupt_fix_collate` | 目标序列（`targets = target_seqs[:, 1:]`）+ `loss_mask`（仅位置/值两个输出位） |
 
 不再通过张量 `ndim` 推断 batch 类型。
 
@@ -490,7 +525,7 @@ loss = masked_cross_entropy(logits, targets, loss_mask)
 | 注意力层 | `src/models.py::CausalSelfAttention` |
 | RoPE 实现 | `src/models.py::RotaryEmbedding`，`src/models.py::apply_rotary_emb` |
 | 训练流程 | `src/training.py::run_training_engine`，`src/training.py::train_epoch`，`src/training.py::evaluate`（AMP、freeze_partial、entropy penalty 均已移除） |
-| 配置入口 | `src/experiment.py::run_experiment`（开头经 `normalize_task_config` 归一化后按 scenario 分派 `_prepare_single_recurrence` / `_prepare_mixed_recurrence` / `_prepare_action`；`src/core.py` 为入口壳并 re-export，由 `src/batch_run.py` 以 `python src/core.py <config>` 子进程方式调用） |
+| 配置入口 | `src/experiment.py::run_experiment`（开头经 `normalize_task_config` 归一化后按 scenario/variant 分派 `_prepare_single_recurrence` / `_prepare_mixed_recurrence` / `_prepare_action` / `_prepare_single_corrupt_fix`（TASK_VARIANT=corrupt_fix）；`src/core.py` 为入口壳并 re-export，由 `src/batch_run.py` 以 `python src/core.py <config>` 子进程方式调用） |
 | 批量运行 | `src/batch_run.py` |
 | 注意力可视化 | `src/analyze_attention.py`（action/mixed 已按 order 参数化；含 cond_wte/ab_emb 键的旧 checkpoint 明确报错，含 rule_head 键的可加载） |
 | 训练后最终生成测试 | **已删除**（`src/final_eval.py` 移除，2026-10-08） |

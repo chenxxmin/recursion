@@ -102,6 +102,7 @@ def normalize(task, cfg, origins):
     from scenarios import normalize_task_config
     norm = normalize_task_config(task, cfg)
     scenario = norm['scenario']
+    variant = norm.get('variant')  # None | 'corrupt_fix'（场景下一级的任务变体）
     order = norm['order']
     notes = []
     positive_int(cfg['NUM_TEST_SAMPLES'], 'NUM_TEST_SAMPLES')
@@ -124,7 +125,10 @@ def normalize(task, cfg, origins):
         positive_int(cfg['NUM_TRAIN_SAMPLES'], 'NUM_TRAIN_SAMPLES')
         require(cfg['NUM_TRAIN_SAMPLES'] <= cfg['P'] ** order, 'Training count exceeds state space')
         if cfg['NUM_MASK'] is None:
-            derived('NUM_MASK', order - 1)
+            if variant == 'corrupt_fix':
+                notes.append('corrupt_fix：loss_mask 由 collate 给出（仅位置/值两个输出位），NUM_MASK 不参与。')
+            else:
+                derived('NUM_MASK', order - 1)
         count = cfg['NUM_TRAIN_SAMPLES']
         rules = (norm['rules'][0] if scenario == 'single' else task)
         if isinstance(rules, list):
@@ -134,7 +138,8 @@ def normalize(task, cfg, origins):
         test_count = cfg['NUM_TEST_SAMPLES'] if cfg['FRESH_TEST_PER_EVAL'] else cfg['P'] ** order - count
         exposure = count / cfg['P'] ** order
         data_mode = mode
-        train_tokens = cfg['TRAIN_LEN']
+        # corrupt_fix: 输入 = 窗口 + EOS + 位置 token（teacher forcing）
+        train_tokens = cfg['TRAIN_LEN'] + (2 if variant == 'corrupt_fix' else 0)
     elif scenario == 'mixed':
         rules = norm['rules']
         require(isinstance(rules, list) and rules, 'RULES must contain rules')
@@ -179,16 +184,20 @@ def normalize(task, cfg, origins):
         data_mode = 'generated + fresh_test' if cfg['FRESH_TEST_PER_EVAL'] else 'generated + fixed_test'
         train_tokens = 2 * cfg['TRAIN_LEN'] - order
     require(cfg['TRAIN_LEN'] > order and cfg['OOD_LEN'] > order, 'Sequence lengths must exceed recurrence order')
-    if scenario != 'action':
+    if scenario != 'action' and variant != 'corrupt_fix':
         require(isinstance(cfg['NUM_MASK'], int) and 0 <= cfg['NUM_MASK'] < cfg['TRAIN_LEN'] - 1,
                 'NUM_MASK leaves no evaluated positions or is invalid')
     if cfg['MAX_TRAIN_HOURS'] is not None:
         notes.append('每条实验独立计时，从训练循环开始；每 ' + str(cfg['EVAL_INTERVAL']) +
                      ' epoch 的评估点检查，到时保存完整存档退出，可能超过名义时限；不改变 cosine horizon。')
     eval_len = cfg['OOD_LEN'] if cfg['FRESH_TEST_PER_EVAL'] or scenario == 'action' else cfg['TRAIN_LEN']
-    eval_tokens = 2 * eval_len - order if scenario == 'action' else eval_len
+    tail_tokens = 2 if variant == 'corrupt_fix' else 0  # corrupt_fix: EOS + 位置 token
+    eval_tokens = 2 * eval_len - order if scenario == 'action' else eval_len + tail_tokens
     max_tokens = (2 * max(cfg['TRAIN_LEN'], cfg['OOD_LEN']) - order if scenario == 'action' else
-                  max(cfg['TRAIN_LEN'], cfg['OOD_LEN']))
+                  max(cfg['TRAIN_LEN'], cfg['OOD_LEN']) + tail_tokens)
+    if variant == 'corrupt_fix':
+        notes.append('corrupt_fix：污损是任务内生的（恰好一位改成随机错误值），无 clean/total 之分，'
+                     '结果口径 = 训练日志 best acc；输出 = 位置 token + 正确值两个 token。')
     notes.append('静态测试在达到 EARLY_STOP_ACCURACY 时停止；fresh test 在最近 10 次评估均值超过阈值时停止。EARLY_STOP_EXTRA_EPOCHS 已废弃，不生效。')
     notes.append('训练结束不再跑 final generation test（2026-10-08 删除）；结果口径 = 训练日志 best acc + eval_clean_action.py。正常完成后跑 attention 分析；存档退出码 42 跳过后处理。')
     return dict(actual_train_samples=count, actual_test_samples=test_count,
@@ -196,7 +205,10 @@ def normalize(task, cfg, origins):
                 train_sequence_tokens=train_tokens, eval_base_length=eval_len,
                 eval_sequence_tokens=eval_tokens, block_size=2 ** (max_tokens - 1).bit_length(),
                 rules=rules, coefficient_convention=convention,
-                actual_num_mask='数据集 loss_mask' if scenario == 'action' else cfg['NUM_MASK'],
+                actual_num_mask=('collate loss_mask（不参与）' if variant == 'corrupt_fix'
+                                 else '数据集 loss_mask' if scenario == 'action' else cfg['NUM_MASK']),
+                **({'vocab_size': cfg['P'] + 2 + max(cfg['TRAIN_LEN'], cfg['OOD_LEN'])}
+                   if variant == 'corrupt_fix' else {}),
                 initialization='resume' if cfg.get('RESUME_FROM') else 'weights_only' if cfg.get('INIT_FROM') else 'fresh',
                 optimizer='AdamW', scheduler='CosineAnnealingLR', scheduler_T_max=cfg['EPOCHS'],
                 output_path='<output>/models/<experiment>/<experiment>.pth', notes=notes)

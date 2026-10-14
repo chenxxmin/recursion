@@ -23,7 +23,7 @@ def _expect_error(fn, *fragments):
 def test_new_single_happy():
     norm = normalize_task_config('single', {'P': 53, 'ORDER': 3, 'RULES': [[1, 2, 3]]})
     assert norm == {'scenario': 'single', 'order': 3, 'rules': [[1, 2, 3]],
-                    'exposure_ratios': 0.7, 'source': 'new'}
+                    'exposure_ratios': 0.7, 'variant': None, 'source': 'new'}
 
 
 def test_new_mixed_scalar_exposure():
@@ -60,7 +60,7 @@ def test_exceptions_passthrough():
     for task in EXCEPTION_TASKS:
         norm = normalize_task_config(task, {'P': 53})
         assert norm == {'scenario': task, 'order': None, 'rules': None,
-                        'exposure_ratios': None, 'source': task}
+                        'exposure_ratios': None, 'variant': None, 'source': task}
 
 
 def test_new_format_errors():
@@ -223,6 +223,52 @@ def test_action_exposure_mismatch_ignored():
                                                 'EXPOSURE_RATIOS': [0.1, 0.2, 0.3]})
     assert norm['exposure_ratios'] is None
     assert any('EXPOSURE_RATIOS' in str(w.message) for w in caught)
+
+
+def test_task_variant_corrupt_fix():
+    # 默认：无 TASK_VARIANT 键 -> variant=None
+    norm = normalize_task_config('single', {'P': 53, 'ORDER': 2, 'RULES': [[1, 1]]})
+    assert norm['variant'] is None
+    # 显式 null 等价
+    norm = normalize_task_config('single', {'P': 53, 'ORDER': 2, 'RULES': [[1, 1]],
+                                            'TASK_VARIANT': None})
+    assert norm['variant'] is None
+    # single + corrupt_fix -> 通过
+    norm = normalize_task_config('single', {'P': 53, 'ORDER': 2, 'RULES': [[1, 1]],
+                                            'TASK_VARIANT': 'corrupt_fix'})
+    assert norm['variant'] == 'corrupt_fix'
+    # 旧 task 名（映射到 single）也支持
+    norm = normalize_task_config('addition', {'P': 23, 'TASK_VARIANT': 'corrupt_fix'})
+    assert norm['variant'] == 'corrupt_fix' and norm['scenario'] == 'single'
+    # 未知变体名 -> 报错
+    _expect_error(lambda: normalize_task_config(
+        'single', {'P': 53, 'ORDER': 2, 'RULES': [[1, 1]], 'TASK_VARIANT': 'nope'}),
+        'TASK_VARIANT')
+    # mixed/action + corrupt_fix -> 尚未实现，报错
+    _expect_error(lambda: normalize_task_config(
+        'mixed', {'P': 23, 'ORDER': 2, 'RULES': [[1, 1], [2, 3]],
+                  'TASK_VARIANT': 'corrupt_fix'}),
+        'corrupt_fix', 'single')
+    _expect_error(lambda: normalize_task_config(
+        'action', {'P': 53, 'ORDER': 2, 'RULES': [[1, 1]], 'TASK_VARIANT': 'corrupt_fix'}),
+        'corrupt_fix')
+    # 例外 task + corrupt_fix -> 报错
+    _expect_error(lambda: normalize_task_config(
+        'multiplication', {'P': 53, 'TASK_VARIANT': 'corrupt_fix'}),
+        'corrupt_fix')
+    # 与 MISSING_PROB 互斥 -> 报错
+    _expect_error(lambda: normalize_task_config(
+        'single', {'P': 53, 'ORDER': 2, 'RULES': [[1, 1]],
+                   'TASK_VARIANT': 'corrupt_fix', 'MISSING_PROB': 0.1}),
+        'MISSING_PROB')
+    # NUM_MASK 无意义 -> warn 忽略，不报错
+    with warnings.catch_warnings(record=True) as caught:
+        warnings.simplefilter('always')
+        norm = normalize_task_config('single', {'P': 53, 'ORDER': 2, 'RULES': [[1, 1]],
+                                                'TASK_VARIANT': 'corrupt_fix',
+                                                'NUM_MASK': 2})
+    assert norm['variant'] == 'corrupt_fix'
+    assert any('NUM_MASK' in str(w.message) for w in caught)
 
 
 if __name__ == '__main__':

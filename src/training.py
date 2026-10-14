@@ -39,6 +39,7 @@ def _unpack_batch(batch, device, extra_kwargs_fn):
       MIXED_AB       -> (ab_indices,)
       LOSS_MASK      -> (loss_mask,)
       ACTION_MISS    -> (clean_seqs, loss_mask); targets_override = clean_seqs
+      CORRUPT_FIX    -> (target_seqs, loss_mask); targets_override = target_seqs
       PLAIN_TARGET   -> (clean_seqs,); targets_override = clean_seqs
       MIXED_AB_TARGET -> (ab_indices, clean_seqs)
     ab_indices are passed through extra_kwargs_fn and also returned as
@@ -73,6 +74,10 @@ def _unpack_batch(batch, device, extra_kwargs_fn):
     if tag == BatchTag.ACTION_MISS:
         if len(batch) != 4:
             raise ValueError(f"ACTION_MISS batch must carry exactly (clean_seqs, loss_mask), got {len(batch) - 2} payload item(s)")
+        return x, batch[3].to(device), {}, None, batch[2].to(device)
+    if tag == BatchTag.CORRUPT_FIX:
+        if len(batch) != 4:
+            raise ValueError(f"CORRUPT_FIX batch must carry exactly (target_seqs, loss_mask), got {len(batch) - 2} payload item(s)")
         return x, batch[3].to(device), {}, None, batch[2].to(device)
     if tag == BatchTag.MIXED_AB_TARGET:
         if len(batch) != 4:

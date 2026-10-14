@@ -2,6 +2,7 @@
   "main": {
     "P": 53,
     "TASK": "addition",
+    "TASK_VARIANT": null,
     "NUM_MASK": null,
     "D_MODEL": 64,
     "N_HEAD": 1,
@@ -13,7 +14,7 @@
     "LR": 0.0003,
     "SAVE_PATH": "fibonacci_transformer.pth",
     "INIT_FROM": null,
-    "MLP_RATIO": 4,
+    "MLP_RATIO": 8,
     "TRAIN_LEN": 16,
     "OOD_LEN": 16,
     "DROPOUT": 0.0,

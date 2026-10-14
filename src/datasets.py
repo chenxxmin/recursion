@@ -418,6 +418,7 @@ class BatchTag(IntEnum):
     PLAIN_TARGET = 4     # payload: (clean_seqs,) -- clean sequences; targets = clean[:, 1:]
     MIXED_AB_TARGET = 5  # payload: (ab_indices, clean_seqs) -- rule index + clean sequences
     ACTION_MISS = 6    # payload: (clean_seqs, loss_mask) -- action + missing (predict mode)
+    CORRUPT_FIX = 7    # payload: (target_seqs, loss_mask) -- corrupt_fix 变体；targets = target_seqs[:, 1:]，mask 仅位置/值两个输出位
 
 
 def collate_fn(batch):
@@ -455,6 +456,51 @@ def make_missing_collate(*, p, init_len, missing_prob, miss_len=1, missing_token
             views.append(view)
             cleans.append(seq)
         return torch.stack(views), BatchTag.PLAIN_TARGET, torch.stack(cleans)
+
+    return collate
+
+
+def make_corrupt_fix_collate(*, p, eos_id, pos_base):
+    """Collate for the corrupt_fix task variant (TASK_VARIANT='corrupt_fix').
+
+    Input: a batch of CLEAN windows (plain LongTensors, any length L).
+    Every call corrupts with fresh randomness (train and test alike): exactly
+    ONE uniformly chosen position k in [0, L) — initial values included — is
+    replaced by a uniformly random WRONG value in [0, p) \\ {original} (a real
+    wrong value, not the missing token).
+
+    Output batch: (x, CORRUPT_FIX, target_seqs, loss_mask) with
+
+        x           = [c'(0..L-1), EOS, pos_tok(k)]      # length L+2
+        target_seqs = [c'(0..L-1), EOS, pos_tok(k), v]   # length L+3
+        loss_mask   = 1 only at the last two target positions
+
+    Under the standard targets_override convention (targets =
+    target_seqs[:, 1:]), the model predicts the position token at the EOS
+    slot and then the correct value v after the fed-back position token
+    (teacher forcing). The training loop's loss/accuracy need no changes.
+    """
+    def collate(batch):
+        xs, targets, masks = [], [], []
+        for seq in batch:
+            L = seq.numel()
+            k = random.randrange(L)
+            orig = int(seq[k])
+            wrong = random.randrange(p - 1)
+            if wrong >= orig:
+                wrong += 1  # uniform over [0, p) \ {orig}
+            view = seq.clone()
+            view[k] = wrong
+            x = torch.cat([view, torch.tensor([eos_id, pos_base + k], dtype=torch.long)])
+            tgt = torch.cat([x, torch.tensor([orig], dtype=torch.long)])
+            mask = torch.zeros(L + 2, dtype=torch.float)  # aligns with tgt[:, 1:]
+            mask[L] = 1.0      # EOS slot -> position token
+            mask[L + 1] = 1.0  # position-token slot -> correct value
+            xs.append(x)
+            targets.append(tgt)
+            masks.append(mask)
+        return (torch.stack(xs), BatchTag.CORRUPT_FIX,
+                torch.stack(targets), torch.stack(masks))
 
     return collate
 

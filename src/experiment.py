@@ -27,7 +27,8 @@ from datasets import (RecurrenceDataset, MixedRecurrenceDataset,
                       ActionDataset, BucketBatchSampler,
                       collate_fn, make_missing_collate,
                       mixed_ab_collate_fn, make_mixed_missing_collate,
-                      action_collate_fn, make_action_missing_collate)
+                      action_collate_fn, make_action_missing_collate,
+                      make_corrupt_fix_collate)
 from training import run_training_engine, resume_checkpoint_path
 
 
@@ -216,7 +217,7 @@ def _prepare_mixed_recurrence(config, device, norm):
     model_kwargs = {'n_rules': len(rules), 'order': order} if aux_classify else {}
     model = FibonacciTransformer(p=P, d_model=D_MODEL, n_head=N_HEAD,
                                  n_layer=N_LAYER, block_size=BLOCK_SIZE,
-                                 dropout=DROPOUT, mlp_ratio=cfg.get('MLP_RATIO', 4),
+                                 dropout=DROPOUT, mlp_ratio=cfg.get('MLP_RATIO', 8),
                                  **model_kwargs)
     if aux_classify:
         extra_kwargs_fn = lambda ab_indices: {'ab_labels': ab_indices.to(device)}
@@ -235,7 +236,7 @@ def _prepare_mixed_recurrence(config, device, norm):
         'n_head': N_HEAD,
         'n_layer': N_LAYER,
         'block_size': BLOCK_SIZE,
-        'mlp_ratio': cfg.get('MLP_RATIO', 4),
+        'mlp_ratio': cfg.get('MLP_RATIO', 8),
         'vocab_size': P + 1,
         'pad_token_id': P,
         # for analyze_attention.py: in-dist length and corruption settings
@@ -333,7 +334,7 @@ def _prepare_action(config, norm):
     model = FibonacciTransformer(
         p=P, d_model=D_MODEL, n_head=N_HEAD, n_layer=N_LAYER,
         block_size=BLOCK_SIZE, dropout=DROPOUT,
-        mlp_ratio=cfg.get('MLP_RATIO', 4)
+        mlp_ratio=cfg.get('MLP_RATIO', 8)
     )
     # vocab_size needs to include flag tokens
     model.vocab_size = P + 1 + len(AB_PAIRS)
@@ -360,7 +361,7 @@ def _prepare_action(config, norm):
         'n_head': N_HEAD,
         'n_layer': N_LAYER,
         'block_size': BLOCK_SIZE,
-        'mlp_ratio': cfg.get('MLP_RATIO', 4),
+        'mlp_ratio': cfg.get('MLP_RATIO', 8),
         'vocab_size': model.vocab_size,
         'pad_token_id': model.pad_token_id,
         'recurrence': 'action',
@@ -509,7 +510,7 @@ def _prepare_single_recurrence(config, norm):
     model = FibonacciTransformer(
         p=P, d_model=D_MODEL, n_head=N_HEAD, n_layer=N_LAYER,
         block_size=BLOCK_SIZE, dropout=DROPOUT,
-        mlp_ratio=cfg.get('MLP_RATIO', 4)
+        mlp_ratio=cfg.get('MLP_RATIO', 8)
     )
     save_config = {
         'p': P,
@@ -517,7 +518,7 @@ def _prepare_single_recurrence(config, norm):
         'n_head': N_HEAD,
         'n_layer': N_LAYER,
         'block_size': BLOCK_SIZE,
-        'mlp_ratio': cfg.get('MLP_RATIO', 4),
+        'mlp_ratio': cfg.get('MLP_RATIO', 8),
         # for analyze_attention.py: in-dist length and corruption settings
         'train_len': TRAIN_LEN,
         'missing_prob': cfg.get('MISSING_PROB', 0.0),
@@ -534,6 +535,155 @@ def _prepare_single_recurrence(config, norm):
         'test_loader': test_loader,
         'test_loader_fn': test_loader_fn,
         'num_mask': num_mask,
+        'save_config': save_config,
+        'cfg': cfg,
+        'p': P,
+        'train_len': TRAIN_LEN,
+        'ood_len': OOD_LEN,
+    }
+
+
+def _prepare_single_corrupt_fix(config, norm):
+    """Prepare the corrupt_fix task variant on the single scenario
+    (TASK_VARIANT='corrupt_fix'; see scenarios.TASK_VARIANTS).
+
+    The data pipeline is identical to _prepare_single_recurrence's single
+    branch (RecurrenceDataset + full_split/sampled_fresh_test, same exposure
+    logic); only the collate, the token layout and the model vocab differ:
+
+      - the collate corrupts exactly ONE position with a random wrong value
+        (online, fresh per batch, train and test alike) and builds
+        x = [corrupted window, EOS, pos_token], targets = [.., pos_token,
+        correct value], loss_mask on the last two target positions only;
+      - vocab: values [0..P-1] | missing P (kept for layout consistency,
+        unused here) | EOS P+1 | position tokens P+2+k for
+        k < max(TRAIN_LEN, OOD_LEN);
+      - num_mask = 0: the loss mask comes from the collate.
+    """
+    cfg = dict(config.get('main', {}))
+    P = cfg['P']
+    D_MODEL = cfg['D_MODEL']
+    N_HEAD = cfg['N_HEAD']
+    N_LAYER = cfg['N_LAYER']
+    BATCH_SIZE = cfg['BATCH_SIZE']
+    TRAIN_LEN = cfg['TRAIN_LEN']
+    OOD_LEN = cfg['OOD_LEN']
+    DROPOUT = cfg['DROPOUT']
+
+    max_len = max(TRAIN_LEN, OOD_LEN)
+    BLOCK_SIZE = _round_up_pow2(max_len + 2)  # input = window + EOS + pos token
+
+    init_len, recurrence_fn, recurrence_name = single_rule_from_task(
+        'single', {'P': P, 'RULES': norm['rules']})
+    max_unique_ratio = norm['exposure_ratios']
+    save_extra_config = save_config_extra(norm, cfg)
+
+    # Data-generation strategy: same semantics as _prepare_single_recurrence.
+    data_mode = cfg.get('DATA_MODE')
+    if data_mode is None:
+        legacy_sampled = (
+            cfg.get('FRESH_TEST_PER_EVAL', False)
+            or cfg.get('STATE_SPACE_CAP') is not None
+        )
+        data_mode = 'sampled_fresh_test' if legacy_sampled else 'full_split'
+    if data_mode not in ('full_split', 'sampled_fresh_test'):
+        raise ValueError(
+            f"DATA_MODE must be 'full_split' or 'sampled_fresh_test', got {data_mode!r}")
+    print(f"[Data mode] {data_mode}")
+
+    state_space_size = P ** init_len
+    NUM_TRAIN_SAMPLES = cfg.get('NUM_TRAIN_SAMPLES')
+    if data_mode == 'full_split':
+        if NUM_TRAIN_SAMPLES is None:
+            NUM_TRAIN_SAMPLES = max(1, int(state_space_size * max_unique_ratio))
+        if NUM_TRAIN_SAMPLES > state_space_size:
+            raise ValueError(
+                f"NUM_TRAIN_SAMPLES ({NUM_TRAIN_SAMPLES}) exceeds state space "
+                f"({state_space_size}) in full_split mode")
+    else:
+        if NUM_TRAIN_SAMPLES is None:
+            raise ValueError(
+                "sampled_fresh_test mode requires explicit NUM_TRAIN_SAMPLES")
+        if NUM_TRAIN_SAMPLES > state_space_size:
+            raise ValueError(
+                f"NUM_TRAIN_SAMPLES ({NUM_TRAIN_SAMPLES}) exceeds state space "
+                f"({state_space_size}); unique training sampling is impossible")
+
+    ds = RecurrenceDataset(
+        p=P, recurrence_fn=recurrence_fn, recurrence_name=recurrence_name,
+        init_len=init_len, num_samples=NUM_TRAIN_SAMPLES,
+        length=TRAIN_LEN,
+    )
+    if data_mode == 'full_split':
+        ds.run_full_split()
+        train_dataset = ds.train_samples
+        test_dataset = ds.test_samples
+    else:
+        train_dataset = ds.sample_unique_train()
+        test_dataset = []
+
+    eos_id = P + 1
+    pos_base = P + 2
+    vocab_size = P + 2 + max_len
+    _print_task_banner(BLOCK_SIZE, TRAIN_LEN,
+                       f"{recurrence_name} [corrupt_fix]")
+
+    collate = make_corrupt_fix_collate(p=P, eos_id=eos_id, pos_base=pos_base)
+    train_sampler = BucketBatchSampler(
+        train_dataset, batch_size=BATCH_SIZE, shuffle=True,
+        reshuffle_each_epoch=cfg.get('RESHUFFLE_EACH_EPOCH', False))
+    train_loader = DataLoader(train_dataset, batch_sampler=train_sampler, collate_fn=collate)
+
+    test_loader = None
+    test_loader_fn = None
+    if data_mode == 'full_split':
+        test_loader = _make_test_loader(test_dataset, BATCH_SIZE, collate)
+    else:
+        NUM_TEST_SAMPLES = cfg.get('NUM_TEST_SAMPLES', 256)
+        fresh_rng = random.Random(cfg.get('RANDOM_SEED', 42) + 10 ** 6 + 7)
+
+        def test_loader_fn():  # noqa: F811 (intentional closure name)
+            fresh_seed = fresh_rng.randrange(2 ** 31)
+            eval_rng = random.Random(fresh_seed)
+            fresh_samples = ds.sample_random_windows(
+                NUM_TEST_SAMPLES, length=OOD_LEN, rng=eval_rng)
+            print(f"[FreshTest] sampled with replacement: "
+                  f"n={NUM_TEST_SAMPLES}, len={OOD_LEN}, seed={fresh_seed}")
+            return _make_test_loader(fresh_samples, BATCH_SIZE, collate)
+
+    model = FibonacciTransformer(
+        p=P, d_model=D_MODEL, n_head=N_HEAD, n_layer=N_LAYER,
+        block_size=BLOCK_SIZE, dropout=DROPOUT,
+        mlp_ratio=cfg.get('MLP_RATIO', 8), vocab_size=vocab_size
+    )
+    save_config = {
+        'p': P,
+        'd_model': D_MODEL,
+        'n_head': N_HEAD,
+        'n_layer': N_LAYER,
+        'block_size': BLOCK_SIZE,
+        'mlp_ratio': cfg.get('MLP_RATIO', 8),
+        'train_len': TRAIN_LEN,
+        'ood_len': OOD_LEN,
+        'data_mode': data_mode,
+        'num_train_samples': NUM_TRAIN_SAMPLES,
+        # corrupt_fix variant block
+        'variant': 'corrupt_fix',
+        'eos_token_id': eos_id,
+        'pos_token_base': pos_base,
+        'vocab_size': vocab_size,
+        'missing_prob': 0.0,
+        'miss_len': cfg.get('MISS_LEN', 1),
+    }
+    save_config.update(save_extra_config)
+    return {
+        'model': model,
+        'train_dataset': train_dataset,
+        'test_dataset': test_dataset,
+        'train_loader': train_loader,
+        'test_loader': test_loader,
+        'test_loader_fn': test_loader_fn,
+        'num_mask': 0,  # unused; loss_mask comes from the collate
         'save_config': save_config,
         'cfg': cfg,
         'p': P,
@@ -593,7 +743,14 @@ def run_experiment(config_path=None):
         print(f"[Error] {exc}")
         sys.exit(2)  # non-zero so batch_run records failure instead of a silent "success"
     scenario = norm['scenario']
-    if scenario == 'mixed':
+    if norm.get('variant') == 'corrupt_fix':
+        # scenarios._normalize_variant already rejects non-single scenarios;
+        # re-check defensively so a future variant never falls through silently.
+        if scenario != 'single':
+            print(f"[Error] corrupt_fix variant not supported for scenario {scenario!r}")
+            sys.exit(2)
+        ctx = _prepare_single_corrupt_fix(config, norm)
+    elif scenario == 'mixed':
         ctx = _prepare_mixed_recurrence(config, device, norm)
     elif scenario == 'action':
         ctx = _prepare_action(config, norm)

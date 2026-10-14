@@ -86,7 +86,7 @@ class CausalSelfAttention(nn.Module):
         return y
 
 class TransformerBlock(nn.Module):
-    def __init__(self, n_embd, n_head, block_size, dropout=0.0, rope=None, mlp_ratio=4):
+    def __init__(self, n_embd, n_head, block_size, dropout=0.0, rope=None, mlp_ratio=8):
         super().__init__()
         self.ln_1 = nn.LayerNorm(n_embd)
         self.attn = CausalSelfAttention(n_embd, n_head, block_size, dropout, rope)
@@ -140,7 +140,7 @@ RULE_LOSS_WEIGHT = 0.5
 
 class FibonacciTransformer(nn.Module):
     def __init__(self, p=53, d_model=64, n_head=1, n_layer=1, block_size=128, dropout=0.0,
-                 mlp_ratio=4, pad_token_id=None, vocab_size=None, n_rules=0, order=None):
+                 mlp_ratio=8, pad_token_id=None, vocab_size=None, n_rules=0, order=None):
         super().__init__()
         self.p = p
         self.pad_token_id = pad_token_id if pad_token_id is not None else p

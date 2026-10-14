@@ -8,6 +8,7 @@ tasks) to one normalized dict:
      'order': int | None,                 # None for exception tasks
      'rules': [[c1, ...], ...] | None,    # canonical; None for exception tasks
      'exposure_ratios': float | [float, ...] | None,
+     'variant': None | 'corrupt_fix',     # TASK_VARIANT；场景下一级的任务变体
      'source': 'new' | <legacy task name>}
 
 Pure config translation: no torch, no RNG, no I/O. Canonical RULES convention
@@ -33,6 +34,10 @@ _LEGACY_SCENARIO = {
     'mixed_ab': 'mixed', 'mixed_abc': 'mixed',
     'action_trib': 'action', 'dynamic_mixed': 'action',
 }
+
+# 合法 TASK_VARIANT 取值（场景下一级的任务变体；None = 标准 next-token 预测）。
+# corrupt_fix：恰好一位污损成随机错误值，尾部接 EOS，模型输出 [位置, 正确值]。
+TASK_VARIANTS = ('corrupt_fix',)
 
 # 合法 task 名全集（报错信息用）。注意 'action' 不在 _LEGACY_SCENARIO 里：
 # 它既是新场景名又是旧 task 名，由 _is_new_format 按配置内容消歧。
@@ -99,6 +104,32 @@ def _check_removed_features(cfg):
                 'ALLOW_TF32', 'ENTROPY_PENALTY_WEIGHT'):
         if cfg.get(key) is not None:
             warnings.warn(f"{key} 已写死/删除，与写死值一致，忽略", stacklevel=2)
+
+
+def _normalize_variant(scenario, cfg):
+    """TASK_VARIANT（场景下一级的任务变体，正交于 scenario）-> None | 'corrupt_fix'.
+
+    corrupt_fix 目前仅 single 场景开放；mixed/action 留扩展位（报错信息里说明）。
+    """
+    raw = cfg.get('TASK_VARIANT')
+    if raw is None:
+        return None
+    if raw not in TASK_VARIANTS:
+        raise ValueError(f"未知 TASK_VARIANT {raw!r}；合法值：{TASK_VARIANTS}")
+    if raw == 'corrupt_fix':
+        if scenario != 'single':
+            raise ValueError(
+                f"TASK_VARIANT='corrupt_fix' 目前仅 single 场景支持"
+                f"（TASK 属于 {scenario!r} 场景）；mixed/action 的 corrupt_fix 尚未实现。")
+        if cfg.get('MISSING_PROB'):
+            raise ValueError(
+                "corrupt_fix 变体的污损是任务内生的（恰好一位改成随机错误值），"
+                "与 MISSING_PROB 在线污损互斥；去掉 MISSING_PROB 即可。")
+        if cfg.get('NUM_MASK') is not None:
+            warnings.warn(
+                "corrupt_fix 变体的 loss_mask 由 collate 给出（仅位置/值两个输出位），"
+                "NUM_MASK 无意义，已忽略", stacklevel=3)
+    return raw
 
 
 def _validate_new_format(task, cfg):
@@ -230,9 +261,10 @@ def normalize_task_config(task, cfg):
         raise ValueError(
             f"AUX_CLASSIFY=true 仅 mixed 场景支持（TASK={task!r} 属于 "
             f"{scenario_of(task)!r} 场景）；去掉该键即可。")
+    variant = _normalize_variant(scenario_of(task), cfg)
     if task in EXCEPTION_TASKS:
         return {'scenario': task, 'order': None, 'rules': None,
-                'exposure_ratios': None, 'source': task}
+                'exposure_ratios': None, 'variant': variant, 'source': task}
     scenario = scenario_of(task)
     if _is_new_format(task, cfg):
         order, rules = _validate_new_format(task, cfg)
@@ -273,4 +305,4 @@ def normalize_task_config(task, cfg):
         if exposure is None:
             exposure = DEFAULT_RATIO if scenario == 'single' else [DEFAULT_RATIO] * len(rules)
     return {'scenario': scenario, 'order': order, 'rules': rules,
-            'exposure_ratios': exposure, 'source': source}
+            'exposure_ratios': exposure, 'variant': variant, 'source': source}

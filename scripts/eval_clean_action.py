@@ -79,7 +79,7 @@ def build_model(sc):
         'D_MODEL': sc['d_model'],
         'N_HEAD': sc['n_head'],
         'N_LAYER': sc['n_layer'],
-        'MLP_RATIO': sc.get('mlp_ratio', 4),
+        'MLP_RATIO': sc.get('mlp_ratio', 8),
         'TRAIN_LEN': sc['train_len'],
         'OOD_LEN': sc['ood_len'],
         'MISSING_PROB': 0.0,
