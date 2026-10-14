@@ -9,6 +9,7 @@ tasks) to one normalized dict:
      'rules': [[c1, ...], ...] | None,    # canonical; None for exception tasks
      'exposure_ratios': float | [float, ...] | None,
      'variant': None | 'corrupt_fix' | 'fill_blank',  # TASK_VARIANT；场景下一级的任务变体
+     'const': int,                        # 常数项（CONST 键，默认 0；仅 single 可非零）
      'source': 'new' | <legacy task name>}
 
 Pure config translation: no torch, no RNG, no I/O. Canonical RULES convention
@@ -107,12 +108,35 @@ def _check_removed_features(cfg):
             warnings.warn(f"{key} 已写死/删除，与写死值一致，忽略", stacklevel=2)
 
 
+def _normalize_const(scenario, cfg):
+    """CONST：递推公式的常数项（x_k = c1*x_{k-1} + ... + CONST mod P），默认 0。
+
+    目前仅 single 场景允许非零（等差数列 ORDER=1 + RULES=[[1]] + CONST=d）；
+    其余场景/例外 task 设非零值报错。注意不能用键名 C——A/B/C/D 已被旧系数占用。
+    """
+    raw = cfg.get('CONST', 0)
+    if raw is None:
+        raw = 0
+    if not isinstance(raw, int) or isinstance(raw, bool):
+        raise ValueError(f"CONST 必须是整数，got {raw!r}")
+    if not 0 <= raw < cfg['P']:
+        raise ValueError(f"CONST 越界 [0, {cfg['P']})：{raw}")
+    if raw != 0 and scenario != 'single':
+        raise ValueError(
+            f"CONST（常数项）目前仅 single 场景支持（TASK 属于 {scenario!r} 场景）")
+    return raw
+
+
 def _normalize_variant(scenario, cfg):
     """TASK_VARIANT（场景下一级的任务变体，正交于 scenario）-> None | 'corrupt_fix' | 'fill_blank'.
 
     变体目前仅 single 场景开放；mixed/action 留扩展位（报错信息里说明）。
     """
     raw = cfg.get('TASK_VARIANT')
+    if cfg.get('FILL_BLANK_ALL_POSITIONS') and raw != 'fill_blank':
+        raise ValueError(
+            "FILL_BLANK_ALL_POSITIONS 仅 TASK_VARIANT='fill_blank' 支持"
+            "（每个位置挖空各成一条训练样本）")
     if raw is None:
         return None
     if raw not in TASK_VARIANTS:
@@ -267,9 +291,11 @@ def normalize_task_config(task, cfg):
             f"AUX_CLASSIFY=true 仅 mixed 场景支持（TASK={task!r} 属于 "
             f"{scenario_of(task)!r} 场景）；去掉该键即可。")
     variant = _normalize_variant(scenario_of(task), cfg)
+    const = _normalize_const(scenario_of(task), cfg)
     if task in EXCEPTION_TASKS:
         return {'scenario': task, 'order': None, 'rules': None,
-                'exposure_ratios': None, 'variant': variant, 'source': task}
+                'exposure_ratios': None, 'variant': variant, 'const': const,
+                'source': task}
     scenario = scenario_of(task)
     if _is_new_format(task, cfg):
         order, rules = _validate_new_format(task, cfg)
@@ -310,4 +336,5 @@ def normalize_task_config(task, cfg):
         if exposure is None:
             exposure = DEFAULT_RATIO if scenario == 'single' else [DEFAULT_RATIO] * len(rules)
     return {'scenario': scenario, 'order': order, 'rules': rules,
-            'exposure_ratios': exposure, 'variant': variant, 'source': source}
+            'exposure_ratios': exposure, 'variant': variant, 'const': const,
+            'source': source}

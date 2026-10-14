@@ -36,6 +36,7 @@ X(k) = c1*X(k-1) + c2*X(k-2) + ... + c_o*X(k-o)  (mod P)
 ```
 
 - `ORDER` ≥2，`RULES` 恰好 1 条（canonical）。**ORDER=1 合法**（2026-10-14 起，等比递推 `x_k = c·x_{k-1}`，仅 single；状态空间 `P^1 = P`，建议配大 P）；mixed/action 不接受 ORDER=1。
+- **常数项 `CONST`**（2026-10-14，默认 0）：`x_k = c1·x_{k-1} + ... + c_o·x_{k-o} + CONST (mod P)`。仅 single 可非零（mixed/action/例外 task 设非零报错）。等差数列写法：`ORDER=1, RULES=[[1]], CONST=d`。注意键名不能用 `C`（A/B/C/D 已被旧系数键占用）。
 - 初始状态长度 `init_len = ORDER`；状态空间大小 `P^order`。
 - 暴露率由 `EXPOSURE_RATIOS`（标量，默认 0.7）控制；`NUM_TRAIN_SAMPLES` 显式设置时覆盖。
 - 高阶大 P（如 order=4 @ P=127，`P^4 ≈ 2.6 亿`）必须配 `STATE_SPACE_CAP` 或用 `DATA_MODE: sampled_fresh_test`（见 §4.1），否则全状态枚举爆炸。
@@ -146,6 +147,8 @@ loss_mask    = 仅 EOS 槽一位为 1（acc 只有 target[L] 一个输出位）
 
 约束、评估口径、早停、结果口径均与 corrupt_fix 相同（§1.7）。collate：`make_fill_blank_collate`；BatchTag：`FILL_BLANK`；checkpoint save_config 记 `variant`/`eos_token_id`/`blank_token_id`/`vocab_size`。
 
+**`FILL_BLANK_ALL_POSITIONS`**（2026-10-14，默认 false，仅 fill_blank）：true 时数据侧枚举式挖空——每条序列的每个位置挖空各成一条样本（`(seq, k)` 元组，样本数 × 窗口长度，train/test 同样），collate 使用样本携带的位置不再随机选位。适合小状态空间任务（如等差数列）保证位置覆盖。
+
 ---
 
 ## 2. 配置
@@ -166,6 +169,7 @@ loss_mask    = 仅 EOS 槽一位为 1（acc 只有 target[L] 一个输出位）
 | `P` | 模数 |
 | `ORDER` | 递推阶数，≥2 整数（single 允许 1，等比递推）；新格式必须显式写 |
 | `RULES` | 系数列表，canonical 方向（第一个系数乘最新的值）。`single` 恰好 1 条；`mixed`/`action` ≥1 条；每条长度 == `ORDER`，系数 ∈ [0, P) |
+| `CONST` | 递推常数项（默认 0）：`x_k = c1·x_{k-1} + ... + CONST (mod P)`。仅 single 可非零；等差数列 = `ORDER=1, RULES=[[1]], CONST=d` |
 | `NUM_MASK` | `null` 表示场景默认（single/mixed = `order-1`；action 由数据集生成 loss_mask）。**注意：`0` 是字面值**（首位置也计入损失与评估）；旧代码（≤2026-07-08）把 `0` 当"未设置"。**今后配置不要再写 `NUM_MASK: 0`**——想排除"只看 x0 预测 x1"这个不可预测的首位置时，应显式写 `1` |
 
 **数据**

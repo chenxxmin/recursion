@@ -1,0 +1,21 @@
+{
+  "concurrency": 1,
+  "experiments": [
+    {
+      "name": "single_o1_fillblank_a1const1_d512l2r8h1_P1009_tr16_allpos_seed42",
+      "task": "single",
+      "config": {
+        "TASK_VARIANT": "fill_blank",
+        "FILL_BLANK_ALL_POSITIONS": true,
+        "ORDER": 1,
+        "RULES": [[1]],
+        "CONST": 1,
+        "P": 1009,
+        "D_MODEL": 512,
+        "N_LAYER": 2,
+        "TRAIN_LEN": 16,
+        "EVAL_INTERVAL": 1
+      }
+    }
+  ]
+}

@@ -9,16 +9,20 @@ from dataclasses import dataclass
 
 @dataclass(frozen=True)
 class LinearRecurrenceRule:
-    coeffs: tuple[int, ...]  # X(k) = (c1*X(k-1) + c2*X(k-2) + ...) mod p
+    coeffs: tuple[int, ...]  # X(k) = (c1*X(k-1) + c2*X(k-2) + ... + const) mod p
     p: int
     name: str = ""           # e.g. "a1b2c4"; auto-generated when empty
+    const: int = 0           # optional constant term (2026-10-14)
 
     def __post_init__(self):
         # frozen dataclass: normalize via object.__setattr__
         object.__setattr__(self, 'coeffs', tuple(int(c) for c in self.coeffs))
+        object.__setattr__(self, 'const', int(self.const))
         if not self.name:
             labels = 'abcdefgh'
             auto = ''.join(f"{labels[i]}{c}" for i, c in enumerate(self.coeffs))
+            if self.const:
+                auto += f"+{self.const}"
             object.__setattr__(self, 'name', auto)
 
     @property
@@ -34,9 +38,10 @@ class LinearRecurrenceRule:
         zip(coeffs, reversed(seq)) pairs c1 with seq[-1], c2 with seq[-2], ...
         """
         coeffs = self.coeffs
+        const = self.const
 
         def fn(seq, p):
-            return sum(c * s for c, s in zip(coeffs, reversed(seq))) % p
+            return (sum(c * s for c, s in zip(coeffs, reversed(seq))) + const) % p
 
         return fn
 
@@ -53,14 +58,16 @@ def single_rule_from_task(task, cfg):
     get = lambda k: cfg.get(k.upper(), cfg.get(k.lower(), 1))
     if task == 'single':
         # Scenario-unification single task: canonical rules live in
-        # cfg['RULES'] (merged config) or cfg['rules'] (checkpoint save_config).
+        # cfg['RULES'] (merged config) or cfg['rules'] (checkpoint save_config);
+        # optional constant term in cfg['CONST']/cfg['const'] (default 0).
         rules = cfg.get('RULES', cfg.get('rules'))
         if not rules or len(rules) != 1:
             raise ValueError("task 'single' needs exactly one rule in RULES/rules")
         coeffs = [int(c) for c in rules[0]]
+        const = int(cfg.get('CONST', cfg.get('const', 0)) or 0)
         name = ('X(k)=(' + '+'.join(f"{c}*X(k-{i + 1})" for i, c in enumerate(coeffs))
-                + f") mod {p}")
-        rule = LinearRecurrenceRule(coeffs=tuple(coeffs), p=p)
+                + (f"+{const}" if const else '') + f") mod {p}")
+        rule = LinearRecurrenceRule(coeffs=tuple(coeffs), p=p, const=const)
         return len(coeffs), rule.next_fn(), name
     if task == 'addition':
         a, b = get('a'), get('b')
@@ -106,7 +113,8 @@ def save_config_extra(norm, cfg):
         coeffs = [int(c) for c in norm['rules'][0]]
         order = norm['order']
         extra = {'scenario': 'single', 'order': order, 'rules': [coeffs],
-                 'recurrence': _RECURRENCE_NAMES.get(order, f'single_o{order}')}
+                 'recurrence': _RECURRENCE_NAMES.get(order, f'single_o{order}'),
+                 'const': int(norm.get('const', 0))}
         for letter, c in zip('abcd', coeffs):
             extra[letter] = c
         return extra

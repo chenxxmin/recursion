@@ -514,6 +514,11 @@ def make_fill_blank_collate(*, p, eos_id, blank_id=None):
     random wrong value, and the model only outputs the correct VALUE — no
     position token (the blank marks itself).
 
+    Input items: plain LongTensors (blank position k drawn uniformly at
+    random per call) or (seq, k) tuples (k carried by the sample, used
+    verbatim — FILL_BLANK_ALL_POSITIONS mode, where the dataset enumerates
+    every position of every window).
+
     Output batch: (x, FILL_BLANK, target_seqs, loss_mask) with
 
         x           = [c'(0..L-1), EOS]        # length L+1
@@ -524,9 +529,13 @@ def make_fill_blank_collate(*, p, eos_id, blank_id=None):
 
     def collate(batch):
         xs, targets, masks = [], [], []
-        for seq in batch:
+        for item in batch:
+            if isinstance(item, (list, tuple)):
+                seq, k = item[0], int(item[1])
+            else:
+                seq = item
+                k = random.randrange(seq.numel())
             L = seq.numel()
-            k = random.randrange(L)
             orig = int(seq[k])
             view = seq.clone()
             view[k] = blank

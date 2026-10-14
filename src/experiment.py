@@ -406,7 +406,7 @@ def _prepare_single_recurrence(config, norm):
 
     if scenario == 'single':
         init_len, recurrence_fn, recurrence_name = single_rule_from_task(
-            'single', {'P': P, 'RULES': norm['rules']})
+            'single', {'P': P, 'RULES': norm['rules'], 'CONST': norm.get('const', 0)})
         default_num_mask = norm['order'] - 1
         max_unique_ratio = norm['exposure_ratios']
     else:
@@ -581,7 +581,7 @@ def _prepare_single_variant(config, norm):
     BLOCK_SIZE = _round_up_pow2(max_len + tail_tokens)
 
     init_len, recurrence_fn, recurrence_name = single_rule_from_task(
-        'single', {'P': P, 'RULES': norm['rules']})
+        'single', {'P': P, 'RULES': norm['rules'], 'CONST': norm.get('const', 0)})
     max_unique_ratio = norm['exposure_ratios']
     save_extra_config = save_config_extra(norm, cfg)
 
@@ -629,6 +629,19 @@ def _prepare_single_variant(config, norm):
         train_dataset = ds.sample_unique_train()
         test_dataset = []
 
+    # FILL_BLANK_ALL_POSITIONS（仅 fill_blank）：每条序列的每个位置挖空各成
+    # 一条样本，样本数 × 窗口长度；空白位置由样本携带（(seq, k) 元组），
+    # collate 不再随机选位（空白替换仍由 collate 完成）。
+    blank_all = (variant == 'fill_blank'
+                 and cfg.get('FILL_BLANK_ALL_POSITIONS', False))
+    if blank_all:
+        n_base = len(train_dataset)
+        train_dataset = [(seq, k) for seq in train_dataset for k in range(len(seq))]
+        if data_mode == 'full_split':
+            test_dataset = [(seq, k) for seq in test_dataset for k in range(len(seq))]
+        print(f"[Variant] FILL_BLANK_ALL_POSITIONS: {n_base} windows -> "
+              f"{len(train_dataset)} train samples (x{TRAIN_LEN})")
+
     eos_id = P + 1
     if variant == 'corrupt_fix':
         collate = make_corrupt_fix_collate(p=P, eos_id=eos_id, pos_base=P + 2)
@@ -658,6 +671,9 @@ def _prepare_single_variant(config, norm):
             eval_rng = random.Random(fresh_seed)
             fresh_samples = ds.sample_random_windows(
                 NUM_TEST_SAMPLES, length=OOD_LEN, rng=eval_rng)
+            if blank_all:
+                fresh_samples = [(seq, k) for seq in fresh_samples
+                                 for k in range(len(seq))]
             print(f"[FreshTest] sampled with replacement: "
                   f"n={NUM_TEST_SAMPLES}, len={OOD_LEN}, seed={fresh_seed}")
             return _make_test_loader(fresh_samples, BATCH_SIZE, collate)

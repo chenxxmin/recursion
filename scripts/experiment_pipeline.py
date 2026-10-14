@@ -137,6 +137,13 @@ def normalize(task, cfg, origins):
         convention = '第一个系数乘最新值' if isinstance(rules, list) else '由 task 固定的非线性公式；A/B 不参与'
         test_count = cfg['NUM_TEST_SAMPLES'] if cfg['FRESH_TEST_PER_EVAL'] else cfg['P'] ** order - count
         exposure = count / cfg['P'] ** order
+        # fill_blank 逐位置枚举挖空：每窗口 × 窗口长度 条样本（train/test 同样）
+        if variant == 'fill_blank' and cfg.get('FILL_BLANK_ALL_POSITIONS'):
+            eval_win_len = cfg['OOD_LEN'] if cfg['FRESH_TEST_PER_EVAL'] else cfg['TRAIN_LEN']
+            notes.append('FILL_BLANK_ALL_POSITIONS：每个位置挖空各成一条样本，'
+                         '训练样本数 = 窗口数 × TRAIN_LEN（test 同乘以窗口长度）。')
+            count = {'windows': count, 'total': count * cfg['TRAIN_LEN']}
+            test_count = {'windows': test_count, 'total': test_count * eval_win_len}
         data_mode = mode
         # 变体尾部 token：corrupt_fix = EOS + 位置 token；fill_blank = EOS
         tail = {'corrupt_fix': 2, 'fill_blank': 1}.get(variant, 0)

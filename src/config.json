@@ -3,6 +3,7 @@
     "P": 53,
     "TASK": "addition",
     "TASK_VARIANT": null,
+    "CONST": 0,
     "NUM_MASK": null,
     "D_MODEL": 64,
     "N_HEAD": 1,

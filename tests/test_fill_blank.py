@@ -114,6 +114,40 @@ def test_run_experiment_fill_blank_rejects_missing_prob():
             raise AssertionError("expected SystemExit(2) for MISSING_PROB conflict")
 
 
+def test_collate_fixed_position_tuples():
+    # (seq, k) 元组样本（FILL_BLANK_ALL_POSITIONS 模式）：空白位置由样本携带
+    p, eos_id, L = 7, 8, 6
+    seqs = _addition_windows(p=p, n=4, length=L)
+    batch = [(seq, k) for seq in seqs for k in range(L)]
+    collate = make_fill_blank_collate(p=p, eos_id=eos_id)
+    x, tag, targets, mask = collate(batch)
+    assert x.shape == (4 * L, L + 1)
+    for j, (seq, k) in enumerate(batch):
+        assert int(x[j, k]) == p, "blank must be at the carried position k"
+        diff = (x[j, :L] != seq).nonzero().flatten().tolist()
+        assert diff == [k]
+        assert int(targets[j, L + 1]) == int(seq[k])
+        assert mask[j].nonzero().flatten().tolist() == [L]
+
+
+def test_run_experiment_arithmetic_fill_blank_all_positions():
+    # 等差数列（ORDER=1 + CONST=1）+ fill_blank + 逐位置枚举挖空：端到端冒烟
+    with tempfile.TemporaryDirectory() as tmpdir:
+        out, save_path = _run_experiment(tmpdir, {
+            'TASK_VARIANT': 'fill_blank', 'FILL_BLANK_ALL_POSITIONS': True,
+            'P': 17, 'ORDER': 1, 'RULES': [[1]], 'CONST': 1})
+        assert os.path.exists(save_path), "checkpoint was not saved"
+        assert 'Train: Loss=' in out and 'nan' not in out.lower()
+        assert 'X(k)=(1*X(k-1)+1) mod 17' in out  # 递推名含常数项
+        # 17 个状态 × 0.7 = 11 train 窗口 × TRAIN_LEN=8 位置 = 88 条训练样本
+        assert '11 windows -> 88 train samples' in out
+        latest = torch.load(os.path.splitext(save_path)[0] + '_latest.pth',
+                            weights_only=False)
+        sc = latest['config']
+        assert sc['variant'] == 'fill_blank' and sc['const'] == 1
+        assert sc['order'] == 1 and sc['rules'] == [[1]]
+
+
 if __name__ == '__main__':
     test_collate_layout()
     print('PASS test_collate_layout')
@@ -125,4 +159,8 @@ if __name__ == '__main__':
     print('PASS test_run_experiment_fill_blank_smoke')
     test_run_experiment_fill_blank_rejects_missing_prob()
     print('PASS test_run_experiment_fill_blank_rejects_missing_prob')
+    test_collate_fixed_position_tuples()
+    print('PASS test_collate_fixed_position_tuples')
+    test_run_experiment_arithmetic_fill_blank_all_positions()
+    print('PASS test_run_experiment_arithmetic_fill_blank_all_positions')
     print('ALL TESTS PASSED: test_fill_blank.py')

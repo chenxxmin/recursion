@@ -23,7 +23,8 @@ def _expect_error(fn, *fragments):
 def test_new_single_happy():
     norm = normalize_task_config('single', {'P': 53, 'ORDER': 3, 'RULES': [[1, 2, 3]]})
     assert norm == {'scenario': 'single', 'order': 3, 'rules': [[1, 2, 3]],
-                    'exposure_ratios': 0.7, 'variant': None, 'source': 'new'}
+                    'exposure_ratios': 0.7, 'variant': None, 'const': 0,
+                    'source': 'new'}
 
 
 def test_new_mixed_scalar_exposure():
@@ -60,7 +61,8 @@ def test_exceptions_passthrough():
     for task in EXCEPTION_TASKS:
         norm = normalize_task_config(task, {'P': 53})
         assert norm == {'scenario': task, 'order': None, 'rules': None,
-                        'exposure_ratios': None, 'variant': None, 'source': task}
+                        'exposure_ratios': None, 'variant': None, 'const': 0,
+                        'source': task}
 
 
 def test_new_format_errors():
@@ -295,6 +297,43 @@ def test_task_variant_fill_blank():
         'single', {'P': 53, 'ORDER': 2, 'RULES': [[1, 1]],
                    'TASK_VARIANT': 'fill_blank', 'MISSING_PROB': 0.2}),
         'MISSING_PROB')
+
+
+def test_const_term():
+    # 默认 0；single 非零合法（等差数列 = ORDER=1 + RULES=[[1]] + CONST=d）
+    norm = normalize_task_config('single', {'P': 1009, 'ORDER': 1, 'RULES': [[1]],
+                                            'CONST': 1})
+    assert norm['const'] == 1
+    # CONST: 0 / null 显式给也合法
+    assert normalize_task_config('single', {'P': 53, 'ORDER': 2, 'RULES': [[1, 1]],
+                                            'CONST': None})['const'] == 0
+    # 越界 / 非整数 -> 报错
+    _expect_error(lambda: normalize_task_config(
+        'single', {'P': 53, 'ORDER': 2, 'RULES': [[1, 1]], 'CONST': 53}), '越界')
+    _expect_error(lambda: normalize_task_config(
+        'single', {'P': 53, 'ORDER': 2, 'RULES': [[1, 1]], 'CONST': 0.5}), '整数')
+    # mixed/action/例外 task + CONST 非零 -> 报错
+    _expect_error(lambda: normalize_task_config(
+        'mixed', {'P': 23, 'ORDER': 2, 'RULES': [[1, 1], [2, 3]], 'CONST': 1}), 'single')
+    _expect_error(lambda: normalize_task_config(
+        'multiplication', {'P': 53, 'CONST': 1}), 'single')
+    # 旧 single 名（映射到 single 场景）允许 CONST
+    assert normalize_task_config('addition', {'P': 53, 'CONST': 2})['const'] == 2
+
+
+def test_fill_blank_all_positions_gate():
+    # 仅 fill_blank 支持；其他变体/无变体 -> 报错
+    _expect_error(lambda: normalize_task_config(
+        'single', {'P': 53, 'ORDER': 2, 'RULES': [[1, 1]],
+                   'FILL_BLANK_ALL_POSITIONS': True}), 'fill_blank')
+    _expect_error(lambda: normalize_task_config(
+        'single', {'P': 53, 'ORDER': 2, 'RULES': [[1, 1]],
+                   'TASK_VARIANT': 'corrupt_fix', 'FILL_BLANK_ALL_POSITIONS': True}),
+        'fill_blank')
+    norm = normalize_task_config('single', {'P': 53, 'ORDER': 2, 'RULES': [[1, 1]],
+                                            'TASK_VARIANT': 'fill_blank',
+                                            'FILL_BLANK_ALL_POSITIONS': True})
+    assert norm['variant'] == 'fill_blank'
 
 
 if __name__ == '__main__':
