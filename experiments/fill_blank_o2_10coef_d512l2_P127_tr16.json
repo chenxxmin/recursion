@@ -1,0 +1,195 @@
+{
+  "concurrency": 2,
+  "experiments": [
+    {
+      "name": "single_o2_fillblank_a117b27_d512l2r8h1_P127_tr16_seed42",
+      "task": "single",
+      "config": {
+        "TASK_VARIANT": "fill_blank",
+        "ORDER": 2,
+        "RULES": [
+          [
+            117,
+            27
+          ]
+        ],
+        "P": 127,
+        "D_MODEL": 512,
+        "N_LAYER": 2,
+        "TRAIN_LEN": 16,
+        "EVAL_INTERVAL": 1
+      }
+    },
+    {
+      "name": "single_o2_fillblank_a25b56_d512l2r8h1_P127_tr16_seed42",
+      "task": "single",
+      "config": {
+        "TASK_VARIANT": "fill_blank",
+        "ORDER": 2,
+        "RULES": [
+          [
+            25,
+            56
+          ]
+        ],
+        "P": 127,
+        "D_MODEL": 512,
+        "N_LAYER": 2,
+        "TRAIN_LEN": 16,
+        "EVAL_INTERVAL": 1
+      }
+    },
+    {
+      "name": "single_o2_fillblank_a61b1_d512l2r8h1_P127_tr16_seed42",
+      "task": "single",
+      "config": {
+        "TASK_VARIANT": "fill_blank",
+        "ORDER": 2,
+        "RULES": [
+          [
+            61,
+            1
+          ]
+        ],
+        "P": 127,
+        "D_MODEL": 512,
+        "N_LAYER": 2,
+        "TRAIN_LEN": 16,
+        "EVAL_INTERVAL": 1
+      }
+    },
+    {
+      "name": "single_o2_fillblank_a104b105_d512l2r8h1_P127_tr16_seed42",
+      "task": "single",
+      "config": {
+        "TASK_VARIANT": "fill_blank",
+        "ORDER": 2,
+        "RULES": [
+          [
+            104,
+            105
+          ]
+        ],
+        "P": 127,
+        "D_MODEL": 512,
+        "N_LAYER": 2,
+        "TRAIN_LEN": 16,
+        "EVAL_INTERVAL": 1
+      }
+    },
+    {
+      "name": "single_o2_fillblank_a5b3_d512l2r8h1_P127_tr16_seed42",
+      "task": "single",
+      "config": {
+        "TASK_VARIANT": "fill_blank",
+        "ORDER": 2,
+        "RULES": [
+          [
+            5,
+            3
+          ]
+        ],
+        "P": 127,
+        "D_MODEL": 512,
+        "N_LAYER": 2,
+        "TRAIN_LEN": 16,
+        "EVAL_INTERVAL": 1
+      }
+    },
+    {
+      "name": "single_o2_fillblank_a78b24_d512l2r8h1_P127_tr16_seed42",
+      "task": "single",
+      "config": {
+        "TASK_VARIANT": "fill_blank",
+        "ORDER": 2,
+        "RULES": [
+          [
+            78,
+            24
+          ]
+        ],
+        "P": 127,
+        "D_MODEL": 512,
+        "N_LAYER": 2,
+        "TRAIN_LEN": 16,
+        "EVAL_INTERVAL": 1
+      }
+    },
+    {
+      "name": "single_o2_fillblank_a67b105_d512l2r8h1_P127_tr16_seed42",
+      "task": "single",
+      "config": {
+        "TASK_VARIANT": "fill_blank",
+        "ORDER": 2,
+        "RULES": [
+          [
+            67,
+            105
+          ]
+        ],
+        "P": 127,
+        "D_MODEL": 512,
+        "N_LAYER": 2,
+        "TRAIN_LEN": 16,
+        "EVAL_INTERVAL": 1
+      }
+    },
+    {
+      "name": "single_o2_fillblank_a54b113_d512l2r8h1_P127_tr16_seed42",
+      "task": "single",
+      "config": {
+        "TASK_VARIANT": "fill_blank",
+        "ORDER": 2,
+        "RULES": [
+          [
+            54,
+            113
+          ]
+        ],
+        "P": 127,
+        "D_MODEL": 512,
+        "N_LAYER": 2,
+        "TRAIN_LEN": 16,
+        "EVAL_INTERVAL": 1
+      }
+    },
+    {
+      "name": "single_o2_fillblank_a50b73_d512l2r8h1_P127_tr16_seed42",
+      "task": "single",
+      "config": {
+        "TASK_VARIANT": "fill_blank",
+        "ORDER": 2,
+        "RULES": [
+          [
+            50,
+            73
+          ]
+        ],
+        "P": 127,
+        "D_MODEL": 512,
+        "N_LAYER": 2,
+        "TRAIN_LEN": 16,
+        "EVAL_INTERVAL": 1
+      }
+    },
+    {
+      "name": "single_o2_fillblank_a83b88_d512l2r8h1_P127_tr16_seed42",
+      "task": "single",
+      "config": {
+        "TASK_VARIANT": "fill_blank",
+        "ORDER": 2,
+        "RULES": [
+          [
+            83,
+            88
+          ]
+        ],
+        "P": 127,
+        "D_MODEL": 512,
+        "N_LAYER": 2,
+        "TRAIN_LEN": 16,
+        "EVAL_INTERVAL": 1
+      }
+    }
+  ]
+}
