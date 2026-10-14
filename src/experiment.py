@@ -659,9 +659,13 @@ def _prepare_single_variant(config, norm):
 
     eos_id = P + 1
     if variant == 'corrupt_fix':
-        collate = make_corrupt_fix_collate(p=P, eos_id=eos_id, pos_base=P + 2)
+        # CORRUPT_FIX_PARALLEL：并行解码，值预测看不到位置答案（双 EOS 槽）
+        parallel = cfg.get('CORRUPT_FIX_PARALLEL', False)
+        collate = make_corrupt_fix_collate(p=P, eos_id=eos_id, pos_base=P + 2,
+                                           parallel=parallel)
         vocab_size = P + 2 + max_len
-        variant_save = {'eos_token_id': eos_id, 'pos_token_base': P + 2}
+        variant_save = {'eos_token_id': eos_id, 'pos_token_base': P + 2,
+                        'parallel_decode': parallel}
     else:  # fill_blank
         collate = make_fill_blank_collate(p=P, eos_id=eos_id)
         vocab_size = P + 2

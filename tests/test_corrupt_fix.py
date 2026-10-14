@@ -172,6 +172,36 @@ def test_run_experiment_corrupt_fix_order1_smoke():
         assert sc['rules'] == [[3]]
 
 
+def test_collate_layout_parallel():
+    # CORRUPT_FIX_PARALLEL：x 末位是第二个 EOS（不是位置 token），
+    # targets/loss_mask 与 teacher forcing 版完全一致
+    p, eos_id, pos_base, L = 7, 8, 9, 6
+    seqs = _addition_windows(p=p, n=16, length=L)
+    collate_tf = make_corrupt_fix_collate(p=p, eos_id=eos_id, pos_base=pos_base)
+    collate_par = make_corrupt_fix_collate(p=p, eos_id=eos_id, pos_base=pos_base,
+                                           parallel=True)
+    random.seed(123)
+    x_tf, tag, targets_tf, mask_tf = collate_tf(seqs)
+    random.seed(123)
+    x_par, _, targets_par, mask_par = collate_par(seqs)
+    assert torch.equal(targets_tf, targets_par) and torch.equal(mask_tf, mask_par)
+    assert torch.equal(x_tf[:, :-1], x_par[:, :-1])  # 仅末位不同
+    assert (x_par[:, -1] == eos_id).all(), "parallel 模式末位必须是 EOS"
+    assert (x_tf[:, -1] >= pos_base).all()  # 对照：TF 版末位是位置 token
+
+
+def test_run_experiment_corrupt_fix_parallel_smoke():
+    with tempfile.TemporaryDirectory() as tmpdir:
+        out, save_path = _run_experiment(tmpdir, {'TASK_VARIANT': 'corrupt_fix',
+                                                  'CORRUPT_FIX_PARALLEL': True})
+        assert os.path.exists(save_path)
+        assert 'Train: Loss=' in out and 'nan' not in out.lower()
+        latest = torch.load(os.path.splitext(save_path)[0] + '_latest.pth',
+                            weights_only=False)
+        sc = latest['config']
+        assert sc['variant'] == 'corrupt_fix' and sc['parallel_decode'] is True
+
+
 if __name__ == '__main__':
     test_collate_layout()
     print('PASS test_collate_layout')
@@ -185,4 +215,8 @@ if __name__ == '__main__':
     print('PASS test_run_experiment_corrupt_fix_rejects_missing_prob')
     test_run_experiment_corrupt_fix_order1_smoke()
     print('PASS test_run_experiment_corrupt_fix_order1_smoke')
+    test_collate_layout_parallel()
+    print('PASS test_collate_layout_parallel')
+    test_run_experiment_corrupt_fix_parallel_smoke()
+    print('PASS test_run_experiment_corrupt_fix_parallel_smoke')
     print('ALL TESTS PASSED: test_corrupt_fix.py')

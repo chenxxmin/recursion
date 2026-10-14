@@ -129,6 +129,8 @@ loss_mask    = 仅最后两个 target 位为 1（EOS 槽预测位置 token，位
 - checkpoint save_config 追加 `variant` / `eos_token_id` / `pos_token_base` / `vocab_size` 四键。
 - collate：`src/datasets.py::make_corrupt_fix_collate`；BatchTag：`CORRUPT_FIX`（payload = `target_seqs` + `loss_mask`）。
 
+**`CORRUPT_FIX_PARALLEL`**（2026-10-14，默认 false，仅 corrupt_fix）：并行解码模式——输入末位从“真实位置 token”（teacher forcing）换成**第二个 EOS**，位置与值两个预测基于同一前缀并行产生，**值预测看不到位置答案**（回答“模型答不出位置时凭什么答对值”的口径问题）。targets/loss_mask 与 TF 版完全相同，save_config 记 `parallel_decode`。此模式下 overall acc =（位置 acc + 盲值 acc）/ 2，盲值 acc 才是端到端难度的诚实下界。
+
 ### 1.8 fill_blank 任务变体（2026-10-14）
 
 与 corrupt_fix 同族（`TASK_VARIANT='fill_blank'`，仅 single），差别仅在污损方式与输出：

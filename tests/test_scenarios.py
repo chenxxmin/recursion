@@ -336,6 +336,21 @@ def test_fill_blank_all_positions_gate():
     assert norm['variant'] == 'fill_blank'
 
 
+def test_corrupt_fix_parallel_gate():
+    # 仅 corrupt_fix 支持
+    _expect_error(lambda: normalize_task_config(
+        'single', {'P': 53, 'ORDER': 2, 'RULES': [[1, 1]],
+                   'CORRUPT_FIX_PARALLEL': True}), 'corrupt_fix')
+    _expect_error(lambda: normalize_task_config(
+        'single', {'P': 53, 'ORDER': 2, 'RULES': [[1, 1]],
+                   'TASK_VARIANT': 'fill_blank', 'CORRUPT_FIX_PARALLEL': True}),
+        'corrupt_fix')
+    norm = normalize_task_config('single', {'P': 53, 'ORDER': 2, 'RULES': [[1, 1]],
+                                            'TASK_VARIANT': 'corrupt_fix',
+                                            'CORRUPT_FIX_PARALLEL': True})
+    assert norm['variant'] == 'corrupt_fix'
+
+
 if __name__ == '__main__':
     for _name, _fn in sorted(list(globals().items())):
         if _name.startswith('test_') and callable(_fn):

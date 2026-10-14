@@ -461,7 +461,7 @@ def make_missing_collate(*, p, init_len, missing_prob, miss_len=1, missing_token
     return collate
 
 
-def make_corrupt_fix_collate(*, p, eos_id, pos_base):
+def make_corrupt_fix_collate(*, p, eos_id, pos_base, parallel=False):
     """Collate for the corrupt_fix task variant (TASK_VARIANT='corrupt_fix').
 
     Input: a batch of CLEAN windows (plain LongTensors, any length L).
@@ -480,6 +480,11 @@ def make_corrupt_fix_collate(*, p, eos_id, pos_base):
     target_seqs[:, 1:]), the model predicts the position token at the EOS
     slot and then the correct value v after the fed-back position token
     (teacher forcing). The training loop's loss/accuracy need no changes.
+
+    parallel=True（CORRUPT_FIX_PARALLEL）：值预测看不到位置答案——输入的
+    最后一个 token 换成第二个 EOS（而非真实位置 token），位置与值两个
+    预测在同一前缀上并行产生。targets/loss_mask 与 teacher forcing 版
+    完全相同（只有 x 的末位不同）。
     """
     def collate(batch):
         xs, targets, masks = [], [], []
@@ -492,8 +497,12 @@ def make_corrupt_fix_collate(*, p, eos_id, pos_base):
                 wrong += 1  # uniform over [0, p) \ {orig}
             view = seq.clone()
             view[k] = wrong
-            x = torch.cat([view, torch.tensor([eos_id, pos_base + k], dtype=torch.long)])
-            tgt = torch.cat([x, torch.tensor([orig], dtype=torch.long)])
+            last = eos_id if parallel else pos_base + k
+            x = torch.cat([view, torch.tensor([eos_id, last], dtype=torch.long)])
+            # targets 两种模式相同（[c', EOS, pos_tok(k), 正确值]）；
+            # 只有 x 的末位不同（parallel 用第二个 EOS 遮住位置答案）。
+            tgt = torch.cat([view, torch.tensor([eos_id, pos_base + k, orig],
+                                                dtype=torch.long)])
             mask = torch.zeros(L + 2, dtype=torch.float)  # aligns with tgt[:, 1:]
             mask[L] = 1.0      # EOS slot -> position token
             mask[L + 1] = 1.0  # position-token slot -> correct value

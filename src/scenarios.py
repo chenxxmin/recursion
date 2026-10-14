@@ -141,6 +141,10 @@ def _normalize_variant(scenario, cfg):
         raise ValueError(
             "TEST_ALL_POSITIONS 仅 TASK_VARIANT='fill_blank' 支持"
             "（测试集逐位置枚举挖空）")
+    if cfg.get('CORRUPT_FIX_PARALLEL') and raw != 'corrupt_fix':
+        raise ValueError(
+            "CORRUPT_FIX_PARALLEL 仅 TASK_VARIANT='corrupt_fix' 支持"
+            "（并行解码：值预测看不到位置答案）")
     if (cfg.get('TEST_ALL_POSITIONS') and cfg.get('FILL_BLANK_ALL_POSITIONS')
             and raw == 'fill_blank'):
         warnings.warn(

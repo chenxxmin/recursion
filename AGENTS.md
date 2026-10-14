@@ -41,6 +41,7 @@
 10. **ORDER=1 开放给 single**（2026-10-14）：等比递推 `x_k = c·x_{k-1}`（注意不是等差——框架无常数项）。状态空间 `P^1 = P`，建议大 P；mixed/action 仍要求 ORDER≥2（归一化层报错）。
 11. **fill_blank 任务变体**（2026-10-14）：`TASK_VARIANT='fill_blank'`（仅 single）：恰好一位替换成空白 token（id=P），尾部接 EOS，模型只输出正确值一个 token（loss/acc 仅 EOS 槽）；词表 `P+2`，prepare 与 corrupt_fix 共用 `_prepare_single_variant`。约束同 corrupt_fix（与 MISSING_PROB 互斥、NUM_MASK 忽略、mixed/action 报错）。规格见 settings 文档 §1.8。
 12. **CONST 常数项 + FILL_BLANK_ALL_POSITIONS + TEST_ALL_POSITIONS**（2026-10-14）：①`CONST`（默认 0，仅 single 可非零）给递推公式加常数项 `x_k = ... + CONST mod P`；等差数列 = `ORDER=1, RULES=[[1]], CONST=d`。键名不能用 C（A/B/C/D 已被旧系数占用）。②`FILL_BLANK_ALL_POSITIONS: true`（仅 fill_blank，其他情况报错）：每条序列的每个位置挖空各成一条样本（(seq,k) 元组，样本数 × 窗口长度），collate 用样本携带的位置。③`TEST_ALL_POSITIONS: true`（仅 fill_blank）：只把测试集改成逐位置枚举（确定性评估口径，eval 计算 × 窗口长度），训练侧保持在线随机挖空；静态切分制下 `NUM_TEST_SAMPLES` 变为测试窗口数上限（默认 256，确定性子抽样）。checkpoint save_config 的 single 块新增 `const` 键。
+13. **CORRUPT_FIX_PARALLEL 并行解码**（2026-10-14）：仅 corrupt_fix。true 时输入末位用第二个 EOS 代替真实位置 token（双 EOS 槽），位置/值并行预测，值看不到位置答案（默认 false = teacher forcing，值 acc 是“给定点位置算值”的条件准确率，端到端能力≈位置 acc）。save_config 记 `parallel_decode`。
 
 ## 4. 本机环境的坑（反复踩过）
 
