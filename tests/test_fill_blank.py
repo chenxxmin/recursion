@@ -148,6 +148,18 @@ def test_run_experiment_arithmetic_fill_blank_all_positions():
         assert sc['order'] == 1 and sc['rules'] == [[1]]
 
 
+def test_run_experiment_fill_blank_test_all_positions():
+    # TEST_ALL_POSITIONS：只扩测试集（训练侧保持在线随机挖空）
+    with tempfile.TemporaryDirectory() as tmpdir:
+        out, save_path = _run_experiment(tmpdir, {
+            'TASK_VARIANT': 'fill_blank', 'TEST_ALL_POSITIONS': True,
+            'P': 17, 'ORDER': 1, 'RULES': [[1]], 'CONST': 1})
+        assert os.path.exists(save_path)
+        # 6 个测试窗口 × TRAIN_LEN=8 位置 = 48 条确定性测试样本
+        assert 'TEST_ALL_POSITIONS: test set -> 48 samples' in out
+        assert 'FILL_BLANK_ALL_POSITIONS' not in out  # 训练侧未开枚举
+
+
 if __name__ == '__main__':
     test_collate_layout()
     print('PASS test_collate_layout')
@@ -163,4 +175,6 @@ if __name__ == '__main__':
     print('PASS test_collate_fixed_position_tuples')
     test_run_experiment_arithmetic_fill_blank_all_positions()
     print('PASS test_run_experiment_arithmetic_fill_blank_all_positions')
+    test_run_experiment_fill_blank_test_all_positions()
+    print('PASS test_run_experiment_fill_blank_test_all_positions')
     print('ALL TESTS PASSED: test_fill_blank.py')

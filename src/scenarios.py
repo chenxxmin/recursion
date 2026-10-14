@@ -137,6 +137,15 @@ def _normalize_variant(scenario, cfg):
         raise ValueError(
             "FILL_BLANK_ALL_POSITIONS 仅 TASK_VARIANT='fill_blank' 支持"
             "（每个位置挖空各成一条训练样本）")
+    if cfg.get('TEST_ALL_POSITIONS') and raw != 'fill_blank':
+        raise ValueError(
+            "TEST_ALL_POSITIONS 仅 TASK_VARIANT='fill_blank' 支持"
+            "（测试集逐位置枚举挖空）")
+    if (cfg.get('TEST_ALL_POSITIONS') and cfg.get('FILL_BLANK_ALL_POSITIONS')
+            and raw == 'fill_blank'):
+        warnings.warn(
+            "FILL_BLANK_ALL_POSITIONS 已使测试集逐位置枚举，TEST_ALL_POSITIONS 冗余",
+            stacklevel=3)
     if raw is None:
         return None
     if raw not in TASK_VARIANTS:

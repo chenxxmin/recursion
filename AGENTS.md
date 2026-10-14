@@ -40,7 +40,7 @@
 9. **MLP_RATIO 默认 4→8**（2026-10-14）：`src/config.json` main 段与代码内全部 fallback（experiment.py / models.py / eval_clean_action.py）同步改为 8。未显式写 MLP_RATIO 的旧实验 JSON 重跑会得到更宽的 MLP（历史实验 JSON 多数显式写了 8，不受影响）。
 10. **ORDER=1 开放给 single**（2026-10-14）：等比递推 `x_k = c·x_{k-1}`（注意不是等差——框架无常数项）。状态空间 `P^1 = P`，建议大 P；mixed/action 仍要求 ORDER≥2（归一化层报错）。
 11. **fill_blank 任务变体**（2026-10-14）：`TASK_VARIANT='fill_blank'`（仅 single）：恰好一位替换成空白 token（id=P），尾部接 EOS，模型只输出正确值一个 token（loss/acc 仅 EOS 槽）；词表 `P+2`，prepare 与 corrupt_fix 共用 `_prepare_single_variant`。约束同 corrupt_fix（与 MISSING_PROB 互斥、NUM_MASK 忽略、mixed/action 报错）。规格见 settings 文档 §1.8。
-12. **CONST 常数项 + FILL_BLANK_ALL_POSITIONS**（2026-10-14）：①`CONST`（默认 0，仅 single 可非零）给递推公式加常数项 `x_k = ... + CONST mod P`；等差数列 = `ORDER=1, RULES=[[1]], CONST=d`。键名不能用 C（A/B/C/D 已被旧系数占用）。②`FILL_BLANK_ALL_POSITIONS: true`（仅 fill_blank，其他情况报错）：每条序列的每个位置挖空各成一条样本（(seq,k) 元组，样本数 × 窗口长度），collate 用样本携带的位置。checkpoint save_config 的 single 块新增 `const` 键。
+12. **CONST 常数项 + FILL_BLANK_ALL_POSITIONS + TEST_ALL_POSITIONS**（2026-10-14）：①`CONST`（默认 0，仅 single 可非零）给递推公式加常数项 `x_k = ... + CONST mod P`；等差数列 = `ORDER=1, RULES=[[1]], CONST=d`。键名不能用 C（A/B/C/D 已被旧系数占用）。②`FILL_BLANK_ALL_POSITIONS: true`（仅 fill_blank，其他情况报错）：每条序列的每个位置挖空各成一条样本（(seq,k) 元组，样本数 × 窗口长度），collate 用样本携带的位置。③`TEST_ALL_POSITIONS: true`（仅 fill_blank）：只把测试集改成逐位置枚举（确定性评估口径，eval 计算 × 窗口长度），训练侧保持在线随机挖空。checkpoint save_config 的 single 块新增 `const` 键。
 
 ## 4. 本机环境的坑（反复踩过）
 

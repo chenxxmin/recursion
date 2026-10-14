@@ -641,6 +641,14 @@ def _prepare_single_variant(config, norm):
             test_dataset = [(seq, k) for seq in test_dataset for k in range(len(seq))]
         print(f"[Variant] FILL_BLANK_ALL_POSITIONS: {n_base} windows -> "
               f"{len(train_dataset)} train samples (x{TRAIN_LEN})")
+    # TEST_ALL_POSITIONS（仅 fill_blank）：只把测试集改成逐位置枚举挖空
+    # （确定性评估口径），训练侧保持在线随机挖空。blank_all 时测试已枚举，跳过。
+    test_all = (variant == 'fill_blank' and not blank_all
+                and cfg.get('TEST_ALL_POSITIONS', False))
+    if test_all and data_mode == 'full_split':
+        test_dataset = [(seq, k) for seq in test_dataset for k in range(len(seq))]
+        print(f"[Variant] TEST_ALL_POSITIONS: test set -> "
+              f"{len(test_dataset)} samples (every window x every position)")
 
     eos_id = P + 1
     if variant == 'corrupt_fix':
@@ -671,7 +679,7 @@ def _prepare_single_variant(config, norm):
             eval_rng = random.Random(fresh_seed)
             fresh_samples = ds.sample_random_windows(
                 NUM_TEST_SAMPLES, length=OOD_LEN, rng=eval_rng)
-            if blank_all:
+            if blank_all or test_all:
                 fresh_samples = [(seq, k) for seq in fresh_samples
                                  for k in range(len(seq))]
             print(f"[FreshTest] sampled with replacement: "
