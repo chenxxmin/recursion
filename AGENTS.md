@@ -11,10 +11,10 @@
 ## 1. 代码结构（src/）
 
 - `core.py`：薄入口（re-export），实际逻辑在 `experiment.py`（run_experiment 主流程 + 三个 prepare）。
-- `experiment.py`：`run_experiment` 开头经 `scenarios.normalize_task_config` 归一化后按 scenario/variant 分派（`_prepare_single_recurrence`（single + 三个非线性例外）/ `_prepare_mixed_recurrence`（mixed）/ `_prepare_action`（action，order 参数区分阶数）/ `_prepare_single_corrupt_fix`（TASK_VARIANT=corrupt_fix，仅 single））。
+- `experiment.py`：`run_experiment` 开头经 `scenarios.normalize_task_config` 归一化后按 scenario/variant 分派（`_prepare_single_recurrence`（single + 三个非线性例外）/ `_prepare_mixed_recurrence`（mixed）/ `_prepare_action`（action，order 参数区分阶数）/ `_prepare_single_variant`（TASK_VARIANT=corrupt_fix/fill_blank，仅 single））。
 - `scenarios.py`：归一化层 `normalize_task_config`（纯配置翻译，无 torch 依赖）：旧 task 名映射（addition/tribonacci/tetranacci→single、mixed_ab/mixed_abc→mixed、action_trib/dynamic_mixed→action）、action 旧键 AB_PAIRS/ABC_PAIRS 反转为 canonical RULES、旧暴露率键→EXPOSURE_RATIOS、已删功能显式启用则报错。
 - `rules.py`：递推规则。`LinearRecurrenceRule`（任意阶任意系数的通用入口，canonical 方向）、`single_rule_from_task`（task 名 → (init_len, next_fn, name)）、`rules_from_config(rules_raw, p)`（新签名：消费归一化结果的 canonical 系数列表）。
-- `datasets.py`：RecurrenceDataset（全状态枚举+循环遍历，或 STATE_SPACE_CAP 抽样）、MixedRecurrenceDataset、ActionDataset、所有 collate（含 corrupt_fix 变体的 `make_corrupt_fix_collate`）。
+- `datasets.py`：RecurrenceDataset（全状态枚举+循环遍历，或 STATE_SPACE_CAP 抽样）、MixedRecurrenceDataset、ActionDataset、所有 collate（含变体的 `make_corrupt_fix_collate` / `make_fill_blank_collate`）。
 - `training.py`：训练/评估循环、早停、SIGTERM 优雅退出、checkpoint。
 - `batch_run.py`：批量编排（读 experiments/*.json，合并配置，一卡一实验）；`chain_rounds.sh` + `prepare_chain_round.py`：多轮续跑。`chain_run.py`：通用课程链（分 stage 串行，`INIT_FROM:"@prev"/@<stage>` 暖启动，gate 门槛，顶层 concurrency 透传）；交接文档 `docs/CURRICULUM_NTASK_HANDOVER.md`。`curriculum_chain_Ntask.py` 是旧的 N=2→5 专用调度器（硬编码，勿用作通用 pipeline）。
 - 测试：`tests/test_*.py` 是纯 assert 脚本，**没有 pytest**；本机运行 `python tests/test_xxx.py`（test_sample_gen.py 等需要 `PYTHONPATH=src`）。
@@ -39,6 +39,7 @@
 8. **corrupt_fix 任务变体**（2026-10-14）：新正交键 `TASK_VARIANT`（场景下一级，默认 null）。`corrupt_fix` 目前仅 single：collate 在线把恰好一个位置（含初值）改成随机错误值（≠原值，非 missing token），尾部接 EOS（id=P+1），模型自回归输出位置 token（id=P+2+k）与正确值（teacher forcing）；词表 `P+2+max(TRAIN_LEN,OOD_LEN)`，loss/acc 只算最后两个输出位（复用 targets_override 约定，training.py 零改动）。与 `MISSING_PROB>0` 互斥（报错），`NUM_MASK` 无意义（警告忽略）；mixed/action 组合报“尚未实现”。规格见 docs/recursion_model_and_training_settings.md §1.7。
 9. **MLP_RATIO 默认 4→8**（2026-10-14）：`src/config.json` main 段与代码内全部 fallback（experiment.py / models.py / eval_clean_action.py）同步改为 8。未显式写 MLP_RATIO 的旧实验 JSON 重跑会得到更宽的 MLP（历史实验 JSON 多数显式写了 8，不受影响）。
 10. **ORDER=1 开放给 single**（2026-10-14）：等比递推 `x_k = c·x_{k-1}`（注意不是等差——框架无常数项）。状态空间 `P^1 = P`，建议大 P；mixed/action 仍要求 ORDER≥2（归一化层报错）。
+11. **fill_blank 任务变体**（2026-10-14）：`TASK_VARIANT='fill_blank'`（仅 single）：恰好一位替换成空白 token（id=P），尾部接 EOS，模型只输出正确值一个 token（loss/acc 仅 EOS 槽）；词表 `P+2`，prepare 与 corrupt_fix 共用 `_prepare_single_variant`。约束同 corrupt_fix（与 MISSING_PROB 互斥、NUM_MASK 忽略、mixed/action 报错）。规格见 settings 文档 §1.8。
 
 ## 4. 本机环境的坑（反复踩过）
 

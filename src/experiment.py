@@ -2,7 +2,8 @@
 
 Extracted from core.py (core.py split, step 4). run_experiment is a slim
 orchestrator: parse config -> normalize_task_config -> scenario dispatch
-(_prepare_single_recurrence / _prepare_mixed_recurrence / _prepare_action)
+(_prepare_single_recurrence / _prepare_mixed_recurrence / _prepare_action
+/ _prepare_single_variant（corrupt_fix/fill_blank）)
 -> run_training_engine. The stage-3 final generation test (final_eval.py)
 was removed 2026-10-08; result reporting is the training log's best acc
 plus scripts/eval_clean_action.py. Depends on
@@ -28,7 +29,7 @@ from datasets import (RecurrenceDataset, MixedRecurrenceDataset,
                       collate_fn, make_missing_collate,
                       mixed_ab_collate_fn, make_mixed_missing_collate,
                       action_collate_fn, make_action_missing_collate,
-                      make_corrupt_fix_collate)
+                      make_corrupt_fix_collate, make_fill_blank_collate)
 from training import run_training_engine, resume_checkpoint_path
 
 
@@ -543,23 +544,27 @@ def _prepare_single_recurrence(config, norm):
     }
 
 
-def _prepare_single_corrupt_fix(config, norm):
-    """Prepare the corrupt_fix task variant on the single scenario
-    (TASK_VARIANT='corrupt_fix'; see scenarios.TASK_VARIANTS).
+def _prepare_single_variant(config, norm):
+    """Prepare single-scenario task variants (TASK_VARIANT ∈
+    {'corrupt_fix', 'fill_blank'}; see scenarios.TASK_VARIANTS).
 
     The data pipeline is identical to _prepare_single_recurrence's single
     branch (RecurrenceDataset + full_split/sampled_fresh_test, same exposure
     logic); only the collate, the token layout and the model vocab differ:
 
-      - the collate corrupts exactly ONE position with a random wrong value
-        (online, fresh per batch, train and test alike) and builds
-        x = [corrupted window, EOS, pos_token], targets = [.., pos_token,
-        correct value], loss_mask on the last two target positions only;
-      - vocab: values [0..P-1] | missing P (kept for layout consistency,
-        unused here) | EOS P+1 | position tokens P+2+k for
-        k < max(TRAIN_LEN, OOD_LEN);
-      - num_mask = 0: the loss mask comes from the collate.
+      - corrupt_fix: collate corrupts exactly ONE position with a random
+        wrong value; x = [corrupted window, EOS, pos_token], targets =
+        [.., pos_token, correct value], loss on the last two positions.
+        vocab = values [0..P-1] | missing P (unused) | EOS P+1 |
+        position tokens P+2+k, k < max(TRAIN_LEN, OOD_LEN).
+      - fill_blank: collate replaces exactly ONE position with the blank
+        token (id = P); x = [corrupted window, EOS], targets = [.., correct
+        value], loss on the EOS slot only. vocab = values | blank P |
+        EOS P+1, i.e. vocab_size = P + 2.
+
+    num_mask = 0 in both: the loss mask comes from the collate.
     """
+    variant = norm['variant']
     cfg = dict(config.get('main', {}))
     P = cfg['P']
     D_MODEL = cfg['D_MODEL']
@@ -571,7 +576,9 @@ def _prepare_single_corrupt_fix(config, norm):
     DROPOUT = cfg['DROPOUT']
 
     max_len = max(TRAIN_LEN, OOD_LEN)
-    BLOCK_SIZE = _round_up_pow2(max_len + 2)  # input = window + EOS + pos token
+    # corrupt_fix: 输入 = 窗口 + EOS + 位置 token；fill_blank: 窗口 + EOS
+    tail_tokens = 2 if variant == 'corrupt_fix' else 1
+    BLOCK_SIZE = _round_up_pow2(max_len + tail_tokens)
 
     init_len, recurrence_fn, recurrence_name = single_rule_from_task(
         'single', {'P': P, 'RULES': norm['rules']})
@@ -623,12 +630,16 @@ def _prepare_single_corrupt_fix(config, norm):
         test_dataset = []
 
     eos_id = P + 1
-    pos_base = P + 2
-    vocab_size = P + 2 + max_len
+    if variant == 'corrupt_fix':
+        collate = make_corrupt_fix_collate(p=P, eos_id=eos_id, pos_base=P + 2)
+        vocab_size = P + 2 + max_len
+        variant_save = {'eos_token_id': eos_id, 'pos_token_base': P + 2}
+    else:  # fill_blank
+        collate = make_fill_blank_collate(p=P, eos_id=eos_id)
+        vocab_size = P + 2
+        variant_save = {'eos_token_id': eos_id, 'blank_token_id': P}
     _print_task_banner(BLOCK_SIZE, TRAIN_LEN,
-                       f"{recurrence_name} [corrupt_fix]")
-
-    collate = make_corrupt_fix_collate(p=P, eos_id=eos_id, pos_base=pos_base)
+                       f"{recurrence_name} [{variant}]")
     train_sampler = BucketBatchSampler(
         train_dataset, batch_size=BATCH_SIZE, shuffle=True,
         reshuffle_each_epoch=cfg.get('RESHUFFLE_EACH_EPOCH', False))
@@ -667,10 +678,9 @@ def _prepare_single_corrupt_fix(config, norm):
         'ood_len': OOD_LEN,
         'data_mode': data_mode,
         'num_train_samples': NUM_TRAIN_SAMPLES,
-        # corrupt_fix variant block
-        'variant': 'corrupt_fix',
-        'eos_token_id': eos_id,
-        'pos_token_base': pos_base,
+        # variant block
+        'variant': variant,
+        **variant_save,
         'vocab_size': vocab_size,
         'missing_prob': 0.0,
         'miss_len': cfg.get('MISS_LEN', 1),
@@ -743,13 +753,13 @@ def run_experiment(config_path=None):
         print(f"[Error] {exc}")
         sys.exit(2)  # non-zero so batch_run records failure instead of a silent "success"
     scenario = norm['scenario']
-    if norm.get('variant') == 'corrupt_fix':
+    if norm.get('variant') in ('corrupt_fix', 'fill_blank'):
         # scenarios._normalize_variant already rejects non-single scenarios;
         # re-check defensively so a future variant never falls through silently.
         if scenario != 'single':
-            print(f"[Error] corrupt_fix variant not supported for scenario {scenario!r}")
+            print(f"[Error] variant {norm['variant']!r} not supported for scenario {scenario!r}")
             sys.exit(2)
-        ctx = _prepare_single_corrupt_fix(config, norm)
+        ctx = _prepare_single_variant(config, norm)
     elif scenario == 'mixed':
         ctx = _prepare_mixed_recurrence(config, device, norm)
     elif scenario == 'action':

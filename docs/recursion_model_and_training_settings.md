@@ -128,6 +128,24 @@ loss_mask    = 仅最后两个 target 位为 1（EOS 槽预测位置 token，位
 - checkpoint save_config 追加 `variant` / `eos_token_id` / `pos_token_base` / `vocab_size` 四键。
 - collate：`src/datasets.py::make_corrupt_fix_collate`；BatchTag：`CORRUPT_FIX`（payload = `target_seqs` + `loss_mask`）。
 
+### 1.8 fill_blank 任务变体（2026-10-14）
+
+与 corrupt_fix 同族（`TASK_VARIANT='fill_blank'`，仅 single），差别仅在污损方式与输出：
+
+1. 恰好一个位置 k（均匀选自 [0, L)，含初值位）被替换成**空白 token**（id = P，即现有 missing token），不是随机错误值；
+2. 尾部接 EOS（id = P+1），模型只输出**一个 token：空白处的正确值**（空白位置不言自明，不用答位置）；
+3. 词表 = 值 `0..P-1` + 空白 P + EOS P+1，即 `vocab_size = P+2`；`BLOCK_SIZE = round_up_pow2(max(TRAIN_LEN, OOD_LEN) + 1)`。
+
+序列/target 布局：
+
+```
+x            = [污损窗口(L), EOS]        # 长 L+1
+targets_override = [污损窗口(L), EOS, 正确值]   # 长 L+2
+loss_mask    = 仅 EOS 槽一位为 1（acc 只有 target[L] 一个输出位）
+```
+
+约束、评估口径、早停、结果口径均与 corrupt_fix 相同（§1.7）。collate：`make_fill_blank_collate`；BatchTag：`FILL_BLANK`；checkpoint save_config 记 `variant`/`eos_token_id`/`blank_token_id`/`vocab_size`。
+
 ---
 
 ## 2. 配置
@@ -144,7 +162,7 @@ loss_mask    = 仅最后两个 target 位为 1（EOS 槽预测位置 token，位
 | 配置项 | 说明 |
 |--------|------|
 | `TASK` | 场景名（`single`/`mixed`/`action`）或三个非线性例外 task 名；旧 task 名经归一化层兼容（见 §1.6），新实验一律用场景名 |
-| `TASK_VARIANT` | 场景下一级的任务变体（正交于 `TASK`，2026-10-14）。`null`（默认）= 标准 next-token 预测；`corrupt_fix` = 找错改值任务（恰好一位污损成随机错误值 + 尾部 EOS + 输出位置 token 与正确值，见 §1.7），目前仅 single 场景开放 |
+| `TASK_VARIANT` | 场景下一级的任务变体（正交于 `TASK`，2026-10-14）。`null`（默认）= 标准 next-token 预测；`corrupt_fix` = 找错改值任务（恰好一位污损成随机错误值 + 尾部 EOS + 输出位置 token 与正确值，见 §1.7）；`fill_blank` = 填空白任务（恰好一位替换成空白 token id=P + 尾部 EOS + 只输出正确值，见 §1.8）。目前均仅 single 场景开放 |
 | `P` | 模数 |
 | `ORDER` | 递推阶数，≥2 整数（single 允许 1，等比递推）；新格式必须显式写 |
 | `RULES` | 系数列表，canonical 方向（第一个系数乘最新的值）。`single` 恰好 1 条；`mixed`/`action` ≥1 条；每条长度 == `ORDER`，系数 ∈ [0, P) |
@@ -482,6 +500,7 @@ loss = masked_cross_entropy(logits, targets, loss_mask)
 | `BatchTag.MIXED_AB_TARGET` | `make_mixed_missing_collate` | `ab_indices` + 干净目标序列 |
 | `BatchTag.ACTION_MISS` | `make_action_missing_collate` | 干净目标序列 + `loss_mask` |
 | `BatchTag.CORRUPT_FIX` | `make_corrupt_fix_collate` | 目标序列（`targets = target_seqs[:, 1:]`）+ `loss_mask`（仅位置/值两个输出位） |
+| `BatchTag.FILL_BLANK` | `make_fill_blank_collate` | 目标序列 + `loss_mask`（仅 EOS 槽一个输出位） |
 
 不再通过张量 `ndim` 推断 batch 类型。
 
@@ -525,7 +544,7 @@ loss = masked_cross_entropy(logits, targets, loss_mask)
 | 注意力层 | `src/models.py::CausalSelfAttention` |
 | RoPE 实现 | `src/models.py::RotaryEmbedding`，`src/models.py::apply_rotary_emb` |
 | 训练流程 | `src/training.py::run_training_engine`，`src/training.py::train_epoch`，`src/training.py::evaluate`（AMP、freeze_partial、entropy penalty 均已移除） |
-| 配置入口 | `src/experiment.py::run_experiment`（开头经 `normalize_task_config` 归一化后按 scenario/variant 分派 `_prepare_single_recurrence` / `_prepare_mixed_recurrence` / `_prepare_action` / `_prepare_single_corrupt_fix`（TASK_VARIANT=corrupt_fix）；`src/core.py` 为入口壳并 re-export，由 `src/batch_run.py` 以 `python src/core.py <config>` 子进程方式调用） |
+| 配置入口 | `src/experiment.py::run_experiment`（开头经 `normalize_task_config` 归一化后按 scenario/variant 分派 `_prepare_single_recurrence` / `_prepare_mixed_recurrence` / `_prepare_action` / `_prepare_single_variant`（TASK_VARIANT=corrupt_fix/fill_blank）；`src/core.py` 为入口壳并 re-export，由 `src/batch_run.py` 以 `python src/core.py <config>` 子进程方式调用） |
 | 批量运行 | `src/batch_run.py` |
 | 注意力可视化 | `src/analyze_attention.py`（action/mixed 已按 order 参数化；含 cond_wte/ab_emb 键的旧 checkpoint 明确报错，含 rule_head 键的可加载） |
 | 训练后最终生成测试 | **已删除**（`src/final_eval.py` 移除，2026-10-08） |

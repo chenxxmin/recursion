@@ -419,6 +419,7 @@ class BatchTag(IntEnum):
     MIXED_AB_TARGET = 5  # payload: (ab_indices, clean_seqs) -- rule index + clean sequences
     ACTION_MISS = 6    # payload: (clean_seqs, loss_mask) -- action + missing (predict mode)
     CORRUPT_FIX = 7    # payload: (target_seqs, loss_mask) -- corrupt_fix 变体；targets = target_seqs[:, 1:]，mask 仅位置/值两个输出位
+    FILL_BLANK = 8     # payload: (target_seqs, loss_mask) -- fill_blank 变体；mask 仅 EOS 槽一个输出位
 
 
 def collate_fn(batch):
@@ -500,6 +501,43 @@ def make_corrupt_fix_collate(*, p, eos_id, pos_base):
             targets.append(tgt)
             masks.append(mask)
         return (torch.stack(xs), BatchTag.CORRUPT_FIX,
+                torch.stack(targets), torch.stack(masks))
+
+    return collate
+
+
+def make_fill_blank_collate(*, p, eos_id, blank_id=None):
+    """Collate for the fill_blank task variant (TASK_VARIANT='fill_blank').
+
+    Same online single-position corruption as corrupt_fix, but the position
+    is replaced by the BLANK token (id = p, the missing token) instead of a
+    random wrong value, and the model only outputs the correct VALUE — no
+    position token (the blank marks itself).
+
+    Output batch: (x, FILL_BLANK, target_seqs, loss_mask) with
+
+        x           = [c'(0..L-1), EOS]        # length L+1
+        target_seqs = [c'(0..L-1), EOS, v]     # length L+2
+        loss_mask   = 1 only at the EOS slot (predict the correct value v)
+    """
+    blank = p if blank_id is None else blank_id
+
+    def collate(batch):
+        xs, targets, masks = [], [], []
+        for seq in batch:
+            L = seq.numel()
+            k = random.randrange(L)
+            orig = int(seq[k])
+            view = seq.clone()
+            view[k] = blank
+            x = torch.cat([view, torch.tensor([eos_id], dtype=torch.long)])
+            tgt = torch.cat([x, torch.tensor([orig], dtype=torch.long)])
+            mask = torch.zeros(L + 1, dtype=torch.float)  # aligns with tgt[:, 1:]
+            mask[L] = 1.0  # EOS slot -> correct value
+            xs.append(x)
+            targets.append(tgt)
+            masks.append(mask)
+        return (torch.stack(xs), BatchTag.FILL_BLANK,
                 torch.stack(targets), torch.stack(masks))
 
     return collate

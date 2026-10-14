@@ -336,11 +336,11 @@ def main():
 
     print("=" * SEP_WIDTH)
 
-    # GPU whitelist: BATCH_RUN_GPUS="0,1,2,3" restricts which (physical)
-    # GPU ids this batch may use. On this machine GPUs 0-3 are ours and
-    # 4-7 are forbidden, so the whitelist defaults to 0-3; set
-    # BATCH_RUN_GPUS explicitly only to narrow it further.
-    env_gpus = os.environ.get('BATCH_RUN_GPUS', '0,1,2,3')
+    # GPU whitelist: BATCH_RUN_GPUS="0,1,..." restricts which (physical)
+    # GPU ids this batch may use; default is all 8 cards (the historical
+    # 0-3-only restriction belonged to a different machine; removed
+    # 2026-10-10). Set BATCH_RUN_GPUS explicitly to narrow it further.
+    env_gpus = os.environ.get('BATCH_RUN_GPUS', '0,1,2,3,4,5,6,7')
     allowed = {int(x) for x in env_gpus.split(',') if x.strip()}
     gpu_ids = [g for g in gpu_ids if g in allowed]
     print(f"GPU whitelist: {sorted(allowed)} -> usable: {gpu_ids}")

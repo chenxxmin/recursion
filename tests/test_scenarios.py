@@ -280,6 +280,23 @@ def test_task_variant_corrupt_fix():
     assert any('NUM_MASK' in str(w.message) for w in caught)
 
 
+def test_task_variant_fill_blank():
+    # single + fill_blank -> 通过
+    norm = normalize_task_config('single', {'P': 53, 'ORDER': 2, 'RULES': [[1, 1]],
+                                            'TASK_VARIANT': 'fill_blank'})
+    assert norm['variant'] == 'fill_blank'
+    # 非 single -> 报错
+    _expect_error(lambda: normalize_task_config(
+        'mixed', {'P': 23, 'ORDER': 2, 'RULES': [[1, 1], [2, 3]],
+                  'TASK_VARIANT': 'fill_blank'}),
+        'fill_blank', 'single')
+    # 与 MISSING_PROB 互斥
+    _expect_error(lambda: normalize_task_config(
+        'single', {'P': 53, 'ORDER': 2, 'RULES': [[1, 1]],
+                   'TASK_VARIANT': 'fill_blank', 'MISSING_PROB': 0.2}),
+        'MISSING_PROB')
+
+
 if __name__ == '__main__':
     for _name, _fn in sorted(list(globals().items())):
         if _name.startswith('test_') and callable(_fn):
