@@ -1,0 +1,189 @@
+{
+  "concurrency": 2,
+  "experiments": [
+    {
+      "name": "single_o2_fillblank_a63b61_d512l2r8h4_P127_tr16_e3000_seed42",
+      "task": "single",
+      "config": {
+        "ORDER": 2,
+        "P": 127,
+        "D_MODEL": 512,
+        "N_LAYER": 2,
+        "N_HEAD": 4,
+        "TRAIN_LEN": 16,
+        "EVAL_INTERVAL": 20,
+        "EPOCHS": 3000,
+        "RULES": [
+          [
+            63,
+            61
+          ]
+        ],
+        "TASK_VARIANT": "fill_blank",
+        "TEST_ALL_POSITIONS": true,
+        "NUM_TEST_SAMPLES": 1000
+      }
+    },
+    {
+      "name": "single_o2_fillblank_a56b62_d512l2r8h4_P127_tr16_e3000_seed42",
+      "task": "single",
+      "config": {
+        "ORDER": 2,
+        "P": 127,
+        "D_MODEL": 512,
+        "N_LAYER": 2,
+        "N_HEAD": 4,
+        "TRAIN_LEN": 16,
+        "EVAL_INTERVAL": 20,
+        "EPOCHS": 3000,
+        "RULES": [
+          [
+            56,
+            62
+          ]
+        ],
+        "TASK_VARIANT": "fill_blank",
+        "TEST_ALL_POSITIONS": true,
+        "NUM_TEST_SAMPLES": 1000
+      }
+    },
+    {
+      "name": "single_o2_fillblank_a57b64_d512l2r8h4_P127_tr16_e3000_seed42",
+      "task": "single",
+      "config": {
+        "ORDER": 2,
+        "P": 127,
+        "D_MODEL": 512,
+        "N_LAYER": 2,
+        "N_HEAD": 4,
+        "TRAIN_LEN": 16,
+        "EVAL_INTERVAL": 20,
+        "EPOCHS": 3000,
+        "RULES": [
+          [
+            57,
+            64
+          ]
+        ],
+        "TASK_VARIANT": "fill_blank",
+        "TEST_ALL_POSITIONS": true,
+        "NUM_TEST_SAMPLES": 1000
+      }
+    },
+    {
+      "name": "single_o2_fillblank_a62b59_d512l2r8h4_P127_tr16_e3000_seed42",
+      "task": "single",
+      "config": {
+        "ORDER": 2,
+        "P": 127,
+        "D_MODEL": 512,
+        "N_LAYER": 2,
+        "N_HEAD": 4,
+        "TRAIN_LEN": 16,
+        "EVAL_INTERVAL": 20,
+        "EPOCHS": 3000,
+        "RULES": [
+          [
+            62,
+            59
+          ]
+        ],
+        "TASK_VARIANT": "fill_blank",
+        "TEST_ALL_POSITIONS": true,
+        "NUM_TEST_SAMPLES": 1000
+      }
+    },
+    {
+      "name": "single_o2_fillblank_a67b65_d512l2r8h4_P127_tr16_e3000_seed42",
+      "task": "single",
+      "config": {
+        "ORDER": 2,
+        "P": 127,
+        "D_MODEL": 512,
+        "N_LAYER": 2,
+        "N_HEAD": 4,
+        "TRAIN_LEN": 16,
+        "EVAL_INTERVAL": 20,
+        "EPOCHS": 3000,
+        "RULES": [
+          [
+            67,
+            65
+          ]
+        ],
+        "TASK_VARIANT": "fill_blank",
+        "TEST_ALL_POSITIONS": true,
+        "NUM_TEST_SAMPLES": 1000
+      }
+    },
+    {
+      "name": "single_o2_fillblank_a54b20_d512l2r8h4_P127_tr16_e3000_seed42",
+      "task": "single",
+      "config": {
+        "ORDER": 2,
+        "P": 127,
+        "D_MODEL": 512,
+        "N_LAYER": 2,
+        "N_HEAD": 4,
+        "TRAIN_LEN": 16,
+        "EVAL_INTERVAL": 20,
+        "EPOCHS": 3000,
+        "RULES": [
+          [
+            54,
+            20
+          ]
+        ],
+        "TASK_VARIANT": "fill_blank",
+        "TEST_ALL_POSITIONS": true,
+        "NUM_TEST_SAMPLES": 1000
+      }
+    },
+    {
+      "name": "single_o2_fillblank_a29b108_d512l2r8h4_P127_tr16_e3000_seed42",
+      "task": "single",
+      "config": {
+        "ORDER": 2,
+        "P": 127,
+        "D_MODEL": 512,
+        "N_LAYER": 2,
+        "N_HEAD": 4,
+        "TRAIN_LEN": 16,
+        "EVAL_INTERVAL": 20,
+        "EPOCHS": 3000,
+        "RULES": [
+          [
+            29,
+            108
+          ]
+        ],
+        "TASK_VARIANT": "fill_blank",
+        "TEST_ALL_POSITIONS": true,
+        "NUM_TEST_SAMPLES": 1000
+      }
+    },
+    {
+      "name": "single_o2_fillblank_a50b119_d512l2r8h4_P127_tr16_e3000_seed42",
+      "task": "single",
+      "config": {
+        "ORDER": 2,
+        "P": 127,
+        "D_MODEL": 512,
+        "N_LAYER": 2,
+        "N_HEAD": 4,
+        "TRAIN_LEN": 16,
+        "EVAL_INTERVAL": 20,
+        "EPOCHS": 3000,
+        "RULES": [
+          [
+            50,
+            119
+          ]
+        ],
+        "TASK_VARIANT": "fill_blank",
+        "TEST_ALL_POSITIONS": true,
+        "NUM_TEST_SAMPLES": 1000
+      }
+    }
+  ]
+}
