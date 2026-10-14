@@ -1,0 +1,61 @@
+{
+  "concurrency": 4,
+  "experiments": [
+    {
+      "name": "single_o2_corruptfix_a93b69_d512l2r8h1_P127_tr16_seed42",
+      "task": "single",
+      "config": {
+        "TASK_VARIANT": "corrupt_fix",
+        "ORDER": 2,
+        "RULES": [[93, 69]],
+        "P": 127,
+        "D_MODEL": 512,
+        "N_LAYER": 2,
+        "TRAIN_LEN": 16,
+        "EVAL_INTERVAL": 1
+      }
+    },
+    {
+      "name": "single_o2_corruptfix_a22b86_d512l2r8h1_P127_tr16_seed42",
+      "task": "single",
+      "config": {
+        "TASK_VARIANT": "corrupt_fix",
+        "ORDER": 2,
+        "RULES": [[22, 86]],
+        "P": 127,
+        "D_MODEL": 512,
+        "N_LAYER": 2,
+        "TRAIN_LEN": 16,
+        "EVAL_INTERVAL": 1
+      }
+    },
+    {
+      "name": "single_o2_corruptfix_a98b19_d512l2r8h1_P127_tr16_seed42",
+      "task": "single",
+      "config": {
+        "TASK_VARIANT": "corrupt_fix",
+        "ORDER": 2,
+        "RULES": [[98, 19]],
+        "P": 127,
+        "D_MODEL": 512,
+        "N_LAYER": 2,
+        "TRAIN_LEN": 16,
+        "EVAL_INTERVAL": 1
+      }
+    },
+    {
+      "name": "single_o2_corruptfix_a103b61_d512l2r8h1_P127_tr16_seed42",
+      "task": "single",
+      "config": {
+        "TASK_VARIANT": "corrupt_fix",
+        "ORDER": 2,
+        "RULES": [[103, 61]],
+        "P": 127,
+        "D_MODEL": 512,
+        "N_LAYER": 2,
+        "TRAIN_LEN": 16,
+        "EVAL_INTERVAL": 1
+      }
+    }
+  ]
+}
