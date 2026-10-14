@@ -199,7 +199,7 @@ loss_mask    = 仅 EOS 槽一位为 1（acc 只有 target[L] 一个输出位）
 
 | 配置项 | 说明 |
 |--------|------|
-| `D_MODEL` / `N_HEAD` / `N_LAYER` / `MLP_RATIO` / `DROPOUT` | 模型隐藏维度 / 注意力头数 / Transformer block 层数 / MLP 隐藏层相对 d_model 的倍数（**默认 8**，2026-10-14 起；此前为 4） / Dropout 概率 |
+| `D_MODEL` / `N_HEAD` / `N_LAYER` / `MLP_RATIO` / `DROPOUT` | 模型隐藏维度 / 注意力头数（**默认 4**，2026-10-14 起；此前为 1） / Transformer block 层数 / MLP 隐藏层相对 d_model 的倍数（**默认 8**，2026-10-14 起；此前为 4） / Dropout 概率 |
 
 **优化**
 

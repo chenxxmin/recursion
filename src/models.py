@@ -139,7 +139,7 @@ RULE_LOSS_WEIGHT = 0.5
 
 
 class FibonacciTransformer(nn.Module):
-    def __init__(self, p=53, d_model=64, n_head=1, n_layer=1, block_size=128, dropout=0.0,
+    def __init__(self, p=53, d_model=64, n_head=4, n_layer=1, block_size=128, dropout=0.0,
                  mlp_ratio=8, pad_token_id=None, vocab_size=None, n_rules=0, order=None):
         super().__init__()
         self.p = p

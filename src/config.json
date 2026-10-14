@@ -6,7 +6,7 @@
     "CONST": 0,
     "NUM_MASK": null,
     "D_MODEL": 64,
-    "N_HEAD": 1,
+    "N_HEAD": 4,
     "N_LAYER": 1,
     "BATCH_SIZE": 512,
     "GRAD_ACCUM_STEPS": 1,
