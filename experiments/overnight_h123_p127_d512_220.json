@@ -1,0 +1,7705 @@
+{
+  "concurrency": 2,
+  "experiments": [
+    {
+      "name": "H1_D_J63_a62b55_d512l2r8h4_P127_seed17996",
+      "task": "single",
+      "config": {
+        "P": 127,
+        "ORDER": 2,
+        "D_MODEL": 512,
+        "N_LAYER": 2,
+        "N_HEAD": 4,
+        "MLP_RATIO": 8,
+        "TRAIN_LEN": 16,
+        "OOD_LEN": 16,
+        "DATA_MODE": "full_split",
+        "BATCH_SIZE": 512,
+        "RESHUFFLE_EACH_EPOCH": false,
+        "DROPOUT": 0,
+        "LR": 0.0003,
+        "WEIGHT_DECAY": 1,
+        "GRAD_CLIP_NORM": 1,
+        "FIRST_TASK_WEIGHT": 1,
+        "EPOCHS": 1000,
+        "EVAL_INTERVAL": 1,
+        "EARLY_STOP_ACCURACY": 0.99,
+        "EARLY_STOP_NO_IMPROVE": 3000,
+        "MAX_TRAIN_HOURS": 0.0833,
+        "POS_PROBE": false,
+        "RULES": [
+          [
+            62,
+            55
+          ]
+        ],
+        "RANDOM_SEED": 17996
+      }
+    },
+    {
+      "name": "H1_D_J63_a124b93_d512l2r8h4_P127_seed17996",
+      "task": "single",
+      "config": {
+        "P": 127,
+        "ORDER": 2,
+        "D_MODEL": 512,
+        "N_LAYER": 2,
+        "N_HEAD": 4,
+        "MLP_RATIO": 8,
+        "TRAIN_LEN": 16,
+        "OOD_LEN": 16,
+        "DATA_MODE": "full_split",
+        "BATCH_SIZE": 512,
+        "RESHUFFLE_EACH_EPOCH": false,
+        "DROPOUT": 0,
+        "LR": 0.0003,
+        "WEIGHT_DECAY": 1,
+        "GRAD_CLIP_NORM": 1,
+        "FIRST_TASK_WEIGHT": 1,
+        "EPOCHS": 1000,
+        "EVAL_INTERVAL": 1,
+        "EARLY_STOP_ACCURACY": 0.99,
+        "EARLY_STOP_NO_IMPROVE": 3000,
+        "MAX_TRAIN_HOURS": 0.0833,
+        "POS_PROBE": false,
+        "RULES": [
+          [
+            124,
+            93
+          ]
+        ],
+        "RANDOM_SEED": 17996
+      }
+    },
+    {
+      "name": "H1_D_J63_a30b29_d512l2r8h4_P127_seed17996",
+      "task": "single",
+      "config": {
+        "P": 127,
+        "ORDER": 2,
+        "D_MODEL": 512,
+        "N_LAYER": 2,
+        "N_HEAD": 4,
+        "MLP_RATIO": 8,
+        "TRAIN_LEN": 16,
+        "OOD_LEN": 16,
+        "DATA_MODE": "full_split",
+        "BATCH_SIZE": 512,
+        "RESHUFFLE_EACH_EPOCH": false,
+        "DROPOUT": 0,
+        "LR": 0.0003,
+        "WEIGHT_DECAY": 1,
+        "GRAD_CLIP_NORM": 1,
+        "FIRST_TASK_WEIGHT": 1,
+        "EPOCHS": 1000,
+        "EVAL_INTERVAL": 1,
+        "EARLY_STOP_ACCURACY": 0.99,
+        "EARLY_STOP_NO_IMPROVE": 3000,
+        "MAX_TRAIN_HOURS": 0.0833,
+        "POS_PROBE": false,
+        "RULES": [
+          [
+            30,
+            29
+          ]
+        ],
+        "RANDOM_SEED": 17996
+      }
+    },
+    {
+      "name": "H1_D_J126_a65b55_d512l2r8h4_P127_seed17996",
+      "task": "single",
+      "config": {
+        "P": 127,
+        "ORDER": 2,
+        "D_MODEL": 512,
+        "N_LAYER": 2,
+        "N_HEAD": 4,
+        "MLP_RATIO": 8,
+        "TRAIN_LEN": 16,
+        "OOD_LEN": 16,
+        "DATA_MODE": "full_split",
+        "BATCH_SIZE": 512,
+        "RESHUFFLE_EACH_EPOCH": false,
+        "DROPOUT": 0,
+        "LR": 0.0003,
+        "WEIGHT_DECAY": 1,
+        "GRAD_CLIP_NORM": 1,
+        "FIRST_TASK_WEIGHT": 1,
+        "EPOCHS": 1000,
+        "EVAL_INTERVAL": 1,
+        "EARLY_STOP_ACCURACY": 0.99,
+        "EARLY_STOP_NO_IMPROVE": 3000,
+        "MAX_TRAIN_HOURS": 0.0833,
+        "POS_PROBE": false,
+        "RULES": [
+          [
+            65,
+            55
+          ]
+        ],
+        "RANDOM_SEED": 17996
+      }
+    },
+    {
+      "name": "H1_D_J126_a3b93_d512l2r8h4_P127_seed17996",
+      "task": "single",
+      "config": {
+        "P": 127,
+        "ORDER": 2,
+        "D_MODEL": 512,
+        "N_LAYER": 2,
+        "N_HEAD": 4,
+        "MLP_RATIO": 8,
+        "TRAIN_LEN": 16,
+        "OOD_LEN": 16,
+        "DATA_MODE": "full_split",
+        "BATCH_SIZE": 512,
+        "RESHUFFLE_EACH_EPOCH": false,
+        "DROPOUT": 0,
+        "LR": 0.0003,
+        "WEIGHT_DECAY": 1,
+        "GRAD_CLIP_NORM": 1,
+        "FIRST_TASK_WEIGHT": 1,
+        "EPOCHS": 1000,
+        "EVAL_INTERVAL": 1,
+        "EARLY_STOP_ACCURACY": 0.99,
+        "EARLY_STOP_NO_IMPROVE": 3000,
+        "MAX_TRAIN_HOURS": 0.0833,
+        "POS_PROBE": false,
+        "RULES": [
+          [
+            3,
+            93
+          ]
+        ],
+        "RANDOM_SEED": 17996
+      }
+    },
+    {
+      "name": "H1_D_J126_a97b29_d512l2r8h4_P127_seed17996",
+      "task": "single",
+      "config": {
+        "P": 127,
+        "ORDER": 2,
+        "D_MODEL": 512,
+        "N_LAYER": 2,
+        "N_HEAD": 4,
+        "MLP_RATIO": 8,
+        "TRAIN_LEN": 16,
+        "OOD_LEN": 16,
+        "DATA_MODE": "full_split",
+        "BATCH_SIZE": 512,
+        "RESHUFFLE_EACH_EPOCH": false,
+        "DROPOUT": 0,
+        "LR": 0.0003,
+        "WEIGHT_DECAY": 1,
+        "GRAD_CLIP_NORM": 1,
+        "FIRST_TASK_WEIGHT": 1,
+        "EPOCHS": 1000,
+        "EVAL_INTERVAL": 1,
+        "EARLY_STOP_ACCURACY": 0.99,
+        "EARLY_STOP_NO_IMPROVE": 3000,
+        "MAX_TRAIN_HOURS": 0.0833,
+        "POS_PROBE": false,
+        "RULES": [
+          [
+            97,
+            29
+          ]
+        ],
+        "RANDOM_SEED": 17996
+      }
+    },
+    {
+      "name": "H1_R1_S1_42_a67b61_d512l2r8h4_P127_seed17996",
+      "task": "single",
+      "config": {
+        "P": 127,
+        "ORDER": 2,
+        "D_MODEL": 512,
+        "N_LAYER": 2,
+        "N_HEAD": 4,
+        "MLP_RATIO": 8,
+        "TRAIN_LEN": 16,
+        "OOD_LEN": 16,
+        "DATA_MODE": "full_split",
+        "BATCH_SIZE": 512,
+        "RESHUFFLE_EACH_EPOCH": false,
+        "DROPOUT": 0,
+        "LR": 0.0003,
+        "WEIGHT_DECAY": 1,
+        "GRAD_CLIP_NORM": 1,
+        "FIRST_TASK_WEIGHT": 1,
+        "EPOCHS": 1000,
+        "EVAL_INTERVAL": 1,
+        "EARLY_STOP_ACCURACY": 0.99,
+        "EARLY_STOP_NO_IMPROVE": 3000,
+        "MAX_TRAIN_HOURS": 0.0833,
+        "POS_PROBE": false,
+        "RULES": [
+          [
+            67,
+            61
+          ]
+        ],
+        "RANDOM_SEED": 17996
+      }
+    },
+    {
+      "name": "H1_R1_S1_42_a6b122_d512l2r8h4_P127_seed17996",
+      "task": "single",
+      "config": {
+        "P": 127,
+        "ORDER": 2,
+        "D_MODEL": 512,
+        "N_LAYER": 2,
+        "N_HEAD": 4,
+        "MLP_RATIO": 8,
+        "TRAIN_LEN": 16,
+        "OOD_LEN": 16,
+        "DATA_MODE": "full_split",
+        "BATCH_SIZE": 512,
+        "RESHUFFLE_EACH_EPOCH": false,
+        "DROPOUT": 0,
+        "LR": 0.0003,
+        "WEIGHT_DECAY": 1,
+        "GRAD_CLIP_NORM": 1,
+        "FIRST_TASK_WEIGHT": 1,
+        "EPOCHS": 1000,
+        "EVAL_INTERVAL": 1,
+        "EARLY_STOP_ACCURACY": 0.99,
+        "EARLY_STOP_NO_IMPROVE": 3000,
+        "MAX_TRAIN_HOURS": 0.0833,
+        "POS_PROBE": false,
+        "RULES": [
+          [
+            6,
+            122
+          ]
+        ],
+        "RANDOM_SEED": 17996
+      }
+    },
+    {
+      "name": "H1_R1_S1_42_a103b25_d512l2r8h4_P127_seed17996",
+      "task": "single",
+      "config": {
+        "P": 127,
+        "ORDER": 2,
+        "D_MODEL": 512,
+        "N_LAYER": 2,
+        "N_HEAD": 4,
+        "MLP_RATIO": 8,
+        "TRAIN_LEN": 16,
+        "OOD_LEN": 16,
+        "DATA_MODE": "full_split",
+        "BATCH_SIZE": 512,
+        "RESHUFFLE_EACH_EPOCH": false,
+        "DROPOUT": 0,
+        "LR": 0.0003,
+        "WEIGHT_DECAY": 1,
+        "GRAD_CLIP_NORM": 1,
+        "FIRST_TASK_WEIGHT": 1,
+        "EPOCHS": 1000,
+        "EVAL_INTERVAL": 1,
+        "EARLY_STOP_ACCURACY": 0.99,
+        "EARLY_STOP_NO_IMPROVE": 3000,
+        "MAX_TRAIN_HOURS": 0.0833,
+        "POS_PROBE": false,
+        "RULES": [
+          [
+            103,
+            25
+          ]
+        ],
+        "RANDOM_SEED": 17996
+      }
+    },
+    {
+      "name": "H1_R1_S1_126_a4b124_d512l2r8h4_P127_seed17996",
+      "task": "single",
+      "config": {
+        "P": 127,
+        "ORDER": 2,
+        "D_MODEL": 512,
+        "N_LAYER": 2,
+        "N_HEAD": 4,
+        "MLP_RATIO": 8,
+        "TRAIN_LEN": 16,
+        "OOD_LEN": 16,
+        "DATA_MODE": "full_split",
+        "BATCH_SIZE": 512,
+        "RESHUFFLE_EACH_EPOCH": false,
+        "DROPOUT": 0,
+        "LR": 0.0003,
+        "WEIGHT_DECAY": 1,
+        "GRAD_CLIP_NORM": 1,
+        "FIRST_TASK_WEIGHT": 1,
+        "EPOCHS": 1000,
+        "EVAL_INTERVAL": 1,
+        "EARLY_STOP_ACCURACY": 0.99,
+        "EARLY_STOP_NO_IMPROVE": 3000,
+        "MAX_TRAIN_HOURS": 0.0833,
+        "POS_PROBE": false,
+        "RULES": [
+          [
+            4,
+            124
+          ]
+        ],
+        "RANDOM_SEED": 17996
+      }
+    },
+    {
+      "name": "H1_R1_S1_126_a68b60_d512l2r8h4_P127_seed17996",
+      "task": "single",
+      "config": {
+        "P": 127,
+        "ORDER": 2,
+        "D_MODEL": 512,
+        "N_LAYER": 2,
+        "N_HEAD": 4,
+        "MLP_RATIO": 8,
+        "TRAIN_LEN": 16,
+        "OOD_LEN": 16,
+        "DATA_MODE": "full_split",
+        "BATCH_SIZE": 512,
+        "RESHUFFLE_EACH_EPOCH": false,
+        "DROPOUT": 0,
+        "LR": 0.0003,
+        "WEIGHT_DECAY": 1,
+        "GRAD_CLIP_NORM": 1,
+        "FIRST_TASK_WEIGHT": 1,
+        "EPOCHS": 1000,
+        "EVAL_INTERVAL": 1,
+        "EARLY_STOP_ACCURACY": 0.99,
+        "EARLY_STOP_NO_IMPROVE": 3000,
+        "MAX_TRAIN_HOURS": 0.0833,
+        "POS_PROBE": false,
+        "RULES": [
+          [
+            68,
+            60
+          ]
+        ],
+        "RANDOM_SEED": 17996
+      }
+    },
+    {
+      "name": "H1_R1_S1_126_a98b30_d512l2r8h4_P127_seed17996",
+      "task": "single",
+      "config": {
+        "P": 127,
+        "ORDER": 2,
+        "D_MODEL": 512,
+        "N_LAYER": 2,
+        "N_HEAD": 4,
+        "MLP_RATIO": 8,
+        "TRAIN_LEN": 16,
+        "OOD_LEN": 16,
+        "DATA_MODE": "full_split",
+        "BATCH_SIZE": 512,
+        "RESHUFFLE_EACH_EPOCH": false,
+        "DROPOUT": 0,
+        "LR": 0.0003,
+        "WEIGHT_DECAY": 1,
+        "GRAD_CLIP_NORM": 1,
+        "FIRST_TASK_WEIGHT": 1,
+        "EPOCHS": 1000,
+        "EVAL_INTERVAL": 1,
+        "EARLY_STOP_ACCURACY": 0.99,
+        "EARLY_STOP_NO_IMPROVE": 3000,
+        "MAX_TRAIN_HOURS": 0.0833,
+        "POS_PROBE": false,
+        "RULES": [
+          [
+            98,
+            30
+          ]
+        ],
+        "RANDOM_SEED": 17996
+      }
+    },
+    {
+      "name": "H1_Rm1_S2_42_a65b66_d512l2r8h4_P127_seed17996",
+      "task": "single",
+      "config": {
+        "P": 127,
+        "ORDER": 2,
+        "D_MODEL": 512,
+        "N_LAYER": 2,
+        "N_HEAD": 4,
+        "MLP_RATIO": 8,
+        "TRAIN_LEN": 16,
+        "OOD_LEN": 16,
+        "DATA_MODE": "full_split",
+        "BATCH_SIZE": 512,
+        "RESHUFFLE_EACH_EPOCH": false,
+        "DROPOUT": 0,
+        "LR": 0.0003,
+        "WEIGHT_DECAY": 1,
+        "GRAD_CLIP_NORM": 1,
+        "FIRST_TASK_WEIGHT": 1,
+        "EPOCHS": 1000,
+        "EVAL_INTERVAL": 1,
+        "EARLY_STOP_ACCURACY": 0.99,
+        "EARLY_STOP_NO_IMPROVE": 3000,
+        "MAX_TRAIN_HOURS": 0.0833,
+        "POS_PROBE": false,
+        "RULES": [
+          [
+            65,
+            66
+          ]
+        ],
+        "RANDOM_SEED": 17996
+      }
+    },
+    {
+      "name": "H1_Rm1_S2_42_a4b5_d512l2r8h4_P127_seed17996",
+      "task": "single",
+      "config": {
+        "P": 127,
+        "ORDER": 2,
+        "D_MODEL": 512,
+        "N_LAYER": 2,
+        "N_HEAD": 4,
+        "MLP_RATIO": 8,
+        "TRAIN_LEN": 16,
+        "OOD_LEN": 16,
+        "DATA_MODE": "full_split",
+        "BATCH_SIZE": 512,
+        "RESHUFFLE_EACH_EPOCH": false,
+        "DROPOUT": 0,
+        "LR": 0.0003,
+        "WEIGHT_DECAY": 1,
+        "GRAD_CLIP_NORM": 1,
+        "FIRST_TASK_WEIGHT": 1,
+        "EPOCHS": 1000,
+        "EVAL_INTERVAL": 1,
+        "EARLY_STOP_ACCURACY": 0.99,
+        "EARLY_STOP_NO_IMPROVE": 3000,
+        "MAX_TRAIN_HOURS": 0.0833,
+        "POS_PROBE": false,
+        "RULES": [
+          [
+            4,
+            5
+          ]
+        ],
+        "RANDOM_SEED": 17996
+      }
+    },
+    {
+      "name": "H1_Rm1_S2_42_a101b102_d512l2r8h4_P127_seed17996",
+      "task": "single",
+      "config": {
+        "P": 127,
+        "ORDER": 2,
+        "D_MODEL": 512,
+        "N_LAYER": 2,
+        "N_HEAD": 4,
+        "MLP_RATIO": 8,
+        "TRAIN_LEN": 16,
+        "OOD_LEN": 16,
+        "DATA_MODE": "full_split",
+        "BATCH_SIZE": 512,
+        "RESHUFFLE_EACH_EPOCH": false,
+        "DROPOUT": 0,
+        "LR": 0.0003,
+        "WEIGHT_DECAY": 1,
+        "GRAD_CLIP_NORM": 1,
+        "FIRST_TASK_WEIGHT": 1,
+        "EPOCHS": 1000,
+        "EVAL_INTERVAL": 1,
+        "EARLY_STOP_ACCURACY": 0.99,
+        "EARLY_STOP_NO_IMPROVE": 3000,
+        "MAX_TRAIN_HOURS": 0.0833,
+        "POS_PROBE": false,
+        "RULES": [
+          [
+            101,
+            102
+          ]
+        ],
+        "RANDOM_SEED": 17996
+      }
+    },
+    {
+      "name": "H1_Rm1_S2_126_a2b3_d512l2r8h4_P127_seed17996",
+      "task": "single",
+      "config": {
+        "P": 127,
+        "ORDER": 2,
+        "D_MODEL": 512,
+        "N_LAYER": 2,
+        "N_HEAD": 4,
+        "MLP_RATIO": 8,
+        "TRAIN_LEN": 16,
+        "OOD_LEN": 16,
+        "DATA_MODE": "full_split",
+        "BATCH_SIZE": 512,
+        "RESHUFFLE_EACH_EPOCH": false,
+        "DROPOUT": 0,
+        "LR": 0.0003,
+        "WEIGHT_DECAY": 1,
+        "GRAD_CLIP_NORM": 1,
+        "FIRST_TASK_WEIGHT": 1,
+        "EPOCHS": 1000,
+        "EVAL_INTERVAL": 1,
+        "EARLY_STOP_ACCURACY": 0.99,
+        "EARLY_STOP_NO_IMPROVE": 3000,
+        "MAX_TRAIN_HOURS": 0.0833,
+        "POS_PROBE": false,
+        "RULES": [
+          [
+            2,
+            3
+          ]
+        ],
+        "RANDOM_SEED": 17996
+      }
+    },
+    {
+      "name": "H1_Rm1_S2_126_a52b53_d512l2r8h4_P127_seed17996",
+      "task": "single",
+      "config": {
+        "P": 127,
+        "ORDER": 2,
+        "D_MODEL": 512,
+        "N_LAYER": 2,
+        "N_HEAD": 4,
+        "MLP_RATIO": 8,
+        "TRAIN_LEN": 16,
+        "OOD_LEN": 16,
+        "DATA_MODE": "full_split",
+        "BATCH_SIZE": 512,
+        "RESHUFFLE_EACH_EPOCH": false,
+        "DROPOUT": 0,
+        "LR": 0.0003,
+        "WEIGHT_DECAY": 1,
+        "GRAD_CLIP_NORM": 1,
+        "FIRST_TASK_WEIGHT": 1,
+        "EPOCHS": 1000,
+        "EVAL_INTERVAL": 1,
+        "EARLY_STOP_ACCURACY": 0.99,
+        "EARLY_STOP_NO_IMPROVE": 3000,
+        "MAX_TRAIN_HOURS": 0.0833,
+        "POS_PROBE": false,
+        "RULES": [
+          [
+            52,
+            53
+          ]
+        ],
+        "RANDOM_SEED": 17996
+      }
+    },
+    {
+      "name": "H1_Rm1_S2_126_a96b97_d512l2r8h4_P127_seed17996",
+      "task": "single",
+      "config": {
+        "P": 127,
+        "ORDER": 2,
+        "D_MODEL": 512,
+        "N_LAYER": 2,
+        "N_HEAD": 4,
+        "MLP_RATIO": 8,
+        "TRAIN_LEN": 16,
+        "OOD_LEN": 16,
+        "DATA_MODE": "full_split",
+        "BATCH_SIZE": 512,
+        "RESHUFFLE_EACH_EPOCH": false,
+        "DROPOUT": 0,
+        "LR": 0.0003,
+        "WEIGHT_DECAY": 1,
+        "GRAD_CLIP_NORM": 1,
+        "FIRST_TASK_WEIGHT": 1,
+        "EPOCHS": 1000,
+        "EVAL_INTERVAL": 1,
+        "EARLY_STOP_ACCURACY": 0.99,
+        "EARLY_STOP_NO_IMPROVE": 3000,
+        "MAX_TRAIN_HOURS": 0.0833,
+        "POS_PROBE": false,
+        "RULES": [
+          [
+            96,
+            97
+          ]
+        ],
+        "RANDOM_SEED": 17996
+      }
+    },
+    {
+      "name": "H1_O_S18_126_a13b10_d512l2r8h4_P127_seed17996",
+      "task": "single",
+      "config": {
+        "P": 127,
+        "ORDER": 2,
+        "D_MODEL": 512,
+        "N_LAYER": 2,
+        "N_HEAD": 4,
+        "MLP_RATIO": 8,
+        "TRAIN_LEN": 16,
+        "OOD_LEN": 16,
+        "DATA_MODE": "full_split",
+        "BATCH_SIZE": 512,
+        "RESHUFFLE_EACH_EPOCH": false,
+        "DROPOUT": 0,
+        "LR": 0.0003,
+        "WEIGHT_DECAY": 1,
+        "GRAD_CLIP_NORM": 1,
+        "FIRST_TASK_WEIGHT": 1,
+        "EPOCHS": 1000,
+        "EVAL_INTERVAL": 1,
+        "EARLY_STOP_ACCURACY": 0.99,
+        "EARLY_STOP_NO_IMPROVE": 3000,
+        "MAX_TRAIN_HOURS": 0.0833,
+        "POS_PROBE": false,
+        "RULES": [
+          [
+            13,
+            10
+          ]
+        ],
+        "RANDOM_SEED": 17996
+      }
+    },
+    {
+      "name": "H1_O_S18_126_a77b125_d512l2r8h4_P127_seed17996",
+      "task": "single",
+      "config": {
+        "P": 127,
+        "ORDER": 2,
+        "D_MODEL": 512,
+        "N_LAYER": 2,
+        "N_HEAD": 4,
+        "MLP_RATIO": 8,
+        "TRAIN_LEN": 16,
+        "OOD_LEN": 16,
+        "DATA_MODE": "full_split",
+        "BATCH_SIZE": 512,
+        "RESHUFFLE_EACH_EPOCH": false,
+        "DROPOUT": 0,
+        "LR": 0.0003,
+        "WEIGHT_DECAY": 1,
+        "GRAD_CLIP_NORM": 1,
+        "FIRST_TASK_WEIGHT": 1,
+        "EPOCHS": 1000,
+        "EVAL_INTERVAL": 1,
+        "EARLY_STOP_ACCURACY": 0.99,
+        "EARLY_STOP_NO_IMPROVE": 3000,
+        "MAX_TRAIN_HOURS": 0.0833,
+        "POS_PROBE": false,
+        "RULES": [
+          [
+            77,
+            125
+          ]
+        ],
+        "RANDOM_SEED": 17996
+      }
+    },
+    {
+      "name": "H1_O_S18_126_a45b77_d512l2r8h4_P127_seed17996",
+      "task": "single",
+      "config": {
+        "P": 127,
+        "ORDER": 2,
+        "D_MODEL": 512,
+        "N_LAYER": 2,
+        "N_HEAD": 4,
+        "MLP_RATIO": 8,
+        "TRAIN_LEN": 16,
+        "OOD_LEN": 16,
+        "DATA_MODE": "full_split",
+        "BATCH_SIZE": 512,
+        "RESHUFFLE_EACH_EPOCH": false,
+        "DROPOUT": 0,
+        "LR": 0.0003,
+        "WEIGHT_DECAY": 1,
+        "GRAD_CLIP_NORM": 1,
+        "FIRST_TASK_WEIGHT": 1,
+        "EPOCHS": 1000,
+        "EVAL_INTERVAL": 1,
+        "EARLY_STOP_ACCURACY": 0.99,
+        "EARLY_STOP_NO_IMPROVE": 3000,
+        "MAX_TRAIN_HOURS": 0.0833,
+        "POS_PROBE": false,
+        "RULES": [
+          [
+            45,
+            77
+          ]
+        ],
+        "RANDOM_SEED": 17996
+      }
+    },
+    {
+      "name": "H1_O_S42_126_a5b3_d512l2r8h4_P127_seed17996",
+      "task": "single",
+      "config": {
+        "P": 127,
+        "ORDER": 2,
+        "D_MODEL": 512,
+        "N_LAYER": 2,
+        "N_HEAD": 4,
+        "MLP_RATIO": 8,
+        "TRAIN_LEN": 16,
+        "OOD_LEN": 16,
+        "DATA_MODE": "full_split",
+        "BATCH_SIZE": 512,
+        "RESHUFFLE_EACH_EPOCH": false,
+        "DROPOUT": 0,
+        "LR": 0.0003,
+        "WEIGHT_DECAY": 1,
+        "GRAD_CLIP_NORM": 1,
+        "FIRST_TASK_WEIGHT": 1,
+        "EPOCHS": 1000,
+        "EVAL_INTERVAL": 1,
+        "EARLY_STOP_ACCURACY": 0.99,
+        "EARLY_STOP_NO_IMPROVE": 3000,
+        "MAX_TRAIN_HOURS": 0.0833,
+        "POS_PROBE": false,
+        "RULES": [
+          [
+            5,
+            3
+          ]
+        ],
+        "RANDOM_SEED": 17996
+      }
+    },
+    {
+      "name": "H1_O_S42_126_a25b56_d512l2r8h4_P127_seed17996",
+      "task": "single",
+      "config": {
+        "P": 127,
+        "ORDER": 2,
+        "D_MODEL": 512,
+        "N_LAYER": 2,
+        "N_HEAD": 4,
+        "MLP_RATIO": 8,
+        "TRAIN_LEN": 16,
+        "OOD_LEN": 16,
+        "DATA_MODE": "full_split",
+        "BATCH_SIZE": 512,
+        "RESHUFFLE_EACH_EPOCH": false,
+        "DROPOUT": 0,
+        "LR": 0.0003,
+        "WEIGHT_DECAY": 1,
+        "GRAD_CLIP_NORM": 1,
+        "FIRST_TASK_WEIGHT": 1,
+        "EPOCHS": 1000,
+        "EVAL_INTERVAL": 1,
+        "EARLY_STOP_ACCURACY": 0.99,
+        "EARLY_STOP_NO_IMPROVE": 3000,
+        "MAX_TRAIN_HOURS": 0.0833,
+        "POS_PROBE": false,
+        "RULES": [
+          [
+            25,
+            56
+          ]
+        ],
+        "RANDOM_SEED": 17996
+      }
+    },
+    {
+      "name": "H1_O_S42_126_a62b59_d512l2r8h4_P127_seed17996",
+      "task": "single",
+      "config": {
+        "P": 127,
+        "ORDER": 2,
+        "D_MODEL": 512,
+        "N_LAYER": 2,
+        "N_HEAD": 4,
+        "MLP_RATIO": 8,
+        "TRAIN_LEN": 16,
+        "OOD_LEN": 16,
+        "DATA_MODE": "full_split",
+        "BATCH_SIZE": 512,
+        "RESHUFFLE_EACH_EPOCH": false,
+        "DROPOUT": 0,
+        "LR": 0.0003,
+        "WEIGHT_DECAY": 1,
+        "GRAD_CLIP_NORM": 1,
+        "FIRST_TASK_WEIGHT": 1,
+        "EPOCHS": 1000,
+        "EVAL_INTERVAL": 1,
+        "EARLY_STOP_ACCURACY": 0.99,
+        "EARLY_STOP_NO_IMPROVE": 3000,
+        "MAX_TRAIN_HOURS": 0.0833,
+        "POS_PROBE": false,
+        "RULES": [
+          [
+            62,
+            59
+          ]
+        ],
+        "RANDOM_SEED": 17996
+      }
+    },
+    {
+      "name": "H1_O_S42_126_a67b65_d512l2r8h4_P127_seed17996",
+      "task": "single",
+      "config": {
+        "P": 127,
+        "ORDER": 2,
+        "D_MODEL": 512,
+        "N_LAYER": 2,
+        "N_HEAD": 4,
+        "MLP_RATIO": 8,
+        "TRAIN_LEN": 16,
+        "OOD_LEN": 16,
+        "DATA_MODE": "full_split",
+        "BATCH_SIZE": 512,
+        "RESHUFFLE_EACH_EPOCH": false,
+        "DROPOUT": 0,
+        "LR": 0.0003,
+        "WEIGHT_DECAY": 1,
+        "GRAD_CLIP_NORM": 1,
+        "FIRST_TASK_WEIGHT": 1,
+        "EPOCHS": 1000,
+        "EVAL_INTERVAL": 1,
+        "EARLY_STOP_ACCURACY": 0.99,
+        "EARLY_STOP_NO_IMPROVE": 3000,
+        "MAX_TRAIN_HOURS": 0.0833,
+        "POS_PROBE": false,
+        "RULES": [
+          [
+            67,
+            65
+          ]
+        ],
+        "RANDOM_SEED": 17996
+      }
+    },
+    {
+      "name": "H2_O_S6_126_a85b97_d512l2r8h4_P127_seed17996",
+      "task": "single",
+      "config": {
+        "P": 127,
+        "ORDER": 2,
+        "D_MODEL": 512,
+        "N_LAYER": 2,
+        "N_HEAD": 4,
+        "MLP_RATIO": 8,
+        "TRAIN_LEN": 16,
+        "OOD_LEN": 16,
+        "DATA_MODE": "full_split",
+        "BATCH_SIZE": 512,
+        "RESHUFFLE_EACH_EPOCH": false,
+        "DROPOUT": 0,
+        "LR": 0.0003,
+        "WEIGHT_DECAY": 1,
+        "GRAD_CLIP_NORM": 1,
+        "FIRST_TASK_WEIGHT": 1,
+        "EPOCHS": 1000,
+        "EVAL_INTERVAL": 1,
+        "EARLY_STOP_ACCURACY": 0.99,
+        "EARLY_STOP_NO_IMPROVE": 3000,
+        "MAX_TRAIN_HOURS": 0.0833,
+        "POS_PROBE": false,
+        "RULES": [
+          [
+            85,
+            97
+          ]
+        ],
+        "RANDOM_SEED": 17996
+      }
+    },
+    {
+      "name": "H2_O_S6_126_a29b23_d512l2r8h4_P127_seed17996",
+      "task": "single",
+      "config": {
+        "P": 127,
+        "ORDER": 2,
+        "D_MODEL": 512,
+        "N_LAYER": 2,
+        "N_HEAD": 4,
+        "MLP_RATIO": 8,
+        "TRAIN_LEN": 16,
+        "OOD_LEN": 16,
+        "DATA_MODE": "full_split",
+        "BATCH_SIZE": 512,
+        "RESHUFFLE_EACH_EPOCH": false,
+        "DROPOUT": 0,
+        "LR": 0.0003,
+        "WEIGHT_DECAY": 1,
+        "GRAD_CLIP_NORM": 1,
+        "FIRST_TASK_WEIGHT": 1,
+        "EPOCHS": 1000,
+        "EVAL_INTERVAL": 1,
+        "EARLY_STOP_ACCURACY": 0.99,
+        "EARLY_STOP_NO_IMPROVE": 3000,
+        "MAX_TRAIN_HOURS": 0.0833,
+        "POS_PROBE": false,
+        "RULES": [
+          [
+            29,
+            23
+          ]
+        ],
+        "RANDOM_SEED": 17996
+      }
+    },
+    {
+      "name": "H2_O_S6_126_a90b39_d512l2r8h4_P127_seed17996",
+      "task": "single",
+      "config": {
+        "P": 127,
+        "ORDER": 2,
+        "D_MODEL": 512,
+        "N_LAYER": 2,
+        "N_HEAD": 4,
+        "MLP_RATIO": 8,
+        "TRAIN_LEN": 16,
+        "OOD_LEN": 16,
+        "DATA_MODE": "full_split",
+        "BATCH_SIZE": 512,
+        "RESHUFFLE_EACH_EPOCH": false,
+        "DROPOUT": 0,
+        "LR": 0.0003,
+        "WEIGHT_DECAY": 1,
+        "GRAD_CLIP_NORM": 1,
+        "FIRST_TASK_WEIGHT": 1,
+        "EPOCHS": 1000,
+        "EVAL_INTERVAL": 1,
+        "EARLY_STOP_ACCURACY": 0.99,
+        "EARLY_STOP_NO_IMPROVE": 3000,
+        "MAX_TRAIN_HOURS": 0.0833,
+        "POS_PROBE": false,
+        "RULES": [
+          [
+            90,
+            39
+          ]
+        ],
+        "RANDOM_SEED": 17996
+      }
+    },
+    {
+      "name": "H2_O_S14_126_a51b93_d512l2r8h4_P127_seed17996",
+      "task": "single",
+      "config": {
+        "P": 127,
+        "ORDER": 2,
+        "D_MODEL": 512,
+        "N_LAYER": 2,
+        "N_HEAD": 4,
+        "MLP_RATIO": 8,
+        "TRAIN_LEN": 16,
+        "OOD_LEN": 16,
+        "DATA_MODE": "full_split",
+        "BATCH_SIZE": 512,
+        "RESHUFFLE_EACH_EPOCH": false,
+        "DROPOUT": 0,
+        "LR": 0.0003,
+        "WEIGHT_DECAY": 1,
+        "GRAD_CLIP_NORM": 1,
+        "FIRST_TASK_WEIGHT": 1,
+        "EPOCHS": 1000,
+        "EVAL_INTERVAL": 1,
+        "EARLY_STOP_ACCURACY": 0.99,
+        "EARLY_STOP_NO_IMPROVE": 3000,
+        "MAX_TRAIN_HOURS": 0.0833,
+        "POS_PROBE": false,
+        "RULES": [
+          [
+            51,
+            93
+          ]
+        ],
+        "RANDOM_SEED": 17996
+      }
+    },
+    {
+      "name": "H2_O_S14_126_a111b24_d512l2r8h4_P127_seed17996",
+      "task": "single",
+      "config": {
+        "P": 127,
+        "ORDER": 2,
+        "D_MODEL": 512,
+        "N_LAYER": 2,
+        "N_HEAD": 4,
+        "MLP_RATIO": 8,
+        "TRAIN_LEN": 16,
+        "OOD_LEN": 16,
+        "DATA_MODE": "full_split",
+        "BATCH_SIZE": 512,
+        "RESHUFFLE_EACH_EPOCH": false,
+        "DROPOUT": 0,
+        "LR": 0.0003,
+        "WEIGHT_DECAY": 1,
+        "GRAD_CLIP_NORM": 1,
+        "FIRST_TASK_WEIGHT": 1,
+        "EPOCHS": 1000,
+        "EVAL_INTERVAL": 1,
+        "EARLY_STOP_ACCURACY": 0.99,
+        "EARLY_STOP_NO_IMPROVE": 3000,
+        "MAX_TRAIN_HOURS": 0.0833,
+        "POS_PROBE": false,
+        "RULES": [
+          [
+            111,
+            24
+          ]
+        ],
+        "RANDOM_SEED": 17996
+      }
+    },
+    {
+      "name": "H2_O_S14_126_a116b90_d512l2r8h4_P127_seed17996",
+      "task": "single",
+      "config": {
+        "P": 127,
+        "ORDER": 2,
+        "D_MODEL": 512,
+        "N_LAYER": 2,
+        "N_HEAD": 4,
+        "MLP_RATIO": 8,
+        "TRAIN_LEN": 16,
+        "OOD_LEN": 16,
+        "DATA_MODE": "full_split",
+        "BATCH_SIZE": 512,
+        "RESHUFFLE_EACH_EPOCH": false,
+        "DROPOUT": 0,
+        "LR": 0.0003,
+        "WEIGHT_DECAY": 1,
+        "GRAD_CLIP_NORM": 1,
+        "FIRST_TASK_WEIGHT": 1,
+        "EPOCHS": 1000,
+        "EVAL_INTERVAL": 1,
+        "EARLY_STOP_ACCURACY": 0.99,
+        "EARLY_STOP_NO_IMPROVE": 3000,
+        "MAX_TRAIN_HOURS": 0.0833,
+        "POS_PROBE": false,
+        "RULES": [
+          [
+            116,
+            90
+          ]
+        ],
+        "RANDOM_SEED": 17996
+      }
+    },
+    {
+      "name": "H2_O_S126_126_a51b111_d512l2r8h4_P127_seed17996",
+      "task": "single",
+      "config": {
+        "P": 127,
+        "ORDER": 2,
+        "D_MODEL": 512,
+        "N_LAYER": 2,
+        "N_HEAD": 4,
+        "MLP_RATIO": 8,
+        "TRAIN_LEN": 16,
+        "OOD_LEN": 16,
+        "DATA_MODE": "full_split",
+        "BATCH_SIZE": 512,
+        "RESHUFFLE_EACH_EPOCH": false,
+        "DROPOUT": 0,
+        "LR": 0.0003,
+        "WEIGHT_DECAY": 1,
+        "GRAD_CLIP_NORM": 1,
+        "FIRST_TASK_WEIGHT": 1,
+        "EPOCHS": 1000,
+        "EVAL_INTERVAL": 1,
+        "EARLY_STOP_ACCURACY": 0.99,
+        "EARLY_STOP_NO_IMPROVE": 3000,
+        "MAX_TRAIN_HOURS": 0.0833,
+        "POS_PROBE": false,
+        "RULES": [
+          [
+            51,
+            111
+          ]
+        ],
+        "RANDOM_SEED": 17996
+      }
+    },
+    {
+      "name": "H2_O_S126_126_a113b51_d512l2r8h4_P127_seed17996",
+      "task": "single",
+      "config": {
+        "P": 127,
+        "ORDER": 2,
+        "D_MODEL": 512,
+        "N_LAYER": 2,
+        "N_HEAD": 4,
+        "MLP_RATIO": 8,
+        "TRAIN_LEN": 16,
+        "OOD_LEN": 16,
+        "DATA_MODE": "full_split",
+        "BATCH_SIZE": 512,
+        "RESHUFFLE_EACH_EPOCH": false,
+        "DROPOUT": 0,
+        "LR": 0.0003,
+        "WEIGHT_DECAY": 1,
+        "GRAD_CLIP_NORM": 1,
+        "FIRST_TASK_WEIGHT": 1,
+        "EPOCHS": 1000,
+        "EVAL_INTERVAL": 1,
+        "EARLY_STOP_ACCURACY": 0.99,
+        "EARLY_STOP_NO_IMPROVE": 3000,
+        "MAX_TRAIN_HOURS": 0.0833,
+        "POS_PROBE": false,
+        "RULES": [
+          [
+            113,
+            51
+          ]
+        ],
+        "RANDOM_SEED": 17996
+      }
+    },
+    {
+      "name": "H2_O_S126_126_a115b108_d512l2r8h4_P127_seed17996",
+      "task": "single",
+      "config": {
+        "P": 127,
+        "ORDER": 2,
+        "D_MODEL": 512,
+        "N_LAYER": 2,
+        "N_HEAD": 4,
+        "MLP_RATIO": 8,
+        "TRAIN_LEN": 16,
+        "OOD_LEN": 16,
+        "DATA_MODE": "full_split",
+        "BATCH_SIZE": 512,
+        "RESHUFFLE_EACH_EPOCH": false,
+        "DROPOUT": 0,
+        "LR": 0.0003,
+        "WEIGHT_DECAY": 1,
+        "GRAD_CLIP_NORM": 1,
+        "FIRST_TASK_WEIGHT": 1,
+        "EPOCHS": 1000,
+        "EVAL_INTERVAL": 1,
+        "EARLY_STOP_ACCURACY": 0.99,
+        "EARLY_STOP_NO_IMPROVE": 3000,
+        "MAX_TRAIN_HOURS": 0.0833,
+        "POS_PROBE": false,
+        "RULES": [
+          [
+            115,
+            108
+          ]
+        ],
+        "RANDOM_SEED": 17996
+      }
+    },
+    {
+      "name": "H2_O_I384_a29b108_d512l2r8h4_P127_seed17996",
+      "task": "single",
+      "config": {
+        "P": 127,
+        "ORDER": 2,
+        "D_MODEL": 512,
+        "N_LAYER": 2,
+        "N_HEAD": 4,
+        "MLP_RATIO": 8,
+        "TRAIN_LEN": 16,
+        "OOD_LEN": 16,
+        "DATA_MODE": "full_split",
+        "BATCH_SIZE": 512,
+        "RESHUFFLE_EACH_EPOCH": false,
+        "DROPOUT": 0,
+        "LR": 0.0003,
+        "WEIGHT_DECAY": 1,
+        "GRAD_CLIP_NORM": 1,
+        "FIRST_TASK_WEIGHT": 1,
+        "EPOCHS": 1000,
+        "EVAL_INTERVAL": 1,
+        "EARLY_STOP_ACCURACY": 0.99,
+        "EARLY_STOP_NO_IMPROVE": 3000,
+        "MAX_TRAIN_HOURS": 0.0833,
+        "POS_PROBE": false,
+        "RULES": [
+          [
+            29,
+            108
+          ]
+        ],
+        "RANDOM_SEED": 17996
+      }
+    },
+    {
+      "name": "H2_O_I384_a88b20_d512l2r8h4_P127_seed17996",
+      "task": "single",
+      "config": {
+        "P": 127,
+        "ORDER": 2,
+        "D_MODEL": 512,
+        "N_LAYER": 2,
+        "N_HEAD": 4,
+        "MLP_RATIO": 8,
+        "TRAIN_LEN": 16,
+        "OOD_LEN": 16,
+        "DATA_MODE": "full_split",
+        "BATCH_SIZE": 512,
+        "RESHUFFLE_EACH_EPOCH": false,
+        "DROPOUT": 0,
+        "LR": 0.0003,
+        "WEIGHT_DECAY": 1,
+        "GRAD_CLIP_NORM": 1,
+        "FIRST_TASK_WEIGHT": 1,
+        "EPOCHS": 1000,
+        "EVAL_INTERVAL": 1,
+        "EARLY_STOP_ACCURACY": 0.99,
+        "EARLY_STOP_NO_IMPROVE": 3000,
+        "MAX_TRAIN_HOURS": 0.0833,
+        "POS_PROBE": false,
+        "RULES": [
+          [
+            88,
+            20
+          ]
+        ],
+        "RANDOM_SEED": 17996
+      }
+    },
+    {
+      "name": "H2_O_I384_a10b20_d512l2r8h4_P127_seed17996",
+      "task": "single",
+      "config": {
+        "P": 127,
+        "ORDER": 2,
+        "D_MODEL": 512,
+        "N_LAYER": 2,
+        "N_HEAD": 4,
+        "MLP_RATIO": 8,
+        "TRAIN_LEN": 16,
+        "OOD_LEN": 16,
+        "DATA_MODE": "full_split",
+        "BATCH_SIZE": 512,
+        "RESHUFFLE_EACH_EPOCH": false,
+        "DROPOUT": 0,
+        "LR": 0.0003,
+        "WEIGHT_DECAY": 1,
+        "GRAD_CLIP_NORM": 1,
+        "FIRST_TASK_WEIGHT": 1,
+        "EPOCHS": 1000,
+        "EVAL_INTERVAL": 1,
+        "EARLY_STOP_ACCURACY": 0.99,
+        "EARLY_STOP_NO_IMPROVE": 3000,
+        "MAX_TRAIN_HOURS": 0.0833,
+        "POS_PROBE": false,
+        "RULES": [
+          [
+            10,
+            20
+          ]
+        ],
+        "RANDOM_SEED": 17996
+      }
+    },
+    {
+      "name": "H2_O_I896_a82b111_d512l2r8h4_P127_seed17996",
+      "task": "single",
+      "config": {
+        "P": 127,
+        "ORDER": 2,
+        "D_MODEL": 512,
+        "N_LAYER": 2,
+        "N_HEAD": 4,
+        "MLP_RATIO": 8,
+        "TRAIN_LEN": 16,
+        "OOD_LEN": 16,
+        "DATA_MODE": "full_split",
+        "BATCH_SIZE": 512,
+        "RESHUFFLE_EACH_EPOCH": false,
+        "DROPOUT": 0,
+        "LR": 0.0003,
+        "WEIGHT_DECAY": 1,
+        "GRAD_CLIP_NORM": 1,
+        "FIRST_TASK_WEIGHT": 1,
+        "EPOCHS": 1000,
+        "EVAL_INTERVAL": 1,
+        "EARLY_STOP_ACCURACY": 0.99,
+        "EARLY_STOP_NO_IMPROVE": 3000,
+        "MAX_TRAIN_HOURS": 0.0833,
+        "POS_PROBE": false,
+        "RULES": [
+          [
+            82,
+            111
+          ]
+        ],
+        "RANDOM_SEED": 17996
+      }
+    },
+    {
+      "name": "H2_O_I896_a17b63_d512l2r8h4_P127_seed17996",
+      "task": "single",
+      "config": {
+        "P": 127,
+        "ORDER": 2,
+        "D_MODEL": 512,
+        "N_LAYER": 2,
+        "N_HEAD": 4,
+        "MLP_RATIO": 8,
+        "TRAIN_LEN": 16,
+        "OOD_LEN": 16,
+        "DATA_MODE": "full_split",
+        "BATCH_SIZE": 512,
+        "RESHUFFLE_EACH_EPOCH": false,
+        "DROPOUT": 0,
+        "LR": 0.0003,
+        "WEIGHT_DECAY": 1,
+        "GRAD_CLIP_NORM": 1,
+        "FIRST_TASK_WEIGHT": 1,
+        "EPOCHS": 1000,
+        "EVAL_INTERVAL": 1,
+        "EARLY_STOP_ACCURACY": 0.99,
+        "EARLY_STOP_NO_IMPROVE": 3000,
+        "MAX_TRAIN_HOURS": 0.0833,
+        "POS_PROBE": false,
+        "RULES": [
+          [
+            17,
+            63
+          ]
+        ],
+        "RANDOM_SEED": 17996
+      }
+    },
+    {
+      "name": "H2_O_I896_a92b63_d512l2r8h4_P127_seed17996",
+      "task": "single",
+      "config": {
+        "P": 127,
+        "ORDER": 2,
+        "D_MODEL": 512,
+        "N_LAYER": 2,
+        "N_HEAD": 4,
+        "MLP_RATIO": 8,
+        "TRAIN_LEN": 16,
+        "OOD_LEN": 16,
+        "DATA_MODE": "full_split",
+        "BATCH_SIZE": 512,
+        "RESHUFFLE_EACH_EPOCH": false,
+        "DROPOUT": 0,
+        "LR": 0.0003,
+        "WEIGHT_DECAY": 1,
+        "GRAD_CLIP_NORM": 1,
+        "FIRST_TASK_WEIGHT": 1,
+        "EPOCHS": 1000,
+        "EVAL_INTERVAL": 1,
+        "EARLY_STOP_ACCURACY": 0.99,
+        "EARLY_STOP_NO_IMPROVE": 3000,
+        "MAX_TRAIN_HOURS": 0.0833,
+        "POS_PROBE": false,
+        "RULES": [
+          [
+            92,
+            63
+          ]
+        ],
+        "RANDOM_SEED": 17996
+      }
+    },
+    {
+      "name": "H2_O_I5376_a24b117_d512l2r8h4_P127_seed17996",
+      "task": "single",
+      "config": {
+        "P": 127,
+        "ORDER": 2,
+        "D_MODEL": 512,
+        "N_LAYER": 2,
+        "N_HEAD": 4,
+        "MLP_RATIO": 8,
+        "TRAIN_LEN": 16,
+        "OOD_LEN": 16,
+        "DATA_MODE": "full_split",
+        "BATCH_SIZE": 512,
+        "RESHUFFLE_EACH_EPOCH": false,
+        "DROPOUT": 0,
+        "LR": 0.0003,
+        "WEIGHT_DECAY": 1,
+        "GRAD_CLIP_NORM": 1,
+        "FIRST_TASK_WEIGHT": 1,
+        "EPOCHS": 1000,
+        "EVAL_INTERVAL": 1,
+        "EARLY_STOP_ACCURACY": 0.99,
+        "EARLY_STOP_NO_IMPROVE": 3000,
+        "MAX_TRAIN_HOURS": 0.0833,
+        "POS_PROBE": false,
+        "RULES": [
+          [
+            24,
+            117
+          ]
+        ],
+        "RANDOM_SEED": 17996
+      }
+    },
+    {
+      "name": "H2_O_I5376_a85b50_d512l2r8h4_P127_seed17996",
+      "task": "single",
+      "config": {
+        "P": 127,
+        "ORDER": 2,
+        "D_MODEL": 512,
+        "N_LAYER": 2,
+        "N_HEAD": 4,
+        "MLP_RATIO": 8,
+        "TRAIN_LEN": 16,
+        "OOD_LEN": 16,
+        "DATA_MODE": "full_split",
+        "BATCH_SIZE": 512,
+        "RESHUFFLE_EACH_EPOCH": false,
+        "DROPOUT": 0,
+        "LR": 0.0003,
+        "WEIGHT_DECAY": 1,
+        "GRAD_CLIP_NORM": 1,
+        "FIRST_TASK_WEIGHT": 1,
+        "EPOCHS": 1000,
+        "EVAL_INTERVAL": 1,
+        "EARLY_STOP_ACCURACY": 0.99,
+        "EARLY_STOP_NO_IMPROVE": 3000,
+        "MAX_TRAIN_HOURS": 0.0833,
+        "POS_PROBE": false,
+        "RULES": [
+          [
+            85,
+            50
+          ]
+        ],
+        "RANDOM_SEED": 17996
+      }
+    },
+    {
+      "name": "H2_O_I5376_a90b117_d512l2r8h4_P127_seed17996",
+      "task": "single",
+      "config": {
+        "P": 127,
+        "ORDER": 2,
+        "D_MODEL": 512,
+        "N_LAYER": 2,
+        "N_HEAD": 4,
+        "MLP_RATIO": 8,
+        "TRAIN_LEN": 16,
+        "OOD_LEN": 16,
+        "DATA_MODE": "full_split",
+        "BATCH_SIZE": 512,
+        "RESHUFFLE_EACH_EPOCH": false,
+        "DROPOUT": 0,
+        "LR": 0.0003,
+        "WEIGHT_DECAY": 1,
+        "GRAD_CLIP_NORM": 1,
+        "FIRST_TASK_WEIGHT": 1,
+        "EPOCHS": 1000,
+        "EVAL_INTERVAL": 1,
+        "EARLY_STOP_ACCURACY": 0.99,
+        "EARLY_STOP_NO_IMPROVE": 3000,
+        "MAX_TRAIN_HOURS": 0.0833,
+        "POS_PROBE": false,
+        "RULES": [
+          [
+            90,
+            117
+          ]
+        ],
+        "RANDOM_SEED": 17996
+      }
+    },
+    {
+      "name": "H2_O_I16128_a90b70_d512l2r8h4_P127_seed17996",
+      "task": "single",
+      "config": {
+        "P": 127,
+        "ORDER": 2,
+        "D_MODEL": 512,
+        "N_LAYER": 2,
+        "N_HEAD": 4,
+        "MLP_RATIO": 8,
+        "TRAIN_LEN": 16,
+        "OOD_LEN": 16,
+        "DATA_MODE": "full_split",
+        "BATCH_SIZE": 512,
+        "RESHUFFLE_EACH_EPOCH": false,
+        "DROPOUT": 0,
+        "LR": 0.0003,
+        "WEIGHT_DECAY": 1,
+        "GRAD_CLIP_NORM": 1,
+        "FIRST_TASK_WEIGHT": 1,
+        "EPOCHS": 1000,
+        "EVAL_INTERVAL": 1,
+        "EARLY_STOP_ACCURACY": 0.99,
+        "EARLY_STOP_NO_IMPROVE": 3000,
+        "MAX_TRAIN_HOURS": 0.0833,
+        "POS_PROBE": false,
+        "RULES": [
+          [
+            90,
+            70
+          ]
+        ],
+        "RANDOM_SEED": 17996
+      }
+    },
+    {
+      "name": "H2_O_I16128_a26b11_d512l2r8h4_P127_seed17996",
+      "task": "single",
+      "config": {
+        "P": 127,
+        "ORDER": 2,
+        "D_MODEL": 512,
+        "N_LAYER": 2,
+        "N_HEAD": 4,
+        "MLP_RATIO": 8,
+        "TRAIN_LEN": 16,
+        "OOD_LEN": 16,
+        "DATA_MODE": "full_split",
+        "BATCH_SIZE": 512,
+        "RESHUFFLE_EACH_EPOCH": false,
+        "DROPOUT": 0,
+        "LR": 0.0003,
+        "WEIGHT_DECAY": 1,
+        "GRAD_CLIP_NORM": 1,
+        "FIRST_TASK_WEIGHT": 1,
+        "EPOCHS": 1000,
+        "EVAL_INTERVAL": 1,
+        "EARLY_STOP_ACCURACY": 0.99,
+        "EARLY_STOP_NO_IMPROVE": 3000,
+        "MAX_TRAIN_HOURS": 0.0833,
+        "POS_PROBE": false,
+        "RULES": [
+          [
+            26,
+            11
+          ]
+        ],
+        "RANDOM_SEED": 17996
+      }
+    },
+    {
+      "name": "H2_O_I16128_a26b74_d512l2r8h4_P127_seed17996",
+      "task": "single",
+      "config": {
+        "P": 127,
+        "ORDER": 2,
+        "D_MODEL": 512,
+        "N_LAYER": 2,
+        "N_HEAD": 4,
+        "MLP_RATIO": 8,
+        "TRAIN_LEN": 16,
+        "OOD_LEN": 16,
+        "DATA_MODE": "full_split",
+        "BATCH_SIZE": 512,
+        "RESHUFFLE_EACH_EPOCH": false,
+        "DROPOUT": 0,
+        "LR": 0.0003,
+        "WEIGHT_DECAY": 1,
+        "GRAD_CLIP_NORM": 1,
+        "FIRST_TASK_WEIGHT": 1,
+        "EPOCHS": 1000,
+        "EVAL_INTERVAL": 1,
+        "EARLY_STOP_ACCURACY": 0.99,
+        "EARLY_STOP_NO_IMPROVE": 3000,
+        "MAX_TRAIN_HOURS": 0.0833,
+        "POS_PROBE": false,
+        "RULES": [
+          [
+            26,
+            74
+          ]
+        ],
+        "RANDOM_SEED": 17996
+      }
+    },
+    {
+      "name": "H3_A44_a44b84_d512l2r8h4_P127_seed17996",
+      "task": "single",
+      "config": {
+        "P": 127,
+        "ORDER": 2,
+        "D_MODEL": 512,
+        "N_LAYER": 2,
+        "N_HEAD": 4,
+        "MLP_RATIO": 8,
+        "TRAIN_LEN": 16,
+        "OOD_LEN": 16,
+        "DATA_MODE": "full_split",
+        "BATCH_SIZE": 512,
+        "RESHUFFLE_EACH_EPOCH": false,
+        "DROPOUT": 0,
+        "LR": 0.0003,
+        "WEIGHT_DECAY": 1,
+        "GRAD_CLIP_NORM": 1,
+        "FIRST_TASK_WEIGHT": 1,
+        "EPOCHS": 1000,
+        "EVAL_INTERVAL": 1,
+        "EARLY_STOP_ACCURACY": 0.99,
+        "EARLY_STOP_NO_IMPROVE": 3000,
+        "MAX_TRAIN_HOURS": 0.0833,
+        "POS_PROBE": false,
+        "RULES": [
+          [
+            44,
+            84
+          ]
+        ],
+        "RANDOM_SEED": 17996
+      }
+    },
+    {
+      "name": "H3_A44_a44b45_d512l2r8h4_P127_seed17996",
+      "task": "single",
+      "config": {
+        "P": 127,
+        "ORDER": 2,
+        "D_MODEL": 512,
+        "N_LAYER": 2,
+        "N_HEAD": 4,
+        "MLP_RATIO": 8,
+        "TRAIN_LEN": 16,
+        "OOD_LEN": 16,
+        "DATA_MODE": "full_split",
+        "BATCH_SIZE": 512,
+        "RESHUFFLE_EACH_EPOCH": false,
+        "DROPOUT": 0,
+        "LR": 0.0003,
+        "WEIGHT_DECAY": 1,
+        "GRAD_CLIP_NORM": 1,
+        "FIRST_TASK_WEIGHT": 1,
+        "EPOCHS": 1000,
+        "EVAL_INTERVAL": 1,
+        "EARLY_STOP_ACCURACY": 0.99,
+        "EARLY_STOP_NO_IMPROVE": 3000,
+        "MAX_TRAIN_HOURS": 0.0833,
+        "POS_PROBE": false,
+        "RULES": [
+          [
+            44,
+            45
+          ]
+        ],
+        "RANDOM_SEED": 17996
+      }
+    },
+    {
+      "name": "H3_A44_a44b59_d512l2r8h4_P127_seed17996",
+      "task": "single",
+      "config": {
+        "P": 127,
+        "ORDER": 2,
+        "D_MODEL": 512,
+        "N_LAYER": 2,
+        "N_HEAD": 4,
+        "MLP_RATIO": 8,
+        "TRAIN_LEN": 16,
+        "OOD_LEN": 16,
+        "DATA_MODE": "full_split",
+        "BATCH_SIZE": 512,
+        "RESHUFFLE_EACH_EPOCH": false,
+        "DROPOUT": 0,
+        "LR": 0.0003,
+        "WEIGHT_DECAY": 1,
+        "GRAD_CLIP_NORM": 1,
+        "FIRST_TASK_WEIGHT": 1,
+        "EPOCHS": 1000,
+        "EVAL_INTERVAL": 1,
+        "EARLY_STOP_ACCURACY": 0.99,
+        "EARLY_STOP_NO_IMPROVE": 3000,
+        "MAX_TRAIN_HOURS": 0.0833,
+        "POS_PROBE": false,
+        "RULES": [
+          [
+            44,
+            59
+          ]
+        ],
+        "RANDOM_SEED": 17996
+      }
+    },
+    {
+      "name": "H3_A66_a66b62_d512l2r8h4_P127_seed17996",
+      "task": "single",
+      "config": {
+        "P": 127,
+        "ORDER": 2,
+        "D_MODEL": 512,
+        "N_LAYER": 2,
+        "N_HEAD": 4,
+        "MLP_RATIO": 8,
+        "TRAIN_LEN": 16,
+        "OOD_LEN": 16,
+        "DATA_MODE": "full_split",
+        "BATCH_SIZE": 512,
+        "RESHUFFLE_EACH_EPOCH": false,
+        "DROPOUT": 0,
+        "LR": 0.0003,
+        "WEIGHT_DECAY": 1,
+        "GRAD_CLIP_NORM": 1,
+        "FIRST_TASK_WEIGHT": 1,
+        "EPOCHS": 1000,
+        "EVAL_INTERVAL": 1,
+        "EARLY_STOP_ACCURACY": 0.99,
+        "EARLY_STOP_NO_IMPROVE": 3000,
+        "MAX_TRAIN_HOURS": 0.0833,
+        "POS_PROBE": false,
+        "RULES": [
+          [
+            66,
+            62
+          ]
+        ],
+        "RANDOM_SEED": 17996
+      }
+    },
+    {
+      "name": "H3_A66_a66b67_d512l2r8h4_P127_seed17996",
+      "task": "single",
+      "config": {
+        "P": 127,
+        "ORDER": 2,
+        "D_MODEL": 512,
+        "N_LAYER": 2,
+        "N_HEAD": 4,
+        "MLP_RATIO": 8,
+        "TRAIN_LEN": 16,
+        "OOD_LEN": 16,
+        "DATA_MODE": "full_split",
+        "BATCH_SIZE": 512,
+        "RESHUFFLE_EACH_EPOCH": false,
+        "DROPOUT": 0,
+        "LR": 0.0003,
+        "WEIGHT_DECAY": 1,
+        "GRAD_CLIP_NORM": 1,
+        "FIRST_TASK_WEIGHT": 1,
+        "EPOCHS": 1000,
+        "EVAL_INTERVAL": 1,
+        "EARLY_STOP_ACCURACY": 0.99,
+        "EARLY_STOP_NO_IMPROVE": 3000,
+        "MAX_TRAIN_HOURS": 0.0833,
+        "POS_PROBE": false,
+        "RULES": [
+          [
+            66,
+            67
+          ]
+        ],
+        "RANDOM_SEED": 17996
+      }
+    },
+    {
+      "name": "H3_A66_a66b85_d512l2r8h4_P127_seed17996",
+      "task": "single",
+      "config": {
+        "P": 127,
+        "ORDER": 2,
+        "D_MODEL": 512,
+        "N_LAYER": 2,
+        "N_HEAD": 4,
+        "MLP_RATIO": 8,
+        "TRAIN_LEN": 16,
+        "OOD_LEN": 16,
+        "DATA_MODE": "full_split",
+        "BATCH_SIZE": 512,
+        "RESHUFFLE_EACH_EPOCH": false,
+        "DROPOUT": 0,
+        "LR": 0.0003,
+        "WEIGHT_DECAY": 1,
+        "GRAD_CLIP_NORM": 1,
+        "FIRST_TASK_WEIGHT": 1,
+        "EPOCHS": 1000,
+        "EVAL_INTERVAL": 1,
+        "EARLY_STOP_ACCURACY": 0.99,
+        "EARLY_STOP_NO_IMPROVE": 3000,
+        "MAX_TRAIN_HOURS": 0.0833,
+        "POS_PROBE": false,
+        "RULES": [
+          [
+            66,
+            85
+          ]
+        ],
+        "RANDOM_SEED": 17996
+      }
+    },
+    {
+      "name": "H3_A92_a92b36_d512l2r8h4_P127_seed17996",
+      "task": "single",
+      "config": {
+        "P": 127,
+        "ORDER": 2,
+        "D_MODEL": 512,
+        "N_LAYER": 2,
+        "N_HEAD": 4,
+        "MLP_RATIO": 8,
+        "TRAIN_LEN": 16,
+        "OOD_LEN": 16,
+        "DATA_MODE": "full_split",
+        "BATCH_SIZE": 512,
+        "RESHUFFLE_EACH_EPOCH": false,
+        "DROPOUT": 0,
+        "LR": 0.0003,
+        "WEIGHT_DECAY": 1,
+        "GRAD_CLIP_NORM": 1,
+        "FIRST_TASK_WEIGHT": 1,
+        "EPOCHS": 1000,
+        "EVAL_INTERVAL": 1,
+        "EARLY_STOP_ACCURACY": 0.99,
+        "EARLY_STOP_NO_IMPROVE": 3000,
+        "MAX_TRAIN_HOURS": 0.0833,
+        "POS_PROBE": false,
+        "RULES": [
+          [
+            92,
+            36
+          ]
+        ],
+        "RANDOM_SEED": 17996
+      }
+    },
+    {
+      "name": "H3_A92_a92b93_d512l2r8h4_P127_seed17996",
+      "task": "single",
+      "config": {
+        "P": 127,
+        "ORDER": 2,
+        "D_MODEL": 512,
+        "N_LAYER": 2,
+        "N_HEAD": 4,
+        "MLP_RATIO": 8,
+        "TRAIN_LEN": 16,
+        "OOD_LEN": 16,
+        "DATA_MODE": "full_split",
+        "BATCH_SIZE": 512,
+        "RESHUFFLE_EACH_EPOCH": false,
+        "DROPOUT": 0,
+        "LR": 0.0003,
+        "WEIGHT_DECAY": 1,
+        "GRAD_CLIP_NORM": 1,
+        "FIRST_TASK_WEIGHT": 1,
+        "EPOCHS": 1000,
+        "EVAL_INTERVAL": 1,
+        "EARLY_STOP_ACCURACY": 0.99,
+        "EARLY_STOP_NO_IMPROVE": 3000,
+        "MAX_TRAIN_HOURS": 0.0833,
+        "POS_PROBE": false,
+        "RULES": [
+          [
+            92,
+            93
+          ]
+        ],
+        "RANDOM_SEED": 17996
+      }
+    },
+    {
+      "name": "H3_A92_a92b56_d512l2r8h4_P127_seed17996",
+      "task": "single",
+      "config": {
+        "P": 127,
+        "ORDER": 2,
+        "D_MODEL": 512,
+        "N_LAYER": 2,
+        "N_HEAD": 4,
+        "MLP_RATIO": 8,
+        "TRAIN_LEN": 16,
+        "OOD_LEN": 16,
+        "DATA_MODE": "full_split",
+        "BATCH_SIZE": 512,
+        "RESHUFFLE_EACH_EPOCH": false,
+        "DROPOUT": 0,
+        "LR": 0.0003,
+        "WEIGHT_DECAY": 1,
+        "GRAD_CLIP_NORM": 1,
+        "FIRST_TASK_WEIGHT": 1,
+        "EPOCHS": 1000,
+        "EVAL_INTERVAL": 1,
+        "EARLY_STOP_ACCURACY": 0.99,
+        "EARLY_STOP_NO_IMPROVE": 3000,
+        "MAX_TRAIN_HOURS": 0.0833,
+        "POS_PROBE": false,
+        "RULES": [
+          [
+            92,
+            56
+          ]
+        ],
+        "RANDOM_SEED": 17996
+      }
+    },
+    {
+      "name": "H1_D_J63_a62b55_d512l2r8h4_P127_seed18318",
+      "task": "single",
+      "config": {
+        "P": 127,
+        "ORDER": 2,
+        "D_MODEL": 512,
+        "N_LAYER": 2,
+        "N_HEAD": 4,
+        "MLP_RATIO": 8,
+        "TRAIN_LEN": 16,
+        "OOD_LEN": 16,
+        "DATA_MODE": "full_split",
+        "BATCH_SIZE": 512,
+        "RESHUFFLE_EACH_EPOCH": false,
+        "DROPOUT": 0,
+        "LR": 0.0003,
+        "WEIGHT_DECAY": 1,
+        "GRAD_CLIP_NORM": 1,
+        "FIRST_TASK_WEIGHT": 1,
+        "EPOCHS": 1000,
+        "EVAL_INTERVAL": 1,
+        "EARLY_STOP_ACCURACY": 0.99,
+        "EARLY_STOP_NO_IMPROVE": 3000,
+        "MAX_TRAIN_HOURS": 0.0833,
+        "POS_PROBE": false,
+        "RULES": [
+          [
+            62,
+            55
+          ]
+        ],
+        "RANDOM_SEED": 18318
+      }
+    },
+    {
+      "name": "H1_D_J63_a124b93_d512l2r8h4_P127_seed18318",
+      "task": "single",
+      "config": {
+        "P": 127,
+        "ORDER": 2,
+        "D_MODEL": 512,
+        "N_LAYER": 2,
+        "N_HEAD": 4,
+        "MLP_RATIO": 8,
+        "TRAIN_LEN": 16,
+        "OOD_LEN": 16,
+        "DATA_MODE": "full_split",
+        "BATCH_SIZE": 512,
+        "RESHUFFLE_EACH_EPOCH": false,
+        "DROPOUT": 0,
+        "LR": 0.0003,
+        "WEIGHT_DECAY": 1,
+        "GRAD_CLIP_NORM": 1,
+        "FIRST_TASK_WEIGHT": 1,
+        "EPOCHS": 1000,
+        "EVAL_INTERVAL": 1,
+        "EARLY_STOP_ACCURACY": 0.99,
+        "EARLY_STOP_NO_IMPROVE": 3000,
+        "MAX_TRAIN_HOURS": 0.0833,
+        "POS_PROBE": false,
+        "RULES": [
+          [
+            124,
+            93
+          ]
+        ],
+        "RANDOM_SEED": 18318
+      }
+    },
+    {
+      "name": "H1_D_J63_a30b29_d512l2r8h4_P127_seed18318",
+      "task": "single",
+      "config": {
+        "P": 127,
+        "ORDER": 2,
+        "D_MODEL": 512,
+        "N_LAYER": 2,
+        "N_HEAD": 4,
+        "MLP_RATIO": 8,
+        "TRAIN_LEN": 16,
+        "OOD_LEN": 16,
+        "DATA_MODE": "full_split",
+        "BATCH_SIZE": 512,
+        "RESHUFFLE_EACH_EPOCH": false,
+        "DROPOUT": 0,
+        "LR": 0.0003,
+        "WEIGHT_DECAY": 1,
+        "GRAD_CLIP_NORM": 1,
+        "FIRST_TASK_WEIGHT": 1,
+        "EPOCHS": 1000,
+        "EVAL_INTERVAL": 1,
+        "EARLY_STOP_ACCURACY": 0.99,
+        "EARLY_STOP_NO_IMPROVE": 3000,
+        "MAX_TRAIN_HOURS": 0.0833,
+        "POS_PROBE": false,
+        "RULES": [
+          [
+            30,
+            29
+          ]
+        ],
+        "RANDOM_SEED": 18318
+      }
+    },
+    {
+      "name": "H1_D_J126_a65b55_d512l2r8h4_P127_seed18318",
+      "task": "single",
+      "config": {
+        "P": 127,
+        "ORDER": 2,
+        "D_MODEL": 512,
+        "N_LAYER": 2,
+        "N_HEAD": 4,
+        "MLP_RATIO": 8,
+        "TRAIN_LEN": 16,
+        "OOD_LEN": 16,
+        "DATA_MODE": "full_split",
+        "BATCH_SIZE": 512,
+        "RESHUFFLE_EACH_EPOCH": false,
+        "DROPOUT": 0,
+        "LR": 0.0003,
+        "WEIGHT_DECAY": 1,
+        "GRAD_CLIP_NORM": 1,
+        "FIRST_TASK_WEIGHT": 1,
+        "EPOCHS": 1000,
+        "EVAL_INTERVAL": 1,
+        "EARLY_STOP_ACCURACY": 0.99,
+        "EARLY_STOP_NO_IMPROVE": 3000,
+        "MAX_TRAIN_HOURS": 0.0833,
+        "POS_PROBE": false,
+        "RULES": [
+          [
+            65,
+            55
+          ]
+        ],
+        "RANDOM_SEED": 18318
+      }
+    },
+    {
+      "name": "H1_D_J126_a3b93_d512l2r8h4_P127_seed18318",
+      "task": "single",
+      "config": {
+        "P": 127,
+        "ORDER": 2,
+        "D_MODEL": 512,
+        "N_LAYER": 2,
+        "N_HEAD": 4,
+        "MLP_RATIO": 8,
+        "TRAIN_LEN": 16,
+        "OOD_LEN": 16,
+        "DATA_MODE": "full_split",
+        "BATCH_SIZE": 512,
+        "RESHUFFLE_EACH_EPOCH": false,
+        "DROPOUT": 0,
+        "LR": 0.0003,
+        "WEIGHT_DECAY": 1,
+        "GRAD_CLIP_NORM": 1,
+        "FIRST_TASK_WEIGHT": 1,
+        "EPOCHS": 1000,
+        "EVAL_INTERVAL": 1,
+        "EARLY_STOP_ACCURACY": 0.99,
+        "EARLY_STOP_NO_IMPROVE": 3000,
+        "MAX_TRAIN_HOURS": 0.0833,
+        "POS_PROBE": false,
+        "RULES": [
+          [
+            3,
+            93
+          ]
+        ],
+        "RANDOM_SEED": 18318
+      }
+    },
+    {
+      "name": "H1_D_J126_a97b29_d512l2r8h4_P127_seed18318",
+      "task": "single",
+      "config": {
+        "P": 127,
+        "ORDER": 2,
+        "D_MODEL": 512,
+        "N_LAYER": 2,
+        "N_HEAD": 4,
+        "MLP_RATIO": 8,
+        "TRAIN_LEN": 16,
+        "OOD_LEN": 16,
+        "DATA_MODE": "full_split",
+        "BATCH_SIZE": 512,
+        "RESHUFFLE_EACH_EPOCH": false,
+        "DROPOUT": 0,
+        "LR": 0.0003,
+        "WEIGHT_DECAY": 1,
+        "GRAD_CLIP_NORM": 1,
+        "FIRST_TASK_WEIGHT": 1,
+        "EPOCHS": 1000,
+        "EVAL_INTERVAL": 1,
+        "EARLY_STOP_ACCURACY": 0.99,
+        "EARLY_STOP_NO_IMPROVE": 3000,
+        "MAX_TRAIN_HOURS": 0.0833,
+        "POS_PROBE": false,
+        "RULES": [
+          [
+            97,
+            29
+          ]
+        ],
+        "RANDOM_SEED": 18318
+      }
+    },
+    {
+      "name": "H1_R1_S1_42_a67b61_d512l2r8h4_P127_seed18318",
+      "task": "single",
+      "config": {
+        "P": 127,
+        "ORDER": 2,
+        "D_MODEL": 512,
+        "N_LAYER": 2,
+        "N_HEAD": 4,
+        "MLP_RATIO": 8,
+        "TRAIN_LEN": 16,
+        "OOD_LEN": 16,
+        "DATA_MODE": "full_split",
+        "BATCH_SIZE": 512,
+        "RESHUFFLE_EACH_EPOCH": false,
+        "DROPOUT": 0,
+        "LR": 0.0003,
+        "WEIGHT_DECAY": 1,
+        "GRAD_CLIP_NORM": 1,
+        "FIRST_TASK_WEIGHT": 1,
+        "EPOCHS": 1000,
+        "EVAL_INTERVAL": 1,
+        "EARLY_STOP_ACCURACY": 0.99,
+        "EARLY_STOP_NO_IMPROVE": 3000,
+        "MAX_TRAIN_HOURS": 0.0833,
+        "POS_PROBE": false,
+        "RULES": [
+          [
+            67,
+            61
+          ]
+        ],
+        "RANDOM_SEED": 18318
+      }
+    },
+    {
+      "name": "H1_R1_S1_42_a6b122_d512l2r8h4_P127_seed18318",
+      "task": "single",
+      "config": {
+        "P": 127,
+        "ORDER": 2,
+        "D_MODEL": 512,
+        "N_LAYER": 2,
+        "N_HEAD": 4,
+        "MLP_RATIO": 8,
+        "TRAIN_LEN": 16,
+        "OOD_LEN": 16,
+        "DATA_MODE": "full_split",
+        "BATCH_SIZE": 512,
+        "RESHUFFLE_EACH_EPOCH": false,
+        "DROPOUT": 0,
+        "LR": 0.0003,
+        "WEIGHT_DECAY": 1,
+        "GRAD_CLIP_NORM": 1,
+        "FIRST_TASK_WEIGHT": 1,
+        "EPOCHS": 1000,
+        "EVAL_INTERVAL": 1,
+        "EARLY_STOP_ACCURACY": 0.99,
+        "EARLY_STOP_NO_IMPROVE": 3000,
+        "MAX_TRAIN_HOURS": 0.0833,
+        "POS_PROBE": false,
+        "RULES": [
+          [
+            6,
+            122
+          ]
+        ],
+        "RANDOM_SEED": 18318
+      }
+    },
+    {
+      "name": "H1_R1_S1_42_a103b25_d512l2r8h4_P127_seed18318",
+      "task": "single",
+      "config": {
+        "P": 127,
+        "ORDER": 2,
+        "D_MODEL": 512,
+        "N_LAYER": 2,
+        "N_HEAD": 4,
+        "MLP_RATIO": 8,
+        "TRAIN_LEN": 16,
+        "OOD_LEN": 16,
+        "DATA_MODE": "full_split",
+        "BATCH_SIZE": 512,
+        "RESHUFFLE_EACH_EPOCH": false,
+        "DROPOUT": 0,
+        "LR": 0.0003,
+        "WEIGHT_DECAY": 1,
+        "GRAD_CLIP_NORM": 1,
+        "FIRST_TASK_WEIGHT": 1,
+        "EPOCHS": 1000,
+        "EVAL_INTERVAL": 1,
+        "EARLY_STOP_ACCURACY": 0.99,
+        "EARLY_STOP_NO_IMPROVE": 3000,
+        "MAX_TRAIN_HOURS": 0.0833,
+        "POS_PROBE": false,
+        "RULES": [
+          [
+            103,
+            25
+          ]
+        ],
+        "RANDOM_SEED": 18318
+      }
+    },
+    {
+      "name": "H1_R1_S1_126_a4b124_d512l2r8h4_P127_seed18318",
+      "task": "single",
+      "config": {
+        "P": 127,
+        "ORDER": 2,
+        "D_MODEL": 512,
+        "N_LAYER": 2,
+        "N_HEAD": 4,
+        "MLP_RATIO": 8,
+        "TRAIN_LEN": 16,
+        "OOD_LEN": 16,
+        "DATA_MODE": "full_split",
+        "BATCH_SIZE": 512,
+        "RESHUFFLE_EACH_EPOCH": false,
+        "DROPOUT": 0,
+        "LR": 0.0003,
+        "WEIGHT_DECAY": 1,
+        "GRAD_CLIP_NORM": 1,
+        "FIRST_TASK_WEIGHT": 1,
+        "EPOCHS": 1000,
+        "EVAL_INTERVAL": 1,
+        "EARLY_STOP_ACCURACY": 0.99,
+        "EARLY_STOP_NO_IMPROVE": 3000,
+        "MAX_TRAIN_HOURS": 0.0833,
+        "POS_PROBE": false,
+        "RULES": [
+          [
+            4,
+            124
+          ]
+        ],
+        "RANDOM_SEED": 18318
+      }
+    },
+    {
+      "name": "H1_R1_S1_126_a68b60_d512l2r8h4_P127_seed18318",
+      "task": "single",
+      "config": {
+        "P": 127,
+        "ORDER": 2,
+        "D_MODEL": 512,
+        "N_LAYER": 2,
+        "N_HEAD": 4,
+        "MLP_RATIO": 8,
+        "TRAIN_LEN": 16,
+        "OOD_LEN": 16,
+        "DATA_MODE": "full_split",
+        "BATCH_SIZE": 512,
+        "RESHUFFLE_EACH_EPOCH": false,
+        "DROPOUT": 0,
+        "LR": 0.0003,
+        "WEIGHT_DECAY": 1,
+        "GRAD_CLIP_NORM": 1,
+        "FIRST_TASK_WEIGHT": 1,
+        "EPOCHS": 1000,
+        "EVAL_INTERVAL": 1,
+        "EARLY_STOP_ACCURACY": 0.99,
+        "EARLY_STOP_NO_IMPROVE": 3000,
+        "MAX_TRAIN_HOURS": 0.0833,
+        "POS_PROBE": false,
+        "RULES": [
+          [
+            68,
+            60
+          ]
+        ],
+        "RANDOM_SEED": 18318
+      }
+    },
+    {
+      "name": "H1_R1_S1_126_a98b30_d512l2r8h4_P127_seed18318",
+      "task": "single",
+      "config": {
+        "P": 127,
+        "ORDER": 2,
+        "D_MODEL": 512,
+        "N_LAYER": 2,
+        "N_HEAD": 4,
+        "MLP_RATIO": 8,
+        "TRAIN_LEN": 16,
+        "OOD_LEN": 16,
+        "DATA_MODE": "full_split",
+        "BATCH_SIZE": 512,
+        "RESHUFFLE_EACH_EPOCH": false,
+        "DROPOUT": 0,
+        "LR": 0.0003,
+        "WEIGHT_DECAY": 1,
+        "GRAD_CLIP_NORM": 1,
+        "FIRST_TASK_WEIGHT": 1,
+        "EPOCHS": 1000,
+        "EVAL_INTERVAL": 1,
+        "EARLY_STOP_ACCURACY": 0.99,
+        "EARLY_STOP_NO_IMPROVE": 3000,
+        "MAX_TRAIN_HOURS": 0.0833,
+        "POS_PROBE": false,
+        "RULES": [
+          [
+            98,
+            30
+          ]
+        ],
+        "RANDOM_SEED": 18318
+      }
+    },
+    {
+      "name": "H1_Rm1_S2_42_a65b66_d512l2r8h4_P127_seed18318",
+      "task": "single",
+      "config": {
+        "P": 127,
+        "ORDER": 2,
+        "D_MODEL": 512,
+        "N_LAYER": 2,
+        "N_HEAD": 4,
+        "MLP_RATIO": 8,
+        "TRAIN_LEN": 16,
+        "OOD_LEN": 16,
+        "DATA_MODE": "full_split",
+        "BATCH_SIZE": 512,
+        "RESHUFFLE_EACH_EPOCH": false,
+        "DROPOUT": 0,
+        "LR": 0.0003,
+        "WEIGHT_DECAY": 1,
+        "GRAD_CLIP_NORM": 1,
+        "FIRST_TASK_WEIGHT": 1,
+        "EPOCHS": 1000,
+        "EVAL_INTERVAL": 1,
+        "EARLY_STOP_ACCURACY": 0.99,
+        "EARLY_STOP_NO_IMPROVE": 3000,
+        "MAX_TRAIN_HOURS": 0.0833,
+        "POS_PROBE": false,
+        "RULES": [
+          [
+            65,
+            66
+          ]
+        ],
+        "RANDOM_SEED": 18318
+      }
+    },
+    {
+      "name": "H1_Rm1_S2_42_a4b5_d512l2r8h4_P127_seed18318",
+      "task": "single",
+      "config": {
+        "P": 127,
+        "ORDER": 2,
+        "D_MODEL": 512,
+        "N_LAYER": 2,
+        "N_HEAD": 4,
+        "MLP_RATIO": 8,
+        "TRAIN_LEN": 16,
+        "OOD_LEN": 16,
+        "DATA_MODE": "full_split",
+        "BATCH_SIZE": 512,
+        "RESHUFFLE_EACH_EPOCH": false,
+        "DROPOUT": 0,
+        "LR": 0.0003,
+        "WEIGHT_DECAY": 1,
+        "GRAD_CLIP_NORM": 1,
+        "FIRST_TASK_WEIGHT": 1,
+        "EPOCHS": 1000,
+        "EVAL_INTERVAL": 1,
+        "EARLY_STOP_ACCURACY": 0.99,
+        "EARLY_STOP_NO_IMPROVE": 3000,
+        "MAX_TRAIN_HOURS": 0.0833,
+        "POS_PROBE": false,
+        "RULES": [
+          [
+            4,
+            5
+          ]
+        ],
+        "RANDOM_SEED": 18318
+      }
+    },
+    {
+      "name": "H1_Rm1_S2_42_a101b102_d512l2r8h4_P127_seed18318",
+      "task": "single",
+      "config": {
+        "P": 127,
+        "ORDER": 2,
+        "D_MODEL": 512,
+        "N_LAYER": 2,
+        "N_HEAD": 4,
+        "MLP_RATIO": 8,
+        "TRAIN_LEN": 16,
+        "OOD_LEN": 16,
+        "DATA_MODE": "full_split",
+        "BATCH_SIZE": 512,
+        "RESHUFFLE_EACH_EPOCH": false,
+        "DROPOUT": 0,
+        "LR": 0.0003,
+        "WEIGHT_DECAY": 1,
+        "GRAD_CLIP_NORM": 1,
+        "FIRST_TASK_WEIGHT": 1,
+        "EPOCHS": 1000,
+        "EVAL_INTERVAL": 1,
+        "EARLY_STOP_ACCURACY": 0.99,
+        "EARLY_STOP_NO_IMPROVE": 3000,
+        "MAX_TRAIN_HOURS": 0.0833,
+        "POS_PROBE": false,
+        "RULES": [
+          [
+            101,
+            102
+          ]
+        ],
+        "RANDOM_SEED": 18318
+      }
+    },
+    {
+      "name": "H1_Rm1_S2_126_a2b3_d512l2r8h4_P127_seed18318",
+      "task": "single",
+      "config": {
+        "P": 127,
+        "ORDER": 2,
+        "D_MODEL": 512,
+        "N_LAYER": 2,
+        "N_HEAD": 4,
+        "MLP_RATIO": 8,
+        "TRAIN_LEN": 16,
+        "OOD_LEN": 16,
+        "DATA_MODE": "full_split",
+        "BATCH_SIZE": 512,
+        "RESHUFFLE_EACH_EPOCH": false,
+        "DROPOUT": 0,
+        "LR": 0.0003,
+        "WEIGHT_DECAY": 1,
+        "GRAD_CLIP_NORM": 1,
+        "FIRST_TASK_WEIGHT": 1,
+        "EPOCHS": 1000,
+        "EVAL_INTERVAL": 1,
+        "EARLY_STOP_ACCURACY": 0.99,
+        "EARLY_STOP_NO_IMPROVE": 3000,
+        "MAX_TRAIN_HOURS": 0.0833,
+        "POS_PROBE": false,
+        "RULES": [
+          [
+            2,
+            3
+          ]
+        ],
+        "RANDOM_SEED": 18318
+      }
+    },
+    {
+      "name": "H1_Rm1_S2_126_a52b53_d512l2r8h4_P127_seed18318",
+      "task": "single",
+      "config": {
+        "P": 127,
+        "ORDER": 2,
+        "D_MODEL": 512,
+        "N_LAYER": 2,
+        "N_HEAD": 4,
+        "MLP_RATIO": 8,
+        "TRAIN_LEN": 16,
+        "OOD_LEN": 16,
+        "DATA_MODE": "full_split",
+        "BATCH_SIZE": 512,
+        "RESHUFFLE_EACH_EPOCH": false,
+        "DROPOUT": 0,
+        "LR": 0.0003,
+        "WEIGHT_DECAY": 1,
+        "GRAD_CLIP_NORM": 1,
+        "FIRST_TASK_WEIGHT": 1,
+        "EPOCHS": 1000,
+        "EVAL_INTERVAL": 1,
+        "EARLY_STOP_ACCURACY": 0.99,
+        "EARLY_STOP_NO_IMPROVE": 3000,
+        "MAX_TRAIN_HOURS": 0.0833,
+        "POS_PROBE": false,
+        "RULES": [
+          [
+            52,
+            53
+          ]
+        ],
+        "RANDOM_SEED": 18318
+      }
+    },
+    {
+      "name": "H1_Rm1_S2_126_a96b97_d512l2r8h4_P127_seed18318",
+      "task": "single",
+      "config": {
+        "P": 127,
+        "ORDER": 2,
+        "D_MODEL": 512,
+        "N_LAYER": 2,
+        "N_HEAD": 4,
+        "MLP_RATIO": 8,
+        "TRAIN_LEN": 16,
+        "OOD_LEN": 16,
+        "DATA_MODE": "full_split",
+        "BATCH_SIZE": 512,
+        "RESHUFFLE_EACH_EPOCH": false,
+        "DROPOUT": 0,
+        "LR": 0.0003,
+        "WEIGHT_DECAY": 1,
+        "GRAD_CLIP_NORM": 1,
+        "FIRST_TASK_WEIGHT": 1,
+        "EPOCHS": 1000,
+        "EVAL_INTERVAL": 1,
+        "EARLY_STOP_ACCURACY": 0.99,
+        "EARLY_STOP_NO_IMPROVE": 3000,
+        "MAX_TRAIN_HOURS": 0.0833,
+        "POS_PROBE": false,
+        "RULES": [
+          [
+            96,
+            97
+          ]
+        ],
+        "RANDOM_SEED": 18318
+      }
+    },
+    {
+      "name": "H1_O_S18_126_a13b10_d512l2r8h4_P127_seed18318",
+      "task": "single",
+      "config": {
+        "P": 127,
+        "ORDER": 2,
+        "D_MODEL": 512,
+        "N_LAYER": 2,
+        "N_HEAD": 4,
+        "MLP_RATIO": 8,
+        "TRAIN_LEN": 16,
+        "OOD_LEN": 16,
+        "DATA_MODE": "full_split",
+        "BATCH_SIZE": 512,
+        "RESHUFFLE_EACH_EPOCH": false,
+        "DROPOUT": 0,
+        "LR": 0.0003,
+        "WEIGHT_DECAY": 1,
+        "GRAD_CLIP_NORM": 1,
+        "FIRST_TASK_WEIGHT": 1,
+        "EPOCHS": 1000,
+        "EVAL_INTERVAL": 1,
+        "EARLY_STOP_ACCURACY": 0.99,
+        "EARLY_STOP_NO_IMPROVE": 3000,
+        "MAX_TRAIN_HOURS": 0.0833,
+        "POS_PROBE": false,
+        "RULES": [
+          [
+            13,
+            10
+          ]
+        ],
+        "RANDOM_SEED": 18318
+      }
+    },
+    {
+      "name": "H1_O_S18_126_a77b125_d512l2r8h4_P127_seed18318",
+      "task": "single",
+      "config": {
+        "P": 127,
+        "ORDER": 2,
+        "D_MODEL": 512,
+        "N_LAYER": 2,
+        "N_HEAD": 4,
+        "MLP_RATIO": 8,
+        "TRAIN_LEN": 16,
+        "OOD_LEN": 16,
+        "DATA_MODE": "full_split",
+        "BATCH_SIZE": 512,
+        "RESHUFFLE_EACH_EPOCH": false,
+        "DROPOUT": 0,
+        "LR": 0.0003,
+        "WEIGHT_DECAY": 1,
+        "GRAD_CLIP_NORM": 1,
+        "FIRST_TASK_WEIGHT": 1,
+        "EPOCHS": 1000,
+        "EVAL_INTERVAL": 1,
+        "EARLY_STOP_ACCURACY": 0.99,
+        "EARLY_STOP_NO_IMPROVE": 3000,
+        "MAX_TRAIN_HOURS": 0.0833,
+        "POS_PROBE": false,
+        "RULES": [
+          [
+            77,
+            125
+          ]
+        ],
+        "RANDOM_SEED": 18318
+      }
+    },
+    {
+      "name": "H1_O_S18_126_a45b77_d512l2r8h4_P127_seed18318",
+      "task": "single",
+      "config": {
+        "P": 127,
+        "ORDER": 2,
+        "D_MODEL": 512,
+        "N_LAYER": 2,
+        "N_HEAD": 4,
+        "MLP_RATIO": 8,
+        "TRAIN_LEN": 16,
+        "OOD_LEN": 16,
+        "DATA_MODE": "full_split",
+        "BATCH_SIZE": 512,
+        "RESHUFFLE_EACH_EPOCH": false,
+        "DROPOUT": 0,
+        "LR": 0.0003,
+        "WEIGHT_DECAY": 1,
+        "GRAD_CLIP_NORM": 1,
+        "FIRST_TASK_WEIGHT": 1,
+        "EPOCHS": 1000,
+        "EVAL_INTERVAL": 1,
+        "EARLY_STOP_ACCURACY": 0.99,
+        "EARLY_STOP_NO_IMPROVE": 3000,
+        "MAX_TRAIN_HOURS": 0.0833,
+        "POS_PROBE": false,
+        "RULES": [
+          [
+            45,
+            77
+          ]
+        ],
+        "RANDOM_SEED": 18318
+      }
+    },
+    {
+      "name": "H1_O_S42_126_a5b3_d512l2r8h4_P127_seed18318",
+      "task": "single",
+      "config": {
+        "P": 127,
+        "ORDER": 2,
+        "D_MODEL": 512,
+        "N_LAYER": 2,
+        "N_HEAD": 4,
+        "MLP_RATIO": 8,
+        "TRAIN_LEN": 16,
+        "OOD_LEN": 16,
+        "DATA_MODE": "full_split",
+        "BATCH_SIZE": 512,
+        "RESHUFFLE_EACH_EPOCH": false,
+        "DROPOUT": 0,
+        "LR": 0.0003,
+        "WEIGHT_DECAY": 1,
+        "GRAD_CLIP_NORM": 1,
+        "FIRST_TASK_WEIGHT": 1,
+        "EPOCHS": 1000,
+        "EVAL_INTERVAL": 1,
+        "EARLY_STOP_ACCURACY": 0.99,
+        "EARLY_STOP_NO_IMPROVE": 3000,
+        "MAX_TRAIN_HOURS": 0.0833,
+        "POS_PROBE": false,
+        "RULES": [
+          [
+            5,
+            3
+          ]
+        ],
+        "RANDOM_SEED": 18318
+      }
+    },
+    {
+      "name": "H1_O_S42_126_a25b56_d512l2r8h4_P127_seed18318",
+      "task": "single",
+      "config": {
+        "P": 127,
+        "ORDER": 2,
+        "D_MODEL": 512,
+        "N_LAYER": 2,
+        "N_HEAD": 4,
+        "MLP_RATIO": 8,
+        "TRAIN_LEN": 16,
+        "OOD_LEN": 16,
+        "DATA_MODE": "full_split",
+        "BATCH_SIZE": 512,
+        "RESHUFFLE_EACH_EPOCH": false,
+        "DROPOUT": 0,
+        "LR": 0.0003,
+        "WEIGHT_DECAY": 1,
+        "GRAD_CLIP_NORM": 1,
+        "FIRST_TASK_WEIGHT": 1,
+        "EPOCHS": 1000,
+        "EVAL_INTERVAL": 1,
+        "EARLY_STOP_ACCURACY": 0.99,
+        "EARLY_STOP_NO_IMPROVE": 3000,
+        "MAX_TRAIN_HOURS": 0.0833,
+        "POS_PROBE": false,
+        "RULES": [
+          [
+            25,
+            56
+          ]
+        ],
+        "RANDOM_SEED": 18318
+      }
+    },
+    {
+      "name": "H1_O_S42_126_a62b59_d512l2r8h4_P127_seed18318",
+      "task": "single",
+      "config": {
+        "P": 127,
+        "ORDER": 2,
+        "D_MODEL": 512,
+        "N_LAYER": 2,
+        "N_HEAD": 4,
+        "MLP_RATIO": 8,
+        "TRAIN_LEN": 16,
+        "OOD_LEN": 16,
+        "DATA_MODE": "full_split",
+        "BATCH_SIZE": 512,
+        "RESHUFFLE_EACH_EPOCH": false,
+        "DROPOUT": 0,
+        "LR": 0.0003,
+        "WEIGHT_DECAY": 1,
+        "GRAD_CLIP_NORM": 1,
+        "FIRST_TASK_WEIGHT": 1,
+        "EPOCHS": 1000,
+        "EVAL_INTERVAL": 1,
+        "EARLY_STOP_ACCURACY": 0.99,
+        "EARLY_STOP_NO_IMPROVE": 3000,
+        "MAX_TRAIN_HOURS": 0.0833,
+        "POS_PROBE": false,
+        "RULES": [
+          [
+            62,
+            59
+          ]
+        ],
+        "RANDOM_SEED": 18318
+      }
+    },
+    {
+      "name": "H1_O_S42_126_a67b65_d512l2r8h4_P127_seed18318",
+      "task": "single",
+      "config": {
+        "P": 127,
+        "ORDER": 2,
+        "D_MODEL": 512,
+        "N_LAYER": 2,
+        "N_HEAD": 4,
+        "MLP_RATIO": 8,
+        "TRAIN_LEN": 16,
+        "OOD_LEN": 16,
+        "DATA_MODE": "full_split",
+        "BATCH_SIZE": 512,
+        "RESHUFFLE_EACH_EPOCH": false,
+        "DROPOUT": 0,
+        "LR": 0.0003,
+        "WEIGHT_DECAY": 1,
+        "GRAD_CLIP_NORM": 1,
+        "FIRST_TASK_WEIGHT": 1,
+        "EPOCHS": 1000,
+        "EVAL_INTERVAL": 1,
+        "EARLY_STOP_ACCURACY": 0.99,
+        "EARLY_STOP_NO_IMPROVE": 3000,
+        "MAX_TRAIN_HOURS": 0.0833,
+        "POS_PROBE": false,
+        "RULES": [
+          [
+            67,
+            65
+          ]
+        ],
+        "RANDOM_SEED": 18318
+      }
+    },
+    {
+      "name": "H2_O_S6_126_a85b97_d512l2r8h4_P127_seed18318",
+      "task": "single",
+      "config": {
+        "P": 127,
+        "ORDER": 2,
+        "D_MODEL": 512,
+        "N_LAYER": 2,
+        "N_HEAD": 4,
+        "MLP_RATIO": 8,
+        "TRAIN_LEN": 16,
+        "OOD_LEN": 16,
+        "DATA_MODE": "full_split",
+        "BATCH_SIZE": 512,
+        "RESHUFFLE_EACH_EPOCH": false,
+        "DROPOUT": 0,
+        "LR": 0.0003,
+        "WEIGHT_DECAY": 1,
+        "GRAD_CLIP_NORM": 1,
+        "FIRST_TASK_WEIGHT": 1,
+        "EPOCHS": 1000,
+        "EVAL_INTERVAL": 1,
+        "EARLY_STOP_ACCURACY": 0.99,
+        "EARLY_STOP_NO_IMPROVE": 3000,
+        "MAX_TRAIN_HOURS": 0.0833,
+        "POS_PROBE": false,
+        "RULES": [
+          [
+            85,
+            97
+          ]
+        ],
+        "RANDOM_SEED": 18318
+      }
+    },
+    {
+      "name": "H2_O_S6_126_a29b23_d512l2r8h4_P127_seed18318",
+      "task": "single",
+      "config": {
+        "P": 127,
+        "ORDER": 2,
+        "D_MODEL": 512,
+        "N_LAYER": 2,
+        "N_HEAD": 4,
+        "MLP_RATIO": 8,
+        "TRAIN_LEN": 16,
+        "OOD_LEN": 16,
+        "DATA_MODE": "full_split",
+        "BATCH_SIZE": 512,
+        "RESHUFFLE_EACH_EPOCH": false,
+        "DROPOUT": 0,
+        "LR": 0.0003,
+        "WEIGHT_DECAY": 1,
+        "GRAD_CLIP_NORM": 1,
+        "FIRST_TASK_WEIGHT": 1,
+        "EPOCHS": 1000,
+        "EVAL_INTERVAL": 1,
+        "EARLY_STOP_ACCURACY": 0.99,
+        "EARLY_STOP_NO_IMPROVE": 3000,
+        "MAX_TRAIN_HOURS": 0.0833,
+        "POS_PROBE": false,
+        "RULES": [
+          [
+            29,
+            23
+          ]
+        ],
+        "RANDOM_SEED": 18318
+      }
+    },
+    {
+      "name": "H2_O_S6_126_a90b39_d512l2r8h4_P127_seed18318",
+      "task": "single",
+      "config": {
+        "P": 127,
+        "ORDER": 2,
+        "D_MODEL": 512,
+        "N_LAYER": 2,
+        "N_HEAD": 4,
+        "MLP_RATIO": 8,
+        "TRAIN_LEN": 16,
+        "OOD_LEN": 16,
+        "DATA_MODE": "full_split",
+        "BATCH_SIZE": 512,
+        "RESHUFFLE_EACH_EPOCH": false,
+        "DROPOUT": 0,
+        "LR": 0.0003,
+        "WEIGHT_DECAY": 1,
+        "GRAD_CLIP_NORM": 1,
+        "FIRST_TASK_WEIGHT": 1,
+        "EPOCHS": 1000,
+        "EVAL_INTERVAL": 1,
+        "EARLY_STOP_ACCURACY": 0.99,
+        "EARLY_STOP_NO_IMPROVE": 3000,
+        "MAX_TRAIN_HOURS": 0.0833,
+        "POS_PROBE": false,
+        "RULES": [
+          [
+            90,
+            39
+          ]
+        ],
+        "RANDOM_SEED": 18318
+      }
+    },
+    {
+      "name": "H2_O_S14_126_a51b93_d512l2r8h4_P127_seed18318",
+      "task": "single",
+      "config": {
+        "P": 127,
+        "ORDER": 2,
+        "D_MODEL": 512,
+        "N_LAYER": 2,
+        "N_HEAD": 4,
+        "MLP_RATIO": 8,
+        "TRAIN_LEN": 16,
+        "OOD_LEN": 16,
+        "DATA_MODE": "full_split",
+        "BATCH_SIZE": 512,
+        "RESHUFFLE_EACH_EPOCH": false,
+        "DROPOUT": 0,
+        "LR": 0.0003,
+        "WEIGHT_DECAY": 1,
+        "GRAD_CLIP_NORM": 1,
+        "FIRST_TASK_WEIGHT": 1,
+        "EPOCHS": 1000,
+        "EVAL_INTERVAL": 1,
+        "EARLY_STOP_ACCURACY": 0.99,
+        "EARLY_STOP_NO_IMPROVE": 3000,
+        "MAX_TRAIN_HOURS": 0.0833,
+        "POS_PROBE": false,
+        "RULES": [
+          [
+            51,
+            93
+          ]
+        ],
+        "RANDOM_SEED": 18318
+      }
+    },
+    {
+      "name": "H2_O_S14_126_a111b24_d512l2r8h4_P127_seed18318",
+      "task": "single",
+      "config": {
+        "P": 127,
+        "ORDER": 2,
+        "D_MODEL": 512,
+        "N_LAYER": 2,
+        "N_HEAD": 4,
+        "MLP_RATIO": 8,
+        "TRAIN_LEN": 16,
+        "OOD_LEN": 16,
+        "DATA_MODE": "full_split",
+        "BATCH_SIZE": 512,
+        "RESHUFFLE_EACH_EPOCH": false,
+        "DROPOUT": 0,
+        "LR": 0.0003,
+        "WEIGHT_DECAY": 1,
+        "GRAD_CLIP_NORM": 1,
+        "FIRST_TASK_WEIGHT": 1,
+        "EPOCHS": 1000,
+        "EVAL_INTERVAL": 1,
+        "EARLY_STOP_ACCURACY": 0.99,
+        "EARLY_STOP_NO_IMPROVE": 3000,
+        "MAX_TRAIN_HOURS": 0.0833,
+        "POS_PROBE": false,
+        "RULES": [
+          [
+            111,
+            24
+          ]
+        ],
+        "RANDOM_SEED": 18318
+      }
+    },
+    {
+      "name": "H2_O_S14_126_a116b90_d512l2r8h4_P127_seed18318",
+      "task": "single",
+      "config": {
+        "P": 127,
+        "ORDER": 2,
+        "D_MODEL": 512,
+        "N_LAYER": 2,
+        "N_HEAD": 4,
+        "MLP_RATIO": 8,
+        "TRAIN_LEN": 16,
+        "OOD_LEN": 16,
+        "DATA_MODE": "full_split",
+        "BATCH_SIZE": 512,
+        "RESHUFFLE_EACH_EPOCH": false,
+        "DROPOUT": 0,
+        "LR": 0.0003,
+        "WEIGHT_DECAY": 1,
+        "GRAD_CLIP_NORM": 1,
+        "FIRST_TASK_WEIGHT": 1,
+        "EPOCHS": 1000,
+        "EVAL_INTERVAL": 1,
+        "EARLY_STOP_ACCURACY": 0.99,
+        "EARLY_STOP_NO_IMPROVE": 3000,
+        "MAX_TRAIN_HOURS": 0.0833,
+        "POS_PROBE": false,
+        "RULES": [
+          [
+            116,
+            90
+          ]
+        ],
+        "RANDOM_SEED": 18318
+      }
+    },
+    {
+      "name": "H2_O_S126_126_a51b111_d512l2r8h4_P127_seed18318",
+      "task": "single",
+      "config": {
+        "P": 127,
+        "ORDER": 2,
+        "D_MODEL": 512,
+        "N_LAYER": 2,
+        "N_HEAD": 4,
+        "MLP_RATIO": 8,
+        "TRAIN_LEN": 16,
+        "OOD_LEN": 16,
+        "DATA_MODE": "full_split",
+        "BATCH_SIZE": 512,
+        "RESHUFFLE_EACH_EPOCH": false,
+        "DROPOUT": 0,
+        "LR": 0.0003,
+        "WEIGHT_DECAY": 1,
+        "GRAD_CLIP_NORM": 1,
+        "FIRST_TASK_WEIGHT": 1,
+        "EPOCHS": 1000,
+        "EVAL_INTERVAL": 1,
+        "EARLY_STOP_ACCURACY": 0.99,
+        "EARLY_STOP_NO_IMPROVE": 3000,
+        "MAX_TRAIN_HOURS": 0.0833,
+        "POS_PROBE": false,
+        "RULES": [
+          [
+            51,
+            111
+          ]
+        ],
+        "RANDOM_SEED": 18318
+      }
+    },
+    {
+      "name": "H2_O_S126_126_a113b51_d512l2r8h4_P127_seed18318",
+      "task": "single",
+      "config": {
+        "P": 127,
+        "ORDER": 2,
+        "D_MODEL": 512,
+        "N_LAYER": 2,
+        "N_HEAD": 4,
+        "MLP_RATIO": 8,
+        "TRAIN_LEN": 16,
+        "OOD_LEN": 16,
+        "DATA_MODE": "full_split",
+        "BATCH_SIZE": 512,
+        "RESHUFFLE_EACH_EPOCH": false,
+        "DROPOUT": 0,
+        "LR": 0.0003,
+        "WEIGHT_DECAY": 1,
+        "GRAD_CLIP_NORM": 1,
+        "FIRST_TASK_WEIGHT": 1,
+        "EPOCHS": 1000,
+        "EVAL_INTERVAL": 1,
+        "EARLY_STOP_ACCURACY": 0.99,
+        "EARLY_STOP_NO_IMPROVE": 3000,
+        "MAX_TRAIN_HOURS": 0.0833,
+        "POS_PROBE": false,
+        "RULES": [
+          [
+            113,
+            51
+          ]
+        ],
+        "RANDOM_SEED": 18318
+      }
+    },
+    {
+      "name": "H2_O_S126_126_a115b108_d512l2r8h4_P127_seed18318",
+      "task": "single",
+      "config": {
+        "P": 127,
+        "ORDER": 2,
+        "D_MODEL": 512,
+        "N_LAYER": 2,
+        "N_HEAD": 4,
+        "MLP_RATIO": 8,
+        "TRAIN_LEN": 16,
+        "OOD_LEN": 16,
+        "DATA_MODE": "full_split",
+        "BATCH_SIZE": 512,
+        "RESHUFFLE_EACH_EPOCH": false,
+        "DROPOUT": 0,
+        "LR": 0.0003,
+        "WEIGHT_DECAY": 1,
+        "GRAD_CLIP_NORM": 1,
+        "FIRST_TASK_WEIGHT": 1,
+        "EPOCHS": 1000,
+        "EVAL_INTERVAL": 1,
+        "EARLY_STOP_ACCURACY": 0.99,
+        "EARLY_STOP_NO_IMPROVE": 3000,
+        "MAX_TRAIN_HOURS": 0.0833,
+        "POS_PROBE": false,
+        "RULES": [
+          [
+            115,
+            108
+          ]
+        ],
+        "RANDOM_SEED": 18318
+      }
+    },
+    {
+      "name": "H2_O_I384_a29b108_d512l2r8h4_P127_seed18318",
+      "task": "single",
+      "config": {
+        "P": 127,
+        "ORDER": 2,
+        "D_MODEL": 512,
+        "N_LAYER": 2,
+        "N_HEAD": 4,
+        "MLP_RATIO": 8,
+        "TRAIN_LEN": 16,
+        "OOD_LEN": 16,
+        "DATA_MODE": "full_split",
+        "BATCH_SIZE": 512,
+        "RESHUFFLE_EACH_EPOCH": false,
+        "DROPOUT": 0,
+        "LR": 0.0003,
+        "WEIGHT_DECAY": 1,
+        "GRAD_CLIP_NORM": 1,
+        "FIRST_TASK_WEIGHT": 1,
+        "EPOCHS": 1000,
+        "EVAL_INTERVAL": 1,
+        "EARLY_STOP_ACCURACY": 0.99,
+        "EARLY_STOP_NO_IMPROVE": 3000,
+        "MAX_TRAIN_HOURS": 0.0833,
+        "POS_PROBE": false,
+        "RULES": [
+          [
+            29,
+            108
+          ]
+        ],
+        "RANDOM_SEED": 18318
+      }
+    },
+    {
+      "name": "H2_O_I384_a88b20_d512l2r8h4_P127_seed18318",
+      "task": "single",
+      "config": {
+        "P": 127,
+        "ORDER": 2,
+        "D_MODEL": 512,
+        "N_LAYER": 2,
+        "N_HEAD": 4,
+        "MLP_RATIO": 8,
+        "TRAIN_LEN": 16,
+        "OOD_LEN": 16,
+        "DATA_MODE": "full_split",
+        "BATCH_SIZE": 512,
+        "RESHUFFLE_EACH_EPOCH": false,
+        "DROPOUT": 0,
+        "LR": 0.0003,
+        "WEIGHT_DECAY": 1,
+        "GRAD_CLIP_NORM": 1,
+        "FIRST_TASK_WEIGHT": 1,
+        "EPOCHS": 1000,
+        "EVAL_INTERVAL": 1,
+        "EARLY_STOP_ACCURACY": 0.99,
+        "EARLY_STOP_NO_IMPROVE": 3000,
+        "MAX_TRAIN_HOURS": 0.0833,
+        "POS_PROBE": false,
+        "RULES": [
+          [
+            88,
+            20
+          ]
+        ],
+        "RANDOM_SEED": 18318
+      }
+    },
+    {
+      "name": "H2_O_I384_a10b20_d512l2r8h4_P127_seed18318",
+      "task": "single",
+      "config": {
+        "P": 127,
+        "ORDER": 2,
+        "D_MODEL": 512,
+        "N_LAYER": 2,
+        "N_HEAD": 4,
+        "MLP_RATIO": 8,
+        "TRAIN_LEN": 16,
+        "OOD_LEN": 16,
+        "DATA_MODE": "full_split",
+        "BATCH_SIZE": 512,
+        "RESHUFFLE_EACH_EPOCH": false,
+        "DROPOUT": 0,
+        "LR": 0.0003,
+        "WEIGHT_DECAY": 1,
+        "GRAD_CLIP_NORM": 1,
+        "FIRST_TASK_WEIGHT": 1,
+        "EPOCHS": 1000,
+        "EVAL_INTERVAL": 1,
+        "EARLY_STOP_ACCURACY": 0.99,
+        "EARLY_STOP_NO_IMPROVE": 3000,
+        "MAX_TRAIN_HOURS": 0.0833,
+        "POS_PROBE": false,
+        "RULES": [
+          [
+            10,
+            20
+          ]
+        ],
+        "RANDOM_SEED": 18318
+      }
+    },
+    {
+      "name": "H2_O_I896_a82b111_d512l2r8h4_P127_seed18318",
+      "task": "single",
+      "config": {
+        "P": 127,
+        "ORDER": 2,
+        "D_MODEL": 512,
+        "N_LAYER": 2,
+        "N_HEAD": 4,
+        "MLP_RATIO": 8,
+        "TRAIN_LEN": 16,
+        "OOD_LEN": 16,
+        "DATA_MODE": "full_split",
+        "BATCH_SIZE": 512,
+        "RESHUFFLE_EACH_EPOCH": false,
+        "DROPOUT": 0,
+        "LR": 0.0003,
+        "WEIGHT_DECAY": 1,
+        "GRAD_CLIP_NORM": 1,
+        "FIRST_TASK_WEIGHT": 1,
+        "EPOCHS": 1000,
+        "EVAL_INTERVAL": 1,
+        "EARLY_STOP_ACCURACY": 0.99,
+        "EARLY_STOP_NO_IMPROVE": 3000,
+        "MAX_TRAIN_HOURS": 0.0833,
+        "POS_PROBE": false,
+        "RULES": [
+          [
+            82,
+            111
+          ]
+        ],
+        "RANDOM_SEED": 18318
+      }
+    },
+    {
+      "name": "H2_O_I896_a17b63_d512l2r8h4_P127_seed18318",
+      "task": "single",
+      "config": {
+        "P": 127,
+        "ORDER": 2,
+        "D_MODEL": 512,
+        "N_LAYER": 2,
+        "N_HEAD": 4,
+        "MLP_RATIO": 8,
+        "TRAIN_LEN": 16,
+        "OOD_LEN": 16,
+        "DATA_MODE": "full_split",
+        "BATCH_SIZE": 512,
+        "RESHUFFLE_EACH_EPOCH": false,
+        "DROPOUT": 0,
+        "LR": 0.0003,
+        "WEIGHT_DECAY": 1,
+        "GRAD_CLIP_NORM": 1,
+        "FIRST_TASK_WEIGHT": 1,
+        "EPOCHS": 1000,
+        "EVAL_INTERVAL": 1,
+        "EARLY_STOP_ACCURACY": 0.99,
+        "EARLY_STOP_NO_IMPROVE": 3000,
+        "MAX_TRAIN_HOURS": 0.0833,
+        "POS_PROBE": false,
+        "RULES": [
+          [
+            17,
+            63
+          ]
+        ],
+        "RANDOM_SEED": 18318
+      }
+    },
+    {
+      "name": "H2_O_I896_a92b63_d512l2r8h4_P127_seed18318",
+      "task": "single",
+      "config": {
+        "P": 127,
+        "ORDER": 2,
+        "D_MODEL": 512,
+        "N_LAYER": 2,
+        "N_HEAD": 4,
+        "MLP_RATIO": 8,
+        "TRAIN_LEN": 16,
+        "OOD_LEN": 16,
+        "DATA_MODE": "full_split",
+        "BATCH_SIZE": 512,
+        "RESHUFFLE_EACH_EPOCH": false,
+        "DROPOUT": 0,
+        "LR": 0.0003,
+        "WEIGHT_DECAY": 1,
+        "GRAD_CLIP_NORM": 1,
+        "FIRST_TASK_WEIGHT": 1,
+        "EPOCHS": 1000,
+        "EVAL_INTERVAL": 1,
+        "EARLY_STOP_ACCURACY": 0.99,
+        "EARLY_STOP_NO_IMPROVE": 3000,
+        "MAX_TRAIN_HOURS": 0.0833,
+        "POS_PROBE": false,
+        "RULES": [
+          [
+            92,
+            63
+          ]
+        ],
+        "RANDOM_SEED": 18318
+      }
+    },
+    {
+      "name": "H2_O_I5376_a24b117_d512l2r8h4_P127_seed18318",
+      "task": "single",
+      "config": {
+        "P": 127,
+        "ORDER": 2,
+        "D_MODEL": 512,
+        "N_LAYER": 2,
+        "N_HEAD": 4,
+        "MLP_RATIO": 8,
+        "TRAIN_LEN": 16,
+        "OOD_LEN": 16,
+        "DATA_MODE": "full_split",
+        "BATCH_SIZE": 512,
+        "RESHUFFLE_EACH_EPOCH": false,
+        "DROPOUT": 0,
+        "LR": 0.0003,
+        "WEIGHT_DECAY": 1,
+        "GRAD_CLIP_NORM": 1,
+        "FIRST_TASK_WEIGHT": 1,
+        "EPOCHS": 1000,
+        "EVAL_INTERVAL": 1,
+        "EARLY_STOP_ACCURACY": 0.99,
+        "EARLY_STOP_NO_IMPROVE": 3000,
+        "MAX_TRAIN_HOURS": 0.0833,
+        "POS_PROBE": false,
+        "RULES": [
+          [
+            24,
+            117
+          ]
+        ],
+        "RANDOM_SEED": 18318
+      }
+    },
+    {
+      "name": "H2_O_I5376_a85b50_d512l2r8h4_P127_seed18318",
+      "task": "single",
+      "config": {
+        "P": 127,
+        "ORDER": 2,
+        "D_MODEL": 512,
+        "N_LAYER": 2,
+        "N_HEAD": 4,
+        "MLP_RATIO": 8,
+        "TRAIN_LEN": 16,
+        "OOD_LEN": 16,
+        "DATA_MODE": "full_split",
+        "BATCH_SIZE": 512,
+        "RESHUFFLE_EACH_EPOCH": false,
+        "DROPOUT": 0,
+        "LR": 0.0003,
+        "WEIGHT_DECAY": 1,
+        "GRAD_CLIP_NORM": 1,
+        "FIRST_TASK_WEIGHT": 1,
+        "EPOCHS": 1000,
+        "EVAL_INTERVAL": 1,
+        "EARLY_STOP_ACCURACY": 0.99,
+        "EARLY_STOP_NO_IMPROVE": 3000,
+        "MAX_TRAIN_HOURS": 0.0833,
+        "POS_PROBE": false,
+        "RULES": [
+          [
+            85,
+            50
+          ]
+        ],
+        "RANDOM_SEED": 18318
+      }
+    },
+    {
+      "name": "H2_O_I5376_a90b117_d512l2r8h4_P127_seed18318",
+      "task": "single",
+      "config": {
+        "P": 127,
+        "ORDER": 2,
+        "D_MODEL": 512,
+        "N_LAYER": 2,
+        "N_HEAD": 4,
+        "MLP_RATIO": 8,
+        "TRAIN_LEN": 16,
+        "OOD_LEN": 16,
+        "DATA_MODE": "full_split",
+        "BATCH_SIZE": 512,
+        "RESHUFFLE_EACH_EPOCH": false,
+        "DROPOUT": 0,
+        "LR": 0.0003,
+        "WEIGHT_DECAY": 1,
+        "GRAD_CLIP_NORM": 1,
+        "FIRST_TASK_WEIGHT": 1,
+        "EPOCHS": 1000,
+        "EVAL_INTERVAL": 1,
+        "EARLY_STOP_ACCURACY": 0.99,
+        "EARLY_STOP_NO_IMPROVE": 3000,
+        "MAX_TRAIN_HOURS": 0.0833,
+        "POS_PROBE": false,
+        "RULES": [
+          [
+            90,
+            117
+          ]
+        ],
+        "RANDOM_SEED": 18318
+      }
+    },
+    {
+      "name": "H2_O_I16128_a90b70_d512l2r8h4_P127_seed18318",
+      "task": "single",
+      "config": {
+        "P": 127,
+        "ORDER": 2,
+        "D_MODEL": 512,
+        "N_LAYER": 2,
+        "N_HEAD": 4,
+        "MLP_RATIO": 8,
+        "TRAIN_LEN": 16,
+        "OOD_LEN": 16,
+        "DATA_MODE": "full_split",
+        "BATCH_SIZE": 512,
+        "RESHUFFLE_EACH_EPOCH": false,
+        "DROPOUT": 0,
+        "LR": 0.0003,
+        "WEIGHT_DECAY": 1,
+        "GRAD_CLIP_NORM": 1,
+        "FIRST_TASK_WEIGHT": 1,
+        "EPOCHS": 1000,
+        "EVAL_INTERVAL": 1,
+        "EARLY_STOP_ACCURACY": 0.99,
+        "EARLY_STOP_NO_IMPROVE": 3000,
+        "MAX_TRAIN_HOURS": 0.0833,
+        "POS_PROBE": false,
+        "RULES": [
+          [
+            90,
+            70
+          ]
+        ],
+        "RANDOM_SEED": 18318
+      }
+    },
+    {
+      "name": "H2_O_I16128_a26b11_d512l2r8h4_P127_seed18318",
+      "task": "single",
+      "config": {
+        "P": 127,
+        "ORDER": 2,
+        "D_MODEL": 512,
+        "N_LAYER": 2,
+        "N_HEAD": 4,
+        "MLP_RATIO": 8,
+        "TRAIN_LEN": 16,
+        "OOD_LEN": 16,
+        "DATA_MODE": "full_split",
+        "BATCH_SIZE": 512,
+        "RESHUFFLE_EACH_EPOCH": false,
+        "DROPOUT": 0,
+        "LR": 0.0003,
+        "WEIGHT_DECAY": 1,
+        "GRAD_CLIP_NORM": 1,
+        "FIRST_TASK_WEIGHT": 1,
+        "EPOCHS": 1000,
+        "EVAL_INTERVAL": 1,
+        "EARLY_STOP_ACCURACY": 0.99,
+        "EARLY_STOP_NO_IMPROVE": 3000,
+        "MAX_TRAIN_HOURS": 0.0833,
+        "POS_PROBE": false,
+        "RULES": [
+          [
+            26,
+            11
+          ]
+        ],
+        "RANDOM_SEED": 18318
+      }
+    },
+    {
+      "name": "H2_O_I16128_a26b74_d512l2r8h4_P127_seed18318",
+      "task": "single",
+      "config": {
+        "P": 127,
+        "ORDER": 2,
+        "D_MODEL": 512,
+        "N_LAYER": 2,
+        "N_HEAD": 4,
+        "MLP_RATIO": 8,
+        "TRAIN_LEN": 16,
+        "OOD_LEN": 16,
+        "DATA_MODE": "full_split",
+        "BATCH_SIZE": 512,
+        "RESHUFFLE_EACH_EPOCH": false,
+        "DROPOUT": 0,
+        "LR": 0.0003,
+        "WEIGHT_DECAY": 1,
+        "GRAD_CLIP_NORM": 1,
+        "FIRST_TASK_WEIGHT": 1,
+        "EPOCHS": 1000,
+        "EVAL_INTERVAL": 1,
+        "EARLY_STOP_ACCURACY": 0.99,
+        "EARLY_STOP_NO_IMPROVE": 3000,
+        "MAX_TRAIN_HOURS": 0.0833,
+        "POS_PROBE": false,
+        "RULES": [
+          [
+            26,
+            74
+          ]
+        ],
+        "RANDOM_SEED": 18318
+      }
+    },
+    {
+      "name": "H3_A44_a44b84_d512l2r8h4_P127_seed18318",
+      "task": "single",
+      "config": {
+        "P": 127,
+        "ORDER": 2,
+        "D_MODEL": 512,
+        "N_LAYER": 2,
+        "N_HEAD": 4,
+        "MLP_RATIO": 8,
+        "TRAIN_LEN": 16,
+        "OOD_LEN": 16,
+        "DATA_MODE": "full_split",
+        "BATCH_SIZE": 512,
+        "RESHUFFLE_EACH_EPOCH": false,
+        "DROPOUT": 0,
+        "LR": 0.0003,
+        "WEIGHT_DECAY": 1,
+        "GRAD_CLIP_NORM": 1,
+        "FIRST_TASK_WEIGHT": 1,
+        "EPOCHS": 1000,
+        "EVAL_INTERVAL": 1,
+        "EARLY_STOP_ACCURACY": 0.99,
+        "EARLY_STOP_NO_IMPROVE": 3000,
+        "MAX_TRAIN_HOURS": 0.0833,
+        "POS_PROBE": false,
+        "RULES": [
+          [
+            44,
+            84
+          ]
+        ],
+        "RANDOM_SEED": 18318
+      }
+    },
+    {
+      "name": "H3_A44_a44b45_d512l2r8h4_P127_seed18318",
+      "task": "single",
+      "config": {
+        "P": 127,
+        "ORDER": 2,
+        "D_MODEL": 512,
+        "N_LAYER": 2,
+        "N_HEAD": 4,
+        "MLP_RATIO": 8,
+        "TRAIN_LEN": 16,
+        "OOD_LEN": 16,
+        "DATA_MODE": "full_split",
+        "BATCH_SIZE": 512,
+        "RESHUFFLE_EACH_EPOCH": false,
+        "DROPOUT": 0,
+        "LR": 0.0003,
+        "WEIGHT_DECAY": 1,
+        "GRAD_CLIP_NORM": 1,
+        "FIRST_TASK_WEIGHT": 1,
+        "EPOCHS": 1000,
+        "EVAL_INTERVAL": 1,
+        "EARLY_STOP_ACCURACY": 0.99,
+        "EARLY_STOP_NO_IMPROVE": 3000,
+        "MAX_TRAIN_HOURS": 0.0833,
+        "POS_PROBE": false,
+        "RULES": [
+          [
+            44,
+            45
+          ]
+        ],
+        "RANDOM_SEED": 18318
+      }
+    },
+    {
+      "name": "H3_A44_a44b59_d512l2r8h4_P127_seed18318",
+      "task": "single",
+      "config": {
+        "P": 127,
+        "ORDER": 2,
+        "D_MODEL": 512,
+        "N_LAYER": 2,
+        "N_HEAD": 4,
+        "MLP_RATIO": 8,
+        "TRAIN_LEN": 16,
+        "OOD_LEN": 16,
+        "DATA_MODE": "full_split",
+        "BATCH_SIZE": 512,
+        "RESHUFFLE_EACH_EPOCH": false,
+        "DROPOUT": 0,
+        "LR": 0.0003,
+        "WEIGHT_DECAY": 1,
+        "GRAD_CLIP_NORM": 1,
+        "FIRST_TASK_WEIGHT": 1,
+        "EPOCHS": 1000,
+        "EVAL_INTERVAL": 1,
+        "EARLY_STOP_ACCURACY": 0.99,
+        "EARLY_STOP_NO_IMPROVE": 3000,
+        "MAX_TRAIN_HOURS": 0.0833,
+        "POS_PROBE": false,
+        "RULES": [
+          [
+            44,
+            59
+          ]
+        ],
+        "RANDOM_SEED": 18318
+      }
+    },
+    {
+      "name": "H3_A66_a66b62_d512l2r8h4_P127_seed18318",
+      "task": "single",
+      "config": {
+        "P": 127,
+        "ORDER": 2,
+        "D_MODEL": 512,
+        "N_LAYER": 2,
+        "N_HEAD": 4,
+        "MLP_RATIO": 8,
+        "TRAIN_LEN": 16,
+        "OOD_LEN": 16,
+        "DATA_MODE": "full_split",
+        "BATCH_SIZE": 512,
+        "RESHUFFLE_EACH_EPOCH": false,
+        "DROPOUT": 0,
+        "LR": 0.0003,
+        "WEIGHT_DECAY": 1,
+        "GRAD_CLIP_NORM": 1,
+        "FIRST_TASK_WEIGHT": 1,
+        "EPOCHS": 1000,
+        "EVAL_INTERVAL": 1,
+        "EARLY_STOP_ACCURACY": 0.99,
+        "EARLY_STOP_NO_IMPROVE": 3000,
+        "MAX_TRAIN_HOURS": 0.0833,
+        "POS_PROBE": false,
+        "RULES": [
+          [
+            66,
+            62
+          ]
+        ],
+        "RANDOM_SEED": 18318
+      }
+    },
+    {
+      "name": "H3_A66_a66b67_d512l2r8h4_P127_seed18318",
+      "task": "single",
+      "config": {
+        "P": 127,
+        "ORDER": 2,
+        "D_MODEL": 512,
+        "N_LAYER": 2,
+        "N_HEAD": 4,
+        "MLP_RATIO": 8,
+        "TRAIN_LEN": 16,
+        "OOD_LEN": 16,
+        "DATA_MODE": "full_split",
+        "BATCH_SIZE": 512,
+        "RESHUFFLE_EACH_EPOCH": false,
+        "DROPOUT": 0,
+        "LR": 0.0003,
+        "WEIGHT_DECAY": 1,
+        "GRAD_CLIP_NORM": 1,
+        "FIRST_TASK_WEIGHT": 1,
+        "EPOCHS": 1000,
+        "EVAL_INTERVAL": 1,
+        "EARLY_STOP_ACCURACY": 0.99,
+        "EARLY_STOP_NO_IMPROVE": 3000,
+        "MAX_TRAIN_HOURS": 0.0833,
+        "POS_PROBE": false,
+        "RULES": [
+          [
+            66,
+            67
+          ]
+        ],
+        "RANDOM_SEED": 18318
+      }
+    },
+    {
+      "name": "H3_A66_a66b85_d512l2r8h4_P127_seed18318",
+      "task": "single",
+      "config": {
+        "P": 127,
+        "ORDER": 2,
+        "D_MODEL": 512,
+        "N_LAYER": 2,
+        "N_HEAD": 4,
+        "MLP_RATIO": 8,
+        "TRAIN_LEN": 16,
+        "OOD_LEN": 16,
+        "DATA_MODE": "full_split",
+        "BATCH_SIZE": 512,
+        "RESHUFFLE_EACH_EPOCH": false,
+        "DROPOUT": 0,
+        "LR": 0.0003,
+        "WEIGHT_DECAY": 1,
+        "GRAD_CLIP_NORM": 1,
+        "FIRST_TASK_WEIGHT": 1,
+        "EPOCHS": 1000,
+        "EVAL_INTERVAL": 1,
+        "EARLY_STOP_ACCURACY": 0.99,
+        "EARLY_STOP_NO_IMPROVE": 3000,
+        "MAX_TRAIN_HOURS": 0.0833,
+        "POS_PROBE": false,
+        "RULES": [
+          [
+            66,
+            85
+          ]
+        ],
+        "RANDOM_SEED": 18318
+      }
+    },
+    {
+      "name": "H3_A92_a92b36_d512l2r8h4_P127_seed18318",
+      "task": "single",
+      "config": {
+        "P": 127,
+        "ORDER": 2,
+        "D_MODEL": 512,
+        "N_LAYER": 2,
+        "N_HEAD": 4,
+        "MLP_RATIO": 8,
+        "TRAIN_LEN": 16,
+        "OOD_LEN": 16,
+        "DATA_MODE": "full_split",
+        "BATCH_SIZE": 512,
+        "RESHUFFLE_EACH_EPOCH": false,
+        "DROPOUT": 0,
+        "LR": 0.0003,
+        "WEIGHT_DECAY": 1,
+        "GRAD_CLIP_NORM": 1,
+        "FIRST_TASK_WEIGHT": 1,
+        "EPOCHS": 1000,
+        "EVAL_INTERVAL": 1,
+        "EARLY_STOP_ACCURACY": 0.99,
+        "EARLY_STOP_NO_IMPROVE": 3000,
+        "MAX_TRAIN_HOURS": 0.0833,
+        "POS_PROBE": false,
+        "RULES": [
+          [
+            92,
+            36
+          ]
+        ],
+        "RANDOM_SEED": 18318
+      }
+    },
+    {
+      "name": "H3_A92_a92b93_d512l2r8h4_P127_seed18318",
+      "task": "single",
+      "config": {
+        "P": 127,
+        "ORDER": 2,
+        "D_MODEL": 512,
+        "N_LAYER": 2,
+        "N_HEAD": 4,
+        "MLP_RATIO": 8,
+        "TRAIN_LEN": 16,
+        "OOD_LEN": 16,
+        "DATA_MODE": "full_split",
+        "BATCH_SIZE": 512,
+        "RESHUFFLE_EACH_EPOCH": false,
+        "DROPOUT": 0,
+        "LR": 0.0003,
+        "WEIGHT_DECAY": 1,
+        "GRAD_CLIP_NORM": 1,
+        "FIRST_TASK_WEIGHT": 1,
+        "EPOCHS": 1000,
+        "EVAL_INTERVAL": 1,
+        "EARLY_STOP_ACCURACY": 0.99,
+        "EARLY_STOP_NO_IMPROVE": 3000,
+        "MAX_TRAIN_HOURS": 0.0833,
+        "POS_PROBE": false,
+        "RULES": [
+          [
+            92,
+            93
+          ]
+        ],
+        "RANDOM_SEED": 18318
+      }
+    },
+    {
+      "name": "H3_A92_a92b56_d512l2r8h4_P127_seed18318",
+      "task": "single",
+      "config": {
+        "P": 127,
+        "ORDER": 2,
+        "D_MODEL": 512,
+        "N_LAYER": 2,
+        "N_HEAD": 4,
+        "MLP_RATIO": 8,
+        "TRAIN_LEN": 16,
+        "OOD_LEN": 16,
+        "DATA_MODE": "full_split",
+        "BATCH_SIZE": 512,
+        "RESHUFFLE_EACH_EPOCH": false,
+        "DROPOUT": 0,
+        "LR": 0.0003,
+        "WEIGHT_DECAY": 1,
+        "GRAD_CLIP_NORM": 1,
+        "FIRST_TASK_WEIGHT": 1,
+        "EPOCHS": 1000,
+        "EVAL_INTERVAL": 1,
+        "EARLY_STOP_ACCURACY": 0.99,
+        "EARLY_STOP_NO_IMPROVE": 3000,
+        "MAX_TRAIN_HOURS": 0.0833,
+        "POS_PROBE": false,
+        "RULES": [
+          [
+            92,
+            56
+          ]
+        ],
+        "RANDOM_SEED": 18318
+      }
+    },
+    {
+      "name": "H1_D_J63_a62b55_d512l2r8h4_P127_seed34789",
+      "task": "single",
+      "config": {
+        "P": 127,
+        "ORDER": 2,
+        "D_MODEL": 512,
+        "N_LAYER": 2,
+        "N_HEAD": 4,
+        "MLP_RATIO": 8,
+        "TRAIN_LEN": 16,
+        "OOD_LEN": 16,
+        "DATA_MODE": "full_split",
+        "BATCH_SIZE": 512,
+        "RESHUFFLE_EACH_EPOCH": false,
+        "DROPOUT": 0,
+        "LR": 0.0003,
+        "WEIGHT_DECAY": 1,
+        "GRAD_CLIP_NORM": 1,
+        "FIRST_TASK_WEIGHT": 1,
+        "EPOCHS": 1000,
+        "EVAL_INTERVAL": 1,
+        "EARLY_STOP_ACCURACY": 0.99,
+        "EARLY_STOP_NO_IMPROVE": 3000,
+        "MAX_TRAIN_HOURS": 0.0833,
+        "POS_PROBE": false,
+        "RULES": [
+          [
+            62,
+            55
+          ]
+        ],
+        "RANDOM_SEED": 34789
+      }
+    },
+    {
+      "name": "H1_D_J63_a124b93_d512l2r8h4_P127_seed34789",
+      "task": "single",
+      "config": {
+        "P": 127,
+        "ORDER": 2,
+        "D_MODEL": 512,
+        "N_LAYER": 2,
+        "N_HEAD": 4,
+        "MLP_RATIO": 8,
+        "TRAIN_LEN": 16,
+        "OOD_LEN": 16,
+        "DATA_MODE": "full_split",
+        "BATCH_SIZE": 512,
+        "RESHUFFLE_EACH_EPOCH": false,
+        "DROPOUT": 0,
+        "LR": 0.0003,
+        "WEIGHT_DECAY": 1,
+        "GRAD_CLIP_NORM": 1,
+        "FIRST_TASK_WEIGHT": 1,
+        "EPOCHS": 1000,
+        "EVAL_INTERVAL": 1,
+        "EARLY_STOP_ACCURACY": 0.99,
+        "EARLY_STOP_NO_IMPROVE": 3000,
+        "MAX_TRAIN_HOURS": 0.0833,
+        "POS_PROBE": false,
+        "RULES": [
+          [
+            124,
+            93
+          ]
+        ],
+        "RANDOM_SEED": 34789
+      }
+    },
+    {
+      "name": "H1_D_J63_a30b29_d512l2r8h4_P127_seed34789",
+      "task": "single",
+      "config": {
+        "P": 127,
+        "ORDER": 2,
+        "D_MODEL": 512,
+        "N_LAYER": 2,
+        "N_HEAD": 4,
+        "MLP_RATIO": 8,
+        "TRAIN_LEN": 16,
+        "OOD_LEN": 16,
+        "DATA_MODE": "full_split",
+        "BATCH_SIZE": 512,
+        "RESHUFFLE_EACH_EPOCH": false,
+        "DROPOUT": 0,
+        "LR": 0.0003,
+        "WEIGHT_DECAY": 1,
+        "GRAD_CLIP_NORM": 1,
+        "FIRST_TASK_WEIGHT": 1,
+        "EPOCHS": 1000,
+        "EVAL_INTERVAL": 1,
+        "EARLY_STOP_ACCURACY": 0.99,
+        "EARLY_STOP_NO_IMPROVE": 3000,
+        "MAX_TRAIN_HOURS": 0.0833,
+        "POS_PROBE": false,
+        "RULES": [
+          [
+            30,
+            29
+          ]
+        ],
+        "RANDOM_SEED": 34789
+      }
+    },
+    {
+      "name": "H1_D_J126_a65b55_d512l2r8h4_P127_seed34789",
+      "task": "single",
+      "config": {
+        "P": 127,
+        "ORDER": 2,
+        "D_MODEL": 512,
+        "N_LAYER": 2,
+        "N_HEAD": 4,
+        "MLP_RATIO": 8,
+        "TRAIN_LEN": 16,
+        "OOD_LEN": 16,
+        "DATA_MODE": "full_split",
+        "BATCH_SIZE": 512,
+        "RESHUFFLE_EACH_EPOCH": false,
+        "DROPOUT": 0,
+        "LR": 0.0003,
+        "WEIGHT_DECAY": 1,
+        "GRAD_CLIP_NORM": 1,
+        "FIRST_TASK_WEIGHT": 1,
+        "EPOCHS": 1000,
+        "EVAL_INTERVAL": 1,
+        "EARLY_STOP_ACCURACY": 0.99,
+        "EARLY_STOP_NO_IMPROVE": 3000,
+        "MAX_TRAIN_HOURS": 0.0833,
+        "POS_PROBE": false,
+        "RULES": [
+          [
+            65,
+            55
+          ]
+        ],
+        "RANDOM_SEED": 34789
+      }
+    },
+    {
+      "name": "H1_D_J126_a3b93_d512l2r8h4_P127_seed34789",
+      "task": "single",
+      "config": {
+        "P": 127,
+        "ORDER": 2,
+        "D_MODEL": 512,
+        "N_LAYER": 2,
+        "N_HEAD": 4,
+        "MLP_RATIO": 8,
+        "TRAIN_LEN": 16,
+        "OOD_LEN": 16,
+        "DATA_MODE": "full_split",
+        "BATCH_SIZE": 512,
+        "RESHUFFLE_EACH_EPOCH": false,
+        "DROPOUT": 0,
+        "LR": 0.0003,
+        "WEIGHT_DECAY": 1,
+        "GRAD_CLIP_NORM": 1,
+        "FIRST_TASK_WEIGHT": 1,
+        "EPOCHS": 1000,
+        "EVAL_INTERVAL": 1,
+        "EARLY_STOP_ACCURACY": 0.99,
+        "EARLY_STOP_NO_IMPROVE": 3000,
+        "MAX_TRAIN_HOURS": 0.0833,
+        "POS_PROBE": false,
+        "RULES": [
+          [
+            3,
+            93
+          ]
+        ],
+        "RANDOM_SEED": 34789
+      }
+    },
+    {
+      "name": "H1_D_J126_a97b29_d512l2r8h4_P127_seed34789",
+      "task": "single",
+      "config": {
+        "P": 127,
+        "ORDER": 2,
+        "D_MODEL": 512,
+        "N_LAYER": 2,
+        "N_HEAD": 4,
+        "MLP_RATIO": 8,
+        "TRAIN_LEN": 16,
+        "OOD_LEN": 16,
+        "DATA_MODE": "full_split",
+        "BATCH_SIZE": 512,
+        "RESHUFFLE_EACH_EPOCH": false,
+        "DROPOUT": 0,
+        "LR": 0.0003,
+        "WEIGHT_DECAY": 1,
+        "GRAD_CLIP_NORM": 1,
+        "FIRST_TASK_WEIGHT": 1,
+        "EPOCHS": 1000,
+        "EVAL_INTERVAL": 1,
+        "EARLY_STOP_ACCURACY": 0.99,
+        "EARLY_STOP_NO_IMPROVE": 3000,
+        "MAX_TRAIN_HOURS": 0.0833,
+        "POS_PROBE": false,
+        "RULES": [
+          [
+            97,
+            29
+          ]
+        ],
+        "RANDOM_SEED": 34789
+      }
+    },
+    {
+      "name": "H1_R1_S1_42_a67b61_d512l2r8h4_P127_seed34789",
+      "task": "single",
+      "config": {
+        "P": 127,
+        "ORDER": 2,
+        "D_MODEL": 512,
+        "N_LAYER": 2,
+        "N_HEAD": 4,
+        "MLP_RATIO": 8,
+        "TRAIN_LEN": 16,
+        "OOD_LEN": 16,
+        "DATA_MODE": "full_split",
+        "BATCH_SIZE": 512,
+        "RESHUFFLE_EACH_EPOCH": false,
+        "DROPOUT": 0,
+        "LR": 0.0003,
+        "WEIGHT_DECAY": 1,
+        "GRAD_CLIP_NORM": 1,
+        "FIRST_TASK_WEIGHT": 1,
+        "EPOCHS": 1000,
+        "EVAL_INTERVAL": 1,
+        "EARLY_STOP_ACCURACY": 0.99,
+        "EARLY_STOP_NO_IMPROVE": 3000,
+        "MAX_TRAIN_HOURS": 0.0833,
+        "POS_PROBE": false,
+        "RULES": [
+          [
+            67,
+            61
+          ]
+        ],
+        "RANDOM_SEED": 34789
+      }
+    },
+    {
+      "name": "H1_R1_S1_42_a6b122_d512l2r8h4_P127_seed34789",
+      "task": "single",
+      "config": {
+        "P": 127,
+        "ORDER": 2,
+        "D_MODEL": 512,
+        "N_LAYER": 2,
+        "N_HEAD": 4,
+        "MLP_RATIO": 8,
+        "TRAIN_LEN": 16,
+        "OOD_LEN": 16,
+        "DATA_MODE": "full_split",
+        "BATCH_SIZE": 512,
+        "RESHUFFLE_EACH_EPOCH": false,
+        "DROPOUT": 0,
+        "LR": 0.0003,
+        "WEIGHT_DECAY": 1,
+        "GRAD_CLIP_NORM": 1,
+        "FIRST_TASK_WEIGHT": 1,
+        "EPOCHS": 1000,
+        "EVAL_INTERVAL": 1,
+        "EARLY_STOP_ACCURACY": 0.99,
+        "EARLY_STOP_NO_IMPROVE": 3000,
+        "MAX_TRAIN_HOURS": 0.0833,
+        "POS_PROBE": false,
+        "RULES": [
+          [
+            6,
+            122
+          ]
+        ],
+        "RANDOM_SEED": 34789
+      }
+    },
+    {
+      "name": "H1_R1_S1_42_a103b25_d512l2r8h4_P127_seed34789",
+      "task": "single",
+      "config": {
+        "P": 127,
+        "ORDER": 2,
+        "D_MODEL": 512,
+        "N_LAYER": 2,
+        "N_HEAD": 4,
+        "MLP_RATIO": 8,
+        "TRAIN_LEN": 16,
+        "OOD_LEN": 16,
+        "DATA_MODE": "full_split",
+        "BATCH_SIZE": 512,
+        "RESHUFFLE_EACH_EPOCH": false,
+        "DROPOUT": 0,
+        "LR": 0.0003,
+        "WEIGHT_DECAY": 1,
+        "GRAD_CLIP_NORM": 1,
+        "FIRST_TASK_WEIGHT": 1,
+        "EPOCHS": 1000,
+        "EVAL_INTERVAL": 1,
+        "EARLY_STOP_ACCURACY": 0.99,
+        "EARLY_STOP_NO_IMPROVE": 3000,
+        "MAX_TRAIN_HOURS": 0.0833,
+        "POS_PROBE": false,
+        "RULES": [
+          [
+            103,
+            25
+          ]
+        ],
+        "RANDOM_SEED": 34789
+      }
+    },
+    {
+      "name": "H1_R1_S1_126_a4b124_d512l2r8h4_P127_seed34789",
+      "task": "single",
+      "config": {
+        "P": 127,
+        "ORDER": 2,
+        "D_MODEL": 512,
+        "N_LAYER": 2,
+        "N_HEAD": 4,
+        "MLP_RATIO": 8,
+        "TRAIN_LEN": 16,
+        "OOD_LEN": 16,
+        "DATA_MODE": "full_split",
+        "BATCH_SIZE": 512,
+        "RESHUFFLE_EACH_EPOCH": false,
+        "DROPOUT": 0,
+        "LR": 0.0003,
+        "WEIGHT_DECAY": 1,
+        "GRAD_CLIP_NORM": 1,
+        "FIRST_TASK_WEIGHT": 1,
+        "EPOCHS": 1000,
+        "EVAL_INTERVAL": 1,
+        "EARLY_STOP_ACCURACY": 0.99,
+        "EARLY_STOP_NO_IMPROVE": 3000,
+        "MAX_TRAIN_HOURS": 0.0833,
+        "POS_PROBE": false,
+        "RULES": [
+          [
+            4,
+            124
+          ]
+        ],
+        "RANDOM_SEED": 34789
+      }
+    },
+    {
+      "name": "H1_R1_S1_126_a68b60_d512l2r8h4_P127_seed34789",
+      "task": "single",
+      "config": {
+        "P": 127,
+        "ORDER": 2,
+        "D_MODEL": 512,
+        "N_LAYER": 2,
+        "N_HEAD": 4,
+        "MLP_RATIO": 8,
+        "TRAIN_LEN": 16,
+        "OOD_LEN": 16,
+        "DATA_MODE": "full_split",
+        "BATCH_SIZE": 512,
+        "RESHUFFLE_EACH_EPOCH": false,
+        "DROPOUT": 0,
+        "LR": 0.0003,
+        "WEIGHT_DECAY": 1,
+        "GRAD_CLIP_NORM": 1,
+        "FIRST_TASK_WEIGHT": 1,
+        "EPOCHS": 1000,
+        "EVAL_INTERVAL": 1,
+        "EARLY_STOP_ACCURACY": 0.99,
+        "EARLY_STOP_NO_IMPROVE": 3000,
+        "MAX_TRAIN_HOURS": 0.0833,
+        "POS_PROBE": false,
+        "RULES": [
+          [
+            68,
+            60
+          ]
+        ],
+        "RANDOM_SEED": 34789
+      }
+    },
+    {
+      "name": "H1_R1_S1_126_a98b30_d512l2r8h4_P127_seed34789",
+      "task": "single",
+      "config": {
+        "P": 127,
+        "ORDER": 2,
+        "D_MODEL": 512,
+        "N_LAYER": 2,
+        "N_HEAD": 4,
+        "MLP_RATIO": 8,
+        "TRAIN_LEN": 16,
+        "OOD_LEN": 16,
+        "DATA_MODE": "full_split",
+        "BATCH_SIZE": 512,
+        "RESHUFFLE_EACH_EPOCH": false,
+        "DROPOUT": 0,
+        "LR": 0.0003,
+        "WEIGHT_DECAY": 1,
+        "GRAD_CLIP_NORM": 1,
+        "FIRST_TASK_WEIGHT": 1,
+        "EPOCHS": 1000,
+        "EVAL_INTERVAL": 1,
+        "EARLY_STOP_ACCURACY": 0.99,
+        "EARLY_STOP_NO_IMPROVE": 3000,
+        "MAX_TRAIN_HOURS": 0.0833,
+        "POS_PROBE": false,
+        "RULES": [
+          [
+            98,
+            30
+          ]
+        ],
+        "RANDOM_SEED": 34789
+      }
+    },
+    {
+      "name": "H1_Rm1_S2_42_a65b66_d512l2r8h4_P127_seed34789",
+      "task": "single",
+      "config": {
+        "P": 127,
+        "ORDER": 2,
+        "D_MODEL": 512,
+        "N_LAYER": 2,
+        "N_HEAD": 4,
+        "MLP_RATIO": 8,
+        "TRAIN_LEN": 16,
+        "OOD_LEN": 16,
+        "DATA_MODE": "full_split",
+        "BATCH_SIZE": 512,
+        "RESHUFFLE_EACH_EPOCH": false,
+        "DROPOUT": 0,
+        "LR": 0.0003,
+        "WEIGHT_DECAY": 1,
+        "GRAD_CLIP_NORM": 1,
+        "FIRST_TASK_WEIGHT": 1,
+        "EPOCHS": 1000,
+        "EVAL_INTERVAL": 1,
+        "EARLY_STOP_ACCURACY": 0.99,
+        "EARLY_STOP_NO_IMPROVE": 3000,
+        "MAX_TRAIN_HOURS": 0.0833,
+        "POS_PROBE": false,
+        "RULES": [
+          [
+            65,
+            66
+          ]
+        ],
+        "RANDOM_SEED": 34789
+      }
+    },
+    {
+      "name": "H1_Rm1_S2_42_a4b5_d512l2r8h4_P127_seed34789",
+      "task": "single",
+      "config": {
+        "P": 127,
+        "ORDER": 2,
+        "D_MODEL": 512,
+        "N_LAYER": 2,
+        "N_HEAD": 4,
+        "MLP_RATIO": 8,
+        "TRAIN_LEN": 16,
+        "OOD_LEN": 16,
+        "DATA_MODE": "full_split",
+        "BATCH_SIZE": 512,
+        "RESHUFFLE_EACH_EPOCH": false,
+        "DROPOUT": 0,
+        "LR": 0.0003,
+        "WEIGHT_DECAY": 1,
+        "GRAD_CLIP_NORM": 1,
+        "FIRST_TASK_WEIGHT": 1,
+        "EPOCHS": 1000,
+        "EVAL_INTERVAL": 1,
+        "EARLY_STOP_ACCURACY": 0.99,
+        "EARLY_STOP_NO_IMPROVE": 3000,
+        "MAX_TRAIN_HOURS": 0.0833,
+        "POS_PROBE": false,
+        "RULES": [
+          [
+            4,
+            5
+          ]
+        ],
+        "RANDOM_SEED": 34789
+      }
+    },
+    {
+      "name": "H1_Rm1_S2_42_a101b102_d512l2r8h4_P127_seed34789",
+      "task": "single",
+      "config": {
+        "P": 127,
+        "ORDER": 2,
+        "D_MODEL": 512,
+        "N_LAYER": 2,
+        "N_HEAD": 4,
+        "MLP_RATIO": 8,
+        "TRAIN_LEN": 16,
+        "OOD_LEN": 16,
+        "DATA_MODE": "full_split",
+        "BATCH_SIZE": 512,
+        "RESHUFFLE_EACH_EPOCH": false,
+        "DROPOUT": 0,
+        "LR": 0.0003,
+        "WEIGHT_DECAY": 1,
+        "GRAD_CLIP_NORM": 1,
+        "FIRST_TASK_WEIGHT": 1,
+        "EPOCHS": 1000,
+        "EVAL_INTERVAL": 1,
+        "EARLY_STOP_ACCURACY": 0.99,
+        "EARLY_STOP_NO_IMPROVE": 3000,
+        "MAX_TRAIN_HOURS": 0.0833,
+        "POS_PROBE": false,
+        "RULES": [
+          [
+            101,
+            102
+          ]
+        ],
+        "RANDOM_SEED": 34789
+      }
+    },
+    {
+      "name": "H1_Rm1_S2_126_a2b3_d512l2r8h4_P127_seed34789",
+      "task": "single",
+      "config": {
+        "P": 127,
+        "ORDER": 2,
+        "D_MODEL": 512,
+        "N_LAYER": 2,
+        "N_HEAD": 4,
+        "MLP_RATIO": 8,
+        "TRAIN_LEN": 16,
+        "OOD_LEN": 16,
+        "DATA_MODE": "full_split",
+        "BATCH_SIZE": 512,
+        "RESHUFFLE_EACH_EPOCH": false,
+        "DROPOUT": 0,
+        "LR": 0.0003,
+        "WEIGHT_DECAY": 1,
+        "GRAD_CLIP_NORM": 1,
+        "FIRST_TASK_WEIGHT": 1,
+        "EPOCHS": 1000,
+        "EVAL_INTERVAL": 1,
+        "EARLY_STOP_ACCURACY": 0.99,
+        "EARLY_STOP_NO_IMPROVE": 3000,
+        "MAX_TRAIN_HOURS": 0.0833,
+        "POS_PROBE": false,
+        "RULES": [
+          [
+            2,
+            3
+          ]
+        ],
+        "RANDOM_SEED": 34789
+      }
+    },
+    {
+      "name": "H1_Rm1_S2_126_a52b53_d512l2r8h4_P127_seed34789",
+      "task": "single",
+      "config": {
+        "P": 127,
+        "ORDER": 2,
+        "D_MODEL": 512,
+        "N_LAYER": 2,
+        "N_HEAD": 4,
+        "MLP_RATIO": 8,
+        "TRAIN_LEN": 16,
+        "OOD_LEN": 16,
+        "DATA_MODE": "full_split",
+        "BATCH_SIZE": 512,
+        "RESHUFFLE_EACH_EPOCH": false,
+        "DROPOUT": 0,
+        "LR": 0.0003,
+        "WEIGHT_DECAY": 1,
+        "GRAD_CLIP_NORM": 1,
+        "FIRST_TASK_WEIGHT": 1,
+        "EPOCHS": 1000,
+        "EVAL_INTERVAL": 1,
+        "EARLY_STOP_ACCURACY": 0.99,
+        "EARLY_STOP_NO_IMPROVE": 3000,
+        "MAX_TRAIN_HOURS": 0.0833,
+        "POS_PROBE": false,
+        "RULES": [
+          [
+            52,
+            53
+          ]
+        ],
+        "RANDOM_SEED": 34789
+      }
+    },
+    {
+      "name": "H1_Rm1_S2_126_a96b97_d512l2r8h4_P127_seed34789",
+      "task": "single",
+      "config": {
+        "P": 127,
+        "ORDER": 2,
+        "D_MODEL": 512,
+        "N_LAYER": 2,
+        "N_HEAD": 4,
+        "MLP_RATIO": 8,
+        "TRAIN_LEN": 16,
+        "OOD_LEN": 16,
+        "DATA_MODE": "full_split",
+        "BATCH_SIZE": 512,
+        "RESHUFFLE_EACH_EPOCH": false,
+        "DROPOUT": 0,
+        "LR": 0.0003,
+        "WEIGHT_DECAY": 1,
+        "GRAD_CLIP_NORM": 1,
+        "FIRST_TASK_WEIGHT": 1,
+        "EPOCHS": 1000,
+        "EVAL_INTERVAL": 1,
+        "EARLY_STOP_ACCURACY": 0.99,
+        "EARLY_STOP_NO_IMPROVE": 3000,
+        "MAX_TRAIN_HOURS": 0.0833,
+        "POS_PROBE": false,
+        "RULES": [
+          [
+            96,
+            97
+          ]
+        ],
+        "RANDOM_SEED": 34789
+      }
+    },
+    {
+      "name": "H1_O_S18_126_a13b10_d512l2r8h4_P127_seed34789",
+      "task": "single",
+      "config": {
+        "P": 127,
+        "ORDER": 2,
+        "D_MODEL": 512,
+        "N_LAYER": 2,
+        "N_HEAD": 4,
+        "MLP_RATIO": 8,
+        "TRAIN_LEN": 16,
+        "OOD_LEN": 16,
+        "DATA_MODE": "full_split",
+        "BATCH_SIZE": 512,
+        "RESHUFFLE_EACH_EPOCH": false,
+        "DROPOUT": 0,
+        "LR": 0.0003,
+        "WEIGHT_DECAY": 1,
+        "GRAD_CLIP_NORM": 1,
+        "FIRST_TASK_WEIGHT": 1,
+        "EPOCHS": 1000,
+        "EVAL_INTERVAL": 1,
+        "EARLY_STOP_ACCURACY": 0.99,
+        "EARLY_STOP_NO_IMPROVE": 3000,
+        "MAX_TRAIN_HOURS": 0.0833,
+        "POS_PROBE": false,
+        "RULES": [
+          [
+            13,
+            10
+          ]
+        ],
+        "RANDOM_SEED": 34789
+      }
+    },
+    {
+      "name": "H1_O_S18_126_a77b125_d512l2r8h4_P127_seed34789",
+      "task": "single",
+      "config": {
+        "P": 127,
+        "ORDER": 2,
+        "D_MODEL": 512,
+        "N_LAYER": 2,
+        "N_HEAD": 4,
+        "MLP_RATIO": 8,
+        "TRAIN_LEN": 16,
+        "OOD_LEN": 16,
+        "DATA_MODE": "full_split",
+        "BATCH_SIZE": 512,
+        "RESHUFFLE_EACH_EPOCH": false,
+        "DROPOUT": 0,
+        "LR": 0.0003,
+        "WEIGHT_DECAY": 1,
+        "GRAD_CLIP_NORM": 1,
+        "FIRST_TASK_WEIGHT": 1,
+        "EPOCHS": 1000,
+        "EVAL_INTERVAL": 1,
+        "EARLY_STOP_ACCURACY": 0.99,
+        "EARLY_STOP_NO_IMPROVE": 3000,
+        "MAX_TRAIN_HOURS": 0.0833,
+        "POS_PROBE": false,
+        "RULES": [
+          [
+            77,
+            125
+          ]
+        ],
+        "RANDOM_SEED": 34789
+      }
+    },
+    {
+      "name": "H1_O_S18_126_a45b77_d512l2r8h4_P127_seed34789",
+      "task": "single",
+      "config": {
+        "P": 127,
+        "ORDER": 2,
+        "D_MODEL": 512,
+        "N_LAYER": 2,
+        "N_HEAD": 4,
+        "MLP_RATIO": 8,
+        "TRAIN_LEN": 16,
+        "OOD_LEN": 16,
+        "DATA_MODE": "full_split",
+        "BATCH_SIZE": 512,
+        "RESHUFFLE_EACH_EPOCH": false,
+        "DROPOUT": 0,
+        "LR": 0.0003,
+        "WEIGHT_DECAY": 1,
+        "GRAD_CLIP_NORM": 1,
+        "FIRST_TASK_WEIGHT": 1,
+        "EPOCHS": 1000,
+        "EVAL_INTERVAL": 1,
+        "EARLY_STOP_ACCURACY": 0.99,
+        "EARLY_STOP_NO_IMPROVE": 3000,
+        "MAX_TRAIN_HOURS": 0.0833,
+        "POS_PROBE": false,
+        "RULES": [
+          [
+            45,
+            77
+          ]
+        ],
+        "RANDOM_SEED": 34789
+      }
+    },
+    {
+      "name": "H1_O_S42_126_a5b3_d512l2r8h4_P127_seed34789",
+      "task": "single",
+      "config": {
+        "P": 127,
+        "ORDER": 2,
+        "D_MODEL": 512,
+        "N_LAYER": 2,
+        "N_HEAD": 4,
+        "MLP_RATIO": 8,
+        "TRAIN_LEN": 16,
+        "OOD_LEN": 16,
+        "DATA_MODE": "full_split",
+        "BATCH_SIZE": 512,
+        "RESHUFFLE_EACH_EPOCH": false,
+        "DROPOUT": 0,
+        "LR": 0.0003,
+        "WEIGHT_DECAY": 1,
+        "GRAD_CLIP_NORM": 1,
+        "FIRST_TASK_WEIGHT": 1,
+        "EPOCHS": 1000,
+        "EVAL_INTERVAL": 1,
+        "EARLY_STOP_ACCURACY": 0.99,
+        "EARLY_STOP_NO_IMPROVE": 3000,
+        "MAX_TRAIN_HOURS": 0.0833,
+        "POS_PROBE": false,
+        "RULES": [
+          [
+            5,
+            3
+          ]
+        ],
+        "RANDOM_SEED": 34789
+      }
+    },
+    {
+      "name": "H1_O_S42_126_a25b56_d512l2r8h4_P127_seed34789",
+      "task": "single",
+      "config": {
+        "P": 127,
+        "ORDER": 2,
+        "D_MODEL": 512,
+        "N_LAYER": 2,
+        "N_HEAD": 4,
+        "MLP_RATIO": 8,
+        "TRAIN_LEN": 16,
+        "OOD_LEN": 16,
+        "DATA_MODE": "full_split",
+        "BATCH_SIZE": 512,
+        "RESHUFFLE_EACH_EPOCH": false,
+        "DROPOUT": 0,
+        "LR": 0.0003,
+        "WEIGHT_DECAY": 1,
+        "GRAD_CLIP_NORM": 1,
+        "FIRST_TASK_WEIGHT": 1,
+        "EPOCHS": 1000,
+        "EVAL_INTERVAL": 1,
+        "EARLY_STOP_ACCURACY": 0.99,
+        "EARLY_STOP_NO_IMPROVE": 3000,
+        "MAX_TRAIN_HOURS": 0.0833,
+        "POS_PROBE": false,
+        "RULES": [
+          [
+            25,
+            56
+          ]
+        ],
+        "RANDOM_SEED": 34789
+      }
+    },
+    {
+      "name": "H1_O_S42_126_a62b59_d512l2r8h4_P127_seed34789",
+      "task": "single",
+      "config": {
+        "P": 127,
+        "ORDER": 2,
+        "D_MODEL": 512,
+        "N_LAYER": 2,
+        "N_HEAD": 4,
+        "MLP_RATIO": 8,
+        "TRAIN_LEN": 16,
+        "OOD_LEN": 16,
+        "DATA_MODE": "full_split",
+        "BATCH_SIZE": 512,
+        "RESHUFFLE_EACH_EPOCH": false,
+        "DROPOUT": 0,
+        "LR": 0.0003,
+        "WEIGHT_DECAY": 1,
+        "GRAD_CLIP_NORM": 1,
+        "FIRST_TASK_WEIGHT": 1,
+        "EPOCHS": 1000,
+        "EVAL_INTERVAL": 1,
+        "EARLY_STOP_ACCURACY": 0.99,
+        "EARLY_STOP_NO_IMPROVE": 3000,
+        "MAX_TRAIN_HOURS": 0.0833,
+        "POS_PROBE": false,
+        "RULES": [
+          [
+            62,
+            59
+          ]
+        ],
+        "RANDOM_SEED": 34789
+      }
+    },
+    {
+      "name": "H1_O_S42_126_a67b65_d512l2r8h4_P127_seed34789",
+      "task": "single",
+      "config": {
+        "P": 127,
+        "ORDER": 2,
+        "D_MODEL": 512,
+        "N_LAYER": 2,
+        "N_HEAD": 4,
+        "MLP_RATIO": 8,
+        "TRAIN_LEN": 16,
+        "OOD_LEN": 16,
+        "DATA_MODE": "full_split",
+        "BATCH_SIZE": 512,
+        "RESHUFFLE_EACH_EPOCH": false,
+        "DROPOUT": 0,
+        "LR": 0.0003,
+        "WEIGHT_DECAY": 1,
+        "GRAD_CLIP_NORM": 1,
+        "FIRST_TASK_WEIGHT": 1,
+        "EPOCHS": 1000,
+        "EVAL_INTERVAL": 1,
+        "EARLY_STOP_ACCURACY": 0.99,
+        "EARLY_STOP_NO_IMPROVE": 3000,
+        "MAX_TRAIN_HOURS": 0.0833,
+        "POS_PROBE": false,
+        "RULES": [
+          [
+            67,
+            65
+          ]
+        ],
+        "RANDOM_SEED": 34789
+      }
+    },
+    {
+      "name": "H2_O_S6_126_a85b97_d512l2r8h4_P127_seed34789",
+      "task": "single",
+      "config": {
+        "P": 127,
+        "ORDER": 2,
+        "D_MODEL": 512,
+        "N_LAYER": 2,
+        "N_HEAD": 4,
+        "MLP_RATIO": 8,
+        "TRAIN_LEN": 16,
+        "OOD_LEN": 16,
+        "DATA_MODE": "full_split",
+        "BATCH_SIZE": 512,
+        "RESHUFFLE_EACH_EPOCH": false,
+        "DROPOUT": 0,
+        "LR": 0.0003,
+        "WEIGHT_DECAY": 1,
+        "GRAD_CLIP_NORM": 1,
+        "FIRST_TASK_WEIGHT": 1,
+        "EPOCHS": 1000,
+        "EVAL_INTERVAL": 1,
+        "EARLY_STOP_ACCURACY": 0.99,
+        "EARLY_STOP_NO_IMPROVE": 3000,
+        "MAX_TRAIN_HOURS": 0.0833,
+        "POS_PROBE": false,
+        "RULES": [
+          [
+            85,
+            97
+          ]
+        ],
+        "RANDOM_SEED": 34789
+      }
+    },
+    {
+      "name": "H2_O_S6_126_a29b23_d512l2r8h4_P127_seed34789",
+      "task": "single",
+      "config": {
+        "P": 127,
+        "ORDER": 2,
+        "D_MODEL": 512,
+        "N_LAYER": 2,
+        "N_HEAD": 4,
+        "MLP_RATIO": 8,
+        "TRAIN_LEN": 16,
+        "OOD_LEN": 16,
+        "DATA_MODE": "full_split",
+        "BATCH_SIZE": 512,
+        "RESHUFFLE_EACH_EPOCH": false,
+        "DROPOUT": 0,
+        "LR": 0.0003,
+        "WEIGHT_DECAY": 1,
+        "GRAD_CLIP_NORM": 1,
+        "FIRST_TASK_WEIGHT": 1,
+        "EPOCHS": 1000,
+        "EVAL_INTERVAL": 1,
+        "EARLY_STOP_ACCURACY": 0.99,
+        "EARLY_STOP_NO_IMPROVE": 3000,
+        "MAX_TRAIN_HOURS": 0.0833,
+        "POS_PROBE": false,
+        "RULES": [
+          [
+            29,
+            23
+          ]
+        ],
+        "RANDOM_SEED": 34789
+      }
+    },
+    {
+      "name": "H2_O_S6_126_a90b39_d512l2r8h4_P127_seed34789",
+      "task": "single",
+      "config": {
+        "P": 127,
+        "ORDER": 2,
+        "D_MODEL": 512,
+        "N_LAYER": 2,
+        "N_HEAD": 4,
+        "MLP_RATIO": 8,
+        "TRAIN_LEN": 16,
+        "OOD_LEN": 16,
+        "DATA_MODE": "full_split",
+        "BATCH_SIZE": 512,
+        "RESHUFFLE_EACH_EPOCH": false,
+        "DROPOUT": 0,
+        "LR": 0.0003,
+        "WEIGHT_DECAY": 1,
+        "GRAD_CLIP_NORM": 1,
+        "FIRST_TASK_WEIGHT": 1,
+        "EPOCHS": 1000,
+        "EVAL_INTERVAL": 1,
+        "EARLY_STOP_ACCURACY": 0.99,
+        "EARLY_STOP_NO_IMPROVE": 3000,
+        "MAX_TRAIN_HOURS": 0.0833,
+        "POS_PROBE": false,
+        "RULES": [
+          [
+            90,
+            39
+          ]
+        ],
+        "RANDOM_SEED": 34789
+      }
+    },
+    {
+      "name": "H2_O_S14_126_a51b93_d512l2r8h4_P127_seed34789",
+      "task": "single",
+      "config": {
+        "P": 127,
+        "ORDER": 2,
+        "D_MODEL": 512,
+        "N_LAYER": 2,
+        "N_HEAD": 4,
+        "MLP_RATIO": 8,
+        "TRAIN_LEN": 16,
+        "OOD_LEN": 16,
+        "DATA_MODE": "full_split",
+        "BATCH_SIZE": 512,
+        "RESHUFFLE_EACH_EPOCH": false,
+        "DROPOUT": 0,
+        "LR": 0.0003,
+        "WEIGHT_DECAY": 1,
+        "GRAD_CLIP_NORM": 1,
+        "FIRST_TASK_WEIGHT": 1,
+        "EPOCHS": 1000,
+        "EVAL_INTERVAL": 1,
+        "EARLY_STOP_ACCURACY": 0.99,
+        "EARLY_STOP_NO_IMPROVE": 3000,
+        "MAX_TRAIN_HOURS": 0.0833,
+        "POS_PROBE": false,
+        "RULES": [
+          [
+            51,
+            93
+          ]
+        ],
+        "RANDOM_SEED": 34789
+      }
+    },
+    {
+      "name": "H2_O_S14_126_a111b24_d512l2r8h4_P127_seed34789",
+      "task": "single",
+      "config": {
+        "P": 127,
+        "ORDER": 2,
+        "D_MODEL": 512,
+        "N_LAYER": 2,
+        "N_HEAD": 4,
+        "MLP_RATIO": 8,
+        "TRAIN_LEN": 16,
+        "OOD_LEN": 16,
+        "DATA_MODE": "full_split",
+        "BATCH_SIZE": 512,
+        "RESHUFFLE_EACH_EPOCH": false,
+        "DROPOUT": 0,
+        "LR": 0.0003,
+        "WEIGHT_DECAY": 1,
+        "GRAD_CLIP_NORM": 1,
+        "FIRST_TASK_WEIGHT": 1,
+        "EPOCHS": 1000,
+        "EVAL_INTERVAL": 1,
+        "EARLY_STOP_ACCURACY": 0.99,
+        "EARLY_STOP_NO_IMPROVE": 3000,
+        "MAX_TRAIN_HOURS": 0.0833,
+        "POS_PROBE": false,
+        "RULES": [
+          [
+            111,
+            24
+          ]
+        ],
+        "RANDOM_SEED": 34789
+      }
+    },
+    {
+      "name": "H2_O_S14_126_a116b90_d512l2r8h4_P127_seed34789",
+      "task": "single",
+      "config": {
+        "P": 127,
+        "ORDER": 2,
+        "D_MODEL": 512,
+        "N_LAYER": 2,
+        "N_HEAD": 4,
+        "MLP_RATIO": 8,
+        "TRAIN_LEN": 16,
+        "OOD_LEN": 16,
+        "DATA_MODE": "full_split",
+        "BATCH_SIZE": 512,
+        "RESHUFFLE_EACH_EPOCH": false,
+        "DROPOUT": 0,
+        "LR": 0.0003,
+        "WEIGHT_DECAY": 1,
+        "GRAD_CLIP_NORM": 1,
+        "FIRST_TASK_WEIGHT": 1,
+        "EPOCHS": 1000,
+        "EVAL_INTERVAL": 1,
+        "EARLY_STOP_ACCURACY": 0.99,
+        "EARLY_STOP_NO_IMPROVE": 3000,
+        "MAX_TRAIN_HOURS": 0.0833,
+        "POS_PROBE": false,
+        "RULES": [
+          [
+            116,
+            90
+          ]
+        ],
+        "RANDOM_SEED": 34789
+      }
+    },
+    {
+      "name": "H2_O_S126_126_a51b111_d512l2r8h4_P127_seed34789",
+      "task": "single",
+      "config": {
+        "P": 127,
+        "ORDER": 2,
+        "D_MODEL": 512,
+        "N_LAYER": 2,
+        "N_HEAD": 4,
+        "MLP_RATIO": 8,
+        "TRAIN_LEN": 16,
+        "OOD_LEN": 16,
+        "DATA_MODE": "full_split",
+        "BATCH_SIZE": 512,
+        "RESHUFFLE_EACH_EPOCH": false,
+        "DROPOUT": 0,
+        "LR": 0.0003,
+        "WEIGHT_DECAY": 1,
+        "GRAD_CLIP_NORM": 1,
+        "FIRST_TASK_WEIGHT": 1,
+        "EPOCHS": 1000,
+        "EVAL_INTERVAL": 1,
+        "EARLY_STOP_ACCURACY": 0.99,
+        "EARLY_STOP_NO_IMPROVE": 3000,
+        "MAX_TRAIN_HOURS": 0.0833,
+        "POS_PROBE": false,
+        "RULES": [
+          [
+            51,
+            111
+          ]
+        ],
+        "RANDOM_SEED": 34789
+      }
+    },
+    {
+      "name": "H2_O_S126_126_a113b51_d512l2r8h4_P127_seed34789",
+      "task": "single",
+      "config": {
+        "P": 127,
+        "ORDER": 2,
+        "D_MODEL": 512,
+        "N_LAYER": 2,
+        "N_HEAD": 4,
+        "MLP_RATIO": 8,
+        "TRAIN_LEN": 16,
+        "OOD_LEN": 16,
+        "DATA_MODE": "full_split",
+        "BATCH_SIZE": 512,
+        "RESHUFFLE_EACH_EPOCH": false,
+        "DROPOUT": 0,
+        "LR": 0.0003,
+        "WEIGHT_DECAY": 1,
+        "GRAD_CLIP_NORM": 1,
+        "FIRST_TASK_WEIGHT": 1,
+        "EPOCHS": 1000,
+        "EVAL_INTERVAL": 1,
+        "EARLY_STOP_ACCURACY": 0.99,
+        "EARLY_STOP_NO_IMPROVE": 3000,
+        "MAX_TRAIN_HOURS": 0.0833,
+        "POS_PROBE": false,
+        "RULES": [
+          [
+            113,
+            51
+          ]
+        ],
+        "RANDOM_SEED": 34789
+      }
+    },
+    {
+      "name": "H2_O_S126_126_a115b108_d512l2r8h4_P127_seed34789",
+      "task": "single",
+      "config": {
+        "P": 127,
+        "ORDER": 2,
+        "D_MODEL": 512,
+        "N_LAYER": 2,
+        "N_HEAD": 4,
+        "MLP_RATIO": 8,
+        "TRAIN_LEN": 16,
+        "OOD_LEN": 16,
+        "DATA_MODE": "full_split",
+        "BATCH_SIZE": 512,
+        "RESHUFFLE_EACH_EPOCH": false,
+        "DROPOUT": 0,
+        "LR": 0.0003,
+        "WEIGHT_DECAY": 1,
+        "GRAD_CLIP_NORM": 1,
+        "FIRST_TASK_WEIGHT": 1,
+        "EPOCHS": 1000,
+        "EVAL_INTERVAL": 1,
+        "EARLY_STOP_ACCURACY": 0.99,
+        "EARLY_STOP_NO_IMPROVE": 3000,
+        "MAX_TRAIN_HOURS": 0.0833,
+        "POS_PROBE": false,
+        "RULES": [
+          [
+            115,
+            108
+          ]
+        ],
+        "RANDOM_SEED": 34789
+      }
+    },
+    {
+      "name": "H2_O_I384_a29b108_d512l2r8h4_P127_seed34789",
+      "task": "single",
+      "config": {
+        "P": 127,
+        "ORDER": 2,
+        "D_MODEL": 512,
+        "N_LAYER": 2,
+        "N_HEAD": 4,
+        "MLP_RATIO": 8,
+        "TRAIN_LEN": 16,
+        "OOD_LEN": 16,
+        "DATA_MODE": "full_split",
+        "BATCH_SIZE": 512,
+        "RESHUFFLE_EACH_EPOCH": false,
+        "DROPOUT": 0,
+        "LR": 0.0003,
+        "WEIGHT_DECAY": 1,
+        "GRAD_CLIP_NORM": 1,
+        "FIRST_TASK_WEIGHT": 1,
+        "EPOCHS": 1000,
+        "EVAL_INTERVAL": 1,
+        "EARLY_STOP_ACCURACY": 0.99,
+        "EARLY_STOP_NO_IMPROVE": 3000,
+        "MAX_TRAIN_HOURS": 0.0833,
+        "POS_PROBE": false,
+        "RULES": [
+          [
+            29,
+            108
+          ]
+        ],
+        "RANDOM_SEED": 34789
+      }
+    },
+    {
+      "name": "H2_O_I384_a88b20_d512l2r8h4_P127_seed34789",
+      "task": "single",
+      "config": {
+        "P": 127,
+        "ORDER": 2,
+        "D_MODEL": 512,
+        "N_LAYER": 2,
+        "N_HEAD": 4,
+        "MLP_RATIO": 8,
+        "TRAIN_LEN": 16,
+        "OOD_LEN": 16,
+        "DATA_MODE": "full_split",
+        "BATCH_SIZE": 512,
+        "RESHUFFLE_EACH_EPOCH": false,
+        "DROPOUT": 0,
+        "LR": 0.0003,
+        "WEIGHT_DECAY": 1,
+        "GRAD_CLIP_NORM": 1,
+        "FIRST_TASK_WEIGHT": 1,
+        "EPOCHS": 1000,
+        "EVAL_INTERVAL": 1,
+        "EARLY_STOP_ACCURACY": 0.99,
+        "EARLY_STOP_NO_IMPROVE": 3000,
+        "MAX_TRAIN_HOURS": 0.0833,
+        "POS_PROBE": false,
+        "RULES": [
+          [
+            88,
+            20
+          ]
+        ],
+        "RANDOM_SEED": 34789
+      }
+    },
+    {
+      "name": "H2_O_I384_a10b20_d512l2r8h4_P127_seed34789",
+      "task": "single",
+      "config": {
+        "P": 127,
+        "ORDER": 2,
+        "D_MODEL": 512,
+        "N_LAYER": 2,
+        "N_HEAD": 4,
+        "MLP_RATIO": 8,
+        "TRAIN_LEN": 16,
+        "OOD_LEN": 16,
+        "DATA_MODE": "full_split",
+        "BATCH_SIZE": 512,
+        "RESHUFFLE_EACH_EPOCH": false,
+        "DROPOUT": 0,
+        "LR": 0.0003,
+        "WEIGHT_DECAY": 1,
+        "GRAD_CLIP_NORM": 1,
+        "FIRST_TASK_WEIGHT": 1,
+        "EPOCHS": 1000,
+        "EVAL_INTERVAL": 1,
+        "EARLY_STOP_ACCURACY": 0.99,
+        "EARLY_STOP_NO_IMPROVE": 3000,
+        "MAX_TRAIN_HOURS": 0.0833,
+        "POS_PROBE": false,
+        "RULES": [
+          [
+            10,
+            20
+          ]
+        ],
+        "RANDOM_SEED": 34789
+      }
+    },
+    {
+      "name": "H2_O_I896_a82b111_d512l2r8h4_P127_seed34789",
+      "task": "single",
+      "config": {
+        "P": 127,
+        "ORDER": 2,
+        "D_MODEL": 512,
+        "N_LAYER": 2,
+        "N_HEAD": 4,
+        "MLP_RATIO": 8,
+        "TRAIN_LEN": 16,
+        "OOD_LEN": 16,
+        "DATA_MODE": "full_split",
+        "BATCH_SIZE": 512,
+        "RESHUFFLE_EACH_EPOCH": false,
+        "DROPOUT": 0,
+        "LR": 0.0003,
+        "WEIGHT_DECAY": 1,
+        "GRAD_CLIP_NORM": 1,
+        "FIRST_TASK_WEIGHT": 1,
+        "EPOCHS": 1000,
+        "EVAL_INTERVAL": 1,
+        "EARLY_STOP_ACCURACY": 0.99,
+        "EARLY_STOP_NO_IMPROVE": 3000,
+        "MAX_TRAIN_HOURS": 0.0833,
+        "POS_PROBE": false,
+        "RULES": [
+          [
+            82,
+            111
+          ]
+        ],
+        "RANDOM_SEED": 34789
+      }
+    },
+    {
+      "name": "H2_O_I896_a17b63_d512l2r8h4_P127_seed34789",
+      "task": "single",
+      "config": {
+        "P": 127,
+        "ORDER": 2,
+        "D_MODEL": 512,
+        "N_LAYER": 2,
+        "N_HEAD": 4,
+        "MLP_RATIO": 8,
+        "TRAIN_LEN": 16,
+        "OOD_LEN": 16,
+        "DATA_MODE": "full_split",
+        "BATCH_SIZE": 512,
+        "RESHUFFLE_EACH_EPOCH": false,
+        "DROPOUT": 0,
+        "LR": 0.0003,
+        "WEIGHT_DECAY": 1,
+        "GRAD_CLIP_NORM": 1,
+        "FIRST_TASK_WEIGHT": 1,
+        "EPOCHS": 1000,
+        "EVAL_INTERVAL": 1,
+        "EARLY_STOP_ACCURACY": 0.99,
+        "EARLY_STOP_NO_IMPROVE": 3000,
+        "MAX_TRAIN_HOURS": 0.0833,
+        "POS_PROBE": false,
+        "RULES": [
+          [
+            17,
+            63
+          ]
+        ],
+        "RANDOM_SEED": 34789
+      }
+    },
+    {
+      "name": "H2_O_I896_a92b63_d512l2r8h4_P127_seed34789",
+      "task": "single",
+      "config": {
+        "P": 127,
+        "ORDER": 2,
+        "D_MODEL": 512,
+        "N_LAYER": 2,
+        "N_HEAD": 4,
+        "MLP_RATIO": 8,
+        "TRAIN_LEN": 16,
+        "OOD_LEN": 16,
+        "DATA_MODE": "full_split",
+        "BATCH_SIZE": 512,
+        "RESHUFFLE_EACH_EPOCH": false,
+        "DROPOUT": 0,
+        "LR": 0.0003,
+        "WEIGHT_DECAY": 1,
+        "GRAD_CLIP_NORM": 1,
+        "FIRST_TASK_WEIGHT": 1,
+        "EPOCHS": 1000,
+        "EVAL_INTERVAL": 1,
+        "EARLY_STOP_ACCURACY": 0.99,
+        "EARLY_STOP_NO_IMPROVE": 3000,
+        "MAX_TRAIN_HOURS": 0.0833,
+        "POS_PROBE": false,
+        "RULES": [
+          [
+            92,
+            63
+          ]
+        ],
+        "RANDOM_SEED": 34789
+      }
+    },
+    {
+      "name": "H2_O_I5376_a24b117_d512l2r8h4_P127_seed34789",
+      "task": "single",
+      "config": {
+        "P": 127,
+        "ORDER": 2,
+        "D_MODEL": 512,
+        "N_LAYER": 2,
+        "N_HEAD": 4,
+        "MLP_RATIO": 8,
+        "TRAIN_LEN": 16,
+        "OOD_LEN": 16,
+        "DATA_MODE": "full_split",
+        "BATCH_SIZE": 512,
+        "RESHUFFLE_EACH_EPOCH": false,
+        "DROPOUT": 0,
+        "LR": 0.0003,
+        "WEIGHT_DECAY": 1,
+        "GRAD_CLIP_NORM": 1,
+        "FIRST_TASK_WEIGHT": 1,
+        "EPOCHS": 1000,
+        "EVAL_INTERVAL": 1,
+        "EARLY_STOP_ACCURACY": 0.99,
+        "EARLY_STOP_NO_IMPROVE": 3000,
+        "MAX_TRAIN_HOURS": 0.0833,
+        "POS_PROBE": false,
+        "RULES": [
+          [
+            24,
+            117
+          ]
+        ],
+        "RANDOM_SEED": 34789
+      }
+    },
+    {
+      "name": "H2_O_I5376_a85b50_d512l2r8h4_P127_seed34789",
+      "task": "single",
+      "config": {
+        "P": 127,
+        "ORDER": 2,
+        "D_MODEL": 512,
+        "N_LAYER": 2,
+        "N_HEAD": 4,
+        "MLP_RATIO": 8,
+        "TRAIN_LEN": 16,
+        "OOD_LEN": 16,
+        "DATA_MODE": "full_split",
+        "BATCH_SIZE": 512,
+        "RESHUFFLE_EACH_EPOCH": false,
+        "DROPOUT": 0,
+        "LR": 0.0003,
+        "WEIGHT_DECAY": 1,
+        "GRAD_CLIP_NORM": 1,
+        "FIRST_TASK_WEIGHT": 1,
+        "EPOCHS": 1000,
+        "EVAL_INTERVAL": 1,
+        "EARLY_STOP_ACCURACY": 0.99,
+        "EARLY_STOP_NO_IMPROVE": 3000,
+        "MAX_TRAIN_HOURS": 0.0833,
+        "POS_PROBE": false,
+        "RULES": [
+          [
+            85,
+            50
+          ]
+        ],
+        "RANDOM_SEED": 34789
+      }
+    },
+    {
+      "name": "H2_O_I5376_a90b117_d512l2r8h4_P127_seed34789",
+      "task": "single",
+      "config": {
+        "P": 127,
+        "ORDER": 2,
+        "D_MODEL": 512,
+        "N_LAYER": 2,
+        "N_HEAD": 4,
+        "MLP_RATIO": 8,
+        "TRAIN_LEN": 16,
+        "OOD_LEN": 16,
+        "DATA_MODE": "full_split",
+        "BATCH_SIZE": 512,
+        "RESHUFFLE_EACH_EPOCH": false,
+        "DROPOUT": 0,
+        "LR": 0.0003,
+        "WEIGHT_DECAY": 1,
+        "GRAD_CLIP_NORM": 1,
+        "FIRST_TASK_WEIGHT": 1,
+        "EPOCHS": 1000,
+        "EVAL_INTERVAL": 1,
+        "EARLY_STOP_ACCURACY": 0.99,
+        "EARLY_STOP_NO_IMPROVE": 3000,
+        "MAX_TRAIN_HOURS": 0.0833,
+        "POS_PROBE": false,
+        "RULES": [
+          [
+            90,
+            117
+          ]
+        ],
+        "RANDOM_SEED": 34789
+      }
+    },
+    {
+      "name": "H2_O_I16128_a90b70_d512l2r8h4_P127_seed34789",
+      "task": "single",
+      "config": {
+        "P": 127,
+        "ORDER": 2,
+        "D_MODEL": 512,
+        "N_LAYER": 2,
+        "N_HEAD": 4,
+        "MLP_RATIO": 8,
+        "TRAIN_LEN": 16,
+        "OOD_LEN": 16,
+        "DATA_MODE": "full_split",
+        "BATCH_SIZE": 512,
+        "RESHUFFLE_EACH_EPOCH": false,
+        "DROPOUT": 0,
+        "LR": 0.0003,
+        "WEIGHT_DECAY": 1,
+        "GRAD_CLIP_NORM": 1,
+        "FIRST_TASK_WEIGHT": 1,
+        "EPOCHS": 1000,
+        "EVAL_INTERVAL": 1,
+        "EARLY_STOP_ACCURACY": 0.99,
+        "EARLY_STOP_NO_IMPROVE": 3000,
+        "MAX_TRAIN_HOURS": 0.0833,
+        "POS_PROBE": false,
+        "RULES": [
+          [
+            90,
+            70
+          ]
+        ],
+        "RANDOM_SEED": 34789
+      }
+    },
+    {
+      "name": "H2_O_I16128_a26b11_d512l2r8h4_P127_seed34789",
+      "task": "single",
+      "config": {
+        "P": 127,
+        "ORDER": 2,
+        "D_MODEL": 512,
+        "N_LAYER": 2,
+        "N_HEAD": 4,
+        "MLP_RATIO": 8,
+        "TRAIN_LEN": 16,
+        "OOD_LEN": 16,
+        "DATA_MODE": "full_split",
+        "BATCH_SIZE": 512,
+        "RESHUFFLE_EACH_EPOCH": false,
+        "DROPOUT": 0,
+        "LR": 0.0003,
+        "WEIGHT_DECAY": 1,
+        "GRAD_CLIP_NORM": 1,
+        "FIRST_TASK_WEIGHT": 1,
+        "EPOCHS": 1000,
+        "EVAL_INTERVAL": 1,
+        "EARLY_STOP_ACCURACY": 0.99,
+        "EARLY_STOP_NO_IMPROVE": 3000,
+        "MAX_TRAIN_HOURS": 0.0833,
+        "POS_PROBE": false,
+        "RULES": [
+          [
+            26,
+            11
+          ]
+        ],
+        "RANDOM_SEED": 34789
+      }
+    },
+    {
+      "name": "H2_O_I16128_a26b74_d512l2r8h4_P127_seed34789",
+      "task": "single",
+      "config": {
+        "P": 127,
+        "ORDER": 2,
+        "D_MODEL": 512,
+        "N_LAYER": 2,
+        "N_HEAD": 4,
+        "MLP_RATIO": 8,
+        "TRAIN_LEN": 16,
+        "OOD_LEN": 16,
+        "DATA_MODE": "full_split",
+        "BATCH_SIZE": 512,
+        "RESHUFFLE_EACH_EPOCH": false,
+        "DROPOUT": 0,
+        "LR": 0.0003,
+        "WEIGHT_DECAY": 1,
+        "GRAD_CLIP_NORM": 1,
+        "FIRST_TASK_WEIGHT": 1,
+        "EPOCHS": 1000,
+        "EVAL_INTERVAL": 1,
+        "EARLY_STOP_ACCURACY": 0.99,
+        "EARLY_STOP_NO_IMPROVE": 3000,
+        "MAX_TRAIN_HOURS": 0.0833,
+        "POS_PROBE": false,
+        "RULES": [
+          [
+            26,
+            74
+          ]
+        ],
+        "RANDOM_SEED": 34789
+      }
+    },
+    {
+      "name": "H3_A44_a44b84_d512l2r8h4_P127_seed34789",
+      "task": "single",
+      "config": {
+        "P": 127,
+        "ORDER": 2,
+        "D_MODEL": 512,
+        "N_LAYER": 2,
+        "N_HEAD": 4,
+        "MLP_RATIO": 8,
+        "TRAIN_LEN": 16,
+        "OOD_LEN": 16,
+        "DATA_MODE": "full_split",
+        "BATCH_SIZE": 512,
+        "RESHUFFLE_EACH_EPOCH": false,
+        "DROPOUT": 0,
+        "LR": 0.0003,
+        "WEIGHT_DECAY": 1,
+        "GRAD_CLIP_NORM": 1,
+        "FIRST_TASK_WEIGHT": 1,
+        "EPOCHS": 1000,
+        "EVAL_INTERVAL": 1,
+        "EARLY_STOP_ACCURACY": 0.99,
+        "EARLY_STOP_NO_IMPROVE": 3000,
+        "MAX_TRAIN_HOURS": 0.0833,
+        "POS_PROBE": false,
+        "RULES": [
+          [
+            44,
+            84
+          ]
+        ],
+        "RANDOM_SEED": 34789
+      }
+    },
+    {
+      "name": "H3_A44_a44b45_d512l2r8h4_P127_seed34789",
+      "task": "single",
+      "config": {
+        "P": 127,
+        "ORDER": 2,
+        "D_MODEL": 512,
+        "N_LAYER": 2,
+        "N_HEAD": 4,
+        "MLP_RATIO": 8,
+        "TRAIN_LEN": 16,
+        "OOD_LEN": 16,
+        "DATA_MODE": "full_split",
+        "BATCH_SIZE": 512,
+        "RESHUFFLE_EACH_EPOCH": false,
+        "DROPOUT": 0,
+        "LR": 0.0003,
+        "WEIGHT_DECAY": 1,
+        "GRAD_CLIP_NORM": 1,
+        "FIRST_TASK_WEIGHT": 1,
+        "EPOCHS": 1000,
+        "EVAL_INTERVAL": 1,
+        "EARLY_STOP_ACCURACY": 0.99,
+        "EARLY_STOP_NO_IMPROVE": 3000,
+        "MAX_TRAIN_HOURS": 0.0833,
+        "POS_PROBE": false,
+        "RULES": [
+          [
+            44,
+            45
+          ]
+        ],
+        "RANDOM_SEED": 34789
+      }
+    },
+    {
+      "name": "H3_A44_a44b59_d512l2r8h4_P127_seed34789",
+      "task": "single",
+      "config": {
+        "P": 127,
+        "ORDER": 2,
+        "D_MODEL": 512,
+        "N_LAYER": 2,
+        "N_HEAD": 4,
+        "MLP_RATIO": 8,
+        "TRAIN_LEN": 16,
+        "OOD_LEN": 16,
+        "DATA_MODE": "full_split",
+        "BATCH_SIZE": 512,
+        "RESHUFFLE_EACH_EPOCH": false,
+        "DROPOUT": 0,
+        "LR": 0.0003,
+        "WEIGHT_DECAY": 1,
+        "GRAD_CLIP_NORM": 1,
+        "FIRST_TASK_WEIGHT": 1,
+        "EPOCHS": 1000,
+        "EVAL_INTERVAL": 1,
+        "EARLY_STOP_ACCURACY": 0.99,
+        "EARLY_STOP_NO_IMPROVE": 3000,
+        "MAX_TRAIN_HOURS": 0.0833,
+        "POS_PROBE": false,
+        "RULES": [
+          [
+            44,
+            59
+          ]
+        ],
+        "RANDOM_SEED": 34789
+      }
+    },
+    {
+      "name": "H3_A66_a66b62_d512l2r8h4_P127_seed34789",
+      "task": "single",
+      "config": {
+        "P": 127,
+        "ORDER": 2,
+        "D_MODEL": 512,
+        "N_LAYER": 2,
+        "N_HEAD": 4,
+        "MLP_RATIO": 8,
+        "TRAIN_LEN": 16,
+        "OOD_LEN": 16,
+        "DATA_MODE": "full_split",
+        "BATCH_SIZE": 512,
+        "RESHUFFLE_EACH_EPOCH": false,
+        "DROPOUT": 0,
+        "LR": 0.0003,
+        "WEIGHT_DECAY": 1,
+        "GRAD_CLIP_NORM": 1,
+        "FIRST_TASK_WEIGHT": 1,
+        "EPOCHS": 1000,
+        "EVAL_INTERVAL": 1,
+        "EARLY_STOP_ACCURACY": 0.99,
+        "EARLY_STOP_NO_IMPROVE": 3000,
+        "MAX_TRAIN_HOURS": 0.0833,
+        "POS_PROBE": false,
+        "RULES": [
+          [
+            66,
+            62
+          ]
+        ],
+        "RANDOM_SEED": 34789
+      }
+    },
+    {
+      "name": "H3_A66_a66b67_d512l2r8h4_P127_seed34789",
+      "task": "single",
+      "config": {
+        "P": 127,
+        "ORDER": 2,
+        "D_MODEL": 512,
+        "N_LAYER": 2,
+        "N_HEAD": 4,
+        "MLP_RATIO": 8,
+        "TRAIN_LEN": 16,
+        "OOD_LEN": 16,
+        "DATA_MODE": "full_split",
+        "BATCH_SIZE": 512,
+        "RESHUFFLE_EACH_EPOCH": false,
+        "DROPOUT": 0,
+        "LR": 0.0003,
+        "WEIGHT_DECAY": 1,
+        "GRAD_CLIP_NORM": 1,
+        "FIRST_TASK_WEIGHT": 1,
+        "EPOCHS": 1000,
+        "EVAL_INTERVAL": 1,
+        "EARLY_STOP_ACCURACY": 0.99,
+        "EARLY_STOP_NO_IMPROVE": 3000,
+        "MAX_TRAIN_HOURS": 0.0833,
+        "POS_PROBE": false,
+        "RULES": [
+          [
+            66,
+            67
+          ]
+        ],
+        "RANDOM_SEED": 34789
+      }
+    },
+    {
+      "name": "H3_A66_a66b85_d512l2r8h4_P127_seed34789",
+      "task": "single",
+      "config": {
+        "P": 127,
+        "ORDER": 2,
+        "D_MODEL": 512,
+        "N_LAYER": 2,
+        "N_HEAD": 4,
+        "MLP_RATIO": 8,
+        "TRAIN_LEN": 16,
+        "OOD_LEN": 16,
+        "DATA_MODE": "full_split",
+        "BATCH_SIZE": 512,
+        "RESHUFFLE_EACH_EPOCH": false,
+        "DROPOUT": 0,
+        "LR": 0.0003,
+        "WEIGHT_DECAY": 1,
+        "GRAD_CLIP_NORM": 1,
+        "FIRST_TASK_WEIGHT": 1,
+        "EPOCHS": 1000,
+        "EVAL_INTERVAL": 1,
+        "EARLY_STOP_ACCURACY": 0.99,
+        "EARLY_STOP_NO_IMPROVE": 3000,
+        "MAX_TRAIN_HOURS": 0.0833,
+        "POS_PROBE": false,
+        "RULES": [
+          [
+            66,
+            85
+          ]
+        ],
+        "RANDOM_SEED": 34789
+      }
+    },
+    {
+      "name": "H3_A92_a92b36_d512l2r8h4_P127_seed34789",
+      "task": "single",
+      "config": {
+        "P": 127,
+        "ORDER": 2,
+        "D_MODEL": 512,
+        "N_LAYER": 2,
+        "N_HEAD": 4,
+        "MLP_RATIO": 8,
+        "TRAIN_LEN": 16,
+        "OOD_LEN": 16,
+        "DATA_MODE": "full_split",
+        "BATCH_SIZE": 512,
+        "RESHUFFLE_EACH_EPOCH": false,
+        "DROPOUT": 0,
+        "LR": 0.0003,
+        "WEIGHT_DECAY": 1,
+        "GRAD_CLIP_NORM": 1,
+        "FIRST_TASK_WEIGHT": 1,
+        "EPOCHS": 1000,
+        "EVAL_INTERVAL": 1,
+        "EARLY_STOP_ACCURACY": 0.99,
+        "EARLY_STOP_NO_IMPROVE": 3000,
+        "MAX_TRAIN_HOURS": 0.0833,
+        "POS_PROBE": false,
+        "RULES": [
+          [
+            92,
+            36
+          ]
+        ],
+        "RANDOM_SEED": 34789
+      }
+    },
+    {
+      "name": "H3_A92_a92b93_d512l2r8h4_P127_seed34789",
+      "task": "single",
+      "config": {
+        "P": 127,
+        "ORDER": 2,
+        "D_MODEL": 512,
+        "N_LAYER": 2,
+        "N_HEAD": 4,
+        "MLP_RATIO": 8,
+        "TRAIN_LEN": 16,
+        "OOD_LEN": 16,
+        "DATA_MODE": "full_split",
+        "BATCH_SIZE": 512,
+        "RESHUFFLE_EACH_EPOCH": false,
+        "DROPOUT": 0,
+        "LR": 0.0003,
+        "WEIGHT_DECAY": 1,
+        "GRAD_CLIP_NORM": 1,
+        "FIRST_TASK_WEIGHT": 1,
+        "EPOCHS": 1000,
+        "EVAL_INTERVAL": 1,
+        "EARLY_STOP_ACCURACY": 0.99,
+        "EARLY_STOP_NO_IMPROVE": 3000,
+        "MAX_TRAIN_HOURS": 0.0833,
+        "POS_PROBE": false,
+        "RULES": [
+          [
+            92,
+            93
+          ]
+        ],
+        "RANDOM_SEED": 34789
+      }
+    },
+    {
+      "name": "H3_A92_a92b56_d512l2r8h4_P127_seed34789",
+      "task": "single",
+      "config": {
+        "P": 127,
+        "ORDER": 2,
+        "D_MODEL": 512,
+        "N_LAYER": 2,
+        "N_HEAD": 4,
+        "MLP_RATIO": 8,
+        "TRAIN_LEN": 16,
+        "OOD_LEN": 16,
+        "DATA_MODE": "full_split",
+        "BATCH_SIZE": 512,
+        "RESHUFFLE_EACH_EPOCH": false,
+        "DROPOUT": 0,
+        "LR": 0.0003,
+        "WEIGHT_DECAY": 1,
+        "GRAD_CLIP_NORM": 1,
+        "FIRST_TASK_WEIGHT": 1,
+        "EPOCHS": 1000,
+        "EVAL_INTERVAL": 1,
+        "EARLY_STOP_ACCURACY": 0.99,
+        "EARLY_STOP_NO_IMPROVE": 3000,
+        "MAX_TRAIN_HOURS": 0.0833,
+        "POS_PROBE": false,
+        "RULES": [
+          [
+            92,
+            56
+          ]
+        ],
+        "RANDOM_SEED": 34789
+      }
+    },
+    {
+      "name": "H1_D_J63_a62b55_d512l2r8h4_P127_seed92831",
+      "task": "single",
+      "config": {
+        "P": 127,
+        "ORDER": 2,
+        "D_MODEL": 512,
+        "N_LAYER": 2,
+        "N_HEAD": 4,
+        "MLP_RATIO": 8,
+        "TRAIN_LEN": 16,
+        "OOD_LEN": 16,
+        "DATA_MODE": "full_split",
+        "BATCH_SIZE": 512,
+        "RESHUFFLE_EACH_EPOCH": false,
+        "DROPOUT": 0,
+        "LR": 0.0003,
+        "WEIGHT_DECAY": 1,
+        "GRAD_CLIP_NORM": 1,
+        "FIRST_TASK_WEIGHT": 1,
+        "EPOCHS": 1000,
+        "EVAL_INTERVAL": 1,
+        "EARLY_STOP_ACCURACY": 0.99,
+        "EARLY_STOP_NO_IMPROVE": 3000,
+        "MAX_TRAIN_HOURS": 0.0833,
+        "POS_PROBE": false,
+        "RULES": [
+          [
+            62,
+            55
+          ]
+        ],
+        "RANDOM_SEED": 92831
+      }
+    },
+    {
+      "name": "H1_D_J63_a124b93_d512l2r8h4_P127_seed92831",
+      "task": "single",
+      "config": {
+        "P": 127,
+        "ORDER": 2,
+        "D_MODEL": 512,
+        "N_LAYER": 2,
+        "N_HEAD": 4,
+        "MLP_RATIO": 8,
+        "TRAIN_LEN": 16,
+        "OOD_LEN": 16,
+        "DATA_MODE": "full_split",
+        "BATCH_SIZE": 512,
+        "RESHUFFLE_EACH_EPOCH": false,
+        "DROPOUT": 0,
+        "LR": 0.0003,
+        "WEIGHT_DECAY": 1,
+        "GRAD_CLIP_NORM": 1,
+        "FIRST_TASK_WEIGHT": 1,
+        "EPOCHS": 1000,
+        "EVAL_INTERVAL": 1,
+        "EARLY_STOP_ACCURACY": 0.99,
+        "EARLY_STOP_NO_IMPROVE": 3000,
+        "MAX_TRAIN_HOURS": 0.0833,
+        "POS_PROBE": false,
+        "RULES": [
+          [
+            124,
+            93
+          ]
+        ],
+        "RANDOM_SEED": 92831
+      }
+    },
+    {
+      "name": "H1_D_J63_a30b29_d512l2r8h4_P127_seed92831",
+      "task": "single",
+      "config": {
+        "P": 127,
+        "ORDER": 2,
+        "D_MODEL": 512,
+        "N_LAYER": 2,
+        "N_HEAD": 4,
+        "MLP_RATIO": 8,
+        "TRAIN_LEN": 16,
+        "OOD_LEN": 16,
+        "DATA_MODE": "full_split",
+        "BATCH_SIZE": 512,
+        "RESHUFFLE_EACH_EPOCH": false,
+        "DROPOUT": 0,
+        "LR": 0.0003,
+        "WEIGHT_DECAY": 1,
+        "GRAD_CLIP_NORM": 1,
+        "FIRST_TASK_WEIGHT": 1,
+        "EPOCHS": 1000,
+        "EVAL_INTERVAL": 1,
+        "EARLY_STOP_ACCURACY": 0.99,
+        "EARLY_STOP_NO_IMPROVE": 3000,
+        "MAX_TRAIN_HOURS": 0.0833,
+        "POS_PROBE": false,
+        "RULES": [
+          [
+            30,
+            29
+          ]
+        ],
+        "RANDOM_SEED": 92831
+      }
+    },
+    {
+      "name": "H1_D_J126_a65b55_d512l2r8h4_P127_seed92831",
+      "task": "single",
+      "config": {
+        "P": 127,
+        "ORDER": 2,
+        "D_MODEL": 512,
+        "N_LAYER": 2,
+        "N_HEAD": 4,
+        "MLP_RATIO": 8,
+        "TRAIN_LEN": 16,
+        "OOD_LEN": 16,
+        "DATA_MODE": "full_split",
+        "BATCH_SIZE": 512,
+        "RESHUFFLE_EACH_EPOCH": false,
+        "DROPOUT": 0,
+        "LR": 0.0003,
+        "WEIGHT_DECAY": 1,
+        "GRAD_CLIP_NORM": 1,
+        "FIRST_TASK_WEIGHT": 1,
+        "EPOCHS": 1000,
+        "EVAL_INTERVAL": 1,
+        "EARLY_STOP_ACCURACY": 0.99,
+        "EARLY_STOP_NO_IMPROVE": 3000,
+        "MAX_TRAIN_HOURS": 0.0833,
+        "POS_PROBE": false,
+        "RULES": [
+          [
+            65,
+            55
+          ]
+        ],
+        "RANDOM_SEED": 92831
+      }
+    },
+    {
+      "name": "H1_D_J126_a3b93_d512l2r8h4_P127_seed92831",
+      "task": "single",
+      "config": {
+        "P": 127,
+        "ORDER": 2,
+        "D_MODEL": 512,
+        "N_LAYER": 2,
+        "N_HEAD": 4,
+        "MLP_RATIO": 8,
+        "TRAIN_LEN": 16,
+        "OOD_LEN": 16,
+        "DATA_MODE": "full_split",
+        "BATCH_SIZE": 512,
+        "RESHUFFLE_EACH_EPOCH": false,
+        "DROPOUT": 0,
+        "LR": 0.0003,
+        "WEIGHT_DECAY": 1,
+        "GRAD_CLIP_NORM": 1,
+        "FIRST_TASK_WEIGHT": 1,
+        "EPOCHS": 1000,
+        "EVAL_INTERVAL": 1,
+        "EARLY_STOP_ACCURACY": 0.99,
+        "EARLY_STOP_NO_IMPROVE": 3000,
+        "MAX_TRAIN_HOURS": 0.0833,
+        "POS_PROBE": false,
+        "RULES": [
+          [
+            3,
+            93
+          ]
+        ],
+        "RANDOM_SEED": 92831
+      }
+    },
+    {
+      "name": "H1_D_J126_a97b29_d512l2r8h4_P127_seed92831",
+      "task": "single",
+      "config": {
+        "P": 127,
+        "ORDER": 2,
+        "D_MODEL": 512,
+        "N_LAYER": 2,
+        "N_HEAD": 4,
+        "MLP_RATIO": 8,
+        "TRAIN_LEN": 16,
+        "OOD_LEN": 16,
+        "DATA_MODE": "full_split",
+        "BATCH_SIZE": 512,
+        "RESHUFFLE_EACH_EPOCH": false,
+        "DROPOUT": 0,
+        "LR": 0.0003,
+        "WEIGHT_DECAY": 1,
+        "GRAD_CLIP_NORM": 1,
+        "FIRST_TASK_WEIGHT": 1,
+        "EPOCHS": 1000,
+        "EVAL_INTERVAL": 1,
+        "EARLY_STOP_ACCURACY": 0.99,
+        "EARLY_STOP_NO_IMPROVE": 3000,
+        "MAX_TRAIN_HOURS": 0.0833,
+        "POS_PROBE": false,
+        "RULES": [
+          [
+            97,
+            29
+          ]
+        ],
+        "RANDOM_SEED": 92831
+      }
+    },
+    {
+      "name": "H1_R1_S1_42_a67b61_d512l2r8h4_P127_seed92831",
+      "task": "single",
+      "config": {
+        "P": 127,
+        "ORDER": 2,
+        "D_MODEL": 512,
+        "N_LAYER": 2,
+        "N_HEAD": 4,
+        "MLP_RATIO": 8,
+        "TRAIN_LEN": 16,
+        "OOD_LEN": 16,
+        "DATA_MODE": "full_split",
+        "BATCH_SIZE": 512,
+        "RESHUFFLE_EACH_EPOCH": false,
+        "DROPOUT": 0,
+        "LR": 0.0003,
+        "WEIGHT_DECAY": 1,
+        "GRAD_CLIP_NORM": 1,
+        "FIRST_TASK_WEIGHT": 1,
+        "EPOCHS": 1000,
+        "EVAL_INTERVAL": 1,
+        "EARLY_STOP_ACCURACY": 0.99,
+        "EARLY_STOP_NO_IMPROVE": 3000,
+        "MAX_TRAIN_HOURS": 0.0833,
+        "POS_PROBE": false,
+        "RULES": [
+          [
+            67,
+            61
+          ]
+        ],
+        "RANDOM_SEED": 92831
+      }
+    },
+    {
+      "name": "H1_R1_S1_42_a6b122_d512l2r8h4_P127_seed92831",
+      "task": "single",
+      "config": {
+        "P": 127,
+        "ORDER": 2,
+        "D_MODEL": 512,
+        "N_LAYER": 2,
+        "N_HEAD": 4,
+        "MLP_RATIO": 8,
+        "TRAIN_LEN": 16,
+        "OOD_LEN": 16,
+        "DATA_MODE": "full_split",
+        "BATCH_SIZE": 512,
+        "RESHUFFLE_EACH_EPOCH": false,
+        "DROPOUT": 0,
+        "LR": 0.0003,
+        "WEIGHT_DECAY": 1,
+        "GRAD_CLIP_NORM": 1,
+        "FIRST_TASK_WEIGHT": 1,
+        "EPOCHS": 1000,
+        "EVAL_INTERVAL": 1,
+        "EARLY_STOP_ACCURACY": 0.99,
+        "EARLY_STOP_NO_IMPROVE": 3000,
+        "MAX_TRAIN_HOURS": 0.0833,
+        "POS_PROBE": false,
+        "RULES": [
+          [
+            6,
+            122
+          ]
+        ],
+        "RANDOM_SEED": 92831
+      }
+    },
+    {
+      "name": "H1_R1_S1_42_a103b25_d512l2r8h4_P127_seed92831",
+      "task": "single",
+      "config": {
+        "P": 127,
+        "ORDER": 2,
+        "D_MODEL": 512,
+        "N_LAYER": 2,
+        "N_HEAD": 4,
+        "MLP_RATIO": 8,
+        "TRAIN_LEN": 16,
+        "OOD_LEN": 16,
+        "DATA_MODE": "full_split",
+        "BATCH_SIZE": 512,
+        "RESHUFFLE_EACH_EPOCH": false,
+        "DROPOUT": 0,
+        "LR": 0.0003,
+        "WEIGHT_DECAY": 1,
+        "GRAD_CLIP_NORM": 1,
+        "FIRST_TASK_WEIGHT": 1,
+        "EPOCHS": 1000,
+        "EVAL_INTERVAL": 1,
+        "EARLY_STOP_ACCURACY": 0.99,
+        "EARLY_STOP_NO_IMPROVE": 3000,
+        "MAX_TRAIN_HOURS": 0.0833,
+        "POS_PROBE": false,
+        "RULES": [
+          [
+            103,
+            25
+          ]
+        ],
+        "RANDOM_SEED": 92831
+      }
+    },
+    {
+      "name": "H1_R1_S1_126_a4b124_d512l2r8h4_P127_seed92831",
+      "task": "single",
+      "config": {
+        "P": 127,
+        "ORDER": 2,
+        "D_MODEL": 512,
+        "N_LAYER": 2,
+        "N_HEAD": 4,
+        "MLP_RATIO": 8,
+        "TRAIN_LEN": 16,
+        "OOD_LEN": 16,
+        "DATA_MODE": "full_split",
+        "BATCH_SIZE": 512,
+        "RESHUFFLE_EACH_EPOCH": false,
+        "DROPOUT": 0,
+        "LR": 0.0003,
+        "WEIGHT_DECAY": 1,
+        "GRAD_CLIP_NORM": 1,
+        "FIRST_TASK_WEIGHT": 1,
+        "EPOCHS": 1000,
+        "EVAL_INTERVAL": 1,
+        "EARLY_STOP_ACCURACY": 0.99,
+        "EARLY_STOP_NO_IMPROVE": 3000,
+        "MAX_TRAIN_HOURS": 0.0833,
+        "POS_PROBE": false,
+        "RULES": [
+          [
+            4,
+            124
+          ]
+        ],
+        "RANDOM_SEED": 92831
+      }
+    },
+    {
+      "name": "H1_R1_S1_126_a68b60_d512l2r8h4_P127_seed92831",
+      "task": "single",
+      "config": {
+        "P": 127,
+        "ORDER": 2,
+        "D_MODEL": 512,
+        "N_LAYER": 2,
+        "N_HEAD": 4,
+        "MLP_RATIO": 8,
+        "TRAIN_LEN": 16,
+        "OOD_LEN": 16,
+        "DATA_MODE": "full_split",
+        "BATCH_SIZE": 512,
+        "RESHUFFLE_EACH_EPOCH": false,
+        "DROPOUT": 0,
+        "LR": 0.0003,
+        "WEIGHT_DECAY": 1,
+        "GRAD_CLIP_NORM": 1,
+        "FIRST_TASK_WEIGHT": 1,
+        "EPOCHS": 1000,
+        "EVAL_INTERVAL": 1,
+        "EARLY_STOP_ACCURACY": 0.99,
+        "EARLY_STOP_NO_IMPROVE": 3000,
+        "MAX_TRAIN_HOURS": 0.0833,
+        "POS_PROBE": false,
+        "RULES": [
+          [
+            68,
+            60
+          ]
+        ],
+        "RANDOM_SEED": 92831
+      }
+    },
+    {
+      "name": "H1_R1_S1_126_a98b30_d512l2r8h4_P127_seed92831",
+      "task": "single",
+      "config": {
+        "P": 127,
+        "ORDER": 2,
+        "D_MODEL": 512,
+        "N_LAYER": 2,
+        "N_HEAD": 4,
+        "MLP_RATIO": 8,
+        "TRAIN_LEN": 16,
+        "OOD_LEN": 16,
+        "DATA_MODE": "full_split",
+        "BATCH_SIZE": 512,
+        "RESHUFFLE_EACH_EPOCH": false,
+        "DROPOUT": 0,
+        "LR": 0.0003,
+        "WEIGHT_DECAY": 1,
+        "GRAD_CLIP_NORM": 1,
+        "FIRST_TASK_WEIGHT": 1,
+        "EPOCHS": 1000,
+        "EVAL_INTERVAL": 1,
+        "EARLY_STOP_ACCURACY": 0.99,
+        "EARLY_STOP_NO_IMPROVE": 3000,
+        "MAX_TRAIN_HOURS": 0.0833,
+        "POS_PROBE": false,
+        "RULES": [
+          [
+            98,
+            30
+          ]
+        ],
+        "RANDOM_SEED": 92831
+      }
+    },
+    {
+      "name": "H1_Rm1_S2_42_a65b66_d512l2r8h4_P127_seed92831",
+      "task": "single",
+      "config": {
+        "P": 127,
+        "ORDER": 2,
+        "D_MODEL": 512,
+        "N_LAYER": 2,
+        "N_HEAD": 4,
+        "MLP_RATIO": 8,
+        "TRAIN_LEN": 16,
+        "OOD_LEN": 16,
+        "DATA_MODE": "full_split",
+        "BATCH_SIZE": 512,
+        "RESHUFFLE_EACH_EPOCH": false,
+        "DROPOUT": 0,
+        "LR": 0.0003,
+        "WEIGHT_DECAY": 1,
+        "GRAD_CLIP_NORM": 1,
+        "FIRST_TASK_WEIGHT": 1,
+        "EPOCHS": 1000,
+        "EVAL_INTERVAL": 1,
+        "EARLY_STOP_ACCURACY": 0.99,
+        "EARLY_STOP_NO_IMPROVE": 3000,
+        "MAX_TRAIN_HOURS": 0.0833,
+        "POS_PROBE": false,
+        "RULES": [
+          [
+            65,
+            66
+          ]
+        ],
+        "RANDOM_SEED": 92831
+      }
+    },
+    {
+      "name": "H1_Rm1_S2_42_a4b5_d512l2r8h4_P127_seed92831",
+      "task": "single",
+      "config": {
+        "P": 127,
+        "ORDER": 2,
+        "D_MODEL": 512,
+        "N_LAYER": 2,
+        "N_HEAD": 4,
+        "MLP_RATIO": 8,
+        "TRAIN_LEN": 16,
+        "OOD_LEN": 16,
+        "DATA_MODE": "full_split",
+        "BATCH_SIZE": 512,
+        "RESHUFFLE_EACH_EPOCH": false,
+        "DROPOUT": 0,
+        "LR": 0.0003,
+        "WEIGHT_DECAY": 1,
+        "GRAD_CLIP_NORM": 1,
+        "FIRST_TASK_WEIGHT": 1,
+        "EPOCHS": 1000,
+        "EVAL_INTERVAL": 1,
+        "EARLY_STOP_ACCURACY": 0.99,
+        "EARLY_STOP_NO_IMPROVE": 3000,
+        "MAX_TRAIN_HOURS": 0.0833,
+        "POS_PROBE": false,
+        "RULES": [
+          [
+            4,
+            5
+          ]
+        ],
+        "RANDOM_SEED": 92831
+      }
+    },
+    {
+      "name": "H1_Rm1_S2_42_a101b102_d512l2r8h4_P127_seed92831",
+      "task": "single",
+      "config": {
+        "P": 127,
+        "ORDER": 2,
+        "D_MODEL": 512,
+        "N_LAYER": 2,
+        "N_HEAD": 4,
+        "MLP_RATIO": 8,
+        "TRAIN_LEN": 16,
+        "OOD_LEN": 16,
+        "DATA_MODE": "full_split",
+        "BATCH_SIZE": 512,
+        "RESHUFFLE_EACH_EPOCH": false,
+        "DROPOUT": 0,
+        "LR": 0.0003,
+        "WEIGHT_DECAY": 1,
+        "GRAD_CLIP_NORM": 1,
+        "FIRST_TASK_WEIGHT": 1,
+        "EPOCHS": 1000,
+        "EVAL_INTERVAL": 1,
+        "EARLY_STOP_ACCURACY": 0.99,
+        "EARLY_STOP_NO_IMPROVE": 3000,
+        "MAX_TRAIN_HOURS": 0.0833,
+        "POS_PROBE": false,
+        "RULES": [
+          [
+            101,
+            102
+          ]
+        ],
+        "RANDOM_SEED": 92831
+      }
+    },
+    {
+      "name": "H1_Rm1_S2_126_a2b3_d512l2r8h4_P127_seed92831",
+      "task": "single",
+      "config": {
+        "P": 127,
+        "ORDER": 2,
+        "D_MODEL": 512,
+        "N_LAYER": 2,
+        "N_HEAD": 4,
+        "MLP_RATIO": 8,
+        "TRAIN_LEN": 16,
+        "OOD_LEN": 16,
+        "DATA_MODE": "full_split",
+        "BATCH_SIZE": 512,
+        "RESHUFFLE_EACH_EPOCH": false,
+        "DROPOUT": 0,
+        "LR": 0.0003,
+        "WEIGHT_DECAY": 1,
+        "GRAD_CLIP_NORM": 1,
+        "FIRST_TASK_WEIGHT": 1,
+        "EPOCHS": 1000,
+        "EVAL_INTERVAL": 1,
+        "EARLY_STOP_ACCURACY": 0.99,
+        "EARLY_STOP_NO_IMPROVE": 3000,
+        "MAX_TRAIN_HOURS": 0.0833,
+        "POS_PROBE": false,
+        "RULES": [
+          [
+            2,
+            3
+          ]
+        ],
+        "RANDOM_SEED": 92831
+      }
+    },
+    {
+      "name": "H1_Rm1_S2_126_a52b53_d512l2r8h4_P127_seed92831",
+      "task": "single",
+      "config": {
+        "P": 127,
+        "ORDER": 2,
+        "D_MODEL": 512,
+        "N_LAYER": 2,
+        "N_HEAD": 4,
+        "MLP_RATIO": 8,
+        "TRAIN_LEN": 16,
+        "OOD_LEN": 16,
+        "DATA_MODE": "full_split",
+        "BATCH_SIZE": 512,
+        "RESHUFFLE_EACH_EPOCH": false,
+        "DROPOUT": 0,
+        "LR": 0.0003,
+        "WEIGHT_DECAY": 1,
+        "GRAD_CLIP_NORM": 1,
+        "FIRST_TASK_WEIGHT": 1,
+        "EPOCHS": 1000,
+        "EVAL_INTERVAL": 1,
+        "EARLY_STOP_ACCURACY": 0.99,
+        "EARLY_STOP_NO_IMPROVE": 3000,
+        "MAX_TRAIN_HOURS": 0.0833,
+        "POS_PROBE": false,
+        "RULES": [
+          [
+            52,
+            53
+          ]
+        ],
+        "RANDOM_SEED": 92831
+      }
+    },
+    {
+      "name": "H1_Rm1_S2_126_a96b97_d512l2r8h4_P127_seed92831",
+      "task": "single",
+      "config": {
+        "P": 127,
+        "ORDER": 2,
+        "D_MODEL": 512,
+        "N_LAYER": 2,
+        "N_HEAD": 4,
+        "MLP_RATIO": 8,
+        "TRAIN_LEN": 16,
+        "OOD_LEN": 16,
+        "DATA_MODE": "full_split",
+        "BATCH_SIZE": 512,
+        "RESHUFFLE_EACH_EPOCH": false,
+        "DROPOUT": 0,
+        "LR": 0.0003,
+        "WEIGHT_DECAY": 1,
+        "GRAD_CLIP_NORM": 1,
+        "FIRST_TASK_WEIGHT": 1,
+        "EPOCHS": 1000,
+        "EVAL_INTERVAL": 1,
+        "EARLY_STOP_ACCURACY": 0.99,
+        "EARLY_STOP_NO_IMPROVE": 3000,
+        "MAX_TRAIN_HOURS": 0.0833,
+        "POS_PROBE": false,
+        "RULES": [
+          [
+            96,
+            97
+          ]
+        ],
+        "RANDOM_SEED": 92831
+      }
+    },
+    {
+      "name": "H1_O_S18_126_a13b10_d512l2r8h4_P127_seed92831",
+      "task": "single",
+      "config": {
+        "P": 127,
+        "ORDER": 2,
+        "D_MODEL": 512,
+        "N_LAYER": 2,
+        "N_HEAD": 4,
+        "MLP_RATIO": 8,
+        "TRAIN_LEN": 16,
+        "OOD_LEN": 16,
+        "DATA_MODE": "full_split",
+        "BATCH_SIZE": 512,
+        "RESHUFFLE_EACH_EPOCH": false,
+        "DROPOUT": 0,
+        "LR": 0.0003,
+        "WEIGHT_DECAY": 1,
+        "GRAD_CLIP_NORM": 1,
+        "FIRST_TASK_WEIGHT": 1,
+        "EPOCHS": 1000,
+        "EVAL_INTERVAL": 1,
+        "EARLY_STOP_ACCURACY": 0.99,
+        "EARLY_STOP_NO_IMPROVE": 3000,
+        "MAX_TRAIN_HOURS": 0.0833,
+        "POS_PROBE": false,
+        "RULES": [
+          [
+            13,
+            10
+          ]
+        ],
+        "RANDOM_SEED": 92831
+      }
+    },
+    {
+      "name": "H1_O_S18_126_a77b125_d512l2r8h4_P127_seed92831",
+      "task": "single",
+      "config": {
+        "P": 127,
+        "ORDER": 2,
+        "D_MODEL": 512,
+        "N_LAYER": 2,
+        "N_HEAD": 4,
+        "MLP_RATIO": 8,
+        "TRAIN_LEN": 16,
+        "OOD_LEN": 16,
+        "DATA_MODE": "full_split",
+        "BATCH_SIZE": 512,
+        "RESHUFFLE_EACH_EPOCH": false,
+        "DROPOUT": 0,
+        "LR": 0.0003,
+        "WEIGHT_DECAY": 1,
+        "GRAD_CLIP_NORM": 1,
+        "FIRST_TASK_WEIGHT": 1,
+        "EPOCHS": 1000,
+        "EVAL_INTERVAL": 1,
+        "EARLY_STOP_ACCURACY": 0.99,
+        "EARLY_STOP_NO_IMPROVE": 3000,
+        "MAX_TRAIN_HOURS": 0.0833,
+        "POS_PROBE": false,
+        "RULES": [
+          [
+            77,
+            125
+          ]
+        ],
+        "RANDOM_SEED": 92831
+      }
+    },
+    {
+      "name": "H1_O_S18_126_a45b77_d512l2r8h4_P127_seed92831",
+      "task": "single",
+      "config": {
+        "P": 127,
+        "ORDER": 2,
+        "D_MODEL": 512,
+        "N_LAYER": 2,
+        "N_HEAD": 4,
+        "MLP_RATIO": 8,
+        "TRAIN_LEN": 16,
+        "OOD_LEN": 16,
+        "DATA_MODE": "full_split",
+        "BATCH_SIZE": 512,
+        "RESHUFFLE_EACH_EPOCH": false,
+        "DROPOUT": 0,
+        "LR": 0.0003,
+        "WEIGHT_DECAY": 1,
+        "GRAD_CLIP_NORM": 1,
+        "FIRST_TASK_WEIGHT": 1,
+        "EPOCHS": 1000,
+        "EVAL_INTERVAL": 1,
+        "EARLY_STOP_ACCURACY": 0.99,
+        "EARLY_STOP_NO_IMPROVE": 3000,
+        "MAX_TRAIN_HOURS": 0.0833,
+        "POS_PROBE": false,
+        "RULES": [
+          [
+            45,
+            77
+          ]
+        ],
+        "RANDOM_SEED": 92831
+      }
+    },
+    {
+      "name": "H1_O_S42_126_a5b3_d512l2r8h4_P127_seed92831",
+      "task": "single",
+      "config": {
+        "P": 127,
+        "ORDER": 2,
+        "D_MODEL": 512,
+        "N_LAYER": 2,
+        "N_HEAD": 4,
+        "MLP_RATIO": 8,
+        "TRAIN_LEN": 16,
+        "OOD_LEN": 16,
+        "DATA_MODE": "full_split",
+        "BATCH_SIZE": 512,
+        "RESHUFFLE_EACH_EPOCH": false,
+        "DROPOUT": 0,
+        "LR": 0.0003,
+        "WEIGHT_DECAY": 1,
+        "GRAD_CLIP_NORM": 1,
+        "FIRST_TASK_WEIGHT": 1,
+        "EPOCHS": 1000,
+        "EVAL_INTERVAL": 1,
+        "EARLY_STOP_ACCURACY": 0.99,
+        "EARLY_STOP_NO_IMPROVE": 3000,
+        "MAX_TRAIN_HOURS": 0.0833,
+        "POS_PROBE": false,
+        "RULES": [
+          [
+            5,
+            3
+          ]
+        ],
+        "RANDOM_SEED": 92831
+      }
+    },
+    {
+      "name": "H1_O_S42_126_a25b56_d512l2r8h4_P127_seed92831",
+      "task": "single",
+      "config": {
+        "P": 127,
+        "ORDER": 2,
+        "D_MODEL": 512,
+        "N_LAYER": 2,
+        "N_HEAD": 4,
+        "MLP_RATIO": 8,
+        "TRAIN_LEN": 16,
+        "OOD_LEN": 16,
+        "DATA_MODE": "full_split",
+        "BATCH_SIZE": 512,
+        "RESHUFFLE_EACH_EPOCH": false,
+        "DROPOUT": 0,
+        "LR": 0.0003,
+        "WEIGHT_DECAY": 1,
+        "GRAD_CLIP_NORM": 1,
+        "FIRST_TASK_WEIGHT": 1,
+        "EPOCHS": 1000,
+        "EVAL_INTERVAL": 1,
+        "EARLY_STOP_ACCURACY": 0.99,
+        "EARLY_STOP_NO_IMPROVE": 3000,
+        "MAX_TRAIN_HOURS": 0.0833,
+        "POS_PROBE": false,
+        "RULES": [
+          [
+            25,
+            56
+          ]
+        ],
+        "RANDOM_SEED": 92831
+      }
+    },
+    {
+      "name": "H1_O_S42_126_a62b59_d512l2r8h4_P127_seed92831",
+      "task": "single",
+      "config": {
+        "P": 127,
+        "ORDER": 2,
+        "D_MODEL": 512,
+        "N_LAYER": 2,
+        "N_HEAD": 4,
+        "MLP_RATIO": 8,
+        "TRAIN_LEN": 16,
+        "OOD_LEN": 16,
+        "DATA_MODE": "full_split",
+        "BATCH_SIZE": 512,
+        "RESHUFFLE_EACH_EPOCH": false,
+        "DROPOUT": 0,
+        "LR": 0.0003,
+        "WEIGHT_DECAY": 1,
+        "GRAD_CLIP_NORM": 1,
+        "FIRST_TASK_WEIGHT": 1,
+        "EPOCHS": 1000,
+        "EVAL_INTERVAL": 1,
+        "EARLY_STOP_ACCURACY": 0.99,
+        "EARLY_STOP_NO_IMPROVE": 3000,
+        "MAX_TRAIN_HOURS": 0.0833,
+        "POS_PROBE": false,
+        "RULES": [
+          [
+            62,
+            59
+          ]
+        ],
+        "RANDOM_SEED": 92831
+      }
+    },
+    {
+      "name": "H1_O_S42_126_a67b65_d512l2r8h4_P127_seed92831",
+      "task": "single",
+      "config": {
+        "P": 127,
+        "ORDER": 2,
+        "D_MODEL": 512,
+        "N_LAYER": 2,
+        "N_HEAD": 4,
+        "MLP_RATIO": 8,
+        "TRAIN_LEN": 16,
+        "OOD_LEN": 16,
+        "DATA_MODE": "full_split",
+        "BATCH_SIZE": 512,
+        "RESHUFFLE_EACH_EPOCH": false,
+        "DROPOUT": 0,
+        "LR": 0.0003,
+        "WEIGHT_DECAY": 1,
+        "GRAD_CLIP_NORM": 1,
+        "FIRST_TASK_WEIGHT": 1,
+        "EPOCHS": 1000,
+        "EVAL_INTERVAL": 1,
+        "EARLY_STOP_ACCURACY": 0.99,
+        "EARLY_STOP_NO_IMPROVE": 3000,
+        "MAX_TRAIN_HOURS": 0.0833,
+        "POS_PROBE": false,
+        "RULES": [
+          [
+            67,
+            65
+          ]
+        ],
+        "RANDOM_SEED": 92831
+      }
+    },
+    {
+      "name": "H2_O_S6_126_a85b97_d512l2r8h4_P127_seed92831",
+      "task": "single",
+      "config": {
+        "P": 127,
+        "ORDER": 2,
+        "D_MODEL": 512,
+        "N_LAYER": 2,
+        "N_HEAD": 4,
+        "MLP_RATIO": 8,
+        "TRAIN_LEN": 16,
+        "OOD_LEN": 16,
+        "DATA_MODE": "full_split",
+        "BATCH_SIZE": 512,
+        "RESHUFFLE_EACH_EPOCH": false,
+        "DROPOUT": 0,
+        "LR": 0.0003,
+        "WEIGHT_DECAY": 1,
+        "GRAD_CLIP_NORM": 1,
+        "FIRST_TASK_WEIGHT": 1,
+        "EPOCHS": 1000,
+        "EVAL_INTERVAL": 1,
+        "EARLY_STOP_ACCURACY": 0.99,
+        "EARLY_STOP_NO_IMPROVE": 3000,
+        "MAX_TRAIN_HOURS": 0.0833,
+        "POS_PROBE": false,
+        "RULES": [
+          [
+            85,
+            97
+          ]
+        ],
+        "RANDOM_SEED": 92831
+      }
+    },
+    {
+      "name": "H2_O_S6_126_a29b23_d512l2r8h4_P127_seed92831",
+      "task": "single",
+      "config": {
+        "P": 127,
+        "ORDER": 2,
+        "D_MODEL": 512,
+        "N_LAYER": 2,
+        "N_HEAD": 4,
+        "MLP_RATIO": 8,
+        "TRAIN_LEN": 16,
+        "OOD_LEN": 16,
+        "DATA_MODE": "full_split",
+        "BATCH_SIZE": 512,
+        "RESHUFFLE_EACH_EPOCH": false,
+        "DROPOUT": 0,
+        "LR": 0.0003,
+        "WEIGHT_DECAY": 1,
+        "GRAD_CLIP_NORM": 1,
+        "FIRST_TASK_WEIGHT": 1,
+        "EPOCHS": 1000,
+        "EVAL_INTERVAL": 1,
+        "EARLY_STOP_ACCURACY": 0.99,
+        "EARLY_STOP_NO_IMPROVE": 3000,
+        "MAX_TRAIN_HOURS": 0.0833,
+        "POS_PROBE": false,
+        "RULES": [
+          [
+            29,
+            23
+          ]
+        ],
+        "RANDOM_SEED": 92831
+      }
+    },
+    {
+      "name": "H2_O_S6_126_a90b39_d512l2r8h4_P127_seed92831",
+      "task": "single",
+      "config": {
+        "P": 127,
+        "ORDER": 2,
+        "D_MODEL": 512,
+        "N_LAYER": 2,
+        "N_HEAD": 4,
+        "MLP_RATIO": 8,
+        "TRAIN_LEN": 16,
+        "OOD_LEN": 16,
+        "DATA_MODE": "full_split",
+        "BATCH_SIZE": 512,
+        "RESHUFFLE_EACH_EPOCH": false,
+        "DROPOUT": 0,
+        "LR": 0.0003,
+        "WEIGHT_DECAY": 1,
+        "GRAD_CLIP_NORM": 1,
+        "FIRST_TASK_WEIGHT": 1,
+        "EPOCHS": 1000,
+        "EVAL_INTERVAL": 1,
+        "EARLY_STOP_ACCURACY": 0.99,
+        "EARLY_STOP_NO_IMPROVE": 3000,
+        "MAX_TRAIN_HOURS": 0.0833,
+        "POS_PROBE": false,
+        "RULES": [
+          [
+            90,
+            39
+          ]
+        ],
+        "RANDOM_SEED": 92831
+      }
+    },
+    {
+      "name": "H2_O_S14_126_a51b93_d512l2r8h4_P127_seed92831",
+      "task": "single",
+      "config": {
+        "P": 127,
+        "ORDER": 2,
+        "D_MODEL": 512,
+        "N_LAYER": 2,
+        "N_HEAD": 4,
+        "MLP_RATIO": 8,
+        "TRAIN_LEN": 16,
+        "OOD_LEN": 16,
+        "DATA_MODE": "full_split",
+        "BATCH_SIZE": 512,
+        "RESHUFFLE_EACH_EPOCH": false,
+        "DROPOUT": 0,
+        "LR": 0.0003,
+        "WEIGHT_DECAY": 1,
+        "GRAD_CLIP_NORM": 1,
+        "FIRST_TASK_WEIGHT": 1,
+        "EPOCHS": 1000,
+        "EVAL_INTERVAL": 1,
+        "EARLY_STOP_ACCURACY": 0.99,
+        "EARLY_STOP_NO_IMPROVE": 3000,
+        "MAX_TRAIN_HOURS": 0.0833,
+        "POS_PROBE": false,
+        "RULES": [
+          [
+            51,
+            93
+          ]
+        ],
+        "RANDOM_SEED": 92831
+      }
+    },
+    {
+      "name": "H2_O_S14_126_a111b24_d512l2r8h4_P127_seed92831",
+      "task": "single",
+      "config": {
+        "P": 127,
+        "ORDER": 2,
+        "D_MODEL": 512,
+        "N_LAYER": 2,
+        "N_HEAD": 4,
+        "MLP_RATIO": 8,
+        "TRAIN_LEN": 16,
+        "OOD_LEN": 16,
+        "DATA_MODE": "full_split",
+        "BATCH_SIZE": 512,
+        "RESHUFFLE_EACH_EPOCH": false,
+        "DROPOUT": 0,
+        "LR": 0.0003,
+        "WEIGHT_DECAY": 1,
+        "GRAD_CLIP_NORM": 1,
+        "FIRST_TASK_WEIGHT": 1,
+        "EPOCHS": 1000,
+        "EVAL_INTERVAL": 1,
+        "EARLY_STOP_ACCURACY": 0.99,
+        "EARLY_STOP_NO_IMPROVE": 3000,
+        "MAX_TRAIN_HOURS": 0.0833,
+        "POS_PROBE": false,
+        "RULES": [
+          [
+            111,
+            24
+          ]
+        ],
+        "RANDOM_SEED": 92831
+      }
+    },
+    {
+      "name": "H2_O_S14_126_a116b90_d512l2r8h4_P127_seed92831",
+      "task": "single",
+      "config": {
+        "P": 127,
+        "ORDER": 2,
+        "D_MODEL": 512,
+        "N_LAYER": 2,
+        "N_HEAD": 4,
+        "MLP_RATIO": 8,
+        "TRAIN_LEN": 16,
+        "OOD_LEN": 16,
+        "DATA_MODE": "full_split",
+        "BATCH_SIZE": 512,
+        "RESHUFFLE_EACH_EPOCH": false,
+        "DROPOUT": 0,
+        "LR": 0.0003,
+        "WEIGHT_DECAY": 1,
+        "GRAD_CLIP_NORM": 1,
+        "FIRST_TASK_WEIGHT": 1,
+        "EPOCHS": 1000,
+        "EVAL_INTERVAL": 1,
+        "EARLY_STOP_ACCURACY": 0.99,
+        "EARLY_STOP_NO_IMPROVE": 3000,
+        "MAX_TRAIN_HOURS": 0.0833,
+        "POS_PROBE": false,
+        "RULES": [
+          [
+            116,
+            90
+          ]
+        ],
+        "RANDOM_SEED": 92831
+      }
+    },
+    {
+      "name": "H2_O_S126_126_a51b111_d512l2r8h4_P127_seed92831",
+      "task": "single",
+      "config": {
+        "P": 127,
+        "ORDER": 2,
+        "D_MODEL": 512,
+        "N_LAYER": 2,
+        "N_HEAD": 4,
+        "MLP_RATIO": 8,
+        "TRAIN_LEN": 16,
+        "OOD_LEN": 16,
+        "DATA_MODE": "full_split",
+        "BATCH_SIZE": 512,
+        "RESHUFFLE_EACH_EPOCH": false,
+        "DROPOUT": 0,
+        "LR": 0.0003,
+        "WEIGHT_DECAY": 1,
+        "GRAD_CLIP_NORM": 1,
+        "FIRST_TASK_WEIGHT": 1,
+        "EPOCHS": 1000,
+        "EVAL_INTERVAL": 1,
+        "EARLY_STOP_ACCURACY": 0.99,
+        "EARLY_STOP_NO_IMPROVE": 3000,
+        "MAX_TRAIN_HOURS": 0.0833,
+        "POS_PROBE": false,
+        "RULES": [
+          [
+            51,
+            111
+          ]
+        ],
+        "RANDOM_SEED": 92831
+      }
+    },
+    {
+      "name": "H2_O_S126_126_a113b51_d512l2r8h4_P127_seed92831",
+      "task": "single",
+      "config": {
+        "P": 127,
+        "ORDER": 2,
+        "D_MODEL": 512,
+        "N_LAYER": 2,
+        "N_HEAD": 4,
+        "MLP_RATIO": 8,
+        "TRAIN_LEN": 16,
+        "OOD_LEN": 16,
+        "DATA_MODE": "full_split",
+        "BATCH_SIZE": 512,
+        "RESHUFFLE_EACH_EPOCH": false,
+        "DROPOUT": 0,
+        "LR": 0.0003,
+        "WEIGHT_DECAY": 1,
+        "GRAD_CLIP_NORM": 1,
+        "FIRST_TASK_WEIGHT": 1,
+        "EPOCHS": 1000,
+        "EVAL_INTERVAL": 1,
+        "EARLY_STOP_ACCURACY": 0.99,
+        "EARLY_STOP_NO_IMPROVE": 3000,
+        "MAX_TRAIN_HOURS": 0.0833,
+        "POS_PROBE": false,
+        "RULES": [
+          [
+            113,
+            51
+          ]
+        ],
+        "RANDOM_SEED": 92831
+      }
+    },
+    {
+      "name": "H2_O_S126_126_a115b108_d512l2r8h4_P127_seed92831",
+      "task": "single",
+      "config": {
+        "P": 127,
+        "ORDER": 2,
+        "D_MODEL": 512,
+        "N_LAYER": 2,
+        "N_HEAD": 4,
+        "MLP_RATIO": 8,
+        "TRAIN_LEN": 16,
+        "OOD_LEN": 16,
+        "DATA_MODE": "full_split",
+        "BATCH_SIZE": 512,
+        "RESHUFFLE_EACH_EPOCH": false,
+        "DROPOUT": 0,
+        "LR": 0.0003,
+        "WEIGHT_DECAY": 1,
+        "GRAD_CLIP_NORM": 1,
+        "FIRST_TASK_WEIGHT": 1,
+        "EPOCHS": 1000,
+        "EVAL_INTERVAL": 1,
+        "EARLY_STOP_ACCURACY": 0.99,
+        "EARLY_STOP_NO_IMPROVE": 3000,
+        "MAX_TRAIN_HOURS": 0.0833,
+        "POS_PROBE": false,
+        "RULES": [
+          [
+            115,
+            108
+          ]
+        ],
+        "RANDOM_SEED": 92831
+      }
+    },
+    {
+      "name": "H2_O_I384_a29b108_d512l2r8h4_P127_seed92831",
+      "task": "single",
+      "config": {
+        "P": 127,
+        "ORDER": 2,
+        "D_MODEL": 512,
+        "N_LAYER": 2,
+        "N_HEAD": 4,
+        "MLP_RATIO": 8,
+        "TRAIN_LEN": 16,
+        "OOD_LEN": 16,
+        "DATA_MODE": "full_split",
+        "BATCH_SIZE": 512,
+        "RESHUFFLE_EACH_EPOCH": false,
+        "DROPOUT": 0,
+        "LR": 0.0003,
+        "WEIGHT_DECAY": 1,
+        "GRAD_CLIP_NORM": 1,
+        "FIRST_TASK_WEIGHT": 1,
+        "EPOCHS": 1000,
+        "EVAL_INTERVAL": 1,
+        "EARLY_STOP_ACCURACY": 0.99,
+        "EARLY_STOP_NO_IMPROVE": 3000,
+        "MAX_TRAIN_HOURS": 0.0833,
+        "POS_PROBE": false,
+        "RULES": [
+          [
+            29,
+            108
+          ]
+        ],
+        "RANDOM_SEED": 92831
+      }
+    },
+    {
+      "name": "H2_O_I384_a88b20_d512l2r8h4_P127_seed92831",
+      "task": "single",
+      "config": {
+        "P": 127,
+        "ORDER": 2,
+        "D_MODEL": 512,
+        "N_LAYER": 2,
+        "N_HEAD": 4,
+        "MLP_RATIO": 8,
+        "TRAIN_LEN": 16,
+        "OOD_LEN": 16,
+        "DATA_MODE": "full_split",
+        "BATCH_SIZE": 512,
+        "RESHUFFLE_EACH_EPOCH": false,
+        "DROPOUT": 0,
+        "LR": 0.0003,
+        "WEIGHT_DECAY": 1,
+        "GRAD_CLIP_NORM": 1,
+        "FIRST_TASK_WEIGHT": 1,
+        "EPOCHS": 1000,
+        "EVAL_INTERVAL": 1,
+        "EARLY_STOP_ACCURACY": 0.99,
+        "EARLY_STOP_NO_IMPROVE": 3000,
+        "MAX_TRAIN_HOURS": 0.0833,
+        "POS_PROBE": false,
+        "RULES": [
+          [
+            88,
+            20
+          ]
+        ],
+        "RANDOM_SEED": 92831
+      }
+    },
+    {
+      "name": "H2_O_I384_a10b20_d512l2r8h4_P127_seed92831",
+      "task": "single",
+      "config": {
+        "P": 127,
+        "ORDER": 2,
+        "D_MODEL": 512,
+        "N_LAYER": 2,
+        "N_HEAD": 4,
+        "MLP_RATIO": 8,
+        "TRAIN_LEN": 16,
+        "OOD_LEN": 16,
+        "DATA_MODE": "full_split",
+        "BATCH_SIZE": 512,
+        "RESHUFFLE_EACH_EPOCH": false,
+        "DROPOUT": 0,
+        "LR": 0.0003,
+        "WEIGHT_DECAY": 1,
+        "GRAD_CLIP_NORM": 1,
+        "FIRST_TASK_WEIGHT": 1,
+        "EPOCHS": 1000,
+        "EVAL_INTERVAL": 1,
+        "EARLY_STOP_ACCURACY": 0.99,
+        "EARLY_STOP_NO_IMPROVE": 3000,
+        "MAX_TRAIN_HOURS": 0.0833,
+        "POS_PROBE": false,
+        "RULES": [
+          [
+            10,
+            20
+          ]
+        ],
+        "RANDOM_SEED": 92831
+      }
+    },
+    {
+      "name": "H2_O_I896_a82b111_d512l2r8h4_P127_seed92831",
+      "task": "single",
+      "config": {
+        "P": 127,
+        "ORDER": 2,
+        "D_MODEL": 512,
+        "N_LAYER": 2,
+        "N_HEAD": 4,
+        "MLP_RATIO": 8,
+        "TRAIN_LEN": 16,
+        "OOD_LEN": 16,
+        "DATA_MODE": "full_split",
+        "BATCH_SIZE": 512,
+        "RESHUFFLE_EACH_EPOCH": false,
+        "DROPOUT": 0,
+        "LR": 0.0003,
+        "WEIGHT_DECAY": 1,
+        "GRAD_CLIP_NORM": 1,
+        "FIRST_TASK_WEIGHT": 1,
+        "EPOCHS": 1000,
+        "EVAL_INTERVAL": 1,
+        "EARLY_STOP_ACCURACY": 0.99,
+        "EARLY_STOP_NO_IMPROVE": 3000,
+        "MAX_TRAIN_HOURS": 0.0833,
+        "POS_PROBE": false,
+        "RULES": [
+          [
+            82,
+            111
+          ]
+        ],
+        "RANDOM_SEED": 92831
+      }
+    },
+    {
+      "name": "H2_O_I896_a17b63_d512l2r8h4_P127_seed92831",
+      "task": "single",
+      "config": {
+        "P": 127,
+        "ORDER": 2,
+        "D_MODEL": 512,
+        "N_LAYER": 2,
+        "N_HEAD": 4,
+        "MLP_RATIO": 8,
+        "TRAIN_LEN": 16,
+        "OOD_LEN": 16,
+        "DATA_MODE": "full_split",
+        "BATCH_SIZE": 512,
+        "RESHUFFLE_EACH_EPOCH": false,
+        "DROPOUT": 0,
+        "LR": 0.0003,
+        "WEIGHT_DECAY": 1,
+        "GRAD_CLIP_NORM": 1,
+        "FIRST_TASK_WEIGHT": 1,
+        "EPOCHS": 1000,
+        "EVAL_INTERVAL": 1,
+        "EARLY_STOP_ACCURACY": 0.99,
+        "EARLY_STOP_NO_IMPROVE": 3000,
+        "MAX_TRAIN_HOURS": 0.0833,
+        "POS_PROBE": false,
+        "RULES": [
+          [
+            17,
+            63
+          ]
+        ],
+        "RANDOM_SEED": 92831
+      }
+    },
+    {
+      "name": "H2_O_I896_a92b63_d512l2r8h4_P127_seed92831",
+      "task": "single",
+      "config": {
+        "P": 127,
+        "ORDER": 2,
+        "D_MODEL": 512,
+        "N_LAYER": 2,
+        "N_HEAD": 4,
+        "MLP_RATIO": 8,
+        "TRAIN_LEN": 16,
+        "OOD_LEN": 16,
+        "DATA_MODE": "full_split",
+        "BATCH_SIZE": 512,
+        "RESHUFFLE_EACH_EPOCH": false,
+        "DROPOUT": 0,
+        "LR": 0.0003,
+        "WEIGHT_DECAY": 1,
+        "GRAD_CLIP_NORM": 1,
+        "FIRST_TASK_WEIGHT": 1,
+        "EPOCHS": 1000,
+        "EVAL_INTERVAL": 1,
+        "EARLY_STOP_ACCURACY": 0.99,
+        "EARLY_STOP_NO_IMPROVE": 3000,
+        "MAX_TRAIN_HOURS": 0.0833,
+        "POS_PROBE": false,
+        "RULES": [
+          [
+            92,
+            63
+          ]
+        ],
+        "RANDOM_SEED": 92831
+      }
+    },
+    {
+      "name": "H2_O_I5376_a24b117_d512l2r8h4_P127_seed92831",
+      "task": "single",
+      "config": {
+        "P": 127,
+        "ORDER": 2,
+        "D_MODEL": 512,
+        "N_LAYER": 2,
+        "N_HEAD": 4,
+        "MLP_RATIO": 8,
+        "TRAIN_LEN": 16,
+        "OOD_LEN": 16,
+        "DATA_MODE": "full_split",
+        "BATCH_SIZE": 512,
+        "RESHUFFLE_EACH_EPOCH": false,
+        "DROPOUT": 0,
+        "LR": 0.0003,
+        "WEIGHT_DECAY": 1,
+        "GRAD_CLIP_NORM": 1,
+        "FIRST_TASK_WEIGHT": 1,
+        "EPOCHS": 1000,
+        "EVAL_INTERVAL": 1,
+        "EARLY_STOP_ACCURACY": 0.99,
+        "EARLY_STOP_NO_IMPROVE": 3000,
+        "MAX_TRAIN_HOURS": 0.0833,
+        "POS_PROBE": false,
+        "RULES": [
+          [
+            24,
+            117
+          ]
+        ],
+        "RANDOM_SEED": 92831
+      }
+    },
+    {
+      "name": "H2_O_I5376_a85b50_d512l2r8h4_P127_seed92831",
+      "task": "single",
+      "config": {
+        "P": 127,
+        "ORDER": 2,
+        "D_MODEL": 512,
+        "N_LAYER": 2,
+        "N_HEAD": 4,
+        "MLP_RATIO": 8,
+        "TRAIN_LEN": 16,
+        "OOD_LEN": 16,
+        "DATA_MODE": "full_split",
+        "BATCH_SIZE": 512,
+        "RESHUFFLE_EACH_EPOCH": false,
+        "DROPOUT": 0,
+        "LR": 0.0003,
+        "WEIGHT_DECAY": 1,
+        "GRAD_CLIP_NORM": 1,
+        "FIRST_TASK_WEIGHT": 1,
+        "EPOCHS": 1000,
+        "EVAL_INTERVAL": 1,
+        "EARLY_STOP_ACCURACY": 0.99,
+        "EARLY_STOP_NO_IMPROVE": 3000,
+        "MAX_TRAIN_HOURS": 0.0833,
+        "POS_PROBE": false,
+        "RULES": [
+          [
+            85,
+            50
+          ]
+        ],
+        "RANDOM_SEED": 92831
+      }
+    },
+    {
+      "name": "H2_O_I5376_a90b117_d512l2r8h4_P127_seed92831",
+      "task": "single",
+      "config": {
+        "P": 127,
+        "ORDER": 2,
+        "D_MODEL": 512,
+        "N_LAYER": 2,
+        "N_HEAD": 4,
+        "MLP_RATIO": 8,
+        "TRAIN_LEN": 16,
+        "OOD_LEN": 16,
+        "DATA_MODE": "full_split",
+        "BATCH_SIZE": 512,
+        "RESHUFFLE_EACH_EPOCH": false,
+        "DROPOUT": 0,
+        "LR": 0.0003,
+        "WEIGHT_DECAY": 1,
+        "GRAD_CLIP_NORM": 1,
+        "FIRST_TASK_WEIGHT": 1,
+        "EPOCHS": 1000,
+        "EVAL_INTERVAL": 1,
+        "EARLY_STOP_ACCURACY": 0.99,
+        "EARLY_STOP_NO_IMPROVE": 3000,
+        "MAX_TRAIN_HOURS": 0.0833,
+        "POS_PROBE": false,
+        "RULES": [
+          [
+            90,
+            117
+          ]
+        ],
+        "RANDOM_SEED": 92831
+      }
+    },
+    {
+      "name": "H2_O_I16128_a90b70_d512l2r8h4_P127_seed92831",
+      "task": "single",
+      "config": {
+        "P": 127,
+        "ORDER": 2,
+        "D_MODEL": 512,
+        "N_LAYER": 2,
+        "N_HEAD": 4,
+        "MLP_RATIO": 8,
+        "TRAIN_LEN": 16,
+        "OOD_LEN": 16,
+        "DATA_MODE": "full_split",
+        "BATCH_SIZE": 512,
+        "RESHUFFLE_EACH_EPOCH": false,
+        "DROPOUT": 0,
+        "LR": 0.0003,
+        "WEIGHT_DECAY": 1,
+        "GRAD_CLIP_NORM": 1,
+        "FIRST_TASK_WEIGHT": 1,
+        "EPOCHS": 1000,
+        "EVAL_INTERVAL": 1,
+        "EARLY_STOP_ACCURACY": 0.99,
+        "EARLY_STOP_NO_IMPROVE": 3000,
+        "MAX_TRAIN_HOURS": 0.0833,
+        "POS_PROBE": false,
+        "RULES": [
+          [
+            90,
+            70
+          ]
+        ],
+        "RANDOM_SEED": 92831
+      }
+    },
+    {
+      "name": "H2_O_I16128_a26b11_d512l2r8h4_P127_seed92831",
+      "task": "single",
+      "config": {
+        "P": 127,
+        "ORDER": 2,
+        "D_MODEL": 512,
+        "N_LAYER": 2,
+        "N_HEAD": 4,
+        "MLP_RATIO": 8,
+        "TRAIN_LEN": 16,
+        "OOD_LEN": 16,
+        "DATA_MODE": "full_split",
+        "BATCH_SIZE": 512,
+        "RESHUFFLE_EACH_EPOCH": false,
+        "DROPOUT": 0,
+        "LR": 0.0003,
+        "WEIGHT_DECAY": 1,
+        "GRAD_CLIP_NORM": 1,
+        "FIRST_TASK_WEIGHT": 1,
+        "EPOCHS": 1000,
+        "EVAL_INTERVAL": 1,
+        "EARLY_STOP_ACCURACY": 0.99,
+        "EARLY_STOP_NO_IMPROVE": 3000,
+        "MAX_TRAIN_HOURS": 0.0833,
+        "POS_PROBE": false,
+        "RULES": [
+          [
+            26,
+            11
+          ]
+        ],
+        "RANDOM_SEED": 92831
+      }
+    },
+    {
+      "name": "H2_O_I16128_a26b74_d512l2r8h4_P127_seed92831",
+      "task": "single",
+      "config": {
+        "P": 127,
+        "ORDER": 2,
+        "D_MODEL": 512,
+        "N_LAYER": 2,
+        "N_HEAD": 4,
+        "MLP_RATIO": 8,
+        "TRAIN_LEN": 16,
+        "OOD_LEN": 16,
+        "DATA_MODE": "full_split",
+        "BATCH_SIZE": 512,
+        "RESHUFFLE_EACH_EPOCH": false,
+        "DROPOUT": 0,
+        "LR": 0.0003,
+        "WEIGHT_DECAY": 1,
+        "GRAD_CLIP_NORM": 1,
+        "FIRST_TASK_WEIGHT": 1,
+        "EPOCHS": 1000,
+        "EVAL_INTERVAL": 1,
+        "EARLY_STOP_ACCURACY": 0.99,
+        "EARLY_STOP_NO_IMPROVE": 3000,
+        "MAX_TRAIN_HOURS": 0.0833,
+        "POS_PROBE": false,
+        "RULES": [
+          [
+            26,
+            74
+          ]
+        ],
+        "RANDOM_SEED": 92831
+      }
+    },
+    {
+      "name": "H3_A44_a44b84_d512l2r8h4_P127_seed92831",
+      "task": "single",
+      "config": {
+        "P": 127,
+        "ORDER": 2,
+        "D_MODEL": 512,
+        "N_LAYER": 2,
+        "N_HEAD": 4,
+        "MLP_RATIO": 8,
+        "TRAIN_LEN": 16,
+        "OOD_LEN": 16,
+        "DATA_MODE": "full_split",
+        "BATCH_SIZE": 512,
+        "RESHUFFLE_EACH_EPOCH": false,
+        "DROPOUT": 0,
+        "LR": 0.0003,
+        "WEIGHT_DECAY": 1,
+        "GRAD_CLIP_NORM": 1,
+        "FIRST_TASK_WEIGHT": 1,
+        "EPOCHS": 1000,
+        "EVAL_INTERVAL": 1,
+        "EARLY_STOP_ACCURACY": 0.99,
+        "EARLY_STOP_NO_IMPROVE": 3000,
+        "MAX_TRAIN_HOURS": 0.0833,
+        "POS_PROBE": false,
+        "RULES": [
+          [
+            44,
+            84
+          ]
+        ],
+        "RANDOM_SEED": 92831
+      }
+    },
+    {
+      "name": "H3_A44_a44b45_d512l2r8h4_P127_seed92831",
+      "task": "single",
+      "config": {
+        "P": 127,
+        "ORDER": 2,
+        "D_MODEL": 512,
+        "N_LAYER": 2,
+        "N_HEAD": 4,
+        "MLP_RATIO": 8,
+        "TRAIN_LEN": 16,
+        "OOD_LEN": 16,
+        "DATA_MODE": "full_split",
+        "BATCH_SIZE": 512,
+        "RESHUFFLE_EACH_EPOCH": false,
+        "DROPOUT": 0,
+        "LR": 0.0003,
+        "WEIGHT_DECAY": 1,
+        "GRAD_CLIP_NORM": 1,
+        "FIRST_TASK_WEIGHT": 1,
+        "EPOCHS": 1000,
+        "EVAL_INTERVAL": 1,
+        "EARLY_STOP_ACCURACY": 0.99,
+        "EARLY_STOP_NO_IMPROVE": 3000,
+        "MAX_TRAIN_HOURS": 0.0833,
+        "POS_PROBE": false,
+        "RULES": [
+          [
+            44,
+            45
+          ]
+        ],
+        "RANDOM_SEED": 92831
+      }
+    },
+    {
+      "name": "H3_A44_a44b59_d512l2r8h4_P127_seed92831",
+      "task": "single",
+      "config": {
+        "P": 127,
+        "ORDER": 2,
+        "D_MODEL": 512,
+        "N_LAYER": 2,
+        "N_HEAD": 4,
+        "MLP_RATIO": 8,
+        "TRAIN_LEN": 16,
+        "OOD_LEN": 16,
+        "DATA_MODE": "full_split",
+        "BATCH_SIZE": 512,
+        "RESHUFFLE_EACH_EPOCH": false,
+        "DROPOUT": 0,
+        "LR": 0.0003,
+        "WEIGHT_DECAY": 1,
+        "GRAD_CLIP_NORM": 1,
+        "FIRST_TASK_WEIGHT": 1,
+        "EPOCHS": 1000,
+        "EVAL_INTERVAL": 1,
+        "EARLY_STOP_ACCURACY": 0.99,
+        "EARLY_STOP_NO_IMPROVE": 3000,
+        "MAX_TRAIN_HOURS": 0.0833,
+        "POS_PROBE": false,
+        "RULES": [
+          [
+            44,
+            59
+          ]
+        ],
+        "RANDOM_SEED": 92831
+      }
+    },
+    {
+      "name": "H3_A66_a66b62_d512l2r8h4_P127_seed92831",
+      "task": "single",
+      "config": {
+        "P": 127,
+        "ORDER": 2,
+        "D_MODEL": 512,
+        "N_LAYER": 2,
+        "N_HEAD": 4,
+        "MLP_RATIO": 8,
+        "TRAIN_LEN": 16,
+        "OOD_LEN": 16,
+        "DATA_MODE": "full_split",
+        "BATCH_SIZE": 512,
+        "RESHUFFLE_EACH_EPOCH": false,
+        "DROPOUT": 0,
+        "LR": 0.0003,
+        "WEIGHT_DECAY": 1,
+        "GRAD_CLIP_NORM": 1,
+        "FIRST_TASK_WEIGHT": 1,
+        "EPOCHS": 1000,
+        "EVAL_INTERVAL": 1,
+        "EARLY_STOP_ACCURACY": 0.99,
+        "EARLY_STOP_NO_IMPROVE": 3000,
+        "MAX_TRAIN_HOURS": 0.0833,
+        "POS_PROBE": false,
+        "RULES": [
+          [
+            66,
+            62
+          ]
+        ],
+        "RANDOM_SEED": 92831
+      }
+    },
+    {
+      "name": "H3_A66_a66b67_d512l2r8h4_P127_seed92831",
+      "task": "single",
+      "config": {
+        "P": 127,
+        "ORDER": 2,
+        "D_MODEL": 512,
+        "N_LAYER": 2,
+        "N_HEAD": 4,
+        "MLP_RATIO": 8,
+        "TRAIN_LEN": 16,
+        "OOD_LEN": 16,
+        "DATA_MODE": "full_split",
+        "BATCH_SIZE": 512,
+        "RESHUFFLE_EACH_EPOCH": false,
+        "DROPOUT": 0,
+        "LR": 0.0003,
+        "WEIGHT_DECAY": 1,
+        "GRAD_CLIP_NORM": 1,
+        "FIRST_TASK_WEIGHT": 1,
+        "EPOCHS": 1000,
+        "EVAL_INTERVAL": 1,
+        "EARLY_STOP_ACCURACY": 0.99,
+        "EARLY_STOP_NO_IMPROVE": 3000,
+        "MAX_TRAIN_HOURS": 0.0833,
+        "POS_PROBE": false,
+        "RULES": [
+          [
+            66,
+            67
+          ]
+        ],
+        "RANDOM_SEED": 92831
+      }
+    },
+    {
+      "name": "H3_A66_a66b85_d512l2r8h4_P127_seed92831",
+      "task": "single",
+      "config": {
+        "P": 127,
+        "ORDER": 2,
+        "D_MODEL": 512,
+        "N_LAYER": 2,
+        "N_HEAD": 4,
+        "MLP_RATIO": 8,
+        "TRAIN_LEN": 16,
+        "OOD_LEN": 16,
+        "DATA_MODE": "full_split",
+        "BATCH_SIZE": 512,
+        "RESHUFFLE_EACH_EPOCH": false,
+        "DROPOUT": 0,
+        "LR": 0.0003,
+        "WEIGHT_DECAY": 1,
+        "GRAD_CLIP_NORM": 1,
+        "FIRST_TASK_WEIGHT": 1,
+        "EPOCHS": 1000,
+        "EVAL_INTERVAL": 1,
+        "EARLY_STOP_ACCURACY": 0.99,
+        "EARLY_STOP_NO_IMPROVE": 3000,
+        "MAX_TRAIN_HOURS": 0.0833,
+        "POS_PROBE": false,
+        "RULES": [
+          [
+            66,
+            85
+          ]
+        ],
+        "RANDOM_SEED": 92831
+      }
+    },
+    {
+      "name": "H3_A92_a92b36_d512l2r8h4_P127_seed92831",
+      "task": "single",
+      "config": {
+        "P": 127,
+        "ORDER": 2,
+        "D_MODEL": 512,
+        "N_LAYER": 2,
+        "N_HEAD": 4,
+        "MLP_RATIO": 8,
+        "TRAIN_LEN": 16,
+        "OOD_LEN": 16,
+        "DATA_MODE": "full_split",
+        "BATCH_SIZE": 512,
+        "RESHUFFLE_EACH_EPOCH": false,
+        "DROPOUT": 0,
+        "LR": 0.0003,
+        "WEIGHT_DECAY": 1,
+        "GRAD_CLIP_NORM": 1,
+        "FIRST_TASK_WEIGHT": 1,
+        "EPOCHS": 1000,
+        "EVAL_INTERVAL": 1,
+        "EARLY_STOP_ACCURACY": 0.99,
+        "EARLY_STOP_NO_IMPROVE": 3000,
+        "MAX_TRAIN_HOURS": 0.0833,
+        "POS_PROBE": false,
+        "RULES": [
+          [
+            92,
+            36
+          ]
+        ],
+        "RANDOM_SEED": 92831
+      }
+    },
+    {
+      "name": "H3_A92_a92b93_d512l2r8h4_P127_seed92831",
+      "task": "single",
+      "config": {
+        "P": 127,
+        "ORDER": 2,
+        "D_MODEL": 512,
+        "N_LAYER": 2,
+        "N_HEAD": 4,
+        "MLP_RATIO": 8,
+        "TRAIN_LEN": 16,
+        "OOD_LEN": 16,
+        "DATA_MODE": "full_split",
+        "BATCH_SIZE": 512,
+        "RESHUFFLE_EACH_EPOCH": false,
+        "DROPOUT": 0,
+        "LR": 0.0003,
+        "WEIGHT_DECAY": 1,
+        "GRAD_CLIP_NORM": 1,
+        "FIRST_TASK_WEIGHT": 1,
+        "EPOCHS": 1000,
+        "EVAL_INTERVAL": 1,
+        "EARLY_STOP_ACCURACY": 0.99,
+        "EARLY_STOP_NO_IMPROVE": 3000,
+        "MAX_TRAIN_HOURS": 0.0833,
+        "POS_PROBE": false,
+        "RULES": [
+          [
+            92,
+            93
+          ]
+        ],
+        "RANDOM_SEED": 92831
+      }
+    },
+    {
+      "name": "H3_A92_a92b56_d512l2r8h4_P127_seed92831",
+      "task": "single",
+      "config": {
+        "P": 127,
+        "ORDER": 2,
+        "D_MODEL": 512,
+        "N_LAYER": 2,
+        "N_HEAD": 4,
+        "MLP_RATIO": 8,
+        "TRAIN_LEN": 16,
+        "OOD_LEN": 16,
+        "DATA_MODE": "full_split",
+        "BATCH_SIZE": 512,
+        "RESHUFFLE_EACH_EPOCH": false,
+        "DROPOUT": 0,
+        "LR": 0.0003,
+        "WEIGHT_DECAY": 1,
+        "GRAD_CLIP_NORM": 1,
+        "FIRST_TASK_WEIGHT": 1,
+        "EPOCHS": 1000,
+        "EVAL_INTERVAL": 1,
+        "EARLY_STOP_ACCURACY": 0.99,
+        "EARLY_STOP_NO_IMPROVE": 3000,
+        "MAX_TRAIN_HOURS": 0.0833,
+        "POS_PROBE": false,
+        "RULES": [
+          [
+            92,
+            56
+          ]
+        ],
+        "RANDOM_SEED": 92831
+      }
+    }
+  ]
+}
