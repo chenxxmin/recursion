@@ -1,0 +1,2023 @@
+{
+  "p": 127,
+  "models": "d512 L2 H4 MLP-ratio8",
+  "hypothesis_counts": {
+    "H1": 64,
+    "H2": 56,
+    "H3": 30
+  },
+  "coefficients": [
+    {
+      "group": "H1_D_J63",
+      "coefficients": [
+        62,
+        55
+      ],
+      "root_type": "double",
+      "root_orders": [
+        63
+      ],
+      "irreducible_root_order": null,
+      "shortest_one_term_lag": 127
+    },
+    {
+      "group": "H1_D_J63",
+      "coefficients": [
+        124,
+        93
+      ],
+      "root_type": "double",
+      "root_orders": [
+        63
+      ],
+      "irreducible_root_order": null,
+      "shortest_one_term_lag": 127
+    },
+    {
+      "group": "H1_D_J63",
+      "coefficients": [
+        30,
+        29
+      ],
+      "root_type": "double",
+      "root_orders": [
+        63
+      ],
+      "irreducible_root_order": null,
+      "shortest_one_term_lag": 127
+    },
+    {
+      "group": "H1_D_J63",
+      "coefficients": [
+        103,
+        110
+      ],
+      "root_type": "double",
+      "root_orders": [
+        63
+      ],
+      "irreducible_root_order": null,
+      "shortest_one_term_lag": 127
+    },
+    {
+      "group": "H1_D_J63",
+      "coefficients": [
+        52,
+        86
+      ],
+      "root_type": "double",
+      "root_orders": [
+        63
+      ],
+      "irreducible_root_order": null,
+      "shortest_one_term_lag": 127
+    },
+    {
+      "group": "H1_D_J63",
+      "coefficients": [
+        115,
+        91
+      ],
+      "root_type": "double",
+      "root_orders": [
+        63
+      ],
+      "irreducible_root_order": null,
+      "shortest_one_term_lag": 127
+    },
+    {
+      "group": "H1_D_J63",
+      "coefficients": [
+        60,
+        116
+      ],
+      "root_type": "double",
+      "root_orders": [
+        63
+      ],
+      "irreducible_root_order": null,
+      "shortest_one_term_lag": 127
+    },
+    {
+      "group": "H1_D_J63",
+      "coefficients": [
+        98,
+        12
+      ],
+      "root_type": "double",
+      "root_orders": [
+        63
+      ],
+      "irreducible_root_order": null,
+      "shortest_one_term_lag": 127
+    },
+    {
+      "group": "H1_D_J126",
+      "coefficients": [
+        65,
+        55
+      ],
+      "root_type": "double",
+      "root_orders": [
+        126
+      ],
+      "irreducible_root_order": null,
+      "shortest_one_term_lag": 127
+    },
+    {
+      "group": "H1_D_J126",
+      "coefficients": [
+        3,
+        93
+      ],
+      "root_type": "double",
+      "root_orders": [
+        126
+      ],
+      "irreducible_root_order": null,
+      "shortest_one_term_lag": 127
+    },
+    {
+      "group": "H1_D_J126",
+      "coefficients": [
+        97,
+        29
+      ],
+      "root_type": "double",
+      "root_orders": [
+        126
+      ],
+      "irreducible_root_order": null,
+      "shortest_one_term_lag": 127
+    },
+    {
+      "group": "H1_D_J126",
+      "coefficients": [
+        105,
+        6
+      ],
+      "root_type": "double",
+      "root_orders": [
+        126
+      ],
+      "irreducible_root_order": null,
+      "shortest_one_term_lag": 127
+    },
+    {
+      "group": "H1_D_J126",
+      "coefficients": [
+        114,
+        53
+      ],
+      "root_type": "double",
+      "root_orders": [
+        126
+      ],
+      "irreducible_root_order": null,
+      "shortest_one_term_lag": 127
+    },
+    {
+      "group": "H1_D_J126",
+      "coefficients": [
+        112,
+        39
+      ],
+      "root_type": "double",
+      "root_orders": [
+        126
+      ],
+      "irreducible_root_order": null,
+      "shortest_one_term_lag": 127
+    },
+    {
+      "group": "H1_D_J126",
+      "coefficients": [
+        78,
+        3
+      ],
+      "root_type": "double",
+      "root_orders": [
+        126
+      ],
+      "irreducible_root_order": null,
+      "shortest_one_term_lag": 127
+    },
+    {
+      "group": "H1_D_J126",
+      "coefficients": [
+        67,
+        116
+      ],
+      "root_type": "double",
+      "root_orders": [
+        126
+      ],
+      "irreducible_root_order": null,
+      "shortest_one_term_lag": 127
+    },
+    {
+      "group": "H1_R1_S1_42",
+      "coefficients": [
+        67,
+        61
+      ],
+      "root_type": "root1",
+      "root_orders": [
+        1,
+        42
+      ],
+      "irreducible_root_order": null,
+      "shortest_one_term_lag": 42
+    },
+    {
+      "group": "H1_R1_S1_42",
+      "coefficients": [
+        6,
+        122
+      ],
+      "root_type": "root1",
+      "root_orders": [
+        1,
+        42
+      ],
+      "irreducible_root_order": null,
+      "shortest_one_term_lag": 42
+    },
+    {
+      "group": "H1_R1_S1_42",
+      "coefficients": [
+        103,
+        25
+      ],
+      "root_type": "root1",
+      "root_orders": [
+        1,
+        42
+      ],
+      "irreducible_root_order": null,
+      "shortest_one_term_lag": 42
+    },
+    {
+      "group": "H1_R1_S1_42",
+      "coefficients": [
+        55,
+        73
+      ],
+      "root_type": "root1",
+      "root_orders": [
+        1,
+        42
+      ],
+      "irreducible_root_order": null,
+      "shortest_one_term_lag": 42
+    },
+    {
+      "group": "H1_R1_S1_42",
+      "coefficients": [
+        41,
+        87
+      ],
+      "root_type": "root1",
+      "root_orders": [
+        1,
+        42
+      ],
+      "irreducible_root_order": null,
+      "shortest_one_term_lag": 42
+    },
+    {
+      "group": "H1_R1_S1_42",
+      "coefficients": [
+        81,
+        47
+      ],
+      "root_type": "root1",
+      "root_orders": [
+        1,
+        42
+      ],
+      "irreducible_root_order": null,
+      "shortest_one_term_lag": 42
+    },
+    {
+      "group": "H1_R1_S1_42",
+      "coefficients": [
+        78,
+        50
+      ],
+      "root_type": "root1",
+      "root_orders": [
+        1,
+        42
+      ],
+      "irreducible_root_order": null,
+      "shortest_one_term_lag": 42
+    },
+    {
+      "group": "H1_R1_S1_42",
+      "coefficients": [
+        34,
+        94
+      ],
+      "root_type": "root1",
+      "root_orders": [
+        1,
+        42
+      ],
+      "irreducible_root_order": null,
+      "shortest_one_term_lag": 42
+    },
+    {
+      "group": "H1_R1_S1_126",
+      "coefficients": [
+        4,
+        124
+      ],
+      "root_type": "root1",
+      "root_orders": [
+        1,
+        126
+      ],
+      "irreducible_root_order": null,
+      "shortest_one_term_lag": 126
+    },
+    {
+      "group": "H1_R1_S1_126",
+      "coefficients": [
+        68,
+        60
+      ],
+      "root_type": "root1",
+      "root_orders": [
+        1,
+        126
+      ],
+      "irreducible_root_order": null,
+      "shortest_one_term_lag": 126
+    },
+    {
+      "group": "H1_R1_S1_126",
+      "coefficients": [
+        98,
+        30
+      ],
+      "root_type": "root1",
+      "root_orders": [
+        1,
+        126
+      ],
+      "irreducible_root_order": null,
+      "shortest_one_term_lag": 126
+    },
+    {
+      "group": "H1_R1_S1_126",
+      "coefficients": [
+        102,
+        26
+      ],
+      "root_type": "root1",
+      "root_orders": [
+        1,
+        126
+      ],
+      "irreducible_root_order": null,
+      "shortest_one_term_lag": 126
+    },
+    {
+      "group": "H1_R1_S1_126",
+      "coefficients": [
+        107,
+        21
+      ],
+      "root_type": "root1",
+      "root_orders": [
+        1,
+        126
+      ],
+      "irreducible_root_order": null,
+      "shortest_one_term_lag": 126
+    },
+    {
+      "group": "H1_R1_S1_126",
+      "coefficients": [
+        79,
+        49
+      ],
+      "root_type": "root1",
+      "root_orders": [
+        1,
+        126
+      ],
+      "irreducible_root_order": null,
+      "shortest_one_term_lag": 126
+    },
+    {
+      "group": "H1_R1_S1_126",
+      "coefficients": [
+        58,
+        70
+      ],
+      "root_type": "root1",
+      "root_orders": [
+        1,
+        126
+      ],
+      "irreducible_root_order": null,
+      "shortest_one_term_lag": 126
+    },
+    {
+      "group": "H1_R1_S1_126",
+      "coefficients": [
+        86,
+        42
+      ],
+      "root_type": "root1",
+      "root_orders": [
+        1,
+        126
+      ],
+      "irreducible_root_order": null,
+      "shortest_one_term_lag": 126
+    },
+    {
+      "group": "H1_Rm1_S2_42",
+      "coefficients": [
+        65,
+        66
+      ],
+      "root_type": "rootm1",
+      "root_orders": [
+        2,
+        42
+      ],
+      "irreducible_root_order": null,
+      "shortest_one_term_lag": 21
+    },
+    {
+      "group": "H1_Rm1_S2_42",
+      "coefficients": [
+        4,
+        5
+      ],
+      "root_type": "rootm1",
+      "root_orders": [
+        2,
+        42
+      ],
+      "irreducible_root_order": null,
+      "shortest_one_term_lag": 21
+    },
+    {
+      "group": "H1_Rm1_S2_42",
+      "coefficients": [
+        101,
+        102
+      ],
+      "root_type": "rootm1",
+      "root_orders": [
+        2,
+        42
+      ],
+      "irreducible_root_order": null,
+      "shortest_one_term_lag": 21
+    },
+    {
+      "group": "H1_Rm1_S2_42",
+      "coefficients": [
+        50,
+        51
+      ],
+      "root_type": "rootm1",
+      "root_orders": [
+        2,
+        42
+      ],
+      "irreducible_root_order": null,
+      "shortest_one_term_lag": 21
+    },
+    {
+      "group": "H1_Rm1_S2_42",
+      "coefficients": [
+        79,
+        80
+      ],
+      "root_type": "rootm1",
+      "root_orders": [
+        2,
+        42
+      ],
+      "irreducible_root_order": null,
+      "shortest_one_term_lag": 21
+    },
+    {
+      "group": "H1_Rm1_S2_42",
+      "coefficients": [
+        76,
+        77
+      ],
+      "root_type": "rootm1",
+      "root_orders": [
+        2,
+        42
+      ],
+      "irreducible_root_order": null,
+      "shortest_one_term_lag": 21
+    },
+    {
+      "group": "H1_Rm1_S2_42",
+      "coefficients": [
+        26,
+        27
+      ],
+      "root_type": "rootm1",
+      "root_orders": [
+        2,
+        42
+      ],
+      "irreducible_root_order": null,
+      "shortest_one_term_lag": 21
+    },
+    {
+      "group": "H1_Rm1_S2_42",
+      "coefficients": [
+        88,
+        89
+      ],
+      "root_type": "rootm1",
+      "root_orders": [
+        2,
+        42
+      ],
+      "irreducible_root_order": null,
+      "shortest_one_term_lag": 21
+    },
+    {
+      "group": "H1_Rm1_S2_126",
+      "coefficients": [
+        2,
+        3
+      ],
+      "root_type": "rootm1",
+      "root_orders": [
+        2,
+        126
+      ],
+      "irreducible_root_order": null,
+      "shortest_one_term_lag": 63
+    },
+    {
+      "group": "H1_Rm1_S2_126",
+      "coefficients": [
+        52,
+        53
+      ],
+      "root_type": "rootm1",
+      "root_orders": [
+        2,
+        126
+      ],
+      "irreducible_root_order": null,
+      "shortest_one_term_lag": 63
+    },
+    {
+      "group": "H1_Rm1_S2_126",
+      "coefficients": [
+        96,
+        97
+      ],
+      "root_type": "rootm1",
+      "root_orders": [
+        2,
+        126
+      ],
+      "irreducible_root_order": null,
+      "shortest_one_term_lag": 63
+    },
+    {
+      "group": "H1_Rm1_S2_126",
+      "coefficients": [
+        111,
+        112
+      ],
+      "root_type": "rootm1",
+      "root_orders": [
+        2,
+        126
+      ],
+      "irreducible_root_order": null,
+      "shortest_one_term_lag": 63
+    },
+    {
+      "group": "H1_Rm1_S2_126",
+      "coefficients": [
+        5,
+        6
+      ],
+      "root_type": "rootm1",
+      "root_orders": [
+        2,
+        126
+      ],
+      "irreducible_root_order": null,
+      "shortest_one_term_lag": 63
+    },
+    {
+      "group": "H1_Rm1_S2_126",
+      "coefficients": [
+        108,
+        109
+      ],
+      "root_type": "rootm1",
+      "root_orders": [
+        2,
+        126
+      ],
+      "irreducible_root_order": null,
+      "shortest_one_term_lag": 63
+    },
+    {
+      "group": "H1_Rm1_S2_126",
+      "coefficients": [
+        22,
+        23
+      ],
+      "root_type": "rootm1",
+      "root_orders": [
+        2,
+        126
+      ],
+      "irreducible_root_order": null,
+      "shortest_one_term_lag": 63
+    },
+    {
+      "group": "H1_Rm1_S2_126",
+      "coefficients": [
+        100,
+        101
+      ],
+      "root_type": "rootm1",
+      "root_orders": [
+        2,
+        126
+      ],
+      "irreducible_root_order": null,
+      "shortest_one_term_lag": 63
+    },
+    {
+      "group": "H1_O_S18_126",
+      "coefficients": [
+        13,
+        10
+      ],
+      "root_type": "other",
+      "root_orders": [
+        18,
+        126
+      ],
+      "irreducible_root_order": null,
+      "shortest_one_term_lag": 63
+    },
+    {
+      "group": "H1_O_S18_126",
+      "coefficients": [
+        77,
+        125
+      ],
+      "root_type": "other",
+      "root_orders": [
+        18,
+        126
+      ],
+      "irreducible_root_order": null,
+      "shortest_one_term_lag": 63
+    },
+    {
+      "group": "H1_O_S18_126",
+      "coefficients": [
+        45,
+        77
+      ],
+      "root_type": "other",
+      "root_orders": [
+        18,
+        126
+      ],
+      "irreducible_root_order": null,
+      "shortest_one_term_lag": 63
+    },
+    {
+      "group": "H1_O_S18_126",
+      "coefficients": [
+        102,
+        33
+      ],
+      "root_type": "other",
+      "root_orders": [
+        18,
+        126
+      ],
+      "irreducible_root_order": null,
+      "shortest_one_term_lag": 63
+    },
+    {
+      "group": "H1_O_S18_126",
+      "coefficients": [
+        112,
+        27
+      ],
+      "root_type": "other",
+      "root_orders": [
+        18,
+        126
+      ],
+      "irreducible_root_order": null,
+      "shortest_one_term_lag": 63
+    },
+    {
+      "group": "H1_O_S18_126",
+      "coefficients": [
+        71,
+        66
+      ],
+      "root_type": "other",
+      "root_orders": [
+        18,
+        126
+      ],
+      "irreducible_root_order": null,
+      "shortest_one_term_lag": 63
+    },
+    {
+      "group": "H1_O_S18_126",
+      "coefficients": [
+        105,
+        80
+      ],
+      "root_type": "other",
+      "root_orders": [
+        18,
+        126
+      ],
+      "irreducible_root_order": null,
+      "shortest_one_term_lag": 63
+    },
+    {
+      "group": "H1_O_S18_126",
+      "coefficients": [
+        106,
+        102
+      ],
+      "root_type": "other",
+      "root_orders": [
+        18,
+        126
+      ],
+      "irreducible_root_order": null,
+      "shortest_one_term_lag": 63
+    },
+    {
+      "group": "H1_O_S42_126",
+      "coefficients": [
+        5,
+        3
+      ],
+      "root_type": "other",
+      "root_orders": [
+        42,
+        126
+      ],
+      "irreducible_root_order": null,
+      "shortest_one_term_lag": 63
+    },
+    {
+      "group": "H1_O_S42_126",
+      "coefficients": [
+        25,
+        56
+      ],
+      "root_type": "other",
+      "root_orders": [
+        42,
+        126
+      ],
+      "irreducible_root_order": null,
+      "shortest_one_term_lag": 63
+    },
+    {
+      "group": "H1_O_S42_126",
+      "coefficients": [
+        62,
+        59
+      ],
+      "root_type": "other",
+      "root_orders": [
+        42,
+        126
+      ],
+      "irreducible_root_order": null,
+      "shortest_one_term_lag": 63
+    },
+    {
+      "group": "H1_O_S42_126",
+      "coefficients": [
+        67,
+        65
+      ],
+      "root_type": "other",
+      "root_orders": [
+        42,
+        126
+      ],
+      "irreducible_root_order": null,
+      "shortest_one_term_lag": 63
+    },
+    {
+      "group": "H1_O_S42_126",
+      "coefficients": [
+        40,
+        23
+      ],
+      "root_type": "other",
+      "root_orders": [
+        42,
+        126
+      ],
+      "irreducible_root_order": null,
+      "shortest_one_term_lag": 63
+    },
+    {
+      "group": "H1_O_S42_126",
+      "coefficients": [
+        108,
+        14
+      ],
+      "root_type": "other",
+      "root_orders": [
+        42,
+        126
+      ],
+      "irreducible_root_order": null,
+      "shortest_one_term_lag": 63
+    },
+    {
+      "group": "H1_O_S42_126",
+      "coefficients": [
+        70,
+        109
+      ],
+      "root_type": "other",
+      "root_orders": [
+        42,
+        126
+      ],
+      "irreducible_root_order": null,
+      "shortest_one_term_lag": 63
+    },
+    {
+      "group": "H1_O_S42_126",
+      "coefficients": [
+        24,
+        96
+      ],
+      "root_type": "other",
+      "root_orders": [
+        42,
+        126
+      ],
+      "irreducible_root_order": null,
+      "shortest_one_term_lag": 63
+    },
+    {
+      "group": "H2_O_S6_126",
+      "coefficients": [
+        85,
+        97
+      ],
+      "root_type": "other",
+      "root_orders": [
+        6,
+        126
+      ],
+      "irreducible_root_order": null,
+      "shortest_one_term_lag": 63
+    },
+    {
+      "group": "H2_O_S6_126",
+      "coefficients": [
+        29,
+        23
+      ],
+      "root_type": "other",
+      "root_orders": [
+        6,
+        126
+      ],
+      "irreducible_root_order": null,
+      "shortest_one_term_lag": 63
+    },
+    {
+      "group": "H2_O_S6_126",
+      "coefficients": [
+        90,
+        39
+      ],
+      "root_type": "other",
+      "root_orders": [
+        6,
+        126
+      ],
+      "irreducible_root_order": null,
+      "shortest_one_term_lag": 63
+    },
+    {
+      "group": "H2_O_S6_126",
+      "coefficients": [
+        48,
+        3
+      ],
+      "root_type": "other",
+      "root_orders": [
+        6,
+        126
+      ],
+      "irreducible_root_order": null,
+      "shortest_one_term_lag": 63
+    },
+    {
+      "group": "H2_O_S6_126",
+      "coefficients": [
+        103,
+        118
+      ],
+      "root_type": "other",
+      "root_orders": [
+        6,
+        126
+      ],
+      "irreducible_root_order": null,
+      "shortest_one_term_lag": 63
+    },
+    {
+      "group": "H2_O_S6_126",
+      "coefficients": [
+        59,
+        109
+      ],
+      "root_type": "other",
+      "root_orders": [
+        6,
+        126
+      ],
+      "irreducible_root_order": null,
+      "shortest_one_term_lag": 63
+    },
+    {
+      "group": "H2_O_S6_126",
+      "coefficients": [
+        7,
+        6
+      ],
+      "root_type": "other",
+      "root_orders": [
+        6,
+        126
+      ],
+      "irreducible_root_order": null,
+      "shortest_one_term_lag": 63
+    },
+    {
+      "group": "H2_O_S14_126",
+      "coefficients": [
+        51,
+        93
+      ],
+      "root_type": "other",
+      "root_orders": [
+        14,
+        126
+      ],
+      "irreducible_root_order": null,
+      "shortest_one_term_lag": 63
+    },
+    {
+      "group": "H2_O_S14_126",
+      "coefficients": [
+        111,
+        24
+      ],
+      "root_type": "other",
+      "root_orders": [
+        14,
+        126
+      ],
+      "irreducible_root_order": null,
+      "shortest_one_term_lag": 63
+    },
+    {
+      "group": "H2_O_S14_126",
+      "coefficients": [
+        116,
+        90
+      ],
+      "root_type": "other",
+      "root_orders": [
+        14,
+        126
+      ],
+      "irreducible_root_order": null,
+      "shortest_one_term_lag": 63
+    },
+    {
+      "group": "H2_O_S14_126",
+      "coefficients": [
+        98,
+        96
+      ],
+      "root_type": "other",
+      "root_orders": [
+        14,
+        126
+      ],
+      "irreducible_root_order": null,
+      "shortest_one_term_lag": 63
+    },
+    {
+      "group": "H2_O_S14_126",
+      "coefficients": [
+        38,
+        114
+      ],
+      "root_type": "other",
+      "root_orders": [
+        14,
+        126
+      ],
+      "irreducible_root_order": null,
+      "shortest_one_term_lag": 63
+    },
+    {
+      "group": "H2_O_S14_126",
+      "coefficients": [
+        46,
+        83
+      ],
+      "root_type": "other",
+      "root_orders": [
+        14,
+        126
+      ],
+      "irreducible_root_order": null,
+      "shortest_one_term_lag": 63
+    },
+    {
+      "group": "H2_O_S14_126",
+      "coefficients": [
+        23,
+        109
+      ],
+      "root_type": "other",
+      "root_orders": [
+        14,
+        126
+      ],
+      "irreducible_root_order": null,
+      "shortest_one_term_lag": 63
+    },
+    {
+      "group": "H2_O_S18_126",
+      "coefficients": [
+        121,
+        63
+      ],
+      "root_type": "other",
+      "root_orders": [
+        18,
+        126
+      ],
+      "irreducible_root_order": null,
+      "shortest_one_term_lag": 63
+    },
+    {
+      "group": "H2_O_S18_126",
+      "coefficients": [
+        53,
+        66
+      ],
+      "root_type": "other",
+      "root_orders": [
+        18,
+        126
+      ],
+      "irreducible_root_order": null,
+      "shortest_one_term_lag": 63
+    },
+    {
+      "group": "H2_O_S18_126",
+      "coefficients": [
+        107,
+        89
+      ],
+      "root_type": "other",
+      "root_orders": [
+        18,
+        126
+      ],
+      "irreducible_root_order": null,
+      "shortest_one_term_lag": 63
+    },
+    {
+      "group": "H2_O_S18_126",
+      "coefficients": [
+        6,
+        95
+      ],
+      "root_type": "other",
+      "root_orders": [
+        18,
+        126
+      ],
+      "irreducible_root_order": null,
+      "shortest_one_term_lag": 63
+    },
+    {
+      "group": "H2_O_S18_126",
+      "coefficients": [
+        64,
+        54
+      ],
+      "root_type": "other",
+      "root_orders": [
+        18,
+        126
+      ],
+      "irreducible_root_order": null,
+      "shortest_one_term_lag": 63
+    },
+    {
+      "group": "H2_O_S18_126",
+      "coefficients": [
+        113,
+        89
+      ],
+      "root_type": "other",
+      "root_orders": [
+        18,
+        126
+      ],
+      "irreducible_root_order": null,
+      "shortest_one_term_lag": 63
+    },
+    {
+      "group": "H2_O_S42_126",
+      "coefficients": [
+        22,
+        85
+      ],
+      "root_type": "other",
+      "root_orders": [
+        42,
+        126
+      ],
+      "irreducible_root_order": null,
+      "shortest_one_term_lag": 63
+    },
+    {
+      "group": "H2_O_S42_126",
+      "coefficients": [
+        32,
+        28
+      ],
+      "root_type": "other",
+      "root_orders": [
+        42,
+        126
+      ],
+      "irreducible_root_order": null,
+      "shortest_one_term_lag": 63
+    },
+    {
+      "group": "H2_O_S42_126",
+      "coefficients": [
+        77,
+        92
+      ],
+      "root_type": "other",
+      "root_orders": [
+        42,
+        126
+      ],
+      "irreducible_root_order": null,
+      "shortest_one_term_lag": 63
+    },
+    {
+      "group": "H2_O_S42_126",
+      "coefficients": [
+        92,
+        114
+      ],
+      "root_type": "other",
+      "root_orders": [
+        42,
+        126
+      ],
+      "irreducible_root_order": null,
+      "shortest_one_term_lag": 63
+    },
+    {
+      "group": "H2_O_S42_126",
+      "coefficients": [
+        18,
+        59
+      ],
+      "root_type": "other",
+      "root_orders": [
+        42,
+        126
+      ],
+      "irreducible_root_order": null,
+      "shortest_one_term_lag": 63
+    },
+    {
+      "group": "H2_O_S42_126",
+      "coefficients": [
+        36,
+        75
+      ],
+      "root_type": "other",
+      "root_orders": [
+        42,
+        126
+      ],
+      "irreducible_root_order": null,
+      "shortest_one_term_lag": 63
+    },
+    {
+      "group": "H2_O_S126_126",
+      "coefficients": [
+        51,
+        111
+      ],
+      "root_type": "other",
+      "root_orders": [
+        126,
+        126
+      ],
+      "irreducible_root_order": null,
+      "shortest_one_term_lag": 63
+    },
+    {
+      "group": "H2_O_S126_126",
+      "coefficients": [
+        113,
+        51
+      ],
+      "root_type": "other",
+      "root_orders": [
+        126,
+        126
+      ],
+      "irreducible_root_order": null,
+      "shortest_one_term_lag": 63
+    },
+    {
+      "group": "H2_O_S126_126",
+      "coefficients": [
+        115,
+        108
+      ],
+      "root_type": "other",
+      "root_orders": [
+        126,
+        126
+      ],
+      "irreducible_root_order": null,
+      "shortest_one_term_lag": 63
+    },
+    {
+      "group": "H2_O_S126_126",
+      "coefficients": [
+        14,
+        54
+      ],
+      "root_type": "other",
+      "root_orders": [
+        126,
+        126
+      ],
+      "irreducible_root_order": null,
+      "shortest_one_term_lag": 63
+    },
+    {
+      "group": "H2_O_S126_126",
+      "coefficients": [
+        116,
+        20
+      ],
+      "root_type": "other",
+      "root_orders": [
+        126,
+        126
+      ],
+      "irreducible_root_order": null,
+      "shortest_one_term_lag": 63
+    },
+    {
+      "group": "H2_O_S126_126",
+      "coefficients": [
+        27,
+        108
+      ],
+      "root_type": "other",
+      "root_orders": [
+        126,
+        126
+      ],
+      "irreducible_root_order": null,
+      "shortest_one_term_lag": 63
+    },
+    {
+      "group": "H2_O_I384",
+      "coefficients": [
+        29,
+        108
+      ],
+      "root_type": "other",
+      "root_orders": null,
+      "irreducible_root_order": 384,
+      "shortest_one_term_lag": 64
+    },
+    {
+      "group": "H2_O_I384",
+      "coefficients": [
+        88,
+        20
+      ],
+      "root_type": "other",
+      "root_orders": null,
+      "irreducible_root_order": 384,
+      "shortest_one_term_lag": 64
+    },
+    {
+      "group": "H2_O_I384",
+      "coefficients": [
+        10,
+        20
+      ],
+      "root_type": "other",
+      "root_orders": null,
+      "irreducible_root_order": 384,
+      "shortest_one_term_lag": 64
+    },
+    {
+      "group": "H2_O_I384",
+      "coefficients": [
+        59,
+        20
+      ],
+      "root_type": "other",
+      "root_orders": null,
+      "irreducible_root_order": 384,
+      "shortest_one_term_lag": 64
+    },
+    {
+      "group": "H2_O_I384",
+      "coefficients": [
+        74,
+        20
+      ],
+      "root_type": "other",
+      "root_orders": null,
+      "irreducible_root_order": 384,
+      "shortest_one_term_lag": 64
+    },
+    {
+      "group": "H2_O_I384",
+      "coefficients": [
+        5,
+        20
+      ],
+      "root_type": "other",
+      "root_orders": null,
+      "irreducible_root_order": 384,
+      "shortest_one_term_lag": 64
+    },
+    {
+      "group": "H2_O_I896",
+      "coefficients": [
+        82,
+        111
+      ],
+      "root_type": "other",
+      "root_orders": null,
+      "irreducible_root_order": 896,
+      "shortest_one_term_lag": 64
+    },
+    {
+      "group": "H2_O_I896",
+      "coefficients": [
+        17,
+        63
+      ],
+      "root_type": "other",
+      "root_orders": null,
+      "irreducible_root_order": 896,
+      "shortest_one_term_lag": 64
+    },
+    {
+      "group": "H2_O_I896",
+      "coefficients": [
+        92,
+        63
+      ],
+      "root_type": "other",
+      "root_orders": null,
+      "irreducible_root_order": 896,
+      "shortest_one_term_lag": 64
+    },
+    {
+      "group": "H2_O_I896",
+      "coefficients": [
+        25,
+        123
+      ],
+      "root_type": "other",
+      "root_orders": null,
+      "irreducible_root_order": 896,
+      "shortest_one_term_lag": 64
+    },
+    {
+      "group": "H2_O_I896",
+      "coefficients": [
+        123,
+        63
+      ],
+      "root_type": "other",
+      "root_orders": null,
+      "irreducible_root_order": 896,
+      "shortest_one_term_lag": 64
+    },
+    {
+      "group": "H2_O_I896",
+      "coefficients": [
+        82,
+        95
+      ],
+      "root_type": "other",
+      "root_orders": null,
+      "irreducible_root_order": 896,
+      "shortest_one_term_lag": 64
+    },
+    {
+      "group": "H2_O_I5376",
+      "coefficients": [
+        24,
+        117
+      ],
+      "root_type": "other",
+      "root_orders": null,
+      "irreducible_root_order": 5376,
+      "shortest_one_term_lag": 128
+    },
+    {
+      "group": "H2_O_I5376",
+      "coefficients": [
+        85,
+        50
+      ],
+      "root_type": "other",
+      "root_orders": null,
+      "irreducible_root_order": 5376,
+      "shortest_one_term_lag": 128
+    },
+    {
+      "group": "H2_O_I5376",
+      "coefficients": [
+        90,
+        117
+      ],
+      "root_type": "other",
+      "root_orders": null,
+      "irreducible_root_order": 5376,
+      "shortest_one_term_lag": 128
+    },
+    {
+      "group": "H2_O_I5376",
+      "coefficients": [
+        108,
+        50
+      ],
+      "root_type": "other",
+      "root_orders": null,
+      "irreducible_root_order": 5376,
+      "shortest_one_term_lag": 128
+    },
+    {
+      "group": "H2_O_I5376",
+      "coefficients": [
+        45,
+        47
+      ],
+      "root_type": "other",
+      "root_orders": null,
+      "irreducible_root_order": 5376,
+      "shortest_one_term_lag": 128
+    },
+    {
+      "group": "H2_O_I5376",
+      "coefficients": [
+        117,
+        94
+      ],
+      "root_type": "other",
+      "root_orders": null,
+      "irreducible_root_order": 5376,
+      "shortest_one_term_lag": 128
+    },
+    {
+      "group": "H2_O_I16128",
+      "coefficients": [
+        90,
+        70
+      ],
+      "root_type": "other",
+      "root_orders": null,
+      "irreducible_root_order": 16128,
+      "shortest_one_term_lag": 128
+    },
+    {
+      "group": "H2_O_I16128",
+      "coefficients": [
+        26,
+        11
+      ],
+      "root_type": "other",
+      "root_orders": null,
+      "irreducible_root_order": 16128,
+      "shortest_one_term_lag": 128
+    },
+    {
+      "group": "H2_O_I16128",
+      "coefficients": [
+        26,
+        74
+      ],
+      "root_type": "other",
+      "root_orders": null,
+      "irreducible_root_order": 16128,
+      "shortest_one_term_lag": 128
+    },
+    {
+      "group": "H2_O_I16128",
+      "coefficients": [
+        65,
+        88
+      ],
+      "root_type": "other",
+      "root_orders": null,
+      "irreducible_root_order": 16128,
+      "shortest_one_term_lag": 128
+    },
+    {
+      "group": "H2_O_I16128",
+      "coefficients": [
+        104,
+        82
+      ],
+      "root_type": "other",
+      "root_orders": null,
+      "irreducible_root_order": 16128,
+      "shortest_one_term_lag": 128
+    },
+    {
+      "group": "H2_O_I16128",
+      "coefficients": [
+        65,
+        120
+      ],
+      "root_type": "other",
+      "root_orders": null,
+      "irreducible_root_order": 16128,
+      "shortest_one_term_lag": 128
+    },
+    {
+      "group": "H3_A13",
+      "coefficients": [
+        13,
+        115
+      ],
+      "root_type": "root1",
+      "root_orders": [
+        1,
+        126
+      ],
+      "irreducible_root_order": null,
+      "shortest_one_term_lag": 126
+    },
+    {
+      "group": "H3_A13",
+      "coefficients": [
+        13,
+        14
+      ],
+      "root_type": "rootm1",
+      "root_orders": [
+        2,
+        126
+      ],
+      "irreducible_root_order": null,
+      "shortest_one_term_lag": 63
+    },
+    {
+      "group": "H3_A13",
+      "coefficients": [
+        13,
+        55
+      ],
+      "root_type": "other",
+      "root_orders": [
+        42,
+        126
+      ],
+      "irreducible_root_order": null,
+      "shortest_one_term_lag": 63
+    },
+    {
+      "group": "H3_A44",
+      "coefficients": [
+        44,
+        84
+      ],
+      "root_type": "root1",
+      "root_orders": [
+        1,
+        126
+      ],
+      "irreducible_root_order": null,
+      "shortest_one_term_lag": 126
+    },
+    {
+      "group": "H3_A44",
+      "coefficients": [
+        44,
+        45
+      ],
+      "root_type": "rootm1",
+      "root_orders": [
+        2,
+        126
+      ],
+      "irreducible_root_order": null,
+      "shortest_one_term_lag": 63
+    },
+    {
+      "group": "H3_A44",
+      "coefficients": [
+        44,
+        59
+      ],
+      "root_type": "other",
+      "root_orders": [
+        42,
+        126
+      ],
+      "irreducible_root_order": null,
+      "shortest_one_term_lag": 63
+    },
+    {
+      "group": "H3_A47",
+      "coefficients": [
+        47,
+        81
+      ],
+      "root_type": "root1",
+      "root_orders": [
+        1,
+        126
+      ],
+      "irreducible_root_order": null,
+      "shortest_one_term_lag": 126
+    },
+    {
+      "group": "H3_A47",
+      "coefficients": [
+        47,
+        48
+      ],
+      "root_type": "rootm1",
+      "root_orders": [
+        2,
+        126
+      ],
+      "irreducible_root_order": null,
+      "shortest_one_term_lag": 63
+    },
+    {
+      "group": "H3_A47",
+      "coefficients": [
+        47,
+        24
+      ],
+      "root_type": "other",
+      "root_orders": [
+        42,
+        126
+      ],
+      "irreducible_root_order": null,
+      "shortest_one_term_lag": 63
+    },
+    {
+      "group": "H3_A54",
+      "coefficients": [
+        54,
+        74
+      ],
+      "root_type": "root1",
+      "root_orders": [
+        1,
+        126
+      ],
+      "irreducible_root_order": null,
+      "shortest_one_term_lag": 126
+    },
+    {
+      "group": "H3_A54",
+      "coefficients": [
+        54,
+        55
+      ],
+      "root_type": "rootm1",
+      "root_orders": [
+        2,
+        126
+      ],
+      "irreducible_root_order": null,
+      "shortest_one_term_lag": 63
+    },
+    {
+      "group": "H3_A54",
+      "coefficients": [
+        54,
+        48
+      ],
+      "root_type": "other",
+      "root_orders": [
+        42,
+        126
+      ],
+      "irreducible_root_order": null,
+      "shortest_one_term_lag": 63
+    },
+    {
+      "group": "H3_A56",
+      "coefficients": [
+        56,
+        72
+      ],
+      "root_type": "root1",
+      "root_orders": [
+        1,
+        126
+      ],
+      "irreducible_root_order": null,
+      "shortest_one_term_lag": 126
+    },
+    {
+      "group": "H3_A56",
+      "coefficients": [
+        56,
+        57
+      ],
+      "root_type": "rootm1",
+      "root_orders": [
+        2,
+        126
+      ],
+      "irreducible_root_order": null,
+      "shortest_one_term_lag": 63
+    },
+    {
+      "group": "H3_A56",
+      "coefficients": [
+        56,
+        93
+      ],
+      "root_type": "other",
+      "root_orders": [
+        42,
+        126
+      ],
+      "irreducible_root_order": null,
+      "shortest_one_term_lag": 63
+    },
+    {
+      "group": "H3_A57",
+      "coefficients": [
+        57,
+        71
+      ],
+      "root_type": "root1",
+      "root_orders": [
+        1,
+        126
+      ],
+      "irreducible_root_order": null,
+      "shortest_one_term_lag": 126
+    },
+    {
+      "group": "H3_A57",
+      "coefficients": [
+        57,
+        58
+      ],
+      "root_type": "rootm1",
+      "root_orders": [
+        2,
+        126
+      ],
+      "irreducible_root_order": null,
+      "shortest_one_term_lag": 63
+    },
+    {
+      "group": "H3_A57",
+      "coefficients": [
+        57,
+        75
+      ],
+      "root_type": "other",
+      "root_orders": [
+        42,
+        126
+      ],
+      "irreducible_root_order": null,
+      "shortest_one_term_lag": 63
+    },
+    {
+      "group": "H3_A66",
+      "coefficients": [
+        66,
+        62
+      ],
+      "root_type": "root1",
+      "root_orders": [
+        1,
+        126
+      ],
+      "irreducible_root_order": null,
+      "shortest_one_term_lag": 126
+    },
+    {
+      "group": "H3_A66",
+      "coefficients": [
+        66,
+        67
+      ],
+      "root_type": "rootm1",
+      "root_orders": [
+        2,
+        126
+      ],
+      "irreducible_root_order": null,
+      "shortest_one_term_lag": 63
+    },
+    {
+      "group": "H3_A66",
+      "coefficients": [
+        66,
+        85
+      ],
+      "root_type": "other",
+      "root_orders": [
+        42,
+        126
+      ],
+      "irreducible_root_order": null,
+      "shortest_one_term_lag": 63
+    },
+    {
+      "group": "H3_A84",
+      "coefficients": [
+        84,
+        44
+      ],
+      "root_type": "root1",
+      "root_orders": [
+        1,
+        126
+      ],
+      "irreducible_root_order": null,
+      "shortest_one_term_lag": 126
+    },
+    {
+      "group": "H3_A84",
+      "coefficients": [
+        84,
+        85
+      ],
+      "root_type": "rootm1",
+      "root_orders": [
+        2,
+        126
+      ],
+      "irreducible_root_order": null,
+      "shortest_one_term_lag": 63
+    },
+    {
+      "group": "H3_A84",
+      "coefficients": [
+        84,
+        96
+      ],
+      "root_type": "other",
+      "root_orders": [
+        42,
+        126
+      ],
+      "irreducible_root_order": null,
+      "shortest_one_term_lag": 63
+    },
+    {
+      "group": "H3_A92",
+      "coefficients": [
+        92,
+        36
+      ],
+      "root_type": "root1",
+      "root_orders": [
+        1,
+        126
+      ],
+      "irreducible_root_order": null,
+      "shortest_one_term_lag": 126
+    },
+    {
+      "group": "H3_A92",
+      "coefficients": [
+        92,
+        93
+      ],
+      "root_type": "rootm1",
+      "root_orders": [
+        2,
+        126
+      ],
+      "irreducible_root_order": null,
+      "shortest_one_term_lag": 63
+    },
+    {
+      "group": "H3_A92",
+      "coefficients": [
+        92,
+        56
+      ],
+      "root_type": "other",
+      "root_orders": [
+        42,
+        126
+      ],
+      "irreducible_root_order": null,
+      "shortest_one_term_lag": 63
+    },
+    {
+      "group": "H3_A117",
+      "coefficients": [
+        117,
+        11
+      ],
+      "root_type": "root1",
+      "root_orders": [
+        1,
+        126
+      ],
+      "irreducible_root_order": null,
+      "shortest_one_term_lag": 126
+    },
+    {
+      "group": "H3_A117",
+      "coefficients": [
+        117,
+        118
+      ],
+      "root_type": "rootm1",
+      "root_orders": [
+        2,
+        126
+      ],
+      "irreducible_root_order": null,
+      "shortest_one_term_lag": 63
+    },
+    {
+      "group": "H3_A117",
+      "coefficients": [
+        117,
+        75
+      ],
+      "root_type": "other",
+      "root_orders": [
+        42,
+        126
+      ],
+      "irreducible_root_order": null,
+      "shortest_one_term_lag": 63
+    }
+  ]
+}
