@@ -1,0 +1,125 @@
+{
+  "concurrency": 1,
+  "experiments": [
+    {
+      "name": "single_o4_coefrand_d512l2r8h4_P23_seed17996",
+      "task": "single",
+      "config": {
+        "RANDOM_SEED": 17996,
+        "P": 23,
+        "D_MODEL": 512,
+        "N_LAYER": 2,
+        "N_HEAD": 4,
+        "MLP_RATIO": 8,
+        "ORDER": 4,
+        "RULES": [
+          [
+            7,
+            22,
+            15,
+            4
+          ]
+        ],
+        "EXPOSURE_RATIOS": 0.7,
+        "NUM_MASK": 3,
+        "MAX_TRAIN_HOURS": 1
+      }
+    },
+    {
+      "name": "single_o4_coefrand_d512l2r8h4_P23_seed18996",
+      "task": "single",
+      "config": {
+        "RANDOM_SEED": 18996,
+        "P": 23,
+        "D_MODEL": 512,
+        "N_LAYER": 2,
+        "N_HEAD": 4,
+        "MLP_RATIO": 8,
+        "ORDER": 4,
+        "RULES": [
+          [
+            21,
+            22,
+            16,
+            18
+          ]
+        ],
+        "EXPOSURE_RATIOS": 0.7,
+        "NUM_MASK": 3,
+        "MAX_TRAIN_HOURS": 1
+      }
+    },
+    {
+      "name": "single_o4_coefrand_d512l2r8h4_P23_seed19996",
+      "task": "single",
+      "config": {
+        "RANDOM_SEED": 19996,
+        "P": 23,
+        "D_MODEL": 512,
+        "N_LAYER": 2,
+        "N_HEAD": 4,
+        "MLP_RATIO": 8,
+        "ORDER": 4,
+        "RULES": [
+          [
+            8,
+            6,
+            13,
+            9
+          ]
+        ],
+        "EXPOSURE_RATIOS": 0.7,
+        "NUM_MASK": 3,
+        "MAX_TRAIN_HOURS": 1
+      }
+    },
+    {
+      "name": "single_o4_coefrand_d512l2r8h4_P23_seed20996",
+      "task": "single",
+      "config": {
+        "RANDOM_SEED": 20996,
+        "P": 23,
+        "D_MODEL": 512,
+        "N_LAYER": 2,
+        "N_HEAD": 4,
+        "MLP_RATIO": 8,
+        "ORDER": 4,
+        "RULES": [
+          [
+            11,
+            12,
+            3,
+            7
+          ]
+        ],
+        "EXPOSURE_RATIOS": 0.7,
+        "NUM_MASK": 3,
+        "MAX_TRAIN_HOURS": 1
+      }
+    },
+    {
+      "name": "single_o4_coefrand_d512l2r8h4_P23_seed21996",
+      "task": "single",
+      "config": {
+        "RANDOM_SEED": 21996,
+        "P": 23,
+        "D_MODEL": 512,
+        "N_LAYER": 2,
+        "N_HEAD": 4,
+        "MLP_RATIO": 8,
+        "ORDER": 4,
+        "RULES": [
+          [
+            17,
+            3,
+            2,
+            14
+          ]
+        ],
+        "EXPOSURE_RATIOS": 0.7,
+        "NUM_MASK": 3,
+        "MAX_TRAIN_HOURS": 1
+      }
+    }
+  ]
+}

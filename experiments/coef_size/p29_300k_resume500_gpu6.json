@@ -1,0 +1,92 @@
+{
+  "concurrency": 1,
+  "experiments": [
+    {
+      "name": "single_o4_a1b4c18d24_d512l2r8h4_P29_300k_seed17996",
+      "task": "single",
+      "config": {
+        "RANDOM_SEED": 17996,
+        "P": 29,
+        "D_MODEL": 512,
+        "N_LAYER": 2,
+        "N_HEAD": 4,
+        "MLP_RATIO": 8,
+        "ORDER": 4,
+        "RULES": [
+          [
+            1,
+            4,
+            18,
+            24
+          ]
+        ],
+        "NUM_TRAIN_SAMPLES": 300000,
+        "NUM_TEST_SAMPLES": 256,
+        "DATA_MODE": "sampled_fresh_test",
+        "FRESH_TEST_PER_EVAL": true,
+        "NUM_MASK": 3,
+        "MAX_TRAIN_HOURS": 6,
+        "RESUME_FROM": "/data/cxm/models/single_o4_p29_300k_freshtest_q0/single_o4_a1b4c18d24_d512l2r8h4_P29_300k_seed17996_resume.pth",
+        "EPOCH_CAP": 500
+      }
+    },
+    {
+      "name": "single_o4_a1b4c19d16_d512l2r8h4_P29_300k_seed17996",
+      "task": "single",
+      "config": {
+        "RANDOM_SEED": 17996,
+        "P": 29,
+        "D_MODEL": 512,
+        "N_LAYER": 2,
+        "N_HEAD": 4,
+        "MLP_RATIO": 8,
+        "ORDER": 4,
+        "RULES": [
+          [
+            1,
+            4,
+            19,
+            16
+          ]
+        ],
+        "NUM_TRAIN_SAMPLES": 300000,
+        "NUM_TEST_SAMPLES": 256,
+        "DATA_MODE": "sampled_fresh_test",
+        "FRESH_TEST_PER_EVAL": true,
+        "NUM_MASK": 3,
+        "MAX_TRAIN_HOURS": 6,
+        "RESUME_FROM": "/data/cxm/models/single_o4_p29_300k_freshtest_q0/single_o4_a1b4c19d16_d512l2r8h4_P29_300k_seed17996_resume.pth",
+        "EPOCH_CAP": 500
+      }
+    },
+    {
+      "name": "single_o4_a1b7c2d25_d512l2r8h4_P29_300k_seed17996",
+      "task": "single",
+      "config": {
+        "RANDOM_SEED": 17996,
+        "P": 29,
+        "D_MODEL": 512,
+        "N_LAYER": 2,
+        "N_HEAD": 4,
+        "MLP_RATIO": 8,
+        "ORDER": 4,
+        "RULES": [
+          [
+            1,
+            7,
+            2,
+            25
+          ]
+        ],
+        "NUM_TRAIN_SAMPLES": 300000,
+        "NUM_TEST_SAMPLES": 256,
+        "DATA_MODE": "sampled_fresh_test",
+        "FRESH_TEST_PER_EVAL": true,
+        "NUM_MASK": 3,
+        "MAX_TRAIN_HOURS": 6,
+        "RESUME_FROM": "/data/cxm/models/single_o4_p29_300k_freshtest_q0/single_o4_a1b7c2d25_d512l2r8h4_P29_300k_seed17996_resume.pth",
+        "EPOCH_CAP": 500
+      }
+    }
+  ]
+}

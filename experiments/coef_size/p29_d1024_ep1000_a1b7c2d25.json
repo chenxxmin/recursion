@@ -1,0 +1,31 @@
+{
+  "concurrency": 1,
+  "experiments": [
+    {
+      "name": "single_o4_a1b7c2d25_d1024l2r8h4_P29_seed17996",
+      "task": "single",
+      "config": {
+        "RANDOM_SEED": 17996,
+        "P": 29,
+        "D_MODEL": 1024,
+        "N_LAYER": 2,
+        "N_HEAD": 4,
+        "MLP_RATIO": 8,
+        "ORDER": 4,
+        "RULES": [
+          [
+            1,
+            7,
+            2,
+            25
+          ]
+        ],
+        "EXPOSURE_RATIOS": 0.7,
+        "NUM_MASK": 3,
+        "EPOCH_CAP": 1000,
+        "MAX_TRAIN_HOURS": 11,
+        "RESUME_FROM": "/data/cxm/models/single_o4_p29_d1024_q1/single_o4_a1b7c2d25_d1024l2r8h4_P29_seed17996_resume.pth"
+      }
+    }
+  ]
+}

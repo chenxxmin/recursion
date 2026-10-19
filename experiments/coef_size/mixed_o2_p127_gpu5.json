@@ -1,0 +1,208 @@
+{
+  "concurrency": 1,
+  "experiments": [
+    {
+      "name": "mixed_o2_coeflarge_d512l2r8h4_P127_seed20996",
+      "task": "mixed",
+      "config": {
+        "RANDOM_SEED": 20996,
+        "P": 127,
+        "D_MODEL": 512,
+        "N_LAYER": 2,
+        "N_HEAD": 4,
+        "MLP_RATIO": 8,
+        "ORDER": 2,
+        "RULES": [
+          [
+            105,
+            108
+          ],
+          [
+            89,
+            97
+          ]
+        ],
+        "EXPOSURE_RATIOS": [
+          0.7,
+          0.7
+        ],
+        "NUM_MASK": 2,
+        "MAX_TRAIN_HOURS": 1
+      }
+    },
+    {
+      "name": "mixed_o2_coeflarge_d512l2r8h4_P127_seed21996",
+      "task": "mixed",
+      "config": {
+        "RANDOM_SEED": 21996,
+        "P": 127,
+        "D_MODEL": 512,
+        "N_LAYER": 2,
+        "N_HEAD": 4,
+        "MLP_RATIO": 8,
+        "ORDER": 2,
+        "RULES": [
+          [
+            118,
+            117
+          ],
+          [
+            89,
+            88
+          ]
+        ],
+        "EXPOSURE_RATIOS": [
+          0.7,
+          0.7
+        ],
+        "NUM_MASK": 2,
+        "MAX_TRAIN_HOURS": 1
+      }
+    },
+    {
+      "name": "mixed_o2_coeflarge_d512l2r8h4_P127_seed22996",
+      "task": "mixed",
+      "config": {
+        "RANDOM_SEED": 22996,
+        "P": 127,
+        "D_MODEL": 512,
+        "N_LAYER": 2,
+        "N_HEAD": 4,
+        "MLP_RATIO": 8,
+        "ORDER": 2,
+        "RULES": [
+          [
+            106,
+            116
+          ],
+          [
+            89,
+            109
+          ]
+        ],
+        "EXPOSURE_RATIOS": [
+          0.7,
+          0.7
+        ],
+        "NUM_MASK": 2,
+        "MAX_TRAIN_HOURS": 1
+      }
+    },
+    {
+      "name": "mixed_o2_coeflarge_d512l2r8h4_P127_seed23996",
+      "task": "mixed",
+      "config": {
+        "RANDOM_SEED": 23996,
+        "P": 127,
+        "D_MODEL": 512,
+        "N_LAYER": 2,
+        "N_HEAD": 4,
+        "MLP_RATIO": 8,
+        "ORDER": 2,
+        "RULES": [
+          [
+            107,
+            109
+          ],
+          [
+            115,
+            105
+          ]
+        ],
+        "EXPOSURE_RATIOS": [
+          0.7,
+          0.7
+        ],
+        "NUM_MASK": 2,
+        "MAX_TRAIN_HOURS": 1
+      }
+    },
+    {
+      "name": "mixed_o2_coeflarge_d512l2r8h4_P127_seed24996",
+      "task": "mixed",
+      "config": {
+        "RANDOM_SEED": 24996,
+        "P": 127,
+        "D_MODEL": 512,
+        "N_LAYER": 2,
+        "N_HEAD": 4,
+        "MLP_RATIO": 8,
+        "ORDER": 2,
+        "RULES": [
+          [
+            120,
+            108
+          ],
+          [
+            107,
+            103
+          ]
+        ],
+        "EXPOSURE_RATIOS": [
+          0.7,
+          0.7
+        ],
+        "NUM_MASK": 2,
+        "MAX_TRAIN_HOURS": 1
+      }
+    },
+    {
+      "name": "mixed_o2_coeflarge_d512l2r8h4_P127_seed25996",
+      "task": "mixed",
+      "config": {
+        "RANDOM_SEED": 25996,
+        "P": 127,
+        "D_MODEL": 512,
+        "N_LAYER": 2,
+        "N_HEAD": 4,
+        "MLP_RATIO": 8,
+        "ORDER": 2,
+        "RULES": [
+          [
+            109,
+            108
+          ],
+          [
+            93,
+            125
+          ]
+        ],
+        "EXPOSURE_RATIOS": [
+          0.7,
+          0.7
+        ],
+        "NUM_MASK": 2,
+        "MAX_TRAIN_HOURS": 1
+      }
+    },
+    {
+      "name": "mixed_o2_coeflarge_d512l2r8h4_P127_seed26996",
+      "task": "mixed",
+      "config": {
+        "RANDOM_SEED": 26996,
+        "P": 127,
+        "D_MODEL": 512,
+        "N_LAYER": 2,
+        "N_HEAD": 4,
+        "MLP_RATIO": 8,
+        "ORDER": 2,
+        "RULES": [
+          [
+            123,
+            89
+          ],
+          [
+            114,
+            126
+          ]
+        ],
+        "EXPOSURE_RATIOS": [
+          0.7,
+          0.7
+        ],
+        "NUM_MASK": 2,
+        "MAX_TRAIN_HOURS": 1
+      }
+    }
+  ]
+}

@@ -1,0 +1,237 @@
+{
+  "concurrency": 1,
+  "experiments": [
+    {
+      "name": "mixed_o2_coefsmall_d512l2r8h4_P127_seed25996",
+      "task": "mixed",
+      "config": {
+        "RANDOM_SEED": 25996,
+        "P": 127,
+        "D_MODEL": 512,
+        "N_LAYER": 2,
+        "N_HEAD": 4,
+        "MLP_RATIO": 8,
+        "ORDER": 2,
+        "RULES": [
+          [
+            25,
+            24
+          ],
+          [
+            9,
+            41
+          ]
+        ],
+        "EXPOSURE_RATIOS": [
+          0.7,
+          0.7
+        ],
+        "NUM_MASK": 2,
+        "MAX_TRAIN_HOURS": 1
+      }
+    },
+    {
+      "name": "mixed_o2_coefsmall_d512l2r8h4_P127_seed26996",
+      "task": "mixed",
+      "config": {
+        "RANDOM_SEED": 26996,
+        "P": 127,
+        "D_MODEL": 512,
+        "N_LAYER": 2,
+        "N_HEAD": 4,
+        "MLP_RATIO": 8,
+        "ORDER": 2,
+        "RULES": [
+          [
+            39,
+            5
+          ],
+          [
+            30,
+            42
+          ]
+        ],
+        "EXPOSURE_RATIOS": [
+          0.7,
+          0.7
+        ],
+        "NUM_MASK": 2,
+        "MAX_TRAIN_HOURS": 1
+      }
+    },
+    {
+      "name": "mixed_o2_coefmid_d512l2r8h4_P127_seed17996",
+      "task": "mixed",
+      "config": {
+        "RANDOM_SEED": 17996,
+        "P": 127,
+        "D_MODEL": 512,
+        "N_LAYER": 2,
+        "N_HEAD": 4,
+        "MLP_RATIO": 8,
+        "ORDER": 2,
+        "RULES": [
+          [
+            55,
+            71
+          ],
+          [
+            50,
+            65
+          ]
+        ],
+        "EXPOSURE_RATIOS": [
+          0.7,
+          0.7
+        ],
+        "NUM_MASK": 2,
+        "MAX_TRAIN_HOURS": 1
+      }
+    },
+    {
+      "name": "mixed_o2_coefmid_d512l2r8h4_P127_seed18996",
+      "task": "mixed",
+      "config": {
+        "RANDOM_SEED": 18996,
+        "P": 127,
+        "D_MODEL": 512,
+        "N_LAYER": 2,
+        "N_HEAD": 4,
+        "MLP_RATIO": 8,
+        "ORDER": 2,
+        "RULES": [
+          [
+            84,
+            73
+          ],
+          [
+            78,
+            63
+          ]
+        ],
+        "EXPOSURE_RATIOS": [
+          0.7,
+          0.7
+        ],
+        "NUM_MASK": 2,
+        "MAX_TRAIN_HOURS": 1
+      }
+    },
+    {
+      "name": "mixed_o2_coefmid_d512l2r8h4_P127_seed19996",
+      "task": "mixed",
+      "config": {
+        "RANDOM_SEED": 19996,
+        "P": 127,
+        "D_MODEL": 512,
+        "N_LAYER": 2,
+        "N_HEAD": 4,
+        "MLP_RATIO": 8,
+        "ORDER": 2,
+        "RULES": [
+          [
+            57,
+            53
+          ],
+          [
+            68,
+            59
+          ]
+        ],
+        "EXPOSURE_RATIOS": [
+          0.7,
+          0.7
+        ],
+        "NUM_MASK": 2,
+        "MAX_TRAIN_HOURS": 1
+      }
+    },
+    {
+      "name": "mixed_o2_coefmid_d512l2r8h4_P127_seed20996",
+      "task": "mixed",
+      "config": {
+        "RANDOM_SEED": 20996,
+        "P": 127,
+        "D_MODEL": 512,
+        "N_LAYER": 2,
+        "N_HEAD": 4,
+        "MLP_RATIO": 8,
+        "ORDER": 2,
+        "RULES": [
+          [
+            63,
+            66
+          ],
+          [
+            47,
+            55
+          ]
+        ],
+        "EXPOSURE_RATIOS": [
+          0.7,
+          0.7
+        ],
+        "NUM_MASK": 2,
+        "MAX_TRAIN_HOURS": 1
+      }
+    },
+    {
+      "name": "mixed_o2_coefmid_d512l2r8h4_P127_seed21996",
+      "task": "mixed",
+      "config": {
+        "RANDOM_SEED": 21996,
+        "P": 127,
+        "D_MODEL": 512,
+        "N_LAYER": 2,
+        "N_HEAD": 4,
+        "MLP_RATIO": 8,
+        "ORDER": 2,
+        "RULES": [
+          [
+            76,
+            75
+          ],
+          [
+            47,
+            46
+          ]
+        ],
+        "EXPOSURE_RATIOS": [
+          0.7,
+          0.7
+        ],
+        "NUM_MASK": 2,
+        "MAX_TRAIN_HOURS": 1
+      }
+    },
+    {
+      "name": "mixed_o2_coefmid_d512l2r8h4_P127_seed22996",
+      "task": "mixed",
+      "config": {
+        "RANDOM_SEED": 22996,
+        "P": 127,
+        "D_MODEL": 512,
+        "N_LAYER": 2,
+        "N_HEAD": 4,
+        "MLP_RATIO": 8,
+        "ORDER": 2,
+        "RULES": [
+          [
+            64,
+            74
+          ],
+          [
+            47,
+            67
+          ]
+        ],
+        "EXPOSURE_RATIOS": [
+          0.7,
+          0.7
+        ],
+        "NUM_MASK": 2,
+        "MAX_TRAIN_HOURS": 1
+      }
+    }
+  ]
+}

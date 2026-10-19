@@ -1,0 +1,55 @@
+{
+  "concurrency": 1,
+  "experiments": [
+    {
+      "name": "single_o4_coefrand_d512l2r8h4_P23_seed25996",
+      "task": "single",
+      "config": {
+        "RANDOM_SEED": 25996,
+        "P": 23,
+        "D_MODEL": 512,
+        "N_LAYER": 2,
+        "N_HEAD": 4,
+        "MLP_RATIO": 8,
+        "ORDER": 4,
+        "RULES": [
+          [
+            13,
+            12,
+            5,
+            21
+          ]
+        ],
+        "EXPOSURE_RATIOS": 0.7,
+        "NUM_MASK": 3,
+        "MAX_TRAIN_HOURS": 2,
+        "RESUME_FROM": "/data/cxm/models/single_o4_p23_gpu1/single_o4_coefrand_d512l2r8h4_P23_seed25996_resume.pth"
+      }
+    },
+    {
+      "name": "single_o4_coefrand_d512l2r8h4_P23_seed26996",
+      "task": "single",
+      "config": {
+        "RANDOM_SEED": 26996,
+        "P": 23,
+        "D_MODEL": 512,
+        "N_LAYER": 2,
+        "N_HEAD": 4,
+        "MLP_RATIO": 8,
+        "ORDER": 4,
+        "RULES": [
+          [
+            20,
+            3,
+            22,
+            15
+          ]
+        ],
+        "EXPOSURE_RATIOS": 0.7,
+        "NUM_MASK": 3,
+        "MAX_TRAIN_HOURS": 2,
+        "RESUME_FROM": "/data/cxm/models/single_o4_p23_gpu1/single_o4_coefrand_d512l2r8h4_P23_seed26996_resume.pth"
+      }
+    }
+  ]
+}

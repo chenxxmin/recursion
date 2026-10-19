@@ -1,0 +1,29 @@
+{
+  "concurrency": 1,
+  "experiments": [
+    {
+      "name": "single_o4_a1b9c17d1_d512l4r8h4_P29_seed17996",
+      "task": "single",
+      "config": {
+        "RANDOM_SEED": 17996,
+        "P": 29,
+        "D_MODEL": 512,
+        "N_LAYER": 4,
+        "N_HEAD": 4,
+        "MLP_RATIO": 8,
+        "ORDER": 4,
+        "RULES": [
+          [
+            1,
+            9,
+            17,
+            1
+          ]
+        ],
+        "EXPOSURE_RATIOS": 0.7,
+        "NUM_MASK": 3,
+        "MAX_TRAIN_HOURS": 2
+      }
+    }
+  ]
+}

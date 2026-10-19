@@ -1,0 +1,98 @@
+{
+  "concurrency": 1,
+  "experiments": [
+    {
+      "name": "mixed_o2_coeflarge_miss01len1_d512l2r8h4_P127_seed18996",
+      "task": "mixed",
+      "config": {
+        "RANDOM_SEED": 18996,
+        "P": 127,
+        "D_MODEL": 512,
+        "N_LAYER": 2,
+        "N_HEAD": 4,
+        "MLP_RATIO": 8,
+        "ORDER": 2,
+        "RULES": [
+          [
+            126,
+            115
+          ],
+          [
+            120,
+            105
+          ]
+        ],
+        "EXPOSURE_RATIOS": [
+          0.7,
+          0.7
+        ],
+        "NUM_MASK": 2,
+        "MISSING_PROB": 0.1,
+        "MISS_LEN": 1,
+        "MAX_TRAIN_HOURS": 1
+      }
+    },
+    {
+      "name": "mixed_o2_coeflarge_miss01len1_d512l2r8h4_P127_seed19996",
+      "task": "mixed",
+      "config": {
+        "RANDOM_SEED": 19996,
+        "P": 127,
+        "D_MODEL": 512,
+        "N_LAYER": 2,
+        "N_HEAD": 4,
+        "MLP_RATIO": 8,
+        "ORDER": 2,
+        "RULES": [
+          [
+            99,
+            95
+          ],
+          [
+            110,
+            101
+          ]
+        ],
+        "EXPOSURE_RATIOS": [
+          0.7,
+          0.7
+        ],
+        "NUM_MASK": 2,
+        "MISSING_PROB": 0.1,
+        "MISS_LEN": 1,
+        "MAX_TRAIN_HOURS": 1
+      }
+    },
+    {
+      "name": "mixed_o2_coeflarge_miss01len1_d512l2r8h4_P127_seed20996",
+      "task": "mixed",
+      "config": {
+        "RANDOM_SEED": 20996,
+        "P": 127,
+        "D_MODEL": 512,
+        "N_LAYER": 2,
+        "N_HEAD": 4,
+        "MLP_RATIO": 8,
+        "ORDER": 2,
+        "RULES": [
+          [
+            105,
+            108
+          ],
+          [
+            89,
+            97
+          ]
+        ],
+        "EXPOSURE_RATIOS": [
+          0.7,
+          0.7
+        ],
+        "NUM_MASK": 2,
+        "MISSING_PROB": 0.1,
+        "MISS_LEN": 1,
+        "MAX_TRAIN_HOURS": 1
+      }
+    }
+  ]
+}

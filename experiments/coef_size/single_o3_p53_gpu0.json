@@ -1,0 +1,350 @@
+{
+  "concurrency": 1,
+  "experiments": [
+    {
+      "name": "single_o3_coefsmall_d512l2r8h4_P53_seed17996",
+      "task": "single",
+      "config": {
+        "RANDOM_SEED": 17996,
+        "P": 53,
+        "D_MODEL": 512,
+        "N_LAYER": 2,
+        "N_HEAD": 4,
+        "MLP_RATIO": 8,
+        "ORDER": 3,
+        "RULES": [
+          [
+            7,
+            15,
+            2
+          ]
+        ],
+        "EXPOSURE_RATIOS": 0.7,
+        "NUM_MASK": 2,
+        "MAX_TRAIN_HOURS": 1
+      }
+    },
+    {
+      "name": "single_o3_coefsmall_d512l2r8h4_P53_seed18996",
+      "task": "single",
+      "config": {
+        "RANDOM_SEED": 18996,
+        "P": 53,
+        "D_MODEL": 512,
+        "N_LAYER": 2,
+        "N_HEAD": 4,
+        "MLP_RATIO": 8,
+        "ORDER": 3,
+        "RULES": [
+          [
+            16,
+            11,
+            12
+          ]
+        ],
+        "EXPOSURE_RATIOS": 0.7,
+        "NUM_MASK": 2,
+        "MAX_TRAIN_HOURS": 1
+      }
+    },
+    {
+      "name": "single_o3_coefsmall_d512l2r8h4_P53_seed19996",
+      "task": "single",
+      "config": {
+        "RANDOM_SEED": 19996,
+        "P": 53,
+        "D_MODEL": 512,
+        "N_LAYER": 2,
+        "N_HEAD": 4,
+        "MLP_RATIO": 8,
+        "ORDER": 3,
+        "RULES": [
+          [
+            8,
+            6,
+            7
+          ]
+        ],
+        "EXPOSURE_RATIOS": 0.7,
+        "NUM_MASK": 2,
+        "MAX_TRAIN_HOURS": 1
+      }
+    },
+    {
+      "name": "single_o3_coefsmall_d512l2r8h4_P53_seed20996",
+      "task": "single",
+      "config": {
+        "RANDOM_SEED": 20996,
+        "P": 53,
+        "D_MODEL": 512,
+        "N_LAYER": 2,
+        "N_HEAD": 4,
+        "MLP_RATIO": 8,
+        "ORDER": 3,
+        "RULES": [
+          [
+            11,
+            12,
+            2
+          ]
+        ],
+        "EXPOSURE_RATIOS": 0.7,
+        "NUM_MASK": 2,
+        "MAX_TRAIN_HOURS": 1
+      }
+    },
+    {
+      "name": "single_o3_coefsmall_d512l2r8h4_P53_seed21996",
+      "task": "single",
+      "config": {
+        "RANDOM_SEED": 21996,
+        "P": 53,
+        "D_MODEL": 512,
+        "N_LAYER": 2,
+        "N_HEAD": 4,
+        "MLP_RATIO": 8,
+        "ORDER": 3,
+        "RULES": [
+          [
+            17,
+            3,
+            1
+          ]
+        ],
+        "EXPOSURE_RATIOS": 0.7,
+        "NUM_MASK": 2,
+        "MAX_TRAIN_HOURS": 1
+      }
+    },
+    {
+      "name": "single_o3_coefsmall_d512l2r8h4_P53_seed22996",
+      "task": "single",
+      "config": {
+        "RANDOM_SEED": 22996,
+        "P": 53,
+        "D_MODEL": 512,
+        "N_LAYER": 2,
+        "N_HEAD": 4,
+        "MLP_RATIO": 8,
+        "ORDER": 3,
+        "RULES": [
+          [
+            11,
+            16,
+            2
+          ]
+        ],
+        "EXPOSURE_RATIOS": 0.7,
+        "NUM_MASK": 2,
+        "MAX_TRAIN_HOURS": 1
+      }
+    },
+    {
+      "name": "single_o3_coefsmall_d512l2r8h4_P53_seed23996",
+      "task": "single",
+      "config": {
+        "RANDOM_SEED": 23996,
+        "P": 53,
+        "D_MODEL": 512,
+        "N_LAYER": 2,
+        "N_HEAD": 4,
+        "MLP_RATIO": 8,
+        "ORDER": 3,
+        "RULES": [
+          [
+            12,
+            13,
+            8
+          ]
+        ],
+        "EXPOSURE_RATIOS": 0.7,
+        "NUM_MASK": 2,
+        "MAX_TRAIN_HOURS": 1
+      }
+    },
+    {
+      "name": "single_o3_coefsmall_d512l2r8h4_P53_seed24996",
+      "task": "single",
+      "config": {
+        "RANDOM_SEED": 24996,
+        "P": 53,
+        "D_MODEL": 512,
+        "N_LAYER": 2,
+        "N_HEAD": 4,
+        "MLP_RATIO": 8,
+        "ORDER": 3,
+        "RULES": [
+          [
+            12,
+            17,
+            15
+          ]
+        ],
+        "EXPOSURE_RATIOS": 0.7,
+        "NUM_MASK": 2,
+        "MAX_TRAIN_HOURS": 1
+      }
+    },
+    {
+      "name": "single_o3_coefsmall_d512l2r8h4_P53_seed25996",
+      "task": "single",
+      "config": {
+        "RANDOM_SEED": 25996,
+        "P": 53,
+        "D_MODEL": 512,
+        "N_LAYER": 2,
+        "N_HEAD": 4,
+        "MLP_RATIO": 8,
+        "ORDER": 3,
+        "RULES": [
+          [
+            13,
+            12,
+            3
+          ]
+        ],
+        "EXPOSURE_RATIOS": 0.7,
+        "NUM_MASK": 2,
+        "MAX_TRAIN_HOURS": 1
+      }
+    },
+    {
+      "name": "single_o3_coefsmall_d512l2r8h4_P53_seed26996",
+      "task": "single",
+      "config": {
+        "RANDOM_SEED": 26996,
+        "P": 53,
+        "D_MODEL": 512,
+        "N_LAYER": 2,
+        "N_HEAD": 4,
+        "MLP_RATIO": 8,
+        "ORDER": 3,
+        "RULES": [
+          [
+            3,
+            17,
+            11
+          ]
+        ],
+        "EXPOSURE_RATIOS": 0.7,
+        "NUM_MASK": 2,
+        "MAX_TRAIN_HOURS": 1
+      }
+    },
+    {
+      "name": "single_o3_coefmid_d512l2r8h4_P53_seed17996",
+      "task": "single",
+      "config": {
+        "RANDOM_SEED": 17996,
+        "P": 53,
+        "D_MODEL": 512,
+        "N_LAYER": 2,
+        "N_HEAD": 4,
+        "MLP_RATIO": 8,
+        "ORDER": 3,
+        "RULES": [
+          [
+            24,
+            32,
+            19
+          ]
+        ],
+        "EXPOSURE_RATIOS": 0.7,
+        "NUM_MASK": 2,
+        "MAX_TRAIN_HOURS": 1
+      }
+    },
+    {
+      "name": "single_o3_coefmid_d512l2r8h4_P53_seed18996",
+      "task": "single",
+      "config": {
+        "RANDOM_SEED": 18996,
+        "P": 53,
+        "D_MODEL": 512,
+        "N_LAYER": 2,
+        "N_HEAD": 4,
+        "MLP_RATIO": 8,
+        "ORDER": 3,
+        "RULES": [
+          [
+            33,
+            28,
+            29
+          ]
+        ],
+        "EXPOSURE_RATIOS": 0.7,
+        "NUM_MASK": 2,
+        "MAX_TRAIN_HOURS": 1
+      }
+    },
+    {
+      "name": "single_o3_coefmid_d512l2r8h4_P53_seed19996",
+      "task": "single",
+      "config": {
+        "RANDOM_SEED": 19996,
+        "P": 53,
+        "D_MODEL": 512,
+        "N_LAYER": 2,
+        "N_HEAD": 4,
+        "MLP_RATIO": 8,
+        "ORDER": 3,
+        "RULES": [
+          [
+            25,
+            23,
+            24
+          ]
+        ],
+        "EXPOSURE_RATIOS": 0.7,
+        "NUM_MASK": 2,
+        "MAX_TRAIN_HOURS": 1
+      }
+    },
+    {
+      "name": "single_o3_coefmid_d512l2r8h4_P53_seed20996",
+      "task": "single",
+      "config": {
+        "RANDOM_SEED": 20996,
+        "P": 53,
+        "D_MODEL": 512,
+        "N_LAYER": 2,
+        "N_HEAD": 4,
+        "MLP_RATIO": 8,
+        "ORDER": 3,
+        "RULES": [
+          [
+            28,
+            29,
+            19
+          ]
+        ],
+        "EXPOSURE_RATIOS": 0.7,
+        "NUM_MASK": 2,
+        "MAX_TRAIN_HOURS": 1
+      }
+    },
+    {
+      "name": "single_o3_coefmid_d512l2r8h4_P53_seed21996",
+      "task": "single",
+      "config": {
+        "RANDOM_SEED": 21996,
+        "P": 53,
+        "D_MODEL": 512,
+        "N_LAYER": 2,
+        "N_HEAD": 4,
+        "MLP_RATIO": 8,
+        "ORDER": 3,
+        "RULES": [
+          [
+            34,
+            20,
+            18
+          ]
+        ],
+        "EXPOSURE_RATIOS": 0.7,
+        "NUM_MASK": 2,
+        "MAX_TRAIN_HOURS": 1
+      }
+    }
+  ]
+}
