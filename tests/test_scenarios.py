@@ -351,6 +351,25 @@ def test_corrupt_fix_parallel_gate():
     assert norm['variant'] == 'corrupt_fix'
 
 
+def test_variant_seq_len_and_body_gates():
+    # SEQ_LEN_MIN/MAX 与 BODY_SUPERVISION 仅在变体下合法
+    _expect_error(lambda: normalize_task_config(
+        'single', {'P': 53, 'ORDER': 2, 'RULES': [[1, 1]], 'SEQ_LEN_MIN': 5,
+                   'SEQ_LEN_MAX': 10}), '变体')
+    _expect_error(lambda: normalize_task_config(
+        'single', {'P': 53, 'ORDER': 2, 'RULES': [[1, 1]],
+                   'BODY_SUPERVISION': False}), '变体')
+    _expect_error(lambda: normalize_task_config(
+        'single', {'P': 53, 'ORDER': 2, 'RULES': [[1, 1]],
+                   'TASK_VARIANT': 'fill_blank', 'SEQ_LEN_MIN': 10,
+                   'SEQ_LEN_MAX': 5}), 'min')
+    norm = normalize_task_config('single', {'P': 53, 'ORDER': 2, 'RULES': [[1, 1]],
+                                            'TASK_VARIANT': 'fill_blank',
+                                            'SEQ_LEN_MIN': 5, 'SEQ_LEN_MAX': 10,
+                                            'BODY_SUPERVISION': True})
+    assert norm['variant'] == 'fill_blank'
+
+
 if __name__ == '__main__':
     for _name, _fn in sorted(list(globals().items())):
         if _name.startswith('test_') and callable(_fn):

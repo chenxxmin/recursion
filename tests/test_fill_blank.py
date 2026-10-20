@@ -169,6 +169,45 @@ def test_run_experiment_fill_blank_test_all_positions():
         assert 'TEST_ALL_POSITIONS: 4 windows -> 32 deterministic test samples' in out2
 
 
+def test_collate_body_supervision():
+    # BODY_SUPERVISION：targets 前缀为干净序列，mask 覆盖主体 [body_from, L-1) + 输出槽
+    p, eos_id, L = 7, 8, 6
+    seqs = _addition_windows(p=p, n=8, length=L)
+    random.seed(5)
+    collate = make_fill_blank_collate(p=p, eos_id=eos_id,
+                                      body_supervision=True, body_from=1)
+    x, tag, targets, mask = collate(seqs)
+    clean = torch.stack(seqs)
+    for i in range(8):
+        k = (x[i, :L] != clean[i]).nonzero().flatten().item()
+        # targets 前缀是干净序列（targets[:, :L+1] = [clean[1:], EOS]）
+        assert torch.equal(targets[i, 1:L], clean[i, 1:])
+        # mask：body_from=1 -> target[1..L-2] 主体 + target[L] 输出槽；
+        # target[0]（预测 x1，初值位）与 target[L-1]（预测 EOS）不算
+        ones = mask[i].nonzero().flatten().tolist()
+        assert ones == list(range(1, L - 1)) + [L], f"mask: {ones}"
+
+
+def test_run_experiment_var_len_smoke():
+    # 不定长 SEQ_LEN_MIN/MAX + 主体监督，端到端冒烟
+    with tempfile.TemporaryDirectory() as tmpdir:
+        out, save_path = _run_experiment(tmpdir, {
+            'TASK_VARIANT': 'fill_blank', 'P': 17, 'ORDER': 1,
+            'RULES': [[1]], 'CONST': 1,
+            'SEQ_LEN_MIN': 3, 'SEQ_LEN_MAX': 5})
+        assert os.path.exists(save_path)
+        assert 'nan' not in out.lower()
+        assert 'variable length: windows cut to [3, 5]' in out
+        # 探针按最大长度出 5 个 k（不定长下逐 (l,k) 聚合）
+        probe_lines = [l for l in out.splitlines() if l.startswith('  PosProbe val|')]
+        assert probe_lines and probe_lines[0].count('k') == 5
+        latest = torch.load(os.path.splitext(save_path)[0] + '_latest.pth',
+                            weights_only=False)
+        sc = latest['config']
+        assert sc['seq_len_min'] == 3 and sc['seq_len_max'] == 5
+        assert sc['body_supervision'] is True
+
+
 if __name__ == '__main__':
     test_collate_layout()
     print('PASS test_collate_layout')
@@ -186,4 +225,8 @@ if __name__ == '__main__':
     print('PASS test_run_experiment_arithmetic_fill_blank_all_positions')
     test_run_experiment_fill_blank_test_all_positions()
     print('PASS test_run_experiment_fill_blank_test_all_positions')
+    test_collate_body_supervision()
+    print('PASS test_collate_body_supervision')
+    test_run_experiment_var_len_smoke()
+    print('PASS test_run_experiment_var_len_smoke')
     print('ALL TESTS PASSED: test_fill_blank.py')

@@ -124,6 +124,8 @@ loss_mask    = 仅最后两个 target 位为 1（EOS 槽预测位置 token，位
 ```
 
 - 配置约束：与 `MISSING_PROB > 0` 互斥（污损是任务内生的），同时设置报错；`NUM_MASK` 无意义（loss_mask 来自 collate），设置则警告忽略。
+- **主体监督 `BODY_SUPERVISION`**（2026-10-15，变体默认 **true**）：除输出位外，递推主体也计入 loss/acc——targets 前缀用干净序列（predict 口径），loss_mask 覆盖 [order-1, L-1) 主体区间 + 输出位。设 `false` 回到只有输出位的旧行为。
+- **不定长 `SEQ_LEN_MIN`/`SEQ_LEN_MAX`**（2026-10-15，仅变体）：设置后窗口长度逐样本均匀随机取自 [min, max]（数据集按 max 生成再截断，train/test/探针同样；要求 min > 阶数），分桶 sampler 按长度组 batch。词表/block 按 max 计算。缺省（null）= 定长 TRAIN_LEN/OOD_LEN。
 - 训练/评估零改动：mask 后 CE 只落在两个输出位；acc 为两个输出位的 token 级准确率，per-position acc 自动拆出位置 acc（`target[L]`）与值 acc（`target[L+1]`）；早停两制（静态 / fresh test 10 次均值）直接适用。
 - 结果口径：训练日志 best acc（污损是任务本体，无 clean/total 之分）。
 - checkpoint save_config 追加 `variant` / `eos_token_id` / `pos_token_base` / `vocab_size` 四键。
@@ -301,6 +303,7 @@ loss_mask    = 仅 EOS 槽一位为 1（acc 只有 target[L] 一个输出位）
 - **优化器**：`torch.optim.AdamW(model.parameters(), lr=LR, weight_decay=WEIGHT_DECAY)`
 - **学习率调度**：`CosineAnnealingLR(optimizer, T_max=EPOCHS)`
 - **梯度裁剪**：`clip_grad_norm_(model.parameters(), GRAD_CLIP_NORM)`（默认 1.0）
+- **`SAVE_CHECKPOINTS`**（2026-10-19，默认 `true`）：`false` 时训练全程不落任何存档——不写 `_best`/`_latest`/`_resume`/最终 `model.pth`，日志正常输出（用于大批量粗扫节省磁盘；超时/手动停止的实验无法续跑）。batch_run 的 attention 后处理因找不到模型文件自动跳过
 - **滚动 checkpoint**：每个 eval 点更新 `<model>_latest.pth`（完整训练状态，可直接 `RESUME_FROM`）；best 更新时写 `<model>_best.pth`（按 test accuracy 选择的纯权重，与最终保存同格式）。latest、resume、best 和最终权重均先写同目录临时文件，成功后原子替换；写入失败最多尝试 3 次，保留上一次完整存档（2026-09-21）。
 - **checkpoint save_config**：2026-10-08 起新 checkpoint 在原有字段外追加 `scenario` / `order` / `rules`（canonical）三键；仍能无歧义表达的旧字段（`ab_pairs`、小写 `a/b/c/d`、`recurrence` 名）照写，方便旧分析工具读取新 checkpoint。`rules.py::task_from_save_config` 优先读新块，没有则走旧反推逻辑（旧 checkpoint 全兼容）。
 - **损失函数**：每个时间步的交叉熵，按 `loss_mask` 平均（熵惩罚已于 2026-10-08 移除；mixed 的 rule loss 默认启用——`AUX_CLASSIFY: false` 时关闭——以权重 0.5 加回）。

@@ -354,7 +354,7 @@ def run_training_engine(model, train_loader, test_loader, optimizer, scheduler, 
                         first_task_weight=1.0, max_train_hours=None, resume_state=None,
                         test_loader_fn=None, grad_accum_steps=1, grad_clip_norm=1.0,
                         opt_diag_interval=0, extra_epochs_after_high_acc=0, epoch_cap=None,
-                        extra_eval_fn=None):
+                        extra_eval_fn=None, save_checkpoints=True):
     print(f"\nStart training...")
     best_acc = 0.0
     best_epoch = 0
@@ -413,11 +413,12 @@ def run_training_engine(model, train_loader, test_loader, optimizer, scheduler, 
                 # Rolling best checkpoint (weights only, same layout as the
                 # final save): overwritten whenever the best improves, so the
                 # best weights are always on disk even if the process dies.
-                _atomic_torch_save({'model_state_dict': model.state_dict(),
-                            'config': save_config,
-                            'best_accuracy': best_acc,
-                            'final_epoch': epoch},
-                           best_checkpoint_path(save_path))
+                if save_checkpoints:
+                    _atomic_torch_save({'model_state_dict': model.state_dict(),
+                                'config': save_config,
+                                'best_accuracy': best_acc,
+                                'final_epoch': epoch},
+                               best_checkpoint_path(save_path))
             else:
                 no_improve += eval_interval
             
@@ -479,50 +480,62 @@ def run_training_engine(model, train_loader, test_loader, optimizer, scheduler, 
 
             # Manual stop requested via SIGTERM: same checkpoint path as timeout.
             if _STOP_REQUESTED:
-                resume_path = resume_checkpoint_path(save_path)
-                save_resume_checkpoint(resume_path, model, optimizer, scheduler,
-                                       epoch + 1, best_acc, best_epoch, no_improve,
-                                       high_acc_epoch, save_config)
-                print(f"[STOP] Checkpoint saved at epoch {epoch}: "
-                      f"{os.path.abspath(resume_path)}")
+                if save_checkpoints:
+                    resume_path = resume_checkpoint_path(save_path)
+                    save_resume_checkpoint(resume_path, model, optimizer, scheduler,
+                                           epoch + 1, best_acc, best_epoch, no_improve,
+                                           high_acc_epoch, save_config)
+                    print(f"[STOP] Checkpoint saved at epoch {epoch}: "
+                          f"{os.path.abspath(resume_path)}")
+                else:
+                    print(f"[STOP] Epoch {epoch}: SAVE_CHECKPOINTS=false, no checkpoint saved")
                 return best_acc, epoch, True
 
             # Wall-clock limit: save a full resume checkpoint and bail out.
             # Checked at eval points so best_acc/no_improve are up to date.
             if max_train_hours is not None and \
                     (time.time() - train_t0) >= max_train_hours * 3600:
-                resume_path = resume_checkpoint_path(save_path)
-                save_resume_checkpoint(resume_path, model, optimizer, scheduler,
-                                       epoch + 1, best_acc, best_epoch, no_improve,
-                                       high_acc_epoch, save_config)
-                print(f"[TIMEOUT] Reached MAX_TRAIN_HOURS={max_train_hours} at epoch {epoch}; "
-                      f"resume checkpoint saved to: {os.path.abspath(resume_path)}")
+                if save_checkpoints:
+                    resume_path = resume_checkpoint_path(save_path)
+                    save_resume_checkpoint(resume_path, model, optimizer, scheduler,
+                                           epoch + 1, best_acc, best_epoch, no_improve,
+                                           high_acc_epoch, save_config)
+                    print(f"[TIMEOUT] Reached MAX_TRAIN_HOURS={max_train_hours} at epoch {epoch}; "
+                          f"resume checkpoint saved to: {os.path.abspath(resume_path)}")
+                else:
+                    print(f"[TIMEOUT] Reached MAX_TRAIN_HOURS={max_train_hours} at epoch {epoch}; "
+                          f"SAVE_CHECKPOINTS=false, no checkpoint saved")
                 return best_acc, epoch, True
 
             # Rolling latest checkpoint (full training state, RESUME_FROM-
             # compatible): overwritten at every eval point so a crash loses
             # at most one eval interval of progress.
-            save_resume_checkpoint(latest_checkpoint_path(save_path), model,
-                                   optimizer, scheduler, epoch + 1, best_acc,
-                                   best_epoch, no_improve, high_acc_epoch,
-                                   save_config)
+            if save_checkpoints:
+                save_resume_checkpoint(latest_checkpoint_path(save_path), model,
+                                       optimizer, scheduler, epoch + 1, best_acc,
+                                       best_epoch, no_improve, high_acc_epoch,
+                                       save_config)
     
     print(f"\n{'='*50}")
     # Normal completion and early stopping retain a full resumable state.
-    save_resume_checkpoint(resume_checkpoint_path(save_path), model, optimizer,
-                           scheduler, epoch + 1, best_acc, best_epoch, no_improve,
-                           high_acc_epoch, save_config)
-    print("Saving model...")
+    if save_checkpoints:
+        save_resume_checkpoint(resume_checkpoint_path(save_path), model, optimizer,
+                               scheduler, epoch + 1, best_acc, best_epoch, no_improve,
+                               high_acc_epoch, save_config)
     print(f"Training epochs: {epoch}")
-    save_dict = {
-        'model_state_dict': model.state_dict(),
-        'config': save_config,
-        'best_accuracy': best_acc,
-        'final_epoch': epoch
-    }
-    _atomic_torch_save(save_dict, save_path)
-    print(f"[OK] Model saved to: {os.path.abspath(save_path)}")
-    print(f"  File size: {os.path.getsize(save_path)/1024:.1f} KB")
+    if save_checkpoints:
+        print("Saving model...")
+        save_dict = {
+            'model_state_dict': model.state_dict(),
+            'config': save_config,
+            'best_accuracy': best_acc,
+            'final_epoch': epoch
+        }
+        _atomic_torch_save(save_dict, save_path)
+        print(f"[OK] Model saved to: {os.path.abspath(save_path)}")
+        print(f"  File size: {os.path.getsize(save_path)/1024:.1f} KB")
+    else:
+        print("SAVE_CHECKPOINTS=false: model checkpoint not saved")
     print(f"  Best test accuracy: {best_acc:.2%}")
     
     return best_acc, epoch, False

@@ -31,6 +31,7 @@
     "EARLY_STOP_EXTRA_EPOCHS": 0,
     "MAX_TRAIN_HOURS": null,
     "RESUME_FROM": null,
+    "SAVE_CHECKPOINTS": true,
     "DATA_MODE": null,
     "FRESH_TEST_PER_EVAL": false,
     "STATE_SPACE_CAP": null,

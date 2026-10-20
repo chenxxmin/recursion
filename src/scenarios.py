@@ -145,6 +145,16 @@ def _normalize_variant(scenario, cfg):
         raise ValueError(
             "CORRUPT_FIX_PARALLEL 仅 TASK_VARIANT='corrupt_fix' 支持"
             "（并行解码：值预测看不到位置答案）")
+    if (cfg.get('SEQ_LEN_MIN') is not None or cfg.get('SEQ_LEN_MAX') is not None):
+        if raw is None:
+            raise ValueError("SEQ_LEN_MIN/SEQ_LEN_MAX 仅 TASK_VARIANT 变体支持")
+        lo = cfg.get('SEQ_LEN_MIN')
+        hi = cfg.get('SEQ_LEN_MAX')
+        if not (isinstance(lo, int) and isinstance(hi, int) and 2 <= lo <= hi):
+            raise ValueError(f"SEQ_LEN_MIN/MAX 必须是 2 <= min <= max 的整数，got {lo}, {hi}")
+    if cfg.get('BODY_SUPERVISION') is not None and raw is None:
+        raise ValueError("BODY_SUPERVISION 仅 TASK_VARIANT 变体支持"
+                         "（变体默认 true；标准任务不需要）")
     if (cfg.get('TEST_ALL_POSITIONS') and cfg.get('FILL_BLANK_ALL_POSITIONS')
             and raw == 'fill_blank'):
         warnings.warn(

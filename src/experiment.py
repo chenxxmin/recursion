@@ -111,35 +111,45 @@ def _print_task_banner(block_size, train_len, number_theory_msg):
     print()
 
 
-def _make_pos_probe(windows, collate, length, batch_size):
+def _make_pos_probe(windows, collate, batch_size):
     """POS_PROBE: 固定探针窗口集上按挖空/污损位置 k 分桶的评估钩子。
 
     返回 fn(model, device) -> list[str]（每 eval 点由引擎打印）。
-    对每个 k 用 (seq, k) 元组固定挖空位置，跑 evaluate 取 per_pos_acc：
-    fill_blank 只有值槽（target[L]）；corrupt_fix 有位置槽 target[L] 和
-    值槽 target[L+1]，分两行打印。corrupt_fix 的错误值仍逐次随机
-    （位置 acc 对错值不敏感）；fill_blank 探针完全确定。
+    逐 (长度 l, 位置 k) 用 (seq, k) 元组固定挖空位置跑 evaluate，再按 k 对
+    各长度加权聚合（不定长窗口兼容）。fill_blank 只有值槽（target[l]）；
+    corrupt_fix 有位置槽 target[l] 和值槽 target[l+1]，分两行打印。
+    corrupt_fix 的错误值仍逐次随机（位置 acc 对错值不敏感）；fill_blank
+    探针完全确定。
     """
+    by_len = {}
+    for w in windows:
+        by_len.setdefault(w.numel(), []).append(w)
+
     def probe(model, device):
         model.eval()
-        first_slot, second_slot = {}, {}
+        first_c, first_t, second_c, second_t = {}, {}, {}, {}
         with torch.no_grad():
-            for k in range(length):
-                batch = [(seq, k) for seq in windows]
-                loader = DataLoader(batch, batch_size=batch_size, collate_fn=collate)
-                _, _, per_pos, _ = evaluate(model, loader, device, num_mask=0)
-                if length in per_pos:
-                    first_slot[k] = per_pos[length]
-                if length + 1 in per_pos:
-                    second_slot[k] = per_pos[length + 1]
+            for l, ws in sorted(by_len.items()):
+                for k in range(l):
+                    batch = [(seq, k) for seq in ws]
+                    loader = DataLoader(batch, batch_size=batch_size,
+                                        collate_fn=collate)
+                    _, _, per_pos, _ = evaluate(model, loader, device, num_mask=0)
+                    n = len(ws)
+                    if l in per_pos:
+                        first_c[k] = first_c.get(k, 0.0) + per_pos[l] * n
+                        first_t[k] = first_t.get(k, 0) + n
+                    if l + 1 in per_pos:
+                        second_c[k] = second_c.get(k, 0.0) + per_pos[l + 1] * n
+                        second_t[k] = second_t.get(k, 0) + n
 
-        def fmt(d):
-            return ' '.join(f"k{k:02d}={d[k] * 100:.1f}" for k in sorted(d))
+        def fmt(c, t):
+            return ' '.join(f"k{k:02d}={c[k] / t[k] * 100:.1f}" for k in sorted(t))
 
-        if second_slot:
-            return ['  PosProbe pos| ' + fmt(first_slot),
-                    '  PosProbe val| ' + fmt(second_slot)]
-        return ['  PosProbe val| ' + fmt(first_slot)]
+        if second_t:
+            return ['  PosProbe pos| ' + fmt(first_c, first_t),
+                    '  PosProbe val| ' + fmt(second_c, second_t)]
+        return ['  PosProbe val| ' + fmt(first_c, first_t)]
 
     return probe
 
@@ -608,13 +618,24 @@ def _prepare_single_variant(config, norm):
     OOD_LEN = cfg['OOD_LEN']
     DROPOUT = cfg['DROPOUT']
 
-    max_len = max(TRAIN_LEN, OOD_LEN)
+    # SEQ_LEN_MIN/MAX（仅变体，归一化层校验）：窗口长度逐样本均匀随机
+    # （不定长）；缺省为定长 TRAIN_LEN/OOD_LEN。不定长时数据集按最大长度
+    # 生成再随机截断，分桶 sampler 按长度分组 batch。
+    seq_min = cfg.get('SEQ_LEN_MIN')
+    seq_max = cfg.get('SEQ_LEN_MAX')
+    var_len = seq_min is not None
+
+    max_len = seq_max if var_len else max(TRAIN_LEN, OOD_LEN)
     # corrupt_fix: 输入 = 窗口 + EOS + 位置 token；fill_blank: 窗口 + EOS
     tail_tokens = 2 if variant == 'corrupt_fix' else 1
     BLOCK_SIZE = _round_up_pow2(max_len + tail_tokens)
 
     init_len, recurrence_fn, recurrence_name = single_rule_from_task(
         'single', {'P': P, 'RULES': norm['rules'], 'CONST': norm.get('const', 0)})
+    if var_len and seq_min <= init_len:
+        raise ValueError(
+            f"SEQ_LEN_MIN ({seq_min}) 必须 > 阶数 init_len ({init_len})，"
+            "否则主体没有可监督的递推位置")
     max_unique_ratio = norm['exposure_ratios']
     save_extra_config = save_config_extra(norm, cfg)
 
@@ -652,7 +673,7 @@ def _prepare_single_variant(config, norm):
     ds = RecurrenceDataset(
         p=P, recurrence_fn=recurrence_fn, recurrence_name=recurrence_name,
         init_len=init_len, num_samples=NUM_TRAIN_SAMPLES,
-        length=TRAIN_LEN,
+        length=seq_max if var_len else TRAIN_LEN,
     )
     if data_mode == 'full_split':
         ds.run_full_split()
@@ -661,6 +682,18 @@ def _prepare_single_variant(config, norm):
     else:
         train_dataset = ds.sample_unique_train()
         test_dataset = []
+
+    # 不定长：逐样本随机截断到 [SEQ_LEN_MIN, SEQ_LEN_MAX]（独立 RNG，不扰动主流）
+    if var_len:
+        cut_rng = random.Random(cfg.get('RANDOM_SEED', 42) + 31)
+
+        def _cut(samples):
+            return [s[:cut_rng.randint(seq_min, seq_max)] for s in samples]
+
+        train_dataset = _cut(train_dataset)
+        if data_mode == 'full_split':
+            test_dataset = _cut(test_dataset)
+        print(f"[Variant] variable length: windows cut to [{seq_min}, {seq_max}]")
 
     # FILL_BLANK_ALL_POSITIONS（仅 fill_blank）：每条序列的每个位置挖空各成
     # 一条样本，样本数 × 窗口长度；空白位置由样本携带（(seq, k) 元组），
@@ -673,7 +706,7 @@ def _prepare_single_variant(config, norm):
         if data_mode == 'full_split':
             test_dataset = [(seq, k) for seq in test_dataset for k in range(len(seq))]
         print(f"[Variant] FILL_BLANK_ALL_POSITIONS: {n_base} windows -> "
-              f"{len(train_dataset)} train samples (x{TRAIN_LEN})")
+              f"{len(train_dataset)} train samples")
     # TEST_ALL_POSITIONS（仅 fill_blank）：只把测试集改成逐位置枚举挖空
     # （确定性评估口径），训练侧保持在线随机挖空。blank_all 时测试已枚举，跳过。
     # 静态切分下 NUM_TEST_SAMPLES 作为测试窗口数上限（默认 256）：确定性子抽样，
@@ -686,21 +719,29 @@ def _prepare_single_variant(config, norm):
         if cap is not None and len(test_windows) > cap:
             sub_rng = random.Random(cfg.get('RANDOM_SEED', 42) + 77)
             test_windows = sub_rng.sample(test_windows, cap)
-        print(f"[Variant] TEST_ALL_POSITIONS: {len(test_windows)} windows -> "
-              f"{len(test_windows) * TRAIN_LEN} deterministic test samples")
         test_dataset = [(seq, k) for seq in test_windows for k in range(len(seq))]
+        print(f"[Variant] TEST_ALL_POSITIONS: {len(test_windows)} windows -> "
+              f"{len(test_dataset)} deterministic test samples")
 
+    # BODY_SUPERVISION（变体默认开）：递推主体也计入 loss/acc
+    # （predict 口径，targets 前缀用干净序列）。
+    body_sup = cfg.get('BODY_SUPERVISION', True)
+    body_from = init_len - 1
     eos_id = P + 1
     if variant == 'corrupt_fix':
         # CORRUPT_FIX_PARALLEL：并行解码，值预测看不到位置答案（双 EOS 槽）
         parallel = cfg.get('CORRUPT_FIX_PARALLEL', False)
         collate = make_corrupt_fix_collate(p=P, eos_id=eos_id, pos_base=P + 2,
-                                           parallel=parallel)
+                                           parallel=parallel,
+                                           body_supervision=body_sup,
+                                           body_from=body_from)
         vocab_size = P + 2 + max_len
         variant_save = {'eos_token_id': eos_id, 'pos_token_base': P + 2,
                         'parallel_decode': parallel}
     else:  # fill_blank
-        collate = make_fill_blank_collate(p=P, eos_id=eos_id)
+        collate = make_fill_blank_collate(p=P, eos_id=eos_id,
+                                          body_supervision=body_sup,
+                                          body_from=body_from)
         vocab_size = P + 2
         variant_save = {'eos_token_id': eos_id, 'blank_token_id': P}
     _print_task_banner(BLOCK_SIZE, TRAIN_LEN,
@@ -722,12 +763,17 @@ def _prepare_single_variant(config, norm):
             fresh_seed = fresh_rng.randrange(2 ** 31)
             eval_rng = random.Random(fresh_seed)
             fresh_samples = ds.sample_random_windows(
-                NUM_TEST_SAMPLES, length=OOD_LEN, rng=eval_rng)
+                NUM_TEST_SAMPLES, length=seq_max if var_len else OOD_LEN,
+                rng=eval_rng)
+            if var_len:
+                cut = random.Random(fresh_seed + 1)
+                fresh_samples = [s[:cut.randint(seq_min, seq_max)]
+                                 for s in fresh_samples]
             if blank_all or test_all:
                 fresh_samples = [(seq, k) for seq in fresh_samples
                                  for k in range(len(seq))]
             print(f"[FreshTest] sampled with replacement: "
-                  f"n={NUM_TEST_SAMPLES}, len={OOD_LEN}, seed={fresh_seed}")
+                  f"n={NUM_TEST_SAMPLES}, len={seq_max if var_len else OOD_LEN}, seed={fresh_seed}")
             return _make_test_loader(fresh_samples, BATCH_SIZE, collate)
 
     # POS_PROBE（变体默认开，`POS_PROBE: false` 关闭）：固定探针窗口集，
@@ -741,15 +787,16 @@ def _prepare_single_variant(config, norm):
                     for item in test_dataset]
             probe_windows = random.Random(cfg.get('RANDOM_SEED', 42) + 55).sample(
                 pool, min(probe_n, len(pool)))
-            probe_len = TRAIN_LEN
         else:
             probe_windows = ds.sample_random_windows(
-                probe_n, length=OOD_LEN,
+                probe_n, length=seq_max if var_len else OOD_LEN,
                 rng=random.Random(cfg.get('RANDOM_SEED', 42) + 56))
-            probe_len = OOD_LEN
-        probe_fn = _make_pos_probe(probe_windows, collate, probe_len, BATCH_SIZE)
-        print(f"[Probe] POS_PROBE: {len(probe_windows)} windows x "
-              f"{probe_len} positions, fixed across evals")
+            if var_len:
+                probe_windows = _cut(probe_windows)
+        probe_fn = _make_pos_probe(probe_windows, collate, BATCH_SIZE)
+        probe_lens = sorted({w.numel() for w in probe_windows})
+        print(f"[Probe] POS_PROBE: {len(probe_windows)} windows, "
+              f"lengths={probe_lens}, fixed across evals")
 
     model = FibonacciTransformer(
         p=P, d_model=D_MODEL, n_head=N_HEAD, n_layer=N_LAYER,
@@ -773,6 +820,9 @@ def _prepare_single_variant(config, norm):
         'vocab_size': vocab_size,
         'missing_prob': 0.0,
         'miss_len': cfg.get('MISS_LEN', 1),
+        'body_supervision': body_sup,
+        'seq_len_min': seq_min,
+        'seq_len_max': seq_max,
     }
     save_config.update(save_extra_config)
     return {
@@ -922,7 +972,8 @@ def run_experiment(config_path=None):
         opt_diag_interval=cfg.get('OPT_DIAG_INTERVAL', 0),
         extra_epochs_after_high_acc=cfg.get('EARLY_STOP_EXTRA_EPOCHS', 0),
         epoch_cap=cfg.get('EPOCH_CAP'),
-        extra_eval_fn=ctx.get('extra_eval_fn')
+        extra_eval_fn=ctx.get('extra_eval_fn'),
+        save_checkpoints=cfg.get('SAVE_CHECKPOINTS', True)
     )
 
     if timed_out:

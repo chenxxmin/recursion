@@ -461,7 +461,8 @@ def make_missing_collate(*, p, init_len, missing_prob, miss_len=1, missing_token
     return collate
 
 
-def make_corrupt_fix_collate(*, p, eos_id, pos_base, parallel=False):
+def make_corrupt_fix_collate(*, p, eos_id, pos_base, parallel=False,
+                             body_supervision=False, body_from=0):
     """Collate for the corrupt_fix task variant (TASK_VARIANT='corrupt_fix').
 
     Input: a batch of CLEAN windows (plain LongTensors, any length L), or
@@ -486,6 +487,11 @@ def make_corrupt_fix_collate(*, p, eos_id, pos_base, parallel=False):
     最后一个 token 换成第二个 EOS（而非真实位置 token），位置与值两个
     预测在同一前缀上并行产生。targets/loss_mask 与 teacher forcing 版
     完全相同（只有 x 的末位不同）。
+
+    body_supervision=True（BODY_SUPERVISION，变体默认）：除输出位外，递推
+    主体也计入监督——target 前缀改用干净序列（predict 口径），loss_mask
+    在 [body_from, L-1) 主体区间（前 order-1 个不可预测位除外）与输出位
+    同时为 1。body_from = order-1。
     """
     def collate(batch):
         xs, targets, masks = [], [], []
@@ -504,11 +510,14 @@ def make_corrupt_fix_collate(*, p, eos_id, pos_base, parallel=False):
             view[k] = wrong
             last = eos_id if parallel else pos_base + k
             x = torch.cat([view, torch.tensor([eos_id, last], dtype=torch.long)])
-            # targets 两种模式相同（[c', EOS, pos_tok(k), 正确值]）；
-            # 只有 x 的末位不同（parallel 用第二个 EOS 遮住位置答案）。
-            tgt = torch.cat([view, torch.tensor([eos_id, pos_base + k, orig],
+            # targets 前缀：body_supervision 时用干净序列（主体也监督），
+            # 否则保持污损视图（历史行为，主体不进 loss 反正无所谓）。
+            base = seq if body_supervision else view
+            tgt = torch.cat([base, torch.tensor([eos_id, pos_base + k, orig],
                                                 dtype=torch.long)])
             mask = torch.zeros(L + 2, dtype=torch.float)  # aligns with tgt[:, 1:]
+            if body_supervision:
+                mask[body_from:L - 1] = 1.0  # 递推主体（target i 预测 clean x_{i+1}）
             mask[L] = 1.0      # EOS slot -> position token
             mask[L + 1] = 1.0  # position-token slot -> correct value
             xs.append(x)
@@ -520,7 +529,8 @@ def make_corrupt_fix_collate(*, p, eos_id, pos_base, parallel=False):
     return collate
 
 
-def make_fill_blank_collate(*, p, eos_id, blank_id=None):
+def make_fill_blank_collate(*, p, eos_id, blank_id=None,
+                            body_supervision=False, body_from=0):
     """Collate for the fill_blank task variant (TASK_VARIANT='fill_blank').
 
     Same online single-position corruption as corrupt_fix, but the position
@@ -554,8 +564,11 @@ def make_fill_blank_collate(*, p, eos_id, blank_id=None):
             view = seq.clone()
             view[k] = blank
             x = torch.cat([view, torch.tensor([eos_id], dtype=torch.long)])
-            tgt = torch.cat([x, torch.tensor([orig], dtype=torch.long)])
+            base = seq if body_supervision else view
+            tgt = torch.cat([base, torch.tensor([eos_id, orig], dtype=torch.long)])
             mask = torch.zeros(L + 1, dtype=torch.float)  # aligns with tgt[:, 1:]
+            if body_supervision:
+                mask[body_from:L - 1] = 1.0  # 递推主体
             mask[L] = 1.0  # EOS slot -> correct value
             xs.append(x)
             targets.append(tgt)

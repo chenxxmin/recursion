@@ -157,6 +157,10 @@ def normalize(task, cfg, origins):
         # 变体尾部 token：corrupt_fix = EOS + 位置 token；fill_blank = EOS
         tail = {'corrupt_fix': 2, 'fill_blank': 1}.get(variant, 0)
         train_tokens = cfg['TRAIN_LEN'] + tail
+        if variant and cfg.get('SEQ_LEN_MAX') is not None:
+            notes.append(f"不定长窗口：SEQ_LEN {cfg['SEQ_LEN_MIN']}-{cfg['SEQ_LEN_MAX']}"
+                         f"（逐样本随机截断）；词表/block 按最大长度。")
+            train_tokens = f"{cfg['SEQ_LEN_MIN']}..{cfg['SEQ_LEN_MAX']}+{tail}"
     elif scenario == 'mixed':
         rules = norm['rules']
         require(isinstance(rules, list) and rules, 'RULES must contain rules')
@@ -210,8 +214,10 @@ def normalize(task, cfg, origins):
     eval_len = cfg['OOD_LEN'] if cfg['FRESH_TEST_PER_EVAL'] or scenario == 'action' else cfg['TRAIN_LEN']
     tail_tokens = {'corrupt_fix': 2, 'fill_blank': 1}.get(variant, 0)
     eval_tokens = 2 * eval_len - order if scenario == 'action' else eval_len + tail_tokens
+    max_len_for_block = (cfg['SEQ_LEN_MAX'] if variant and cfg.get('SEQ_LEN_MAX') is not None
+                         else max(cfg['TRAIN_LEN'], cfg['OOD_LEN']))
     max_tokens = (2 * max(cfg['TRAIN_LEN'], cfg['OOD_LEN']) - order if scenario == 'action' else
-                  max(cfg['TRAIN_LEN'], cfg['OOD_LEN']) + tail_tokens)
+                  max_len_for_block + tail_tokens)
     if variant == 'corrupt_fix':
         notes.append('corrupt_fix：污损是任务内生的（恰好一位改成随机错误值），无 clean/total 之分，'
                      '结果口径 = 训练日志 best acc；输出 = 位置 token + 正确值两个 token。')
