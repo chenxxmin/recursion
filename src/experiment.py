@@ -731,19 +731,26 @@ def _prepare_single_variant(config, norm):
     if variant == 'corrupt_fix':
         # CORRUPT_FIX_PARALLEL：并行解码，值预测看不到位置答案（双 EOS 槽）
         parallel = cfg.get('CORRUPT_FIX_PARALLEL', False)
+        # CORRUPT_FIX_PAIRED_CLEAN：配对双样本（干净窗续写 + 污损窗只答题）
+        paired_clean = cfg.get('CORRUPT_FIX_PAIRED_CLEAN', False)
         collate = make_corrupt_fix_collate(p=P, eos_id=eos_id, pos_base=P + 2,
                                            parallel=parallel,
                                            body_supervision=body_sup,
-                                           body_from=body_from)
+                                           body_from=body_from,
+                                           paired_clean=paired_clean)
         vocab_size = P + 2 + max_len
         variant_save = {'eos_token_id': eos_id, 'pos_token_base': P + 2,
-                        'parallel_decode': parallel}
+                        'parallel_decode': parallel,
+                        'paired_clean': paired_clean}
     else:  # fill_blank
         collate = make_fill_blank_collate(p=P, eos_id=eos_id,
                                           body_supervision=body_sup,
                                           body_from=body_from)
         vocab_size = P + 2
         variant_save = {'eos_token_id': eos_id, 'blank_token_id': P}
+    if variant == 'corrupt_fix' and cfg.get('CORRUPT_FIX_PAIRED_CLEAN', False):
+        print('[Variant] CORRUPT_FIX_PAIRED_CLEAN: 干净续写行 + 污损答题行'
+              '（主体监督由干净行承担，污损行只留 pos/val 两槽）')
     _print_task_banner(BLOCK_SIZE, TRAIN_LEN,
                        f"{recurrence_name} [{variant}]")
     train_sampler = BucketBatchSampler(

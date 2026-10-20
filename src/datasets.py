@@ -462,7 +462,8 @@ def make_missing_collate(*, p, init_len, missing_prob, miss_len=1, missing_token
 
 
 def make_corrupt_fix_collate(*, p, eos_id, pos_base, parallel=False,
-                             body_supervision=False, body_from=0):
+                             body_supervision=False, body_from=0,
+                             paired_clean=False):
     """Collate for the corrupt_fix task variant (TASK_VARIANT='corrupt_fix').
 
     Input: a batch of CLEAN windows (plain LongTensors, any length L), or
@@ -492,37 +493,79 @@ def make_corrupt_fix_collate(*, p, eos_id, pos_base, parallel=False,
     主体也计入监督——target 前缀改用干净序列（predict 口径），loss_mask
     在 [body_from, L-1) 主体区间（前 order-1 个不可预测位除外）与输出位
     同时为 1。body_from = order-1。
+
+    paired_clean=True（CORRUPT_FIX_PAIRED_CLEAN）：配对双样本。每个裸窗口
+    产出两行：
+      ① 干净续写行：x = [clean窗]，tgt = [clean窗, EOS]，mask = 主体
+         [body_from, L-1) + EOS 槽——正确值全程暴露，续写不被污损值下毒；
+      ② 污损答题行：与标准 corrupt_fix 相同，但 mask 只留 pos/val 两槽
+         （主体监督由①承担）。
+    (seq, k) 元组（探针/逐位置评估）只产 ② 一行，保持按 k 统计语义。
+    配对模式下行长不一（L+1 vs L+3），批内统一右补齐（pad 位 mask=0，
+    对因果预测无影响）。
     """
+    def _corrupt_row(seq, k):
+        """污损答题行（标准 corrupt_fix；paired 模式下只留 pos/val 两槽）。"""
+        L = seq.numel()
+        orig = int(seq[k])
+        wrong = random.randrange(p - 1)
+        if wrong >= orig:
+            wrong += 1  # uniform over [0, p) \ {orig}
+        view = seq.clone()
+        view[k] = wrong
+        last = eos_id if parallel else pos_base + k
+        x = torch.cat([view, torch.tensor([eos_id, last], dtype=torch.long)])
+        # targets 前缀：body_supervision 时用干净序列（主体也监督），
+        # 否则保持污损视图（历史行为，主体不进 loss 反正无所谓）。
+        sup_body = body_supervision and not paired_clean
+        base = seq if sup_body else view
+        tgt = torch.cat([base, torch.tensor([eos_id, pos_base + k, orig],
+                                            dtype=torch.long)])
+        mask = torch.zeros(L + 2, dtype=torch.float)  # aligns with tgt[:, 1:]
+        if sup_body:
+            mask[body_from:L - 1] = 1.0  # 递推主体（target i 预测 clean x_{i+1}）
+        mask[L] = 1.0      # EOS slot -> position token
+        mask[L + 1] = 1.0  # position-token slot -> correct value
+        return x, tgt, mask
+
+    def _clean_row(seq):
+        """干净续写行（paired 模式专用）：无污损无答题，纯主体续写监督。"""
+        L = seq.numel()
+        tgt = torch.cat([seq, torch.tensor([eos_id], dtype=torch.long)])
+        x = tgt[:-1]
+        mask = torch.zeros(L, dtype=torch.float)  # aligns with tgt[:, 1:]
+        if body_supervision:
+            mask[body_from:L - 1] = 1.0
+        mask[L - 1] = 1.0  # EOS 槽
+        return x, tgt, mask
+
     def collate(batch):
         xs, targets, masks = [], [], []
         for item in batch:
             if isinstance(item, (list, tuple)):
                 seq, k = item[0], int(item[1])
+                xs_t = _corrupt_row(seq, k)  # 探针/评估：只产污损答题行
+                rows = [xs_t]
+            elif paired_clean:
+                k = random.randrange(item.numel())
+                rows = [_clean_row(item), _corrupt_row(item, k)]
             else:
-                seq = item
-                k = random.randrange(seq.numel())
-            L = seq.numel()
-            orig = int(seq[k])
-            wrong = random.randrange(p - 1)
-            if wrong >= orig:
-                wrong += 1  # uniform over [0, p) \ {orig}
-            view = seq.clone()
-            view[k] = wrong
-            last = eos_id if parallel else pos_base + k
-            x = torch.cat([view, torch.tensor([eos_id, last], dtype=torch.long)])
-            # targets 前缀：body_supervision 时用干净序列（主体也监督），
-            # 否则保持污损视图（历史行为，主体不进 loss 反正无所谓）。
-            base = seq if body_supervision else view
-            tgt = torch.cat([base, torch.tensor([eos_id, pos_base + k, orig],
-                                                dtype=torch.long)])
-            mask = torch.zeros(L + 2, dtype=torch.float)  # aligns with tgt[:, 1:]
-            if body_supervision:
-                mask[body_from:L - 1] = 1.0  # 递推主体（target i 预测 clean x_{i+1}）
-            mask[L] = 1.0      # EOS slot -> position token
-            mask[L + 1] = 1.0  # position-token slot -> correct value
-            xs.append(x)
-            targets.append(tgt)
-            masks.append(mask)
+                rows = [_corrupt_row(item, random.randrange(item.numel()))]
+            for x, tgt, mask in rows:
+                xs.append(x)
+                targets.append(tgt)
+                masks.append(mask)
+        if paired_clean:
+            # 行长不一（干净行 L+1 / 污损行 L+3），右补齐到批内最长；
+            # pad 在末尾且 mask=0，不影响任何真实位置的因果预测。
+            max_t = max(t.numel() for t in targets)
+
+            def _pad(t, n, val):
+                return torch.cat([t, torch.full((n - t.numel(),), val,
+                                                dtype=t.dtype)])
+            xs = [_pad(x, max_t - 1, eos_id) for x in xs]
+            targets = [_pad(t, max_t, 0) for t in targets]
+            masks = [_pad(m, max_t - 1, 0.0) for m in masks]
         return (torch.stack(xs), BatchTag.CORRUPT_FIX,
                 torch.stack(targets), torch.stack(masks))
 

@@ -221,6 +221,82 @@ def test_collate_fixed_position_tuples():
         assert int(targets[j, L + 2]) == int(seq[k])
 
 
+def test_collate_layout_paired_clean():
+    # 配对双样本：裸序列产 [干净续写行, 污损答题行] 两行；元组只产答题行
+    p, eos_id, pos_base, L = 7, 8, 9, 6
+    seqs = _addition_windows(p=p, n=8, length=L)
+    random.seed(123)
+    collate = make_corrupt_fix_collate(p=p, eos_id=eos_id, pos_base=pos_base,
+                                       body_supervision=True, body_from=1,
+                                       paired_clean=True)
+    x, tag, targets, mask = collate(seqs)
+    assert tag == BatchTag.CORRUPT_FIX
+    B = len(seqs)
+    max_t = L + 3  # 污损行 tgt 长
+    assert x.shape == (2 * B, max_t - 1)
+    assert targets.shape == (2 * B, max_t)
+    assert mask.shape == (2 * B, max_t - 1)
+    for i in range(B):
+        seq = seqs[i]
+        xc, tc, mc = x[2 * i], targets[2 * i], mask[2 * i]          # 干净行
+        xd, td, md = x[2 * i + 1], targets[2 * i + 1], mask[2 * i + 1]  # 污损行
+        # 干净行：输入就是干净窗，tgt = [clean, EOS]
+        assert torch.equal(xc[:L], seq)
+        assert torch.equal(tc[:L], seq) and int(tc[L]) == eos_id
+        # 干净行 mask：主体 [1, L-1) + EOS 槽 L-1，其余（含补齐位）为 0
+        assert mc[L - 1] == 1.0 and mc[1].item() == 1.0
+        assert mc[0].item() == 0.0 and mc[L:].sum().item() == 0.0
+        # 污损行：恰一位污损，mask 只有 pos/val 两实槽（主体交给干净行）
+        diff = (xd[:L] != seq).nonzero().flatten().tolist()
+        assert len(diff) == 1
+        k = diff[0]
+        assert int(xd[L]) == eos_id and int(xd[L + 1]) == pos_base + k
+        assert int(td[L + 1]) == pos_base + k and int(td[L + 2]) == int(seq[k])
+        assert md.sum().item() == 2.0 and md[L] == 1.0 and md[L + 1] == 1.0
+        assert md[:L].sum().item() == 0.0, "paired 污损行不应监督主体"
+    # 元组路径：只产一行（探针语义不变）
+    batch = [(seqs[0], 2), (seqs[1], 4)]
+    _, _, targets2, mask2 = collate(batch)
+    assert targets2.shape[0] == 2
+    assert mask2[0].sum().item() == 2.0
+
+
+def test_run_experiment_corrupt_fix_paired_clean_smoke():
+    with tempfile.TemporaryDirectory() as tmpdir:
+        out, save_path = _run_experiment(tmpdir, {
+            'TASK_VARIANT': 'corrupt_fix',
+            'CORRUPT_FIX_PAIRED_CLEAN': True})
+        assert os.path.exists(save_path)
+        assert 'CORRUPT_FIX_PAIRED_CLEAN' in out
+        assert 'Train: Loss=' in out and 'nan' not in out.lower()
+        assert 'PosProbe pos|' in out and 'PosProbe val|' in out
+        latest = torch.load(os.path.splitext(save_path)[0] + '_latest.pth',
+                            weights_only=False)
+        sc = latest['config']
+        assert sc['variant'] == 'corrupt_fix' and sc['paired_clean'] is True
+
+
+def test_paired_clean_gates():
+    # 仅 corrupt_fix；与 PARALLEL 互斥（归一化错误 -> SystemExit(2)）
+    with tempfile.TemporaryDirectory() as tmpdir:
+        try:
+            _run_experiment(tmpdir, {'TASK_VARIANT': 'fill_blank',
+                                     'CORRUPT_FIX_PAIRED_CLEAN': True})
+        except SystemExit as exc:
+            assert exc.code == 2
+        else:
+            raise AssertionError('paired_clean on fill_blank must exit(2)')
+    with tempfile.TemporaryDirectory() as tmpdir:
+        try:
+            _run_experiment(tmpdir, {'TASK_VARIANT': 'corrupt_fix',
+                                     'CORRUPT_FIX_PAIRED_CLEAN': True,
+                                     'CORRUPT_FIX_PARALLEL': True})
+        except SystemExit as exc:
+            assert exc.code == 2
+        else:
+            raise AssertionError('paired_clean + parallel must exit(2)')
+
+
 if __name__ == '__main__':
     test_collate_layout()
     print('PASS test_collate_layout')
@@ -240,4 +316,10 @@ if __name__ == '__main__':
     print('PASS test_collate_layout_parallel')
     test_run_experiment_corrupt_fix_parallel_smoke()
     print('PASS test_run_experiment_corrupt_fix_parallel_smoke')
+    test_collate_layout_paired_clean()
+    print('PASS test_collate_layout_paired_clean')
+    test_run_experiment_corrupt_fix_paired_clean_smoke()
+    print('PASS test_run_experiment_corrupt_fix_paired_clean_smoke')
+    test_paired_clean_gates()
+    print('PASS test_paired_clean_gates')
     print('ALL TESTS PASSED: test_corrupt_fix.py')

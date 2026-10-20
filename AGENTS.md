@@ -44,6 +44,7 @@
 13. **CORRUPT_FIX_PARALLEL 并行解码**（2026-10-14）：仅 corrupt_fix。true 时输入末位用第二个 EOS 代替真实位置 token（双 EOS 槽），位置/值并行预测，值看不到位置答案（默认 false = teacher forcing，值 acc 是“给定点位置算值”的条件准确率，端到端能力≈位置 acc）。save_config 记 `parallel_decode`。
 14. **POS_PROBE 逐位置探针**（2026-10-14，变体默认开）：corrupt_fix/fill_blank 每个 eval 点在固定 256 窗口探针集上按挖空/污损位置 k 分桶评估，日志打 `PosProbe pos|/val|` 行（corrupt_fix 两行：位置/值；fill_blank 一行：值）。实现：`experiment._make_pos_probe`（(seq,k) 元组固定 k，两个 collate 均支持元组样本；不定长时逐 (l,k) 再按 k 加权聚合）+ 引擎 `extra_eval_fn` 钩子。epoch×k 热力图的数据源。
 15. **变体主体监督 + 不定长**（2026-10-15）：①`BODY_SUPERVISION`（变体默认 true）：targets 前缀改用干净序列、loss_mask 覆盖递推主体 [order-1, L-1) + 输出位，不再只监督最后输出位。②`SEQ_LEN_MIN`/`SEQ_LEN_MAX`（仅变体，必须成对且 min > 阶数）：窗口逐样本随机截断成不定长，分桶 sampler 按长度组 batch；词表/block 按 max。两个键在非变体下设置会报错。save_config 记 `body_supervision`/`seq_len_min`/`seq_len_max`。
+16. **CORRUPT_FIX_PAIRED_CLEAN**（2026-10-20，仅 corrupt_fix，与 PARALLEL 互斥）：配对双样本——裸窗口产 干净续写行（主体监督，正确值暴露）+ 污损答题行（只 pos/val 两槽）两行；(seq,k) 元组只产答题行，POS_PROBE 口径不变；批内右补齐。save_config 记 `paired_clean`。
 
 15. **SAVE_CHECKPOINTS**（2026-10-19，默认 true）：false 时训练全程不落任何存档（`_best`/`_latest`/`_resume`/最终 `model.pth` 都不写），仅日志，用于大批量粗扫省磁盘；超时/停掉的实验不可续跑，attention 后处理自动跳过。文档：settings §训练循环与早停。
 

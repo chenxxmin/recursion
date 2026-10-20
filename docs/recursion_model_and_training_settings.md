@@ -133,6 +133,8 @@ loss_mask    = 仅最后两个 target 位为 1（EOS 槽预测位置 token，位
 
 **`CORRUPT_FIX_PARALLEL`**（2026-10-14，默认 false，仅 corrupt_fix）：并行解码模式——输入末位从“真实位置 token”（teacher forcing）换成**第二个 EOS**，位置与值两个预测基于同一前缀并行产生，**值预测看不到位置答案**（回答“模型答不出位置时凭什么答对值”的口径问题）。targets/loss_mask 与 TF 版完全相同，save_config 记 `parallel_decode`。此模式下 overall acc =（位置 acc + 盲值 acc）/ 2，盲值 acc 才是端到端难度的诚实下界。
 
+**`CORRUPT_FIX_PAIRED_CLEAN`**（2026-10-20，默认 false，仅 corrupt_fix，与 PARALLEL 互斥）：配对双样本模式——每个裸窗口产两行：①干净续写行（x=[clean窗]，tgt=[clean窗, EOS]，mask=主体+EOS 槽，正确值全程暴露，续写不被污损值下毒）；②污损答题行（同标准 corrupt_fix，但 mask 只留 pos/val 两槽）。设计动机：检验“错误值被当作合法操作数污染续写”的假设（见 reports/VARIANT_SAMECELL_BODYSUP_20261020.md）。(seq, k) 元组只产答题行，POS_PROBE 口径不变。配对模式批内行长不一，右补齐（pad 位 mask=0，因果预测不受影响）。save_config 记 `paired_clean`。
+
 ### 1.8 fill_blank 任务变体（2026-10-14）
 
 与 corrupt_fix 同族（`TASK_VARIANT='fill_blank'`，仅 single），差别仅在污损方式与输出：
