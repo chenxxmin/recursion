@@ -1,0 +1,377 @@
+{
+ "concurrency": 4,
+ "experiments": [
+  {
+   "name": "single_o2_fillblank_a25b56_d512l2r8h4_P127_len5to10_seed42",
+   "task": "single",
+   "config": {
+    "TASK": "single",
+    "ORDER": 2,
+    "P": 127,
+    "D_MODEL": 512,
+    "N_LAYER": 2,
+    "N_HEAD": 4,
+    "MLP_RATIO": 8,
+    "TRAIN_LEN": 10,
+    "OOD_LEN": 10,
+    "SEQ_LEN_MIN": 5,
+    "SEQ_LEN_MAX": 10,
+    "BODY_SUPERVISION": true,
+    "EPOCHS": 3000,
+    "EVAL_INTERVAL": 5,
+    "MAX_TRAIN_HOURS": 1.0,
+    "SAVE_CHECKPOINTS": false,
+    "RANDOM_SEED": 42,
+    "TASK_VARIANT": "fill_blank",
+    "RULES": [
+     [
+      25,
+      56
+     ]
+    ],
+    "TEST_ALL_POSITIONS": true,
+    "NUM_TEST_SAMPLES": 1000
+   }
+  },
+  {
+   "name": "single_o2_fillblank_a62b59_d512l2r8h4_P127_len5to10_seed42",
+   "task": "single",
+   "config": {
+    "TASK": "single",
+    "ORDER": 2,
+    "P": 127,
+    "D_MODEL": 512,
+    "N_LAYER": 2,
+    "N_HEAD": 4,
+    "MLP_RATIO": 8,
+    "TRAIN_LEN": 10,
+    "OOD_LEN": 10,
+    "SEQ_LEN_MIN": 5,
+    "SEQ_LEN_MAX": 10,
+    "BODY_SUPERVISION": true,
+    "EPOCHS": 3000,
+    "EVAL_INTERVAL": 5,
+    "MAX_TRAIN_HOURS": 1.0,
+    "SAVE_CHECKPOINTS": false,
+    "RANDOM_SEED": 42,
+    "TASK_VARIANT": "fill_blank",
+    "RULES": [
+     [
+      62,
+      59
+     ]
+    ],
+    "TEST_ALL_POSITIONS": true,
+    "NUM_TEST_SAMPLES": 1000
+   }
+  },
+  {
+   "name": "single_o2_fillblank_a56b93_d512l2r8h4_P127_len5to10_seed42",
+   "task": "single",
+   "config": {
+    "TASK": "single",
+    "ORDER": 2,
+    "P": 127,
+    "D_MODEL": 512,
+    "N_LAYER": 2,
+    "N_HEAD": 4,
+    "MLP_RATIO": 8,
+    "TRAIN_LEN": 10,
+    "OOD_LEN": 10,
+    "SEQ_LEN_MIN": 5,
+    "SEQ_LEN_MAX": 10,
+    "BODY_SUPERVISION": true,
+    "EPOCHS": 3000,
+    "EVAL_INTERVAL": 5,
+    "MAX_TRAIN_HOURS": 1.0,
+    "SAVE_CHECKPOINTS": false,
+    "RANDOM_SEED": 42,
+    "TASK_VARIANT": "fill_blank",
+    "RULES": [
+     [
+      56,
+      93
+     ]
+    ],
+    "TEST_ALL_POSITIONS": true,
+    "NUM_TEST_SAMPLES": 1000
+   }
+  },
+  {
+   "name": "single_o2_fillblank_a5b3_d512l2r8h4_P127_len5to10_seed42",
+   "task": "single",
+   "config": {
+    "TASK": "single",
+    "ORDER": 2,
+    "P": 127,
+    "D_MODEL": 512,
+    "N_LAYER": 2,
+    "N_HEAD": 4,
+    "MLP_RATIO": 8,
+    "TRAIN_LEN": 10,
+    "OOD_LEN": 10,
+    "SEQ_LEN_MIN": 5,
+    "SEQ_LEN_MAX": 10,
+    "BODY_SUPERVISION": true,
+    "EPOCHS": 3000,
+    "EVAL_INTERVAL": 5,
+    "MAX_TRAIN_HOURS": 1.0,
+    "SAVE_CHECKPOINTS": false,
+    "RANDOM_SEED": 42,
+    "TASK_VARIANT": "fill_blank",
+    "RULES": [
+     [
+      5,
+      3
+     ]
+    ],
+    "TEST_ALL_POSITIONS": true,
+    "NUM_TEST_SAMPLES": 1000
+   }
+  },
+  {
+   "name": "single_o2_fillblank_a67b65_d512l2r8h4_P127_len5to10_seed42",
+   "task": "single",
+   "config": {
+    "TASK": "single",
+    "ORDER": 2,
+    "P": 127,
+    "D_MODEL": 512,
+    "N_LAYER": 2,
+    "N_HEAD": 4,
+    "MLP_RATIO": 8,
+    "TRAIN_LEN": 10,
+    "OOD_LEN": 10,
+    "SEQ_LEN_MIN": 5,
+    "SEQ_LEN_MAX": 10,
+    "BODY_SUPERVISION": true,
+    "EPOCHS": 3000,
+    "EVAL_INTERVAL": 5,
+    "MAX_TRAIN_HOURS": 1.0,
+    "SAVE_CHECKPOINTS": false,
+    "RANDOM_SEED": 42,
+    "TASK_VARIANT": "fill_blank",
+    "RULES": [
+     [
+      67,
+      65
+     ]
+    ],
+    "TEST_ALL_POSITIONS": true,
+    "NUM_TEST_SAMPLES": 1000
+   }
+  },
+  {
+   "name": "single_o2_fillblank_a44b59_d512l2r8h4_P127_len5to10_seed42",
+   "task": "single",
+   "config": {
+    "TASK": "single",
+    "ORDER": 2,
+    "P": 127,
+    "D_MODEL": 512,
+    "N_LAYER": 2,
+    "N_HEAD": 4,
+    "MLP_RATIO": 8,
+    "TRAIN_LEN": 10,
+    "OOD_LEN": 10,
+    "SEQ_LEN_MIN": 5,
+    "SEQ_LEN_MAX": 10,
+    "BODY_SUPERVISION": true,
+    "EPOCHS": 3000,
+    "EVAL_INTERVAL": 5,
+    "MAX_TRAIN_HOURS": 1.0,
+    "SAVE_CHECKPOINTS": false,
+    "RANDOM_SEED": 42,
+    "TASK_VARIANT": "fill_blank",
+    "RULES": [
+     [
+      44,
+      59
+     ]
+    ],
+    "TEST_ALL_POSITIONS": true,
+    "NUM_TEST_SAMPLES": 1000
+   }
+  },
+  {
+   "name": "single_o2_corruptfix_a25b56_d512l2r8h4_P127_len5to10_seed42",
+   "task": "single",
+   "config": {
+    "TASK": "single",
+    "ORDER": 2,
+    "P": 127,
+    "D_MODEL": 512,
+    "N_LAYER": 2,
+    "N_HEAD": 4,
+    "MLP_RATIO": 8,
+    "TRAIN_LEN": 10,
+    "OOD_LEN": 10,
+    "SEQ_LEN_MIN": 5,
+    "SEQ_LEN_MAX": 10,
+    "BODY_SUPERVISION": true,
+    "EPOCHS": 3000,
+    "EVAL_INTERVAL": 5,
+    "MAX_TRAIN_HOURS": 1.0,
+    "SAVE_CHECKPOINTS": false,
+    "RANDOM_SEED": 42,
+    "TASK_VARIANT": "corrupt_fix",
+    "RULES": [
+     [
+      25,
+      56
+     ]
+    ]
+   }
+  },
+  {
+   "name": "single_o2_corruptfix_a62b59_d512l2r8h4_P127_len5to10_seed42",
+   "task": "single",
+   "config": {
+    "TASK": "single",
+    "ORDER": 2,
+    "P": 127,
+    "D_MODEL": 512,
+    "N_LAYER": 2,
+    "N_HEAD": 4,
+    "MLP_RATIO": 8,
+    "TRAIN_LEN": 10,
+    "OOD_LEN": 10,
+    "SEQ_LEN_MIN": 5,
+    "SEQ_LEN_MAX": 10,
+    "BODY_SUPERVISION": true,
+    "EPOCHS": 3000,
+    "EVAL_INTERVAL": 5,
+    "MAX_TRAIN_HOURS": 1.0,
+    "SAVE_CHECKPOINTS": false,
+    "RANDOM_SEED": 42,
+    "TASK_VARIANT": "corrupt_fix",
+    "RULES": [
+     [
+      62,
+      59
+     ]
+    ]
+   }
+  },
+  {
+   "name": "single_o2_corruptfix_a56b93_d512l2r8h4_P127_len5to10_seed42",
+   "task": "single",
+   "config": {
+    "TASK": "single",
+    "ORDER": 2,
+    "P": 127,
+    "D_MODEL": 512,
+    "N_LAYER": 2,
+    "N_HEAD": 4,
+    "MLP_RATIO": 8,
+    "TRAIN_LEN": 10,
+    "OOD_LEN": 10,
+    "SEQ_LEN_MIN": 5,
+    "SEQ_LEN_MAX": 10,
+    "BODY_SUPERVISION": true,
+    "EPOCHS": 3000,
+    "EVAL_INTERVAL": 5,
+    "MAX_TRAIN_HOURS": 1.0,
+    "SAVE_CHECKPOINTS": false,
+    "RANDOM_SEED": 42,
+    "TASK_VARIANT": "corrupt_fix",
+    "RULES": [
+     [
+      56,
+      93
+     ]
+    ]
+   }
+  },
+  {
+   "name": "single_o2_corruptfix_a5b3_d512l2r8h4_P127_len5to10_seed42",
+   "task": "single",
+   "config": {
+    "TASK": "single",
+    "ORDER": 2,
+    "P": 127,
+    "D_MODEL": 512,
+    "N_LAYER": 2,
+    "N_HEAD": 4,
+    "MLP_RATIO": 8,
+    "TRAIN_LEN": 10,
+    "OOD_LEN": 10,
+    "SEQ_LEN_MIN": 5,
+    "SEQ_LEN_MAX": 10,
+    "BODY_SUPERVISION": true,
+    "EPOCHS": 3000,
+    "EVAL_INTERVAL": 5,
+    "MAX_TRAIN_HOURS": 1.0,
+    "SAVE_CHECKPOINTS": false,
+    "RANDOM_SEED": 42,
+    "TASK_VARIANT": "corrupt_fix",
+    "RULES": [
+     [
+      5,
+      3
+     ]
+    ]
+   }
+  },
+  {
+   "name": "single_o2_corruptfix_a67b65_d512l2r8h4_P127_len5to10_seed42",
+   "task": "single",
+   "config": {
+    "TASK": "single",
+    "ORDER": 2,
+    "P": 127,
+    "D_MODEL": 512,
+    "N_LAYER": 2,
+    "N_HEAD": 4,
+    "MLP_RATIO": 8,
+    "TRAIN_LEN": 10,
+    "OOD_LEN": 10,
+    "SEQ_LEN_MIN": 5,
+    "SEQ_LEN_MAX": 10,
+    "BODY_SUPERVISION": true,
+    "EPOCHS": 3000,
+    "EVAL_INTERVAL": 5,
+    "MAX_TRAIN_HOURS": 1.0,
+    "SAVE_CHECKPOINTS": false,
+    "RANDOM_SEED": 42,
+    "TASK_VARIANT": "corrupt_fix",
+    "RULES": [
+     [
+      67,
+      65
+     ]
+    ]
+   }
+  },
+  {
+   "name": "single_o2_corruptfix_a44b59_d512l2r8h4_P127_len5to10_seed42",
+   "task": "single",
+   "config": {
+    "TASK": "single",
+    "ORDER": 2,
+    "P": 127,
+    "D_MODEL": 512,
+    "N_LAYER": 2,
+    "N_HEAD": 4,
+    "MLP_RATIO": 8,
+    "TRAIN_LEN": 10,
+    "OOD_LEN": 10,
+    "SEQ_LEN_MIN": 5,
+    "SEQ_LEN_MAX": 10,
+    "BODY_SUPERVISION": true,
+    "EPOCHS": 3000,
+    "EVAL_INTERVAL": 5,
+    "MAX_TRAIN_HOURS": 1.0,
+    "SAVE_CHECKPOINTS": false,
+    "RANDOM_SEED": 42,
+    "TASK_VARIANT": "corrupt_fix",
+    "RULES": [
+     [
+      44,
+      59
+     ]
+    ]
+   }
+  }
+ ]
+}

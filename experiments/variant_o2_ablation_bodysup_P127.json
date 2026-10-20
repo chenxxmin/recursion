@@ -1,0 +1,129 @@
+{
+ "concurrency": 4,
+ "experiments": [
+  {
+   "name": "single_o2_fillblank_a62b59_d512l2r8h4_P127_tr16_bodysup_seed42",
+   "task": "single",
+   "config": {
+    "TASK": "single",
+    "TASK_VARIANT": "fill_blank",
+    "ORDER": 2,
+    "P": 127,
+    "D_MODEL": 512,
+    "N_LAYER": 2,
+    "N_HEAD": 4,
+    "MLP_RATIO": 8,
+    "TEST_ALL_POSITIONS": true,
+    "NUM_TEST_SAMPLES": 1000,
+    "EPOCHS": 3000,
+    "EVAL_INTERVAL": 5,
+    "MAX_TRAIN_HOURS": 1.0,
+    "SAVE_CHECKPOINTS": false,
+    "RANDOM_SEED": 42,
+    "RULES": [
+     [
+      62,
+      59
+     ]
+    ],
+    "TRAIN_LEN": 16,
+    "OOD_LEN": 16,
+    "BODY_SUPERVISION": true
+   }
+  },
+  {
+   "name": "single_o2_fillblank_a62b59_d512l2r8h4_P127_len5to10_nobodysup_seed42",
+   "task": "single",
+   "config": {
+    "TASK": "single",
+    "TASK_VARIANT": "fill_blank",
+    "ORDER": 2,
+    "P": 127,
+    "D_MODEL": 512,
+    "N_LAYER": 2,
+    "N_HEAD": 4,
+    "MLP_RATIO": 8,
+    "TEST_ALL_POSITIONS": true,
+    "NUM_TEST_SAMPLES": 1000,
+    "EPOCHS": 3000,
+    "EVAL_INTERVAL": 5,
+    "MAX_TRAIN_HOURS": 1.0,
+    "SAVE_CHECKPOINTS": false,
+    "RANDOM_SEED": 42,
+    "RULES": [
+     [
+      62,
+      59
+     ]
+    ],
+    "TRAIN_LEN": 10,
+    "OOD_LEN": 10,
+    "SEQ_LEN_MIN": 5,
+    "SEQ_LEN_MAX": 10,
+    "BODY_SUPERVISION": false
+   }
+  },
+  {
+   "name": "single_o2_fillblank_a67b65_d512l2r8h4_P127_tr16_bodysup_seed42",
+   "task": "single",
+   "config": {
+    "TASK": "single",
+    "TASK_VARIANT": "fill_blank",
+    "ORDER": 2,
+    "P": 127,
+    "D_MODEL": 512,
+    "N_LAYER": 2,
+    "N_HEAD": 4,
+    "MLP_RATIO": 8,
+    "TEST_ALL_POSITIONS": true,
+    "NUM_TEST_SAMPLES": 1000,
+    "EPOCHS": 3000,
+    "EVAL_INTERVAL": 5,
+    "MAX_TRAIN_HOURS": 1.0,
+    "SAVE_CHECKPOINTS": false,
+    "RANDOM_SEED": 42,
+    "RULES": [
+     [
+      67,
+      65
+     ]
+    ],
+    "TRAIN_LEN": 16,
+    "OOD_LEN": 16,
+    "BODY_SUPERVISION": true
+   }
+  },
+  {
+   "name": "single_o2_fillblank_a67b65_d512l2r8h4_P127_len5to10_nobodysup_seed42",
+   "task": "single",
+   "config": {
+    "TASK": "single",
+    "TASK_VARIANT": "fill_blank",
+    "ORDER": 2,
+    "P": 127,
+    "D_MODEL": 512,
+    "N_LAYER": 2,
+    "N_HEAD": 4,
+    "MLP_RATIO": 8,
+    "TEST_ALL_POSITIONS": true,
+    "NUM_TEST_SAMPLES": 1000,
+    "EPOCHS": 3000,
+    "EVAL_INTERVAL": 5,
+    "MAX_TRAIN_HOURS": 1.0,
+    "SAVE_CHECKPOINTS": false,
+    "RANDOM_SEED": 42,
+    "RULES": [
+     [
+      67,
+      65
+     ]
+    ],
+    "TRAIN_LEN": 10,
+    "OOD_LEN": 10,
+    "SEQ_LEN_MIN": 5,
+    "SEQ_LEN_MAX": 10,
+    "BODY_SUPERVISION": false
+   }
+  }
+ ]
+}
