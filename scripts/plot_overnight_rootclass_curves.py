@@ -21,6 +21,7 @@ import numpy as np
 LOG_DIR = '/data/cxm/recursion/overnight_h123_p127_d512_600_nockpt/logs'
 CLS_JSON = 'reports/data/overnight_h123_coef_classification.json'
 OUT_BASE = 'plots/overnight_h123_rootclass_learning_curves'
+TITLE = 'overnight_h123_p127_d512_600'
 
 CLASSES = ['double', 'root1', 'rootm1', 'other']
 CLASS_TITLE = {
@@ -92,8 +93,10 @@ def main():
             if row == 3:
                 ax.set_xlabel('epoch')
 
-    fig.suptitle('overnight_h123_p127_d512_600: learning curves by root type '
-                 '(150 coefficient pairs x 4 seeds, all runs converged to >=99%)', fontsize=14)
+    n_conv = sum(1 for runs in curves.values() for _, _, te in runs if te[-1] >= 99)
+    n_all = sum(len(runs) for runs in curves.values())
+    fig.suptitle(f'{TITLE}: learning curves by root type '
+                 f'(150 coefficient pairs x 4 seeds, {n_conv}/{n_all} runs converged to >=99%)', fontsize=14)
     fig.tight_layout(rect=(0, 0, 1, 0.97))
     fig.savefig(OUT_BASE + '.png', dpi=150)
     fig.savefig(OUT_BASE + '.pdf')
