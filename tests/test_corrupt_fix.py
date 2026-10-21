@@ -297,6 +297,38 @@ def test_paired_clean_gates():
             raise AssertionError('paired_clean + parallel must exit(2)')
 
 
+def test_collate_layout_mask_around():
+    # 动态主体 mask：污损位 k 牵连预测位 {k-1,k,k+1}（预测 x_k/x_{k+1}/x_{k+2}）
+    p, eos_id, pos_base, L = 7, 8, 9, 8
+    seqs = _addition_windows(p=p, n=4, length=L)
+    collate = make_corrupt_fix_collate(p=p, eos_id=eos_id, pos_base=pos_base,
+                                       body_supervision=True, body_from=1,
+                                       mask_around=True)
+    # 用元组固定 k，逐一验证（k=3 中部 / k=0 边界 / k=L-1 边界）
+    for k, expect_masked in [(3, {2, 3, 4}), (0, {1}), (L - 1, {L - 2})]:
+        batch = [(seq, k) for seq in seqs]
+        _, _, _, mask = collate(batch)
+        for i in range(len(seqs)):
+            body = {j for j in range(1, L - 1)}  # 主体监督区间 [1, L-2]
+            want = body - expect_masked
+            got = {j for j in range(L + 2) if mask[i, j] > 0} - {L, L + 1}
+            assert got == want, f'k={k}: masked body slots {got} != {want}'
+            assert mask[i, L] == 1.0 and mask[i, L + 1] == 1.0  # pos/val 不动
+
+
+def test_run_experiment_corrupt_fix_mask_around_smoke():
+    with tempfile.TemporaryDirectory() as tmpdir:
+        out, save_path = _run_experiment(tmpdir, {
+            'TASK_VARIANT': 'corrupt_fix',
+            'CORRUPT_FIX_MASK_AROUND': True})
+        assert os.path.exists(save_path)
+        assert 'CORRUPT_FIX_MASK_AROUND' in out
+        assert 'Train: Loss=' in out and 'nan' not in out.lower()
+        latest = torch.load(os.path.splitext(save_path)[0] + '_latest.pth',
+                            weights_only=False)
+        assert latest['config']['mask_around'] is True
+
+
 if __name__ == '__main__':
     test_collate_layout()
     print('PASS test_collate_layout')
@@ -322,4 +354,8 @@ if __name__ == '__main__':
     print('PASS test_run_experiment_corrupt_fix_paired_clean_smoke')
     test_paired_clean_gates()
     print('PASS test_paired_clean_gates')
+    test_collate_layout_mask_around()
+    print('PASS test_collate_layout_mask_around')
+    test_run_experiment_corrupt_fix_mask_around_smoke()
+    print('PASS test_run_experiment_corrupt_fix_mask_around_smoke')
     print('ALL TESTS PASSED: test_corrupt_fix.py')

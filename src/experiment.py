@@ -733,15 +733,19 @@ def _prepare_single_variant(config, norm):
         parallel = cfg.get('CORRUPT_FIX_PARALLEL', False)
         # CORRUPT_FIX_PAIRED_CLEAN：配对双样本（干净窗续写 + 污损窗只答题）
         paired_clean = cfg.get('CORRUPT_FIX_PAIRED_CLEAN', False)
+        # CORRUPT_FIX_MASK_AROUND：动态剔除污损牵连的主体预测位 {k-1,k,k+1}
+        mask_around = cfg.get('CORRUPT_FIX_MASK_AROUND', False)
         collate = make_corrupt_fix_collate(p=P, eos_id=eos_id, pos_base=P + 2,
                                            parallel=parallel,
                                            body_supervision=body_sup,
                                            body_from=body_from,
-                                           paired_clean=paired_clean)
+                                           paired_clean=paired_clean,
+                                           mask_around=mask_around)
         vocab_size = P + 2 + max_len
         variant_save = {'eos_token_id': eos_id, 'pos_token_base': P + 2,
                         'parallel_decode': parallel,
-                        'paired_clean': paired_clean}
+                        'paired_clean': paired_clean,
+                        'mask_around': mask_around}
     else:  # fill_blank
         collate = make_fill_blank_collate(p=P, eos_id=eos_id,
                                           body_supervision=body_sup,
@@ -751,6 +755,9 @@ def _prepare_single_variant(config, norm):
     if variant == 'corrupt_fix' and cfg.get('CORRUPT_FIX_PAIRED_CLEAN', False):
         print('[Variant] CORRUPT_FIX_PAIRED_CLEAN: 干净续写行 + 污损答题行'
               '（主体监督由干净行承担，污损行只留 pos/val 两槽）')
+    if variant == 'corrupt_fix' and cfg.get('CORRUPT_FIX_MASK_AROUND', False):
+        print('[Variant] CORRUPT_FIX_MASK_AROUND: 动态剔除污损牵连的主体预测位'
+              ' {k-1,k,k+1}（预测 x_k/x_{k+1}/x_{k+2} 不计 loss/acc）')
     _print_task_banner(BLOCK_SIZE, TRAIN_LEN,
                        f"{recurrence_name} [{variant}]")
     train_sampler = BucketBatchSampler(

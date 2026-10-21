@@ -135,6 +135,8 @@ loss_mask    = 仅最后两个 target 位为 1（EOS 槽预测位置 token，位
 
 **`CORRUPT_FIX_PAIRED_CLEAN`**（2026-10-20，默认 false，仅 corrupt_fix，与 PARALLEL 互斥）：配对双样本模式——每个裸窗口产两行：①干净续写行（x=[clean窗]，tgt=[clean窗, EOS]，mask=主体+EOS 槽，正确值全程暴露，续写不被污损值下毒）；②污损答题行（同标准 corrupt_fix，但 mask 只留 pos/val 两槽）。设计动机：检验“错误值被当作合法操作数污染续写”的假设（见 reports/VARIANT_SAMECELL_BODYSUP_20261020.md）。(seq, k) 元组只产答题行，POS_PROBE 口径不变。配对模式批内行长不一，右补齐（pad 位 mask=0，因果预测不受影响）。save_config 记 `paired_clean`。
 
+**`CORRUPT_FIX_MASK_AROUND`**（2026-10-21，默认 false，仅 corrupt_fix）：动态主体 mask——污损位 k 牵连的三个预测位 j∈{k-1,k,k+1}（分别预测 x_k/x_{k+1}/x_{k+2}，输入或目标含污损值）从主体 loss/acc 中剔除，续写只学干净规则；pos/val 两槽不动。训练/评估同一 collate，指标同步变干净（移除前缀含污损的不可约槽，0.99 早停恢复可达）。paired_clean 下无作用。save_config 记 `mask_around`。
+
 ### 1.8 fill_blank 任务变体（2026-10-14）
 
 与 corrupt_fix 同族（`TASK_VARIANT='fill_blank'`，仅 single），差别仅在污损方式与输出：

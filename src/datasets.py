@@ -463,7 +463,7 @@ def make_missing_collate(*, p, init_len, missing_prob, miss_len=1, missing_token
 
 def make_corrupt_fix_collate(*, p, eos_id, pos_base, parallel=False,
                              body_supervision=False, body_from=0,
-                             paired_clean=False):
+                             paired_clean=False, mask_around=False):
     """Collate for the corrupt_fix task variant (TASK_VARIANT='corrupt_fix').
 
     Input: a batch of CLEAN windows (plain LongTensors, any length L), or
@@ -503,6 +503,13 @@ def make_corrupt_fix_collate(*, p, eos_id, pos_base, parallel=False,
     (seq, k) 元组（探针/逐位置评估）只产 ② 一行，保持按 k 统计语义。
     配对模式下行长不一（L+1 vs L+3），批内统一右补齐（pad 位 mask=0，
     对因果预测无影响）。
+
+    mask_around=True（CORRUPT_FIX_MASK_AROUND）：动态主体 mask——污损位 k
+    牵连的三个预测位 j∈{k-1, k, k+1}（分别预测 x_k / x_{k+1} / x_{k+2}，
+    输入或目标含污损值）从主体监督中剔除，续写只学干净规则。pos/val
+    两槽不受影响；训练/评估同一 collate，指标口径同步变干净（移除了
+    前缀含污损的不可约槽位，0.99 早停恢复可达）。paired_clean 下污损行
+    本无主体监督，此键无作用。
     """
     def _corrupt_row(seq, k):
         """污损答题行（标准 corrupt_fix；paired 模式下只留 pos/val 两槽）。"""
@@ -524,6 +531,12 @@ def make_corrupt_fix_collate(*, p, eos_id, pos_base, parallel=False,
         mask = torch.zeros(L + 2, dtype=torch.float)  # aligns with tgt[:, 1:]
         if sup_body:
             mask[body_from:L - 1] = 1.0  # 递推主体（target i 预测 clean x_{i+1}）
+            if mask_around:
+                # 剔除污损牵连位：j 预测 x_{j+1}，j∈{k-1,k,k+1}
+                # 分别对应预测 x_k / x_{k+1} / x_{k+2}
+                for j in (k - 1, k, k + 1):
+                    if body_from <= j <= L - 2:
+                        mask[j] = 0.0
         mask[L] = 1.0      # EOS slot -> position token
         mask[L + 1] = 1.0  # position-token slot -> correct value
         return x, tgt, mask
