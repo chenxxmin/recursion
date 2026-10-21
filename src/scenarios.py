@@ -157,6 +157,14 @@ def _normalize_variant(scenario, cfg):
         raise ValueError(
             "CORRUPT_FIX_MASK_AROUND 仅 TASK_VARIANT='corrupt_fix' 支持"
             "（动态 mask 污损牵连的三个主体预测位 {k-1,k,k+1}）")
+    if cfg.get('CORRUPT_FIX_ALL_POSITIONS'):
+        if raw != 'corrupt_fix':
+            raise ValueError(
+                "CORRUPT_FIX_ALL_POSITIONS 仅 TASK_VARIANT='corrupt_fix' 支持"
+                "（每个位置各污损一次，样本数×窗口长度）")
+        if cfg.get('CORRUPT_FIX_PAIRED_CLEAN'):
+            raise ValueError(
+                "CORRUPT_FIX_ALL_POSITIONS 与 CORRUPT_FIX_PAIRED_CLEAN 暂不支持叠加")
     if (cfg.get('SEQ_LEN_MIN') is not None or cfg.get('SEQ_LEN_MAX') is not None):
         if raw is None:
             raise ValueError("SEQ_LEN_MIN/SEQ_LEN_MAX 仅 TASK_VARIANT 变体支持")

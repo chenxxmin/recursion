@@ -137,6 +137,8 @@ loss_mask    = 仅最后两个 target 位为 1（EOS 槽预测位置 token，位
 
 **`CORRUPT_FIX_MASK_AROUND`**（2026-10-21，默认 false，仅 corrupt_fix）：动态主体 mask——污损位 k 牵连的三个预测位 j∈{k-1,k,k+1}（分别预测 x_k/x_{k+1}/x_{k+2}，输入或目标含污损值）从主体 loss/acc 中剔除，续写只学干净规则；pos/val 两槽不动。训练/评估同一 collate，指标同步变干净（移除前缀含污损的不可约槽，0.99 早停恢复可达）。paired_clean 下无作用。save_config 记 `mask_around`。
 
+**`CORRUPT_FIX_ALL_POSITIONS`**（2026-10-21，默认 false，仅 corrupt_fix，与 PAIRED_CLEAN 互斥）：逐位置枚举污损——每条序列的每个位置各污损一次（(seq,k) 元组携带污损位，错误值仍由 collate 在线随机，每 epoch 不同），训练/测试样本数 × 窗口长度。与 FILL_BLANK_ALL_POSITIONS 同构；不定长下按截断后长度枚举。save_config 记 `all_positions`。
+
 ### 1.8 fill_blank 任务变体（2026-10-14）
 
 与 corrupt_fix 同族（`TASK_VARIANT='fill_blank'`，仅 single），差别仅在污损方式与输出：

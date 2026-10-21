@@ -46,6 +46,7 @@
 15. **变体主体监督 + 不定长**（2026-10-15）：①`BODY_SUPERVISION`（变体默认 true）：targets 前缀改用干净序列、loss_mask 覆盖递推主体 [order-1, L-1) + 输出位，不再只监督最后输出位。②`SEQ_LEN_MIN`/`SEQ_LEN_MAX`（仅变体，必须成对且 min > 阶数）：窗口逐样本随机截断成不定长，分桶 sampler 按长度组 batch；词表/block 按 max。两个键在非变体下设置会报错。save_config 记 `body_supervision`/`seq_len_min`/`seq_len_max`。
 16. **CORRUPT_FIX_PAIRED_CLEAN**（2026-10-20，仅 corrupt_fix，与 PARALLEL 互斥）：配对双样本——裸窗口产 干净续写行（主体监督，正确值暴露）+ 污损答题行（只 pos/val 两槽）两行；(seq,k) 元组只产答题行，POS_PROBE 口径不变；批内右补齐。save_config 记 `paired_clean`。
 17. **CORRUPT_FIX_MASK_AROUND**（2026-10-21，仅 corrupt_fix）：动态主体 mask——污损位 k 牵连的预测位 {k-1,k,k+1}（预测 x_k/x_{k+1}/x_{k+2}）不计主体 loss/acc；pos/val 槽不动；评估同口径（0.99 早停恢复可达）。paired_clean 下无作用。
+18. **CORRUPT_FIX_ALL_POSITIONS**（2026-10-21，仅 corrupt_fix，与 PAIRED_CLEAN 互斥）：逐位置枚举污损（(seq,k) 元组，错误值仍在线随机），样本数×窗口长度，与 FILL_BLANK_ALL_POSITIONS 同构。save_config 记 `all_positions`。
 
 15. **SAVE_CHECKPOINTS**（2026-10-19，默认 true）：false 时训练全程不落任何存档（`_best`/`_latest`/`_resume`/最终 `model.pth` 都不写），仅日志，用于大批量粗扫省磁盘；超时/停掉的实验不可续跑，attention 后处理自动跳过。文档：settings §训练循环与早停。
 

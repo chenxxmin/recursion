@@ -10,6 +10,7 @@ import json
 import math
 import os
 import random
+import re
 import sys
 import tempfile
 
@@ -329,6 +330,45 @@ def test_run_experiment_corrupt_fix_mask_around_smoke():
         assert latest['config']['mask_around'] is True
 
 
+def test_run_experiment_corrupt_fix_all_positions_smoke():
+    # 逐位置枚举污损：样本数 × 窗口长度（不定长下按截断后长度）
+    with tempfile.TemporaryDirectory() as tmpdir:
+        out, save_path = _run_experiment(tmpdir, {
+            'TASK_VARIANT': 'corrupt_fix',
+            'CORRUPT_FIX_ALL_POSITIONS': True,
+            'TRAIN_LEN': 8, 'OOD_LEN': 8})
+        assert os.path.exists(save_path)
+        m = re.search(r'CORRUPT_FIX_ALL_POSITIONS: (\d+) windows -> (\d+) train samples', out)
+        assert m, out[-2000:]
+        n_win, n_samp = int(m.group(1)), int(m.group(2))
+        assert n_samp == n_win * 8, f'{n_samp} != {n_win}*8'
+        assert 'Train: Loss=' in out and 'nan' not in out.lower()
+        latest = torch.load(os.path.splitext(save_path)[0] + '_latest.pth',
+                            weights_only=False)
+        assert latest['config']['all_positions'] is True
+
+
+def test_all_positions_gates():
+    # 仅 corrupt_fix；与 PAIRED_CLEAN 互斥（归一化错误 -> SystemExit(2)）
+    with tempfile.TemporaryDirectory() as tmpdir:
+        try:
+            _run_experiment(tmpdir, {'TASK_VARIANT': 'fill_blank',
+                                     'CORRUPT_FIX_ALL_POSITIONS': True})
+        except SystemExit as exc:
+            assert exc.code == 2
+        else:
+            raise AssertionError('all_positions on fill_blank must exit(2)')
+    with tempfile.TemporaryDirectory() as tmpdir:
+        try:
+            _run_experiment(tmpdir, {'TASK_VARIANT': 'corrupt_fix',
+                                     'CORRUPT_FIX_ALL_POSITIONS': True,
+                                     'CORRUPT_FIX_PAIRED_CLEAN': True})
+        except SystemExit as exc:
+            assert exc.code == 2
+        else:
+            raise AssertionError('all_positions + paired_clean must exit(2)')
+
+
 if __name__ == '__main__':
     test_collate_layout()
     print('PASS test_collate_layout')
@@ -358,4 +398,8 @@ if __name__ == '__main__':
     print('PASS test_collate_layout_mask_around')
     test_run_experiment_corrupt_fix_mask_around_smoke()
     print('PASS test_run_experiment_corrupt_fix_mask_around_smoke')
+    test_run_experiment_corrupt_fix_all_positions_smoke()
+    print('PASS test_run_experiment_corrupt_fix_all_positions_smoke')
+    test_all_positions_gates()
+    print('PASS test_all_positions_gates')
     print('ALL TESTS PASSED: test_corrupt_fix.py')

@@ -707,6 +707,18 @@ def _prepare_single_variant(config, norm):
             test_dataset = [(seq, k) for seq in test_dataset for k in range(len(seq))]
         print(f"[Variant] FILL_BLANK_ALL_POSITIONS: {n_base} windows -> "
               f"{len(train_dataset)} train samples")
+    # CORRUPT_FIX_ALL_POSITIONS（仅 corrupt_fix）：每条序列的每个位置各污损
+    # 一次（(seq, k) 元组，错误值仍由 collate 在线随机），训练/测试样本数
+    # × 窗口长度。与 FILL_BLANK_ALL_POSITIONS 同构。
+    corrupt_all = (variant == 'corrupt_fix'
+                   and cfg.get('CORRUPT_FIX_ALL_POSITIONS', False))
+    if corrupt_all:
+        n_base = len(train_dataset)
+        train_dataset = [(seq, k) for seq in train_dataset for k in range(len(seq))]
+        if data_mode == 'full_split':
+            test_dataset = [(seq, k) for seq in test_dataset for k in range(len(seq))]
+        print(f"[Variant] CORRUPT_FIX_ALL_POSITIONS: {n_base} windows -> "
+              f"{len(train_dataset)} train samples")
     # TEST_ALL_POSITIONS（仅 fill_blank）：只把测试集改成逐位置枚举挖空
     # （确定性评估口径），训练侧保持在线随机挖空。blank_all 时测试已枚举，跳过。
     # 静态切分下 NUM_TEST_SAMPLES 作为测试窗口数上限（默认 256）：确定性子抽样，
@@ -745,7 +757,8 @@ def _prepare_single_variant(config, norm):
         variant_save = {'eos_token_id': eos_id, 'pos_token_base': P + 2,
                         'parallel_decode': parallel,
                         'paired_clean': paired_clean,
-                        'mask_around': mask_around}
+                        'mask_around': mask_around,
+                        'all_positions': corrupt_all}
     else:  # fill_blank
         collate = make_fill_blank_collate(p=P, eos_id=eos_id,
                                           body_supervision=body_sup,
@@ -783,7 +796,7 @@ def _prepare_single_variant(config, norm):
                 cut = random.Random(fresh_seed + 1)
                 fresh_samples = [s[:cut.randint(seq_min, seq_max)]
                                  for s in fresh_samples]
-            if blank_all or test_all:
+            if blank_all or test_all or corrupt_all:
                 fresh_samples = [(seq, k) for seq in fresh_samples
                                  for k in range(len(seq))]
             print(f"[FreshTest] sampled with replacement: "
