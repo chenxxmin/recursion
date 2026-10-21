@@ -775,17 +775,21 @@ def _prepare_single_variant(config, norm):
         paired_clean = cfg.get('CORRUPT_FIX_PAIRED_CLEAN', False)
         # CORRUPT_FIX_MASK_AROUND：动态剔除污损牵连的主体预测位 {k-1,k,k+1}
         mask_around = cfg.get('CORRUPT_FIX_MASK_AROUND', False)
+        # CORRUPT_FIX_POS_WEIGHT：pos 槽 loss 权重（默认 1.0）
+        pos_weight = cfg.get('CORRUPT_FIX_POS_WEIGHT', 1.0)
         collate = make_corrupt_fix_collate(p=P, eos_id=eos_id, pos_base=P + 2,
                                            parallel=parallel,
                                            body_supervision=body_sup,
                                            body_from=body_from,
                                            paired_clean=paired_clean,
-                                           mask_around=mask_around)
+                                           mask_around=mask_around,
+                                           pos_weight=pos_weight)
         vocab_size = P + 2 + max_len
         variant_save = {'eos_token_id': eos_id, 'pos_token_base': P + 2,
                         'parallel_decode': parallel,
                         'paired_clean': paired_clean,
                         'mask_around': mask_around,
+                        'pos_weight': pos_weight,
                         'all_positions': corrupt_all}
     else:  # fill_blank
         collate = make_fill_blank_collate(p=P, eos_id=eos_id,
@@ -799,6 +803,9 @@ def _prepare_single_variant(config, norm):
     if variant == 'corrupt_fix' and cfg.get('CORRUPT_FIX_MASK_AROUND', False):
         print('[Variant] CORRUPT_FIX_MASK_AROUND: 动态剔除污损牵连的主体预测位'
               ' {k-1,k,k+1}（预测 x_k/x_{k+1}/x_{k+2} 不计 loss/acc）')
+    if variant == 'corrupt_fix' and cfg.get('CORRUPT_FIX_POS_WEIGHT', 1.0) != 1.0:
+        print(f"[Variant] CORRUPT_FIX_POS_WEIGHT: pos 槽 loss 权重 x"
+              f"{cfg['CORRUPT_FIX_POS_WEIGHT']}")
     _print_task_banner(BLOCK_SIZE, TRAIN_LEN,
                        f"{recurrence_name} [{variant}]")
     train_sampler = BucketBatchSampler(

@@ -463,7 +463,8 @@ def make_missing_collate(*, p, init_len, missing_prob, miss_len=1, missing_token
 
 def make_corrupt_fix_collate(*, p, eos_id, pos_base, parallel=False,
                              body_supervision=False, body_from=0,
-                             paired_clean=False, mask_around=False):
+                             paired_clean=False, mask_around=False,
+                             pos_weight=1.0):
     """Collate for the corrupt_fix task variant (TASK_VARIANT='corrupt_fix').
 
     Input: a batch of CLEAN windows (plain LongTensors, any length L), or
@@ -510,6 +511,10 @@ def make_corrupt_fix_collate(*, p, eos_id, pos_base, parallel=False,
     两槽不受影响；训练/评估同一 collate，指标口径同步变干净（移除了
     前缀含污损的不可约槽位，0.99 早停恢复可达）。paired_clean 下污损行
     本无主体监督，此键无作用。
+
+    pos_weight（CORRUPT_FIX_POS_WEIGHT，默认 1.0）：pos 槽（EOS 位预测位置
+    token）的 loss 权重——mask[L]=pos_weight，加权计入 loss（acc 统计不受
+    影响，mask>0 即计入一次）。用于加大检测头的训练压力。
     """
     def _corrupt_row(seq, k):
         """污损答题行（标准 corrupt_fix；paired 模式下只留 pos/val 两槽）。"""
@@ -537,7 +542,7 @@ def make_corrupt_fix_collate(*, p, eos_id, pos_base, parallel=False,
                 for j in (k - 1, k, k + 1):
                     if body_from <= j <= L - 2:
                         mask[j] = 0.0
-        mask[L] = 1.0      # EOS slot -> position token
+        mask[L] = pos_weight  # EOS slot -> position token（可加权）
         mask[L + 1] = 1.0  # position-token slot -> correct value
         return x, tgt, mask
 

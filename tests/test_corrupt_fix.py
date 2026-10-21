@@ -351,6 +351,21 @@ def test_run_experiment_corrupt_fix_all_positions_smoke():
         assert latest['config']['all_positions'] is True
 
 
+def test_collate_pos_weight():
+    # pos 槽 loss 权重：mask[L]=w，其余槽不变；acc 统计不受权重影响（>0 即计入）
+    p, eos_id, pos_base, L = 7, 8, 9, 6
+    seqs = _addition_windows(p=p, n=4, length=L)
+    batch = [(seq, 2) for seq in seqs]
+    collate = make_corrupt_fix_collate(p=p, eos_id=eos_id, pos_base=pos_base,
+                                       body_supervision=True, body_from=1,
+                                       pos_weight=10.0)
+    _, _, _, mask = collate(batch)
+    for i in range(len(batch)):
+        assert mask[i, L].item() == 10.0
+        assert mask[i, L + 1].item() == 1.0
+        assert mask[i, 1].item() == 1.0  # 主体槽不受影响
+
+
 def test_all_positions_gates():
     # 仅 corrupt_fix；与 PAIRED_CLEAN 互斥（归一化错误 -> SystemExit(2)）
     with tempfile.TemporaryDirectory() as tmpdir:
@@ -405,4 +420,6 @@ if __name__ == '__main__':
     print('PASS test_run_experiment_corrupt_fix_all_positions_smoke')
     test_all_positions_gates()
     print('PASS test_all_positions_gates')
+    test_collate_pos_weight()
+    print('PASS test_collate_pos_weight')
     print('ALL TESTS PASSED: test_corrupt_fix.py')

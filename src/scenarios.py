@@ -165,6 +165,14 @@ def _normalize_variant(scenario, cfg):
         if cfg.get('CORRUPT_FIX_PAIRED_CLEAN'):
             raise ValueError(
                 "CORRUPT_FIX_ALL_POSITIONS 与 CORRUPT_FIX_PAIRED_CLEAN 暂不支持叠加")
+    if cfg.get('CORRUPT_FIX_POS_WEIGHT') is not None:
+        pw = cfg['CORRUPT_FIX_POS_WEIGHT']
+        if raw != 'corrupt_fix':
+            raise ValueError(
+                "CORRUPT_FIX_POS_WEIGHT 仅 TASK_VARIANT='corrupt_fix' 支持"
+                "（pos 槽 loss 权重）")
+        if not (isinstance(pw, (int, float)) and pw > 0):
+            raise ValueError(f"CORRUPT_FIX_POS_WEIGHT 必须是正数，got {pw}")
     if (cfg.get('SEQ_LEN_MIN') is not None or cfg.get('SEQ_LEN_MAX') is not None):
         if raw is None:
             raise ValueError("SEQ_LEN_MIN/SEQ_LEN_MAX 仅 TASK_VARIANT 变体支持")

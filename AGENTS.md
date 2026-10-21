@@ -47,6 +47,7 @@
 16. **CORRUPT_FIX_PAIRED_CLEAN**（2026-10-20，仅 corrupt_fix，与 PARALLEL 互斥）：配对双样本——裸窗口产 干净续写行（主体监督，正确值暴露）+ 污损答题行（只 pos/val 两槽）两行；(seq,k) 元组只产答题行，POS_PROBE 口径不变；批内右补齐。save_config 记 `paired_clean`。
 17. **CORRUPT_FIX_MASK_AROUND**（2026-10-21，仅 corrupt_fix）：动态主体 mask——污损位 k 牵连的预测位 {k-1,k,k+1}（预测 x_k/x_{k+1}/x_{k+2}）不计主体 loss/acc；pos/val 槽不动；评估同口径（0.99 早停恢复可达）。paired_clean 下无作用。
 18. **CORRUPT_FIX_ALL_POSITIONS**（2026-10-21，仅 corrupt_fix，与 PAIRED_CLEAN 互斥）：逐位置枚举污损（(seq,k) 元组，错误值仍在线随机），样本数×窗口长度，与 FILL_BLANK_ALL_POSITIONS 同构。save_config 记 `all_positions`。
+19. **CORRUPT_FIX_POS_WEIGHT**（2026-10-21，仅 corrupt_fix，默认 1.0=不启用）：pos 槽 loss 权重（mask[L]=w，acc 统计不受影响）。另：PosProbe 同日新增相对位置五桶行 `posR|/valR|`（first/second/mid/last2/last），仅评估侧改动。
 
 15. **SAVE_CHECKPOINTS**（2026-10-19，默认 true）：false 时训练全程不落任何存档（`_best`/`_latest`/`_resume`/最终 `model.pth` 都不写），仅日志，用于大批量粗扫省磁盘；超时/停掉的实验不可续跑，attention 后处理自动跳过。文档：settings §训练循环与早停。
 
