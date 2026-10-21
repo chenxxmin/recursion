@@ -1,0 +1,71 @@
+{
+  "concurrency": 2,
+  "experiments": [
+    {
+      "name": "single_o3_a70b124c50_d1024l2r4h4_P128_gf2n_tr16_n300k_seed17996",
+      "task": "single",
+      "config": {
+        "P": 128,
+        "FIELD": "gf2n",
+        "ORDER": 3,
+        "RULES": [[70, 124, 50]],
+        "D_MODEL": 1024,
+        "N_LAYER": 2,
+        "N_HEAD": 4,
+        "MLP_RATIO": 4,
+        "TRAIN_LEN": 16,
+        "OOD_LEN": 16,
+        "BATCH_SIZE": 512,
+        "LR": 0.0003,
+        "WEIGHT_DECAY": 1,
+        "GRAD_CLIP_NORM": 1.0,
+        "EVAL_INTERVAL": 1,
+        "MISSING_PROB": 0.0,
+        "MISS_LEN": 1,
+        "NUM_TRAIN_SAMPLES": 300000,
+        "RANDOM_SEED": 17996,
+        "MAX_TRAIN_HOURS": 6,
+        "EARLY_STOP_NO_IMPROVE": 3000,
+        "EARLY_STOP_ACCURACY": 0.99,
+        "RULES_POLY": [
+          "x^6 + x^2 + x",
+          "x^6 + x^5 + x^4 + x^3 + x^2",
+          "x^5 + x^4 + x"
+        ],
+        "IRREDUCIBLE_POLY": "x^7 + x + 1"
+      }
+    },
+    {
+      "name": "single_o3_a70b124c50_d1024l2r4h4_P127_mod_tr16_n300k_seed17996",
+      "task": "single",
+      "config": {
+        "P": 127,
+        "ORDER": 3,
+        "RULES": [[70, 124, 50]],
+        "D_MODEL": 1024,
+        "N_LAYER": 2,
+        "N_HEAD": 4,
+        "MLP_RATIO": 4,
+        "TRAIN_LEN": 16,
+        "OOD_LEN": 16,
+        "BATCH_SIZE": 512,
+        "LR": 0.0003,
+        "WEIGHT_DECAY": 1,
+        "GRAD_CLIP_NORM": 1.0,
+        "EVAL_INTERVAL": 1,
+        "MISSING_PROB": 0.0,
+        "MISS_LEN": 1,
+        "NUM_TRAIN_SAMPLES": 300000,
+        "RANDOM_SEED": 17996,
+        "MAX_TRAIN_HOURS": 6,
+        "EARLY_STOP_NO_IMPROVE": 3000,
+        "EARLY_STOP_ACCURACY": 0.99
+      }
+    }
+  ],
+  "_human": {
+    "match_cxm_trib_scale": "d1024l2r4h4 BS=512 WD=1; cxm P127 trib best>=90 used this (never d512l2 at P127)",
+    "NUM_TRAIN_SAMPLES": 300000,
+    "note": "Same as trib124_p127_300k style; ORDER=3 coeffs [70,124,50]"
+  }
+}
