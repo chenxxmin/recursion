@@ -20,7 +20,11 @@ import torch
 import torch.nn as nn
 from torch.utils.data import DataLoader
 
-from rules import rules_from_config, single_rule_from_task, save_config_extra
+from rules import (
+    rules_from_config, single_rule_from_task, save_config_extra, field_from_cfg,
+    coeffs_poly_list, format_recurrence_name,
+)
+from finite_field import poly_str
 from protocol import BATCH_RUN_MERGED_FLAG
 from scenarios import normalize_task_config
 from models import FibonacciTransformer
@@ -166,8 +170,15 @@ def _prepare_mixed_recurrence(config, device, norm):
     OOD_LEN = cfg['OOD_LEN']
     DROPOUT = cfg['DROPOUT']
     order = norm['order']
-    rules = rules_from_config(norm['rules'], P)
+    field = field_from_cfg(cfg, P)
+    rules = rules_from_config(norm['rules'], P, field=field)
     state_space_size = P ** order
+    if field is not None:
+        print(f"[Field] GF(2^{field.n}) order={field.order} "
+              f"irr={poly_str(field.irreducible)} "
+              f"(value tokens 0..{P - 1}, pad={P})")
+        for r in rules:
+            print(f"[Field] rule {r.name}: {format_recurrence_name(r.coeffs, P, field=field)}")
 
     BLOCK_SIZE = _round_up_pow2(max(TRAIN_LEN, OOD_LEN))
 
@@ -264,6 +275,9 @@ def _prepare_mixed_recurrence(config, device, norm):
         'rules': [list(r.coeffs) for r in rules],
         # canonical == legacy mixed convention, safe for old analysis tools
         'ab_pairs': [list(r.coeffs) for r in rules],
+        'field': ('gf2n' if field is not None else None),
+        'rules_poly': [coeffs_poly_list(r.coeffs, field) for r in rules],
+        'irreducible_poly': (poly_str(field.irreducible) if field is not None else None),
         'exposure_ratios': ratios,
         'aux_classify': aux_classify,
         'd_model': D_MODEL,
@@ -317,6 +331,13 @@ def _prepare_action(config, norm):
     missing_prob = cfg.get('MISSING_PROB', 0.0)
     miss_len = cfg.get('MISS_LEN', 1)
     P = cfg['P']
+    field = field_from_cfg(cfg, P)
+    if field is not None:
+        print(f"[Field] GF(2^{field.n}) order={field.order} "
+              f"irr={poly_str(field.irreducible)} "
+              f"(value tokens 0..{P - 1}, pad={P})")
+        for coeffs in norm['rules']:
+            print(f"[Field] rule: {format_recurrence_name(coeffs, P, field=field)}")
     D_MODEL = cfg['D_MODEL']
     N_HEAD = cfg['N_HEAD']
     N_LAYER = cfg['N_LAYER']
@@ -334,11 +355,13 @@ def _prepare_action(config, norm):
 
     train_dataset = ActionDataset(
         p=P, ab_pairs=AB_PAIRS, num_samples=NUM_TRAIN_SAMPLES,
-        length=TRAIN_LEN, seed=cfg.get('RANDOM_SEED', 42), order=order
+        length=TRAIN_LEN, seed=cfg.get('RANDOM_SEED', 42), order=order,
+        field=field,
     )
     test_dataset = ActionDataset(
         p=P, ab_pairs=AB_PAIRS, num_samples=NUM_TEST_SAMPLES,
-        length=OOD_LEN, seed=cfg.get('RANDOM_SEED', 42) + 1, order=order
+        length=OOD_LEN, seed=cfg.get('RANDOM_SEED', 42) + 1, order=order,
+        field=field,
     )
 
     _print_task_banner(BLOCK_SIZE, TRAIN_LEN, f"Dynamic mixed rules: {AB_PAIRS}")
@@ -361,7 +384,7 @@ def _prepare_action(config, norm):
             fresh_seed = fresh_rng.randrange(2 ** 31)
             ds = ActionDataset(
                 p=P, ab_pairs=AB_PAIRS, num_samples=NUM_TEST_SAMPLES,
-                length=OOD_LEN, seed=fresh_seed, order=order)
+                length=OOD_LEN, seed=fresh_seed, order=order, field=field)
             print(f"[FreshTest] rebuilt test set: n={NUM_TEST_SAMPLES}, len={OOD_LEN}, seed={fresh_seed}")
             return _make_test_loader(ds, BATCH_SIZE, collate)
 
@@ -391,6 +414,9 @@ def _prepare_action(config, norm):
         'order': order,
         'rules': [list(r) for r in norm['rules']],  # canonical
         'ab_pairs': [list(pair) for pair in AB_PAIRS],  # action 旧约定，供旧分析工具
+        'field': (f'gf2n' if field is not None else None),
+        'rules_poly': [coeffs_poly_list(r, field) for r in norm['rules']],
+        'irreducible_poly': (poly_str(field.irreducible) if field is not None else None),
         'd_model': D_MODEL,
         'n_head': N_HEAD,
         'n_layer': N_LAYER,
@@ -437,18 +463,37 @@ def _prepare_single_recurrence(config, norm):
 
     BLOCK_SIZE = _round_up_pow2(max(TRAIN_LEN, OOD_LEN))
 
+    field = field_from_cfg(cfg, P)
+    if field is not None:
+        print(f"[Field] GF(2^{field.n}) order={field.order} "
+              f"irr={poly_str(field.irreducible)} "
+              f"(value tokens 0..{P - 1}, pad={P})")
     if scenario == 'single':
         init_len, recurrence_fn, recurrence_name = single_rule_from_task(
-            'single', {'P': P, 'RULES': norm['rules'], 'CONST': norm.get('const', 0)})
+            'single', {
+                'P': P, 'RULES': norm['rules'], 'CONST': norm.get('const', 0),
+                'FIELD': field if field is not None else cfg.get('FIELD'),
+            })
         default_num_mask = norm['order'] - 1
         max_unique_ratio = norm['exposure_ratios']
     else:
         # Nonlinear exception tasks keep their hardcoded recurrences.
+        if field is not None:
+            raise ValueError(
+                f"FIELD=gf2n is not supported for exception task {scenario!r}")
         init_len, recurrence_fn, recurrence_name = single_rule_from_task(scenario, cfg)
         default_num_mask = {'multiplication': 1, 'nonlinear': 1,
                             'nonlinear_mul': 1}[scenario]
         max_unique_ratio = cfg.get('MAX_UNIQUE_RATIO', 0.7)
     save_extra_config = save_config_extra(norm, cfg)
+    if field is not None:
+        save_extra_config = {
+            **save_extra_config,
+            'field': 'gf2n',
+            'rules_poly': [coeffs_poly_list(norm['rules'][0], field)],
+            'irreducible_poly': poly_str(field.irreducible),
+            'recurrence_poly': recurrence_name,
+        }
 
     # Explicit data-generation strategy.
     #   full_split: traverse the full state space, then split into train/test.
@@ -613,10 +658,26 @@ def _prepare_single_variant(config, norm):
     tail_tokens = 2 if variant == 'corrupt_fix' else 1
     BLOCK_SIZE = _round_up_pow2(max_len + tail_tokens)
 
+    field = field_from_cfg(cfg, P)
+    if field is not None:
+        print(f"[Field] GF(2^{field.n}) order={field.order} "
+              f"irr={poly_str(field.irreducible)} "
+              f"(value tokens 0..{P - 1}, pad={P})")
     init_len, recurrence_fn, recurrence_name = single_rule_from_task(
-        'single', {'P': P, 'RULES': norm['rules'], 'CONST': norm.get('const', 0)})
+        'single', {
+            'P': P, 'RULES': norm['rules'], 'CONST': norm.get('const', 0),
+            'FIELD': field if field is not None else cfg.get('FIELD'),
+        })
     max_unique_ratio = norm['exposure_ratios']
     save_extra_config = save_config_extra(norm, cfg)
+    if field is not None:
+        save_extra_config = {
+            **save_extra_config,
+            'field': 'gf2n',
+            'rules_poly': [coeffs_poly_list(norm['rules'][0], field)],
+            'irreducible_poly': poly_str(field.irreducible),
+            'recurrence_poly': recurrence_name,
+        }
 
     # Data-generation strategy: same semantics as _prepare_single_recurrence.
     data_mode = cfg.get('DATA_MODE')

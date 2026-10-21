@@ -598,7 +598,8 @@ def make_mixed_missing_collate(*, p, order, n_rules, missing_prob, miss_len=1):
     return collate
 
 
-def generate_action_sample(p, ab_pairs, flag_start_id, length, rng, order=2):
+def generate_action_sample(p, ab_pairs, flag_start_id, length, rng, order=2,
+                           field=None):
     """Generate one action sequence [x1..x_order, flag, x_{order+1}, ..., flag, x_L].
 
     rng: a random.Random instance owned by the caller (seeding decides the
@@ -609,13 +610,21 @@ def generate_action_sample(p, ab_pairs, flag_start_id, length, rng, order=2):
     LinearRecurrenceRule): the first coefficient multiplies the OLDEST
     value, i.e. x_next = sum(c_i * values[-order + i]) % p; for order=2
     that is a*values[-2] + b*values[-1].
+
+    field: optional GF2n; when set, the linear combination uses field
+    arithmetic (p must equal field.order). Value tokens remain ids in
+    ``[0, p)`` — the model only sees discrete tokens.
     """
     values = [rng.randrange(p) for _ in range(order)]
     seq = list(values)
     for _ in range(order, length):
         rule_idx = rng.randrange(len(ab_pairs))
         coeffs = ab_pairs[rule_idx]
-        x_next = sum(c * v for c, v in zip(coeffs, values[-order:])) % p
+        window = values[-order:]
+        if field is None:
+            x_next = sum(c * v for c, v in zip(coeffs, window)) % p
+        else:
+            x_next = field.linear_combo(coeffs, window, const=0)
         seq.append(flag_start_id + rule_idx)
         seq.append(x_next)
         values.append(x_next)
@@ -645,9 +654,13 @@ class ActionDataset(Dataset):
     always stored CLEAN as (seq, loss_mask) pairs.
     """
 
-    def __init__(self, p, ab_pairs, num_samples, length, seed=0, order=2):
+    def __init__(self, p, ab_pairs, num_samples, length, seed=0, order=2,
+                 field=None):
         super().__init__()
         self.p = p
+        self.field = field
+        if field is not None and field.order != p:
+            raise ValueError(f"field.order={field.order} != p={p}")
         self.ab_pairs = [tuple(pair) for pair in ab_pairs]
         for pair in self.ab_pairs:
             assert len(pair) == order, \
@@ -668,8 +681,9 @@ class ActionDataset(Dataset):
         flags are masked. Missing-value corruption happens on the fly in
         make_action_missing_collate, never here.
         """
-        seq = generate_action_sample(self.p, self.ab_pairs, self.flag_start_id,
-                                      self.length, self.rng, order=self.order)
+        seq = generate_action_sample(
+            self.p, self.ab_pairs, self.flag_start_id,
+            self.length, self.rng, order=self.order, field=self.field)
 
         # Build loss mask aligned to targets = seq[1:]. Value x_j (j >=
         # order+1) sits at seq index 2*j - order - 1, i.e. target index

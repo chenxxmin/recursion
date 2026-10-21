@@ -1,0 +1,68 @@
+{
+  "concurrency": 2,
+  "experiments": [
+    {
+      "name": "single_o2_a70b124_d512l2r8h4_P128_gf2n_tr16_miss0_seed17996",
+      "task": "single",
+      "config": {
+        "P": 128,
+        "FIELD": "gf2n",
+        "ORDER": 2,
+        "RULES": [[70, 124]],
+        "D_MODEL": 512,
+        "N_LAYER": 2,
+        "N_HEAD": 4,
+        "MLP_RATIO": 8,
+        "TRAIN_LEN": 16,
+        "OOD_LEN": 16,
+        "BATCH_SIZE": 512,
+        "LR": 0.0003,
+        "WEIGHT_DECAY": 1,
+        "GRAD_CLIP_NORM": 1.0,
+        "EVAL_INTERVAL": 1,
+        "MISSING_PROB": 0.0,
+        "MISS_LEN": 1,
+        "RANDOM_SEED": 17996,
+        "MAX_TRAIN_HOURS": 3,
+        "EARLY_STOP_NO_IMPROVE": 3000,
+        "EARLY_STOP_ACCURACY": 0.99,
+        "OPT_DIAG_INTERVAL": 1,
+        "RULES_POLY": ["x^6 + x^2 + x", "x^6 + x^5 + x^4 + x^3 + x^2"],
+        "IRREDUCIBLE_POLY": "x^7 + x + 1"
+      }
+    },
+    {
+      "name": "single_o2_a70b124_d512l2r8h4_P127_mod_tr16_miss0_seed17996",
+      "task": "single",
+      "config": {
+        "P": 127,
+        "ORDER": 2,
+        "RULES": [[70, 124]],
+        "D_MODEL": 512,
+        "N_LAYER": 2,
+        "N_HEAD": 4,
+        "MLP_RATIO": 8,
+        "TRAIN_LEN": 16,
+        "OOD_LEN": 16,
+        "BATCH_SIZE": 512,
+        "LR": 0.0003,
+        "WEIGHT_DECAY": 1,
+        "GRAD_CLIP_NORM": 1.0,
+        "EVAL_INTERVAL": 1,
+        "MISSING_PROB": 0.0,
+        "MISS_LEN": 1,
+        "RANDOM_SEED": 17996,
+        "MAX_TRAIN_HOURS": 3,
+        "EARLY_STOP_NO_IMPROVE": 3000,
+        "EARLY_STOP_ACCURACY": 0.99,
+        "OPT_DIAG_INTERVAL": 1
+      }
+    }
+  ],
+  "_human": {
+    "match_cxm": "single_o2_coef_p127_d512 / overnight_h123_p127_d512 template",
+    "diff_vs_prior_scout": "BATCH_SIZE 1024→512; EARLY_STOP_NO_IMPROVE 500→3000; drop explicit EXPOSURE_RATIOS (default 0.7); OPT_DIAG_INTERVAL=1",
+    "RULES_poly": ["x^6 + x^2 + x", "x^6 + x^5 + x^4 + x^3 + x^2"],
+    "note": "Same coeffs as collapsing GF(2^7) run; hypers matched to cxm d512l2r8h4 single."
+  }
+}

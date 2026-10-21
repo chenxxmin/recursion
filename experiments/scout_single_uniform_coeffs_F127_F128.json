@@ -1,0 +1,83 @@
+{
+  "concurrency": 2,
+  "experiments": [
+    {
+      "name": "single_o2_a70b124_d512l2_P128_gf2n_tr16_miss0_seed17996",
+      "task": "single",
+      "config": {
+        "P": 128,
+        "FIELD": "gf2n",
+        "ORDER": 2,
+        "RULES": [
+          [
+            70,
+            124
+          ]
+        ],
+        "D_MODEL": 512,
+        "N_LAYER": 2,
+        "N_HEAD": 4,
+        "MLP_RATIO": 8,
+        "TRAIN_LEN": 16,
+        "OOD_LEN": 16,
+        "BATCH_SIZE": 1024,
+        "EVAL_INTERVAL": 1,
+        "MISSING_PROB": 0.0,
+        "MISS_LEN": 1,
+        "EXPOSURE_RATIOS": 0.7,
+        "RANDOM_SEED": 17996,
+        "MAX_TRAIN_HOURS": 3,
+        "EARLY_STOP_NO_IMPROVE": 500,
+        "EARLY_STOP_ACCURACY": 0.99,
+        "RULES_POLY": [
+          "x^6 + x^2 + x",
+          "x^6 + x^5 + x^4 + x^3 + x^2"
+        ],
+        "IRREDUCIBLE_POLY": "x^7 + x + 1"
+      }
+    },
+    {
+      "name": "single_o2_a70b124_d512l2_P127_mod_tr16_miss0_seed17996",
+      "task": "single",
+      "config": {
+        "P": 127,
+        "ORDER": 2,
+        "RULES": [
+          [
+            70,
+            124
+          ]
+        ],
+        "D_MODEL": 512,
+        "N_LAYER": 2,
+        "N_HEAD": 4,
+        "MLP_RATIO": 8,
+        "TRAIN_LEN": 16,
+        "OOD_LEN": 16,
+        "BATCH_SIZE": 1024,
+        "EVAL_INTERVAL": 1,
+        "MISSING_PROB": 0.0,
+        "MISS_LEN": 1,
+        "EXPOSURE_RATIOS": 0.7,
+        "RANDOM_SEED": 17996,
+        "MAX_TRAIN_HOURS": 3,
+        "EARLY_STOP_NO_IMPROVE": 500,
+        "EARLY_STOP_ACCURACY": 0.99
+      }
+    }
+  ],
+  "_human": {
+    "coeff_sample_seed": 20261021,
+    "coeff_dist": "Unif{1..q-1} independent",
+    "RULES_int": [
+      70,
+      124
+    ],
+    "RULES_poly": [
+      "x^6 + x^2 + x",
+      "x^6 + x^5 + x^4 + x^3 + x^2"
+    ],
+    "irreducible_poly": "x^7 + x + 1",
+    "note": "Ints are code encoding; always display RULES_poly to humans."
+  }
+}
