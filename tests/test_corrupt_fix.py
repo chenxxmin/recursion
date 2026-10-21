@@ -325,6 +325,9 @@ def test_run_experiment_corrupt_fix_mask_around_smoke():
         assert os.path.exists(save_path)
         assert 'CORRUPT_FIX_MASK_AROUND' in out
         assert 'Train: Loss=' in out and 'nan' not in out.lower()
+        # 相对位置五桶探针行
+        assert re.search(r'PosProbe posR\| first=[\d.]+ second=[\d.]+ mid=[\d.]+ last2=[\d.]+ last=[\d.]+', out)
+        assert 'PosProbe valR|' in out
         latest = torch.load(os.path.splitext(save_path)[0] + '_latest.pth',
                             weights_only=False)
         assert latest['config']['mask_around'] is True

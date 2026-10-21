@@ -128,6 +128,21 @@ def _make_pos_probe(windows, collate, batch_size):
     def probe(model, device):
         model.eval()
         first_c, first_t, second_c, second_t = {}, {}, {}, {}
+        # 相对位置五桶：first(k=0) / second(k=1) / mid(2..l-3) / last2(k=l-2) / last(k=l-1)
+        rel_c1, rel_t1 = {}, {}
+        rel_c2, rel_t2 = {}, {}
+
+        def _rel_class(k, l):
+            if k == 0:
+                return 'first'
+            if k == 1:
+                return 'second'
+            if k == l - 1:
+                return 'last'
+            if k == l - 2:
+                return 'last2'
+            return 'mid'
+
         with torch.no_grad():
             for l, ws in sorted(by_len.items()):
                 for k in range(l):
@@ -136,20 +151,33 @@ def _make_pos_probe(windows, collate, batch_size):
                                         collate_fn=collate)
                     _, _, per_pos, _ = evaluate(model, loader, device, num_mask=0)
                     n = len(ws)
+                    rc = _rel_class(k, l)
                     if l in per_pos:
                         first_c[k] = first_c.get(k, 0.0) + per_pos[l] * n
                         first_t[k] = first_t.get(k, 0) + n
+                        rel_c1[rc] = rel_c1.get(rc, 0.0) + per_pos[l] * n
+                        rel_t1[rc] = rel_t1.get(rc, 0) + n
                     if l + 1 in per_pos:
                         second_c[k] = second_c.get(k, 0.0) + per_pos[l + 1] * n
                         second_t[k] = second_t.get(k, 0) + n
+                        rel_c2[rc] = rel_c2.get(rc, 0.0) + per_pos[l + 1] * n
+                        rel_t2[rc] = rel_t2.get(rc, 0) + n
 
         def fmt(c, t):
             return ' '.join(f"k{k:02d}={c[k] / t[k] * 100:.1f}" for k in sorted(t))
 
+        REL_ORDER = ['first', 'second', 'mid', 'last2', 'last']
+
+        def fmt_rel(c, t):
+            return ' '.join(f"{r}={c[r] / t[r] * 100:.1f}" for r in REL_ORDER if r in t)
+
         if second_t:
             return ['  PosProbe pos| ' + fmt(first_c, first_t),
-                    '  PosProbe val| ' + fmt(second_c, second_t)]
-        return ['  PosProbe val| ' + fmt(first_c, first_t)]
+                    '  PosProbe val| ' + fmt(second_c, second_t),
+                    '  PosProbe posR| ' + fmt_rel(rel_c1, rel_t1),
+                    '  PosProbe valR| ' + fmt_rel(rel_c2, rel_t2)]
+        return ['  PosProbe val| ' + fmt(first_c, first_t),
+                '  PosProbe valR| ' + fmt_rel(rel_c1, rel_t1)]
 
     return probe
 
