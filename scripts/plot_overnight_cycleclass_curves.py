@@ -21,6 +21,7 @@ import numpy as np
 LOG_DIR = '/data/cxm/recursion/overnight_h123_p127_d512_600_nockpt/logs'
 CLS_JSON = 'reports/data/overnight_h123_coef_classification.json'
 OUT_BASE = 'plots/overnight_h123_cycleclass_learning_curves'
+TITLE = 'overnight_h123_p127_d512_600'
 
 ROOT_COLOR = {'double': '#d62728', 'root1': '#1f77b4', 'rootm1': '#2ca02c', 'other': '#9467bd'}
 
@@ -90,7 +91,7 @@ def main():
 
     handles = [plt.Line2D([], [], color=v, lw=2, label=k) for k, v in ROOT_COLOR.items()]
     fig.legend(handles=handles, loc='upper right', fontsize=10, title='root class')
-    fig.suptitle('overnight_h123_p127_d512_600: learning curves by cycle structure '
+    fig.suptitle(f'{TITLE}: learning curves by cycle structure '
                  '(sorted by mean convergence epoch, fastest first)', fontsize=15, x=0.45)
     fig.tight_layout(rect=(0, 0, 1, 0.96))
     fig.savefig(OUT_BASE + '.png', dpi=110)
