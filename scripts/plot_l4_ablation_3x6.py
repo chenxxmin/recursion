@@ -67,6 +67,7 @@ for r, (rowlabel, dirname, suffix, allpos_on) in enumerate(ROWS):
         ax.plot(ep, pos, color='tab:orange', lw=1.2, label='pos')
         ax.plot(ep, val, color='tab:green', lw=1.2, label='val')
         ax.set_ylim(0, 102)
+        ax.set_xlim(0, 1000)  # ~2x baseline convergence (~260-490 effective ep)
         ax.grid(alpha=0.3)
         if r == 0:
             ax.set_title(f'[{a},{b}]', fontsize=11)
@@ -78,6 +79,6 @@ axes[0][5].legend(loc='lower right', fontsize=9)
 fig.suptitle('l4 corrupt_fix ablation: body / pos / val test accuracy (seed42, P127, len5to10);\n'
              'x-axis = sample presentations / 11290 (allpos rows x 7.47)', fontsize=12)
 fig.tight_layout(rect=(0, 0, 1, 0.96))
-out = 'plots/variant_o2_l4_ablation_body_pos_val_3x6_xnorm.png'
+out = 'plots/variant_o2_l4_ablation_body_pos_val_3x6_xnorm_z1k.png'
 fig.savefig(out, dpi=150)
 print('saved', out)
