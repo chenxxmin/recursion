@@ -78,6 +78,6 @@ axes[0][5].legend(loc='lower right', fontsize=9)
 fig.suptitle('l4 corrupt_fix ablation: body / pos / val test accuracy (seed42, P127, len5to10);\n'
              'x-axis = sample presentations / 11290 (allpos rows x 7.47)', fontsize=12)
 fig.tight_layout(rect=(0, 0, 1, 0.96))
-out = 'plots/variant_o2_l4_ablation_body_pos_val_3x6.png'
+out = 'plots/variant_o2_l4_ablation_body_pos_val_3x6_xnorm.png'
 fig.savefig(out, dpi=150)
 print('saved', out)
