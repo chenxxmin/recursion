@@ -1,0 +1,197 @@
+{
+ "concurrency": 2,
+ "experiments": [
+  {
+   "name": "single_o2_corruptfix_a25b56_d512l4r8h4_P127_len5to10_allpos_seed42",
+   "task": "single",
+   "config": {
+    "TASK": "single",
+    "TASK_VARIANT": "corrupt_fix",
+    "ORDER": 2,
+    "P": 127,
+    "D_MODEL": 512,
+    "N_LAYER": 4,
+    "N_HEAD": 4,
+    "MLP_RATIO": 8,
+    "TRAIN_LEN": 10,
+    "OOD_LEN": 10,
+    "SEQ_LEN_MIN": 5,
+    "SEQ_LEN_MAX": 10,
+    "BODY_SUPERVISION": true,
+    "CORRUPT_FIX_ALL_POSITIONS": true,
+    "CORRUPT_FIX_MASK_AROUND": false,
+    "EPOCHS": 1000,
+    "EVAL_INTERVAL": 5,
+    "MAX_TRAIN_HOURS": 2.5,
+    "SAVE_CHECKPOINTS": false,
+    "RANDOM_SEED": 42,
+    "RULES": [
+     [
+      25,
+      56
+     ]
+    ]
+   }
+  },
+  {
+   "name": "single_o2_corruptfix_a62b59_d512l4r8h4_P127_len5to10_allpos_seed42",
+   "task": "single",
+   "config": {
+    "TASK": "single",
+    "TASK_VARIANT": "corrupt_fix",
+    "ORDER": 2,
+    "P": 127,
+    "D_MODEL": 512,
+    "N_LAYER": 4,
+    "N_HEAD": 4,
+    "MLP_RATIO": 8,
+    "TRAIN_LEN": 10,
+    "OOD_LEN": 10,
+    "SEQ_LEN_MIN": 5,
+    "SEQ_LEN_MAX": 10,
+    "BODY_SUPERVISION": true,
+    "CORRUPT_FIX_ALL_POSITIONS": true,
+    "CORRUPT_FIX_MASK_AROUND": false,
+    "EPOCHS": 1000,
+    "EVAL_INTERVAL": 5,
+    "MAX_TRAIN_HOURS": 2.5,
+    "SAVE_CHECKPOINTS": false,
+    "RANDOM_SEED": 42,
+    "RULES": [
+     [
+      62,
+      59
+     ]
+    ]
+   }
+  },
+  {
+   "name": "single_o2_corruptfix_a56b93_d512l4r8h4_P127_len5to10_allpos_seed42",
+   "task": "single",
+   "config": {
+    "TASK": "single",
+    "TASK_VARIANT": "corrupt_fix",
+    "ORDER": 2,
+    "P": 127,
+    "D_MODEL": 512,
+    "N_LAYER": 4,
+    "N_HEAD": 4,
+    "MLP_RATIO": 8,
+    "TRAIN_LEN": 10,
+    "OOD_LEN": 10,
+    "SEQ_LEN_MIN": 5,
+    "SEQ_LEN_MAX": 10,
+    "BODY_SUPERVISION": true,
+    "CORRUPT_FIX_ALL_POSITIONS": true,
+    "CORRUPT_FIX_MASK_AROUND": false,
+    "EPOCHS": 1000,
+    "EVAL_INTERVAL": 5,
+    "MAX_TRAIN_HOURS": 2.5,
+    "SAVE_CHECKPOINTS": false,
+    "RANDOM_SEED": 42,
+    "RULES": [
+     [
+      56,
+      93
+     ]
+    ]
+   }
+  },
+  {
+   "name": "single_o2_corruptfix_a5b3_d512l4r8h4_P127_len5to10_allpos_seed42",
+   "task": "single",
+   "config": {
+    "TASK": "single",
+    "TASK_VARIANT": "corrupt_fix",
+    "ORDER": 2,
+    "P": 127,
+    "D_MODEL": 512,
+    "N_LAYER": 4,
+    "N_HEAD": 4,
+    "MLP_RATIO": 8,
+    "TRAIN_LEN": 10,
+    "OOD_LEN": 10,
+    "SEQ_LEN_MIN": 5,
+    "SEQ_LEN_MAX": 10,
+    "BODY_SUPERVISION": true,
+    "CORRUPT_FIX_ALL_POSITIONS": true,
+    "CORRUPT_FIX_MASK_AROUND": false,
+    "EPOCHS": 1000,
+    "EVAL_INTERVAL": 5,
+    "MAX_TRAIN_HOURS": 2.5,
+    "SAVE_CHECKPOINTS": false,
+    "RANDOM_SEED": 42,
+    "RULES": [
+     [
+      5,
+      3
+     ]
+    ]
+   }
+  },
+  {
+   "name": "single_o2_corruptfix_a67b65_d512l4r8h4_P127_len5to10_allpos_seed42",
+   "task": "single",
+   "config": {
+    "TASK": "single",
+    "TASK_VARIANT": "corrupt_fix",
+    "ORDER": 2,
+    "P": 127,
+    "D_MODEL": 512,
+    "N_LAYER": 4,
+    "N_HEAD": 4,
+    "MLP_RATIO": 8,
+    "TRAIN_LEN": 10,
+    "OOD_LEN": 10,
+    "SEQ_LEN_MIN": 5,
+    "SEQ_LEN_MAX": 10,
+    "BODY_SUPERVISION": true,
+    "CORRUPT_FIX_ALL_POSITIONS": true,
+    "CORRUPT_FIX_MASK_AROUND": false,
+    "EPOCHS": 1000,
+    "EVAL_INTERVAL": 5,
+    "MAX_TRAIN_HOURS": 2.5,
+    "SAVE_CHECKPOINTS": false,
+    "RANDOM_SEED": 42,
+    "RULES": [
+     [
+      67,
+      65
+     ]
+    ]
+   }
+  },
+  {
+   "name": "single_o2_corruptfix_a44b59_d512l4r8h4_P127_len5to10_allpos_seed42",
+   "task": "single",
+   "config": {
+    "TASK": "single",
+    "TASK_VARIANT": "corrupt_fix",
+    "ORDER": 2,
+    "P": 127,
+    "D_MODEL": 512,
+    "N_LAYER": 4,
+    "N_HEAD": 4,
+    "MLP_RATIO": 8,
+    "TRAIN_LEN": 10,
+    "OOD_LEN": 10,
+    "SEQ_LEN_MIN": 5,
+    "SEQ_LEN_MAX": 10,
+    "BODY_SUPERVISION": true,
+    "CORRUPT_FIX_ALL_POSITIONS": true,
+    "CORRUPT_FIX_MASK_AROUND": false,
+    "EPOCHS": 1000,
+    "EVAL_INTERVAL": 5,
+    "MAX_TRAIN_HOURS": 2.5,
+    "SAVE_CHECKPOINTS": false,
+    "RANDOM_SEED": 42,
+    "RULES": [
+     [
+      44,
+      59
+     ]
+    ]
+   }
+  }
+ ]
+}
