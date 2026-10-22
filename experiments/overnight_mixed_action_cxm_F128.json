@@ -1,0 +1,75 @@
+{
+  "concurrency": 2,
+  "experiments": [
+    {
+      "name": "mixed_abc_d1024l2r4h4_P128_gf2n_trib124_13-7-14_N2_e0.15_seed17996",
+      "task": "mixed_abc",
+      "config": {
+        "P": 128,
+        "FIELD": "gf2n",
+        "ABC_PAIRS": [[1, 2, 4], [13, 7, 14]],
+        "MIXED_AB_MAX_UNIQUE_RATIOS": [0.1465, 0.1465],
+        "NUM_MASK": 3,
+        "D_MODEL": 1024,
+        "N_LAYER": 2,
+        "N_HEAD": 4,
+        "MLP_RATIO": 4,
+        "BATCH_SIZE": 512,
+        "LR": 0.0003,
+        "WEIGHT_DECAY": 1,
+        "DROPOUT": 0.0,
+        "TRAIN_LEN": 16,
+        "OOD_LEN": 32,
+        "EVAL_INTERVAL": 1,
+        "EARLY_STOP_ACCURACY": 0.99,
+        "MAX_TRAIN_HOURS": 12,
+        "RANDOM_SEED": 17996,
+        "USE_AB_TAG": false,
+        "USE_CONDITIONAL_WTE": false,
+        "IRREDUCIBLE_POLY": "x^7 + x + 1"
+      }
+    },
+    {
+      "name": "action_v2_d2048l2r4h8_P128_gf2n_tr31_N20_miss0_seed17996",
+      "task": "action",
+      "config": {
+        "RANDOM_SEED": 17996,
+        "P": 128,
+        "FIELD": "gf2n",
+        "AB_PAIRS": [
+          [1, 1], [2, 3], [3, 5], [4, 7], [5, 9],
+          [6, 11], [7, 13], [8, 15], [9, 17], [10, 19],
+          [11, 21], [12, 23], [13, 25], [14, 27], [15, 29],
+          [16, 31], [17, 33], [18, 35], [19, 37], [20, 39]
+        ],
+        "TRAIN_LEN": 16,
+        "OOD_LEN": 16,
+        "NUM_TRAIN_SAMPLES": 300000,
+        "NUM_TEST_SAMPLES": 256,
+        "FRESH_TEST_PER_EVAL": true,
+        "EVAL_INTERVAL": 1,
+        "BATCH_SIZE": 1024,
+        "LR": 0.0003,
+        "WEIGHT_DECAY": 1,
+        "DROPOUT": 0.0,
+        "D_MODEL": 2048,
+        "N_LAYER": 2,
+        "N_HEAD": 8,
+        "MLP_RATIO": 4,
+        "MISSING_PROB": 0.0,
+        "EARLY_STOP_ACCURACY": 0.99,
+        "MAX_TRAIN_HOURS": 12,
+        "IRREDUCIBLE_POLY": "x^7 + x + 1"
+      }
+    }
+  ],
+  "_human": {
+    "intent": "cxm mixed/action recipes with domain swapped to F128=GF(2^7); not a verbatim F127 re-run",
+    "cxm_refs": {
+      "mixed": "mixed_abc_d1024l2r4h4_P127_trib124_13-7-14_N2_e0.15_seed17996",
+      "action": "action_v2_d2048l2r4h8_P127_tr31_N20_miss0_seed17996"
+    },
+    "delta_vs_cxm": "P=128 FIELD=gf2n IRREDUCIBLE=x^7+x+1; hypers otherwise matched",
+    "queue_order": ["mixed", "action"]
+  }
+}
