@@ -1,0 +1,127 @@
+{
+  "concurrency": 2,
+  "experiments": [
+    {
+      "name": "mixed_abc_d1024l2r4h4_P127_mod_a79b46c10__a89b98c59_N2_e0.15_seed17996",
+      "task": "mixed_abc",
+      "config": {
+        "P": 127,
+        "ABC_PAIRS": [
+          [
+            79,
+            46,
+            10
+          ],
+          [
+            89,
+            98,
+            59
+          ]
+        ],
+        "MIXED_AB_MAX_UNIQUE_RATIOS": [
+          0.1465,
+          0.1465
+        ],
+        "NUM_MASK": 3,
+        "D_MODEL": 1024,
+        "N_LAYER": 2,
+        "N_HEAD": 4,
+        "MLP_RATIO": 4,
+        "BATCH_SIZE": 512,
+        "LR": 0.0003,
+        "WEIGHT_DECAY": 1,
+        "DROPOUT": 0.0,
+        "TRAIN_LEN": 16,
+        "OOD_LEN": 32,
+        "EVAL_INTERVAL": 1,
+        "EARLY_STOP_ACCURACY": 0.99,
+        "MAX_TRAIN_HOURS": 12,
+        "RANDOM_SEED": 17996,
+        "USE_AB_TAG": false,
+        "USE_CONDITIONAL_WTE": false
+      }
+    },
+    {
+      "name": "mixed_abc_d1024l2r4h4_P128_gf2n_a60b24c99__a84b23c104_N2_e0.15_seed17996",
+      "task": "mixed_abc",
+      "config": {
+        "P": 128,
+        "ABC_PAIRS": [
+          [
+            60,
+            24,
+            99
+          ],
+          [
+            84,
+            23,
+            104
+          ]
+        ],
+        "MIXED_AB_MAX_UNIQUE_RATIOS": [
+          0.1465,
+          0.1465
+        ],
+        "NUM_MASK": 3,
+        "D_MODEL": 1024,
+        "N_LAYER": 2,
+        "N_HEAD": 4,
+        "MLP_RATIO": 4,
+        "BATCH_SIZE": 512,
+        "LR": 0.0003,
+        "WEIGHT_DECAY": 1,
+        "DROPOUT": 0.0,
+        "TRAIN_LEN": 16,
+        "OOD_LEN": 32,
+        "EVAL_INTERVAL": 1,
+        "EARLY_STOP_ACCURACY": 0.99,
+        "MAX_TRAIN_HOURS": 12,
+        "RANDOM_SEED": 17996,
+        "USE_AB_TAG": false,
+        "USE_CONDITIONAL_WTE": false,
+        "FIELD": "gf2n",
+        "IRREDUCIBLE_POLY": "x^7 + x + 1"
+      }
+    }
+  ],
+  "_human": {
+    "intent": "mixed o3: random ABC coeffs per field (F127~U{0..126}, F128~U{0..127}); hypers otherwise match cxm mixed_abc d1024",
+    "sampling": {
+      "n_rules": 2,
+      "order": 3,
+      "seed": 17996,
+      "reject": "all-zero rule vector; duplicate rules",
+      "F127_rules": [
+        [
+          79,
+          46,
+          10
+        ],
+        [
+          89,
+          98,
+          59
+        ]
+      ],
+      "F128_rules": [
+        [
+          60,
+          24,
+          99
+        ],
+        [
+          84,
+          23,
+          104
+        ]
+      ]
+    },
+    "kept_from_cxm_mixed": [
+      "d1024l2r4h4",
+      "BS=512",
+      "ratios 0.1465x2",
+      "NUM_MASK=3",
+      "seed17996 train"
+    ]
+  }
+}
