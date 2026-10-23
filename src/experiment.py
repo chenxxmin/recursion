@@ -792,11 +792,18 @@ def _prepare_single_variant(config, norm):
                         'pos_weight': pos_weight,
                         'all_positions': corrupt_all}
     else:  # fill_blank
+        fixed_pos = cfg.get('FILL_BLANK_FIXED_POS')
+        if fixed_pos is not None:
+            fixed_pos = int(fixed_pos)
+            print(f"[Variant] FILL_BLANK_FIXED_POS={fixed_pos}: 挖空位置固定"
+                  f"（负数从末尾数，-1 = 最后一位）")
         collate = make_fill_blank_collate(p=P, eos_id=eos_id,
                                           body_supervision=body_sup,
-                                          body_from=body_from)
+                                          body_from=body_from,
+                                          fixed_k=fixed_pos)
         vocab_size = P + 2
-        variant_save = {'eos_token_id': eos_id, 'blank_token_id': P}
+        variant_save = {'eos_token_id': eos_id, 'blank_token_id': P,
+                        'fixed_pos': fixed_pos}
     if variant == 'corrupt_fix' and cfg.get('CORRUPT_FIX_PAIRED_CLEAN', False):
         print('[Variant] CORRUPT_FIX_PAIRED_CLEAN: 干净续写行 + 污损答题行'
               '（主体监督由干净行承担，污损行只留 pos/val 两槽）')

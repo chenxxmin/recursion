@@ -591,7 +591,7 @@ def make_corrupt_fix_collate(*, p, eos_id, pos_base, parallel=False,
 
 
 def make_fill_blank_collate(*, p, eos_id, blank_id=None,
-                            body_supervision=False, body_from=0):
+                            body_supervision=False, body_from=0, fixed_k=None):
     """Collate for the fill_blank task variant (TASK_VARIANT='fill_blank').
 
     Same online single-position corruption as corrupt_fix, but the position
@@ -600,9 +600,10 @@ def make_fill_blank_collate(*, p, eos_id, blank_id=None,
     position token (the blank marks itself).
 
     Input items: plain LongTensors (blank position k drawn uniformly at
-    random per call) or (seq, k) tuples (k carried by the sample, used
-    verbatim — FILL_BLANK_ALL_POSITIONS mode, where the dataset enumerates
-    every position of every window).
+    random per call, or fixed to `fixed_k` — negative counts from the end,
+    e.g. -1 = always blank the last position) or (seq, k) tuples (k carried
+    by the sample, used verbatim — FILL_BLANK_ALL_POSITIONS mode, where the
+    dataset enumerates every position of every window).
 
     Output batch: (x, FILL_BLANK, target_seqs, loss_mask) with
 
@@ -619,7 +620,12 @@ def make_fill_blank_collate(*, p, eos_id, blank_id=None,
                 seq, k = item[0], int(item[1])
             else:
                 seq = item
-                k = random.randrange(seq.numel())
+                L0 = seq.numel()
+                if fixed_k is None:
+                    k = random.randrange(L0)
+                else:
+                    k = fixed_k if fixed_k >= 0 else L0 + fixed_k
+                    assert 0 <= k < L0, f"fixed_k={fixed_k} out of range for L={L0}"
             L = seq.numel()
             orig = int(seq[k])
             view = seq.clone()

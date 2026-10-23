@@ -208,7 +208,68 @@ def test_run_experiment_var_len_smoke():
         assert sc['body_supervision'] is True
 
 
+def test_collate_fixed_k():
+    # FILL_BLANK_FIXED_POS：纯张量输入时挖空位置固定，负数从末尾数
+    p, eos_id, L = 7, 8, 6
+    seqs = _addition_windows(p=p, n=16, length=L)
+    collate = make_fill_blank_collate(p=p, eos_id=eos_id, fixed_k=-1)
+    x, tag, targets, mask = collate(seqs)
+    clean = torch.stack(seqs)
+    for i in range(len(seqs)):
+        assert int(x[i, L - 1]) == p, "fixed_k=-1 must blank the last position"
+        assert torch.equal(x[i, :L - 1], clean[i, :L - 1])
+        assert int(targets[i, L + 1]) == int(clean[i, L - 1])
+    # 非负 fixed_k
+    collate2 = make_fill_blank_collate(p=p, eos_id=eos_id, fixed_k=0)
+    x2, _, _, _ = collate2(seqs)
+    for i in range(len(seqs)):
+        assert int(x2[i, 0]) == p
+    # 元组输入携带的 k 优先（不受 fixed_k 影响）
+    collate3 = make_fill_blank_collate(p=p, eos_id=eos_id, fixed_k=-1)
+    xt, _, _, _ = collate3([(seqs[0], 2)])
+    assert int(xt[0, 2]) == p and int(xt[0, L - 1]) != p
+
+
+def test_fixed_pos_gates():
+    # 仅 fill_blank；与 FILL_BLANK_ALL_POSITIONS 互斥
+    with tempfile.TemporaryDirectory() as tmpdir:
+        try:
+            _run_experiment(tmpdir, {'TASK_VARIANT': 'corrupt_fix',
+                                     'FILL_BLANK_FIXED_POS': -1})
+            assert False, 'corrupt_fix + FILL_BLANK_FIXED_POS should fail'
+        except SystemExit:
+            pass
+    with tempfile.TemporaryDirectory() as tmpdir:
+        try:
+            _run_experiment(tmpdir, {'TASK_VARIANT': 'fill_blank',
+                                     'FILL_BLANK_FIXED_POS': -1,
+                                     'FILL_BLANK_ALL_POSITIONS': True})
+            assert False, 'FIXED_POS + ALL_POSITIONS should fail'
+        except SystemExit:
+            pass
+
+
+def test_run_experiment_fixed_pos_smoke():
+    # 端到端：L=4 固定挖末位，save_config 记录 fixed_pos
+    with tempfile.TemporaryDirectory() as tmpdir:
+        out, save_path = _run_experiment(tmpdir, {
+            'TASK_VARIANT': 'fill_blank', 'P': 17, 'ORDER': 1,
+            'RULES': [[1]], 'CONST': 1, 'TRAIN_LEN': 4, 'OOD_LEN': 4,
+            'FILL_BLANK_FIXED_POS': -1})
+        assert os.path.exists(save_path)
+        assert 'FILL_BLANK_FIXED_POS=-1' in out
+        latest = torch.load(os.path.splitext(save_path)[0] + '_latest.pth',
+                            weights_only=False)
+        assert latest['config']['fixed_pos'] == -1
+
+
 if __name__ == '__main__':
+    test_collate_fixed_k()
+    print('PASS test_collate_fixed_k')
+    test_fixed_pos_gates()
+    print('PASS test_fixed_pos_gates')
+    test_run_experiment_fixed_pos_smoke()
+    print('PASS test_run_experiment_fixed_pos_smoke')
     test_collate_layout()
     print('PASS test_collate_layout')
     test_collate_fresh_randomness()
@@ -228,5 +289,7 @@ if __name__ == '__main__':
     test_collate_body_supervision()
     print('PASS test_collate_body_supervision')
     test_run_experiment_var_len_smoke()
+    print('PASS test_run_experiment_var_len_smoke')
+    print('ALL fill_blank tests PASSED')
     print('PASS test_run_experiment_var_len_smoke')
     print('ALL TESTS PASSED: test_fill_blank.py')

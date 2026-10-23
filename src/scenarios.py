@@ -137,6 +137,15 @@ def _normalize_variant(scenario, cfg):
         raise ValueError(
             "FILL_BLANK_ALL_POSITIONS 仅 TASK_VARIANT='fill_blank' 支持"
             "（每个位置挖空各成一条训练样本）")
+    if cfg.get('FILL_BLANK_FIXED_POS') is not None:
+        if raw != 'fill_blank':
+            raise ValueError(
+                "FILL_BLANK_FIXED_POS 仅 TASK_VARIANT='fill_blank' 支持"
+                "（固定挖空位置，负数从末尾数，-1 = 固定挖最后一位）")
+        if cfg.get('FILL_BLANK_ALL_POSITIONS'):
+            raise ValueError(
+                "FILL_BLANK_FIXED_POS 与 FILL_BLANK_ALL_POSITIONS 互斥"
+                "（后者逐位置枚举，固定位置无意义）")
     if cfg.get('TEST_ALL_POSITIONS') and raw != 'fill_blank':
         raise ValueError(
             "TEST_ALL_POSITIONS 仅 TASK_VARIANT='fill_blank' 支持"
