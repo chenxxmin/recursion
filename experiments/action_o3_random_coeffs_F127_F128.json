@@ -1,0 +1,117 @@
+{
+  "concurrency": 2,
+  "experiments": [
+    {
+      "name": "action_o3_d1024l2r4h4_P127_mod_a10b118c26__a98b44c5_N2_miss0_n300k_seed17996",
+      "task": "action",
+      "config": {
+        "P": 127,
+        "ORDER": 3,
+        "RULES": [
+          [
+            10,
+            118,
+            26
+          ],
+          [
+            98,
+            44,
+            5
+          ]
+        ],
+        "TRAIN_LEN": 16,
+        "OOD_LEN": 16,
+        "NUM_TRAIN_SAMPLES": 300000,
+        "NUM_TEST_SAMPLES": 256,
+        "FRESH_TEST_PER_EVAL": true,
+        "EVAL_INTERVAL": 1,
+        "BATCH_SIZE": 512,
+        "LR": 0.0003,
+        "WEIGHT_DECAY": 1,
+        "DROPOUT": 0.0,
+        "D_MODEL": 1024,
+        "N_LAYER": 2,
+        "N_HEAD": 4,
+        "MLP_RATIO": 4,
+        "MISSING_PROB": 0.0,
+        "EARLY_STOP_ACCURACY": 0.99,
+        "MAX_TRAIN_HOURS": 12,
+        "RANDOM_SEED": 17996
+      }
+    },
+    {
+      "name": "action_o3_d1024l2r4h4_P128_gf2n_a58b85c27__a122b88c71_N2_miss0_n300k_seed17996",
+      "task": "action",
+      "config": {
+        "P": 128,
+        "ORDER": 3,
+        "RULES": [
+          [
+            58,
+            85,
+            27
+          ],
+          [
+            122,
+            88,
+            71
+          ]
+        ],
+        "TRAIN_LEN": 16,
+        "OOD_LEN": 16,
+        "NUM_TRAIN_SAMPLES": 300000,
+        "NUM_TEST_SAMPLES": 256,
+        "FRESH_TEST_PER_EVAL": true,
+        "EVAL_INTERVAL": 1,
+        "BATCH_SIZE": 512,
+        "LR": 0.0003,
+        "WEIGHT_DECAY": 1,
+        "DROPOUT": 0.0,
+        "D_MODEL": 1024,
+        "N_LAYER": 2,
+        "N_HEAD": 4,
+        "MLP_RATIO": 4,
+        "MISSING_PROB": 0.0,
+        "EARLY_STOP_ACCURACY": 0.99,
+        "MAX_TRAIN_HOURS": 12,
+        "RANDOM_SEED": 17996,
+        "FIELD": "gf2n",
+        "IRREDUCIBLE_POLY": "x^7 + x + 1"
+      }
+    }
+  ],
+  "_human": {
+    "intent": "action ORDER=3 N=2 as\u5bf9\u7167 to mixed_abc_random_coeffs; same per-field U{0..P-1} sampling (salt=777 so rules differ from mixed)",
+    "sampling": {
+      "n_rules": 2,
+      "order": 3,
+      "seed": 17996,
+      "salt": 777,
+      "F127_rules_canonical": [
+        [
+          10,
+          118,
+          26
+        ],
+        [
+          98,
+          44,
+          5
+        ]
+      ],
+      "F128_rules_canonical": [
+        [
+          58,
+          85,
+          27
+        ],
+        [
+          122,
+          88,
+          71
+        ]
+      ]
+    },
+    "arch_match_mixed": "d1024l2r4h4 BS=512; action keeps 300k+fresh test"
+  }
+}
