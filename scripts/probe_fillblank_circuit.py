@@ -16,7 +16,7 @@ from probe_fillblank_operands import load_model, test_windows, P, BLANK, EOS
 
 
 @torch.no_grad()
-def full_attention(path, a, b, device, L=5, k=2, n=64):
+def full_attention(path, a, b, device, L, k, n=64):
     model, _ = load_model(path, device)
     cap = AttentionCapture(model)
     wins = test_windows(a, b)
@@ -36,10 +36,9 @@ def full_attention(path, a, b, device, L=5, k=2, n=64):
     return mats
 
 
-def draw(mats, a, b, out, threshold=0.15):
-    L, k = 5, 2
-    labels = ['x0', 'x1', 'BLANK', 'x3', 'x4', 'EOS']
-    colors = ['#4c78a8', '#4c78a8', '#e45756', '#4c78a8', '#4c78a8', '#54a24b']
+def draw(mats, a, b, L, k, out, threshold=0.15):
+    labels = [f'x{i}' if i != k else 'BLANK' for i in range(L)] + ['EOS']
+    colors = ['#4c78a8' if i != k else '#e45756' for i in range(L)] + ['#54a24b']
     fig, axes = plt.subplots(1, 4, figsize=(22, 5.2))
     for layer, ax in enumerate(axes):
         mat = mats[layer]
@@ -48,7 +47,7 @@ def draw(mats, a, b, out, threshold=0.15):
                        edgecolor='white', linewidth=1.5)
             ax.text(i, 0, lab, ha='center', va='center', fontsize=10,
                     color='white', weight='bold', zorder=4)
-        for q in range(6):
+        for q in range(L + 1):
             edges = [(j, mat[q, j]) for j in range(6)
                      if mat[q, j] >= threshold and q != j]
             for ei, (j, w) in enumerate(edges):
@@ -74,7 +73,7 @@ def draw(mats, a, b, out, threshold=0.15):
         ax.set_ylim(-0.35, 2.6)
         ax.set_title(f'Layer {layer}', fontsize=13, pad=4)
         ax.axis('off')
-    fig.suptitle(f'fill_blank circuit: a{a}b{b}, L=5, BLANK@k=2 '
+    fig.suptitle(f'fill_blank circuit: a{a}b{b}, L={L}, BLANK@k={k} '
                  f'(attention mean over 64 windows x 4 heads, edges >= {threshold})',
                  fontsize=13)
     fig.tight_layout(rect=(0, 0, 1, 0.93))
@@ -85,20 +84,23 @@ def draw(mats, a, b, out, threshold=0.15):
 def main():
     ap = argparse.ArgumentParser()
     ap.add_argument('--ckpt', required=True)
+    ap.add_argument('--L', type=int, default=5)
+    ap.add_argument('--k', type=int, default=2)
     ap.add_argument('--device', default='cuda:7')
     ap.add_argument('--n-windows', type=int, default=64)
     ap.add_argument('--threshold', type=float, default=0.15)
-    ap.add_argument('--out', default='plots/fillblank_circuit_L5_k2.png')
+    ap.add_argument('--out', default=None)
     args = ap.parse_args()
     import re
     m = re.search(r'a(\d+)b(\d+)', os.path.basename(args.ckpt))
     a, b = int(m.group(1)), int(m.group(2))
-    mats = full_attention(args.ckpt, a, b, args.device, n=args.n_windows)
+    out = args.out or f'plots/fillblank_circuit_L{args.L}_k{args.k}.png'
+    mats = full_attention(args.ckpt, a, b, args.device, L=args.L, k=args.k, n=args.n_windows)
     for layer, mat in enumerate(mats):
         print(f'--- layer {layer} (rows=query, cols=key) ---')
         for q in range(6):
             print('  ', ' '.join(f'{mat[q, j]:.2f}' for j in range(6)))
-    draw(mats, a, b, args.out, args.threshold)
+    draw(mats, a, b, args.L, args.k, out, args.threshold)
 
 
 if __name__ == '__main__':
