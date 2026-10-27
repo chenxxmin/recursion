@@ -1,0 +1,1434 @@
+{
+  "concurrency": 4,
+  "experiments": [
+    {
+      "name": "gapnox_g0_single_o2_d1024_P127_mod_a2b87_seed17996",
+      "task": "single",
+      "config": {
+        "P": 127,
+        "ORDER": 2,
+        "RULES": [
+          [
+            2,
+            87
+          ]
+        ],
+        "D_MODEL": 1024,
+        "N_LAYER": 2,
+        "N_HEAD": 4,
+        "MLP_RATIO": 4,
+        "TRAIN_LEN": 16,
+        "OOD_LEN": 16,
+        "BATCH_SIZE": 512,
+        "LR": 0.0003,
+        "WEIGHT_DECAY": 1,
+        "GRAD_CLIP_NORM": 1.0,
+        "EVAL_INTERVAL": 1,
+        "MISSING_PROB": 0.0,
+        "RANDOM_SEED": 17996,
+        "MAX_TRAIN_HOURS": 8,
+        "EARLY_STOP_NO_IMPROVE": 3000,
+        "EARLY_STOP_ACCURACY": 0.99,
+        "DATA_MODE": "sampled_fresh_test",
+        "FRESH_TEST_PER_EVAL": true,
+        "NUM_TRAIN_SAMPLES": 10000,
+        "NUM_TEST_SAMPLES": 256
+      }
+    },
+    {
+      "name": "gapnox_g0_mixed_o2_d1024_P127_mod_a2b87__a101b30_seed17996",
+      "task": "mixed_ab",
+      "config": {
+        "P": 127,
+        "AB_PAIRS": [
+          [
+            2,
+            87
+          ],
+          [
+            101,
+            30
+          ]
+        ],
+        "MIXED_AB_MAX_UNIQUE_RATIOS": [
+          0.1465,
+          0.1465
+        ],
+        "NUM_MASK": 1,
+        "D_MODEL": 1024,
+        "N_LAYER": 2,
+        "N_HEAD": 4,
+        "MLP_RATIO": 4,
+        "BATCH_SIZE": 512,
+        "LR": 0.0003,
+        "WEIGHT_DECAY": 1,
+        "DROPOUT": 0.0,
+        "TRAIN_LEN": 16,
+        "OOD_LEN": 32,
+        "EVAL_INTERVAL": 1,
+        "EARLY_STOP_ACCURACY": 0.99,
+        "MAX_TRAIN_HOURS": 10,
+        "RANDOM_SEED": 17996,
+        "USE_AB_TAG": false,
+        "USE_CONDITIONAL_WTE": false
+      }
+    },
+    {
+      "name": "gapnox_g0_action_o2_d2048_P127_mod_a2b87__a101b30_seed17996",
+      "task": "action",
+      "config": {
+        "P": 127,
+        "ORDER": 2,
+        "RULES": [
+          [
+            2,
+            87
+          ],
+          [
+            101,
+            30
+          ]
+        ],
+        "TRAIN_LEN": 16,
+        "OOD_LEN": 16,
+        "NUM_TRAIN_SAMPLES": 300000,
+        "NUM_TEST_SAMPLES": 256,
+        "FRESH_TEST_PER_EVAL": true,
+        "EVAL_INTERVAL": 1,
+        "BATCH_SIZE": 1024,
+        "LR": 0.0003,
+        "WEIGHT_DECAY": 1,
+        "DROPOUT": 0.0,
+        "D_MODEL": 2048,
+        "N_LAYER": 2,
+        "N_HEAD": 8,
+        "MLP_RATIO": 4,
+        "MISSING_PROB": 0.0,
+        "EARLY_STOP_ACCURACY": 0.99,
+        "MAX_TRAIN_HOURS": 10,
+        "RANDOM_SEED": 17996
+      }
+    },
+    {
+      "name": "gapnox_g0_single_o2_d1024_P128_gf2n_a2b87_seed17996",
+      "task": "single",
+      "config": {
+        "P": 128,
+        "ORDER": 2,
+        "RULES": [
+          [
+            2,
+            87
+          ]
+        ],
+        "D_MODEL": 1024,
+        "N_LAYER": 2,
+        "N_HEAD": 4,
+        "MLP_RATIO": 4,
+        "TRAIN_LEN": 16,
+        "OOD_LEN": 16,
+        "BATCH_SIZE": 512,
+        "LR": 0.0003,
+        "WEIGHT_DECAY": 1,
+        "GRAD_CLIP_NORM": 1.0,
+        "EVAL_INTERVAL": 1,
+        "MISSING_PROB": 0.0,
+        "RANDOM_SEED": 17996,
+        "MAX_TRAIN_HOURS": 8,
+        "EARLY_STOP_NO_IMPROVE": 3000,
+        "EARLY_STOP_ACCURACY": 0.99,
+        "FIELD": "gf2n",
+        "IRREDUCIBLE_POLY": "x^7 + x + 1",
+        "DATA_MODE": "sampled_fresh_test",
+        "FRESH_TEST_PER_EVAL": true,
+        "NUM_TRAIN_SAMPLES": 10000,
+        "NUM_TEST_SAMPLES": 256
+      }
+    },
+    {
+      "name": "gapnox_g0_mixed_o2_d1024_P128_gf2n_a2b87__a101b30_seed17996",
+      "task": "mixed_ab",
+      "config": {
+        "P": 128,
+        "AB_PAIRS": [
+          [
+            2,
+            87
+          ],
+          [
+            101,
+            30
+          ]
+        ],
+        "MIXED_AB_MAX_UNIQUE_RATIOS": [
+          0.1465,
+          0.1465
+        ],
+        "NUM_MASK": 1,
+        "D_MODEL": 1024,
+        "N_LAYER": 2,
+        "N_HEAD": 4,
+        "MLP_RATIO": 4,
+        "BATCH_SIZE": 512,
+        "LR": 0.0003,
+        "WEIGHT_DECAY": 1,
+        "DROPOUT": 0.0,
+        "TRAIN_LEN": 16,
+        "OOD_LEN": 32,
+        "EVAL_INTERVAL": 1,
+        "EARLY_STOP_ACCURACY": 0.99,
+        "MAX_TRAIN_HOURS": 10,
+        "RANDOM_SEED": 17996,
+        "USE_AB_TAG": false,
+        "USE_CONDITIONAL_WTE": false,
+        "FIELD": "gf2n",
+        "IRREDUCIBLE_POLY": "x^7 + x + 1"
+      }
+    },
+    {
+      "name": "gapnox_g0_action_o2_d2048_P128_gf2n_a2b87__a101b30_seed17996",
+      "task": "action",
+      "config": {
+        "P": 128,
+        "ORDER": 2,
+        "RULES": [
+          [
+            2,
+            87
+          ],
+          [
+            101,
+            30
+          ]
+        ],
+        "TRAIN_LEN": 16,
+        "OOD_LEN": 16,
+        "NUM_TRAIN_SAMPLES": 300000,
+        "NUM_TEST_SAMPLES": 256,
+        "FRESH_TEST_PER_EVAL": true,
+        "EVAL_INTERVAL": 1,
+        "BATCH_SIZE": 1024,
+        "LR": 0.0003,
+        "WEIGHT_DECAY": 1,
+        "DROPOUT": 0.0,
+        "D_MODEL": 2048,
+        "N_LAYER": 2,
+        "N_HEAD": 8,
+        "MLP_RATIO": 4,
+        "MISSING_PROB": 0.0,
+        "EARLY_STOP_ACCURACY": 0.99,
+        "MAX_TRAIN_HOURS": 10,
+        "RANDOM_SEED": 17996,
+        "FIELD": "gf2n",
+        "IRREDUCIBLE_POLY": "x^7 + x + 1"
+      }
+    },
+    {
+      "name": "gapnox_g0_single_o3_d1024_P127_mod_a49b87c63_seed17996",
+      "task": "single",
+      "config": {
+        "P": 127,
+        "ORDER": 3,
+        "RULES": [
+          [
+            49,
+            87,
+            63
+          ]
+        ],
+        "D_MODEL": 1024,
+        "N_LAYER": 2,
+        "N_HEAD": 4,
+        "MLP_RATIO": 4,
+        "TRAIN_LEN": 16,
+        "OOD_LEN": 16,
+        "BATCH_SIZE": 512,
+        "LR": 0.0003,
+        "WEIGHT_DECAY": 1,
+        "GRAD_CLIP_NORM": 1.0,
+        "EVAL_INTERVAL": 1,
+        "MISSING_PROB": 0.0,
+        "RANDOM_SEED": 17996,
+        "MAX_TRAIN_HOURS": 8,
+        "EARLY_STOP_NO_IMPROVE": 3000,
+        "EARLY_STOP_ACCURACY": 0.99,
+        "NUM_TRAIN_SAMPLES": 300000
+      }
+    },
+    {
+      "name": "gapnox_g0_mixed_o3_d1024_P127_mod_a49b87c63__a79b44c52_seed17996",
+      "task": "mixed_abc",
+      "config": {
+        "P": 127,
+        "ABC_PAIRS": [
+          [
+            49,
+            87,
+            63
+          ],
+          [
+            79,
+            44,
+            52
+          ]
+        ],
+        "MIXED_AB_MAX_UNIQUE_RATIOS": [
+          0.1465,
+          0.1465
+        ],
+        "NUM_MASK": 2,
+        "D_MODEL": 1024,
+        "N_LAYER": 2,
+        "N_HEAD": 4,
+        "MLP_RATIO": 4,
+        "BATCH_SIZE": 512,
+        "LR": 0.0003,
+        "WEIGHT_DECAY": 1,
+        "DROPOUT": 0.0,
+        "TRAIN_LEN": 16,
+        "OOD_LEN": 32,
+        "EVAL_INTERVAL": 1,
+        "EARLY_STOP_ACCURACY": 0.99,
+        "MAX_TRAIN_HOURS": 10,
+        "RANDOM_SEED": 17996,
+        "USE_AB_TAG": false,
+        "USE_CONDITIONAL_WTE": false
+      }
+    },
+    {
+      "name": "gapnox_g0_action_o3_d2048_P127_mod_a49b87c63__a79b44c52_seed17996",
+      "task": "action",
+      "config": {
+        "P": 127,
+        "ORDER": 3,
+        "RULES": [
+          [
+            49,
+            87,
+            63
+          ],
+          [
+            79,
+            44,
+            52
+          ]
+        ],
+        "TRAIN_LEN": 16,
+        "OOD_LEN": 16,
+        "NUM_TRAIN_SAMPLES": 300000,
+        "NUM_TEST_SAMPLES": 256,
+        "FRESH_TEST_PER_EVAL": true,
+        "EVAL_INTERVAL": 1,
+        "BATCH_SIZE": 1024,
+        "LR": 0.0003,
+        "WEIGHT_DECAY": 1,
+        "DROPOUT": 0.0,
+        "D_MODEL": 2048,
+        "N_LAYER": 2,
+        "N_HEAD": 8,
+        "MLP_RATIO": 4,
+        "MISSING_PROB": 0.0,
+        "EARLY_STOP_ACCURACY": 0.99,
+        "MAX_TRAIN_HOURS": 10,
+        "RANDOM_SEED": 17996
+      }
+    },
+    {
+      "name": "gapnox_g0_single_o3_d1024_P128_gf2n_a49b87c63_seed17996",
+      "task": "single",
+      "config": {
+        "P": 128,
+        "ORDER": 3,
+        "RULES": [
+          [
+            49,
+            87,
+            63
+          ]
+        ],
+        "D_MODEL": 1024,
+        "N_LAYER": 2,
+        "N_HEAD": 4,
+        "MLP_RATIO": 4,
+        "TRAIN_LEN": 16,
+        "OOD_LEN": 16,
+        "BATCH_SIZE": 512,
+        "LR": 0.0003,
+        "WEIGHT_DECAY": 1,
+        "GRAD_CLIP_NORM": 1.0,
+        "EVAL_INTERVAL": 1,
+        "MISSING_PROB": 0.0,
+        "RANDOM_SEED": 17996,
+        "MAX_TRAIN_HOURS": 8,
+        "EARLY_STOP_NO_IMPROVE": 3000,
+        "EARLY_STOP_ACCURACY": 0.99,
+        "FIELD": "gf2n",
+        "IRREDUCIBLE_POLY": "x^7 + x + 1",
+        "NUM_TRAIN_SAMPLES": 300000
+      }
+    },
+    {
+      "name": "gapnox_g0_mixed_o3_d1024_P128_gf2n_a49b87c63__a79b44c52_seed17996",
+      "task": "mixed_abc",
+      "config": {
+        "P": 128,
+        "ABC_PAIRS": [
+          [
+            49,
+            87,
+            63
+          ],
+          [
+            79,
+            44,
+            52
+          ]
+        ],
+        "MIXED_AB_MAX_UNIQUE_RATIOS": [
+          0.1465,
+          0.1465
+        ],
+        "NUM_MASK": 2,
+        "D_MODEL": 1024,
+        "N_LAYER": 2,
+        "N_HEAD": 4,
+        "MLP_RATIO": 4,
+        "BATCH_SIZE": 512,
+        "LR": 0.0003,
+        "WEIGHT_DECAY": 1,
+        "DROPOUT": 0.0,
+        "TRAIN_LEN": 16,
+        "OOD_LEN": 32,
+        "EVAL_INTERVAL": 1,
+        "EARLY_STOP_ACCURACY": 0.99,
+        "MAX_TRAIN_HOURS": 10,
+        "RANDOM_SEED": 17996,
+        "USE_AB_TAG": false,
+        "USE_CONDITIONAL_WTE": false,
+        "FIELD": "gf2n",
+        "IRREDUCIBLE_POLY": "x^7 + x + 1"
+      }
+    },
+    {
+      "name": "gapnox_g0_action_o3_d2048_P128_gf2n_a49b87c63__a79b44c52_seed17996",
+      "task": "action",
+      "config": {
+        "P": 128,
+        "ORDER": 3,
+        "RULES": [
+          [
+            49,
+            87,
+            63
+          ],
+          [
+            79,
+            44,
+            52
+          ]
+        ],
+        "TRAIN_LEN": 16,
+        "OOD_LEN": 16,
+        "NUM_TRAIN_SAMPLES": 300000,
+        "NUM_TEST_SAMPLES": 256,
+        "FRESH_TEST_PER_EVAL": true,
+        "EVAL_INTERVAL": 1,
+        "BATCH_SIZE": 1024,
+        "LR": 0.0003,
+        "WEIGHT_DECAY": 1,
+        "DROPOUT": 0.0,
+        "D_MODEL": 2048,
+        "N_LAYER": 2,
+        "N_HEAD": 8,
+        "MLP_RATIO": 4,
+        "MISSING_PROB": 0.0,
+        "EARLY_STOP_ACCURACY": 0.99,
+        "MAX_TRAIN_HOURS": 10,
+        "RANDOM_SEED": 17996,
+        "FIELD": "gf2n",
+        "IRREDUCIBLE_POLY": "x^7 + x + 1"
+      }
+    },
+    {
+      "name": "gapnox_g1_single_o2_d1024_P127_mod_a77b50_seed17997",
+      "task": "single",
+      "config": {
+        "P": 127,
+        "ORDER": 2,
+        "RULES": [
+          [
+            77,
+            50
+          ]
+        ],
+        "D_MODEL": 1024,
+        "N_LAYER": 2,
+        "N_HEAD": 4,
+        "MLP_RATIO": 4,
+        "TRAIN_LEN": 16,
+        "OOD_LEN": 16,
+        "BATCH_SIZE": 512,
+        "LR": 0.0003,
+        "WEIGHT_DECAY": 1,
+        "GRAD_CLIP_NORM": 1.0,
+        "EVAL_INTERVAL": 1,
+        "MISSING_PROB": 0.0,
+        "RANDOM_SEED": 17997,
+        "MAX_TRAIN_HOURS": 8,
+        "EARLY_STOP_NO_IMPROVE": 3000,
+        "EARLY_STOP_ACCURACY": 0.99,
+        "DATA_MODE": "sampled_fresh_test",
+        "FRESH_TEST_PER_EVAL": true,
+        "NUM_TRAIN_SAMPLES": 10000,
+        "NUM_TEST_SAMPLES": 256
+      }
+    },
+    {
+      "name": "gapnox_g1_mixed_o2_d1024_P127_mod_a77b50__a44b118_seed17997",
+      "task": "mixed_ab",
+      "config": {
+        "P": 127,
+        "AB_PAIRS": [
+          [
+            77,
+            50
+          ],
+          [
+            44,
+            118
+          ]
+        ],
+        "MIXED_AB_MAX_UNIQUE_RATIOS": [
+          0.1465,
+          0.1465
+        ],
+        "NUM_MASK": 1,
+        "D_MODEL": 1024,
+        "N_LAYER": 2,
+        "N_HEAD": 4,
+        "MLP_RATIO": 4,
+        "BATCH_SIZE": 512,
+        "LR": 0.0003,
+        "WEIGHT_DECAY": 1,
+        "DROPOUT": 0.0,
+        "TRAIN_LEN": 16,
+        "OOD_LEN": 32,
+        "EVAL_INTERVAL": 1,
+        "EARLY_STOP_ACCURACY": 0.99,
+        "MAX_TRAIN_HOURS": 10,
+        "RANDOM_SEED": 17997,
+        "USE_AB_TAG": false,
+        "USE_CONDITIONAL_WTE": false
+      }
+    },
+    {
+      "name": "gapnox_g1_action_o2_d2048_P127_mod_a77b50__a44b118_seed17997",
+      "task": "action",
+      "config": {
+        "P": 127,
+        "ORDER": 2,
+        "RULES": [
+          [
+            77,
+            50
+          ],
+          [
+            44,
+            118
+          ]
+        ],
+        "TRAIN_LEN": 16,
+        "OOD_LEN": 16,
+        "NUM_TRAIN_SAMPLES": 300000,
+        "NUM_TEST_SAMPLES": 256,
+        "FRESH_TEST_PER_EVAL": true,
+        "EVAL_INTERVAL": 1,
+        "BATCH_SIZE": 1024,
+        "LR": 0.0003,
+        "WEIGHT_DECAY": 1,
+        "DROPOUT": 0.0,
+        "D_MODEL": 2048,
+        "N_LAYER": 2,
+        "N_HEAD": 8,
+        "MLP_RATIO": 4,
+        "MISSING_PROB": 0.0,
+        "EARLY_STOP_ACCURACY": 0.99,
+        "MAX_TRAIN_HOURS": 10,
+        "RANDOM_SEED": 17997
+      }
+    },
+    {
+      "name": "gapnox_g1_single_o2_d1024_P128_gf2n_a77b50_seed17997",
+      "task": "single",
+      "config": {
+        "P": 128,
+        "ORDER": 2,
+        "RULES": [
+          [
+            77,
+            50
+          ]
+        ],
+        "D_MODEL": 1024,
+        "N_LAYER": 2,
+        "N_HEAD": 4,
+        "MLP_RATIO": 4,
+        "TRAIN_LEN": 16,
+        "OOD_LEN": 16,
+        "BATCH_SIZE": 512,
+        "LR": 0.0003,
+        "WEIGHT_DECAY": 1,
+        "GRAD_CLIP_NORM": 1.0,
+        "EVAL_INTERVAL": 1,
+        "MISSING_PROB": 0.0,
+        "RANDOM_SEED": 17997,
+        "MAX_TRAIN_HOURS": 8,
+        "EARLY_STOP_NO_IMPROVE": 3000,
+        "EARLY_STOP_ACCURACY": 0.99,
+        "FIELD": "gf2n",
+        "IRREDUCIBLE_POLY": "x^7 + x + 1",
+        "DATA_MODE": "sampled_fresh_test",
+        "FRESH_TEST_PER_EVAL": true,
+        "NUM_TRAIN_SAMPLES": 10000,
+        "NUM_TEST_SAMPLES": 256
+      }
+    },
+    {
+      "name": "gapnox_g1_mixed_o2_d1024_P128_gf2n_a77b50__a44b118_seed17997",
+      "task": "mixed_ab",
+      "config": {
+        "P": 128,
+        "AB_PAIRS": [
+          [
+            77,
+            50
+          ],
+          [
+            44,
+            118
+          ]
+        ],
+        "MIXED_AB_MAX_UNIQUE_RATIOS": [
+          0.1465,
+          0.1465
+        ],
+        "NUM_MASK": 1,
+        "D_MODEL": 1024,
+        "N_LAYER": 2,
+        "N_HEAD": 4,
+        "MLP_RATIO": 4,
+        "BATCH_SIZE": 512,
+        "LR": 0.0003,
+        "WEIGHT_DECAY": 1,
+        "DROPOUT": 0.0,
+        "TRAIN_LEN": 16,
+        "OOD_LEN": 32,
+        "EVAL_INTERVAL": 1,
+        "EARLY_STOP_ACCURACY": 0.99,
+        "MAX_TRAIN_HOURS": 10,
+        "RANDOM_SEED": 17997,
+        "USE_AB_TAG": false,
+        "USE_CONDITIONAL_WTE": false,
+        "FIELD": "gf2n",
+        "IRREDUCIBLE_POLY": "x^7 + x + 1"
+      }
+    },
+    {
+      "name": "gapnox_g1_action_o2_d2048_P128_gf2n_a77b50__a44b118_seed17997",
+      "task": "action",
+      "config": {
+        "P": 128,
+        "ORDER": 2,
+        "RULES": [
+          [
+            77,
+            50
+          ],
+          [
+            44,
+            118
+          ]
+        ],
+        "TRAIN_LEN": 16,
+        "OOD_LEN": 16,
+        "NUM_TRAIN_SAMPLES": 300000,
+        "NUM_TEST_SAMPLES": 256,
+        "FRESH_TEST_PER_EVAL": true,
+        "EVAL_INTERVAL": 1,
+        "BATCH_SIZE": 1024,
+        "LR": 0.0003,
+        "WEIGHT_DECAY": 1,
+        "DROPOUT": 0.0,
+        "D_MODEL": 2048,
+        "N_LAYER": 2,
+        "N_HEAD": 8,
+        "MLP_RATIO": 4,
+        "MISSING_PROB": 0.0,
+        "EARLY_STOP_ACCURACY": 0.99,
+        "MAX_TRAIN_HOURS": 10,
+        "RANDOM_SEED": 17997,
+        "FIELD": "gf2n",
+        "IRREDUCIBLE_POLY": "x^7 + x + 1"
+      }
+    },
+    {
+      "name": "gapnox_g1_single_o3_d1024_P127_mod_a16b28c101_seed17997",
+      "task": "single",
+      "config": {
+        "P": 127,
+        "ORDER": 3,
+        "RULES": [
+          [
+            16,
+            28,
+            101
+          ]
+        ],
+        "D_MODEL": 1024,
+        "N_LAYER": 2,
+        "N_HEAD": 4,
+        "MLP_RATIO": 4,
+        "TRAIN_LEN": 16,
+        "OOD_LEN": 16,
+        "BATCH_SIZE": 512,
+        "LR": 0.0003,
+        "WEIGHT_DECAY": 1,
+        "GRAD_CLIP_NORM": 1.0,
+        "EVAL_INTERVAL": 1,
+        "MISSING_PROB": 0.0,
+        "RANDOM_SEED": 17997,
+        "MAX_TRAIN_HOURS": 8,
+        "EARLY_STOP_NO_IMPROVE": 3000,
+        "EARLY_STOP_ACCURACY": 0.99,
+        "NUM_TRAIN_SAMPLES": 300000
+      }
+    },
+    {
+      "name": "gapnox_g1_mixed_o3_d1024_P127_mod_a16b28c101__a98b99c22_seed17997",
+      "task": "mixed_abc",
+      "config": {
+        "P": 127,
+        "ABC_PAIRS": [
+          [
+            16,
+            28,
+            101
+          ],
+          [
+            98,
+            99,
+            22
+          ]
+        ],
+        "MIXED_AB_MAX_UNIQUE_RATIOS": [
+          0.1465,
+          0.1465
+        ],
+        "NUM_MASK": 2,
+        "D_MODEL": 1024,
+        "N_LAYER": 2,
+        "N_HEAD": 4,
+        "MLP_RATIO": 4,
+        "BATCH_SIZE": 512,
+        "LR": 0.0003,
+        "WEIGHT_DECAY": 1,
+        "DROPOUT": 0.0,
+        "TRAIN_LEN": 16,
+        "OOD_LEN": 32,
+        "EVAL_INTERVAL": 1,
+        "EARLY_STOP_ACCURACY": 0.99,
+        "MAX_TRAIN_HOURS": 10,
+        "RANDOM_SEED": 17997,
+        "USE_AB_TAG": false,
+        "USE_CONDITIONAL_WTE": false
+      }
+    },
+    {
+      "name": "gapnox_g1_action_o3_d2048_P127_mod_a16b28c101__a98b99c22_seed17997",
+      "task": "action",
+      "config": {
+        "P": 127,
+        "ORDER": 3,
+        "RULES": [
+          [
+            16,
+            28,
+            101
+          ],
+          [
+            98,
+            99,
+            22
+          ]
+        ],
+        "TRAIN_LEN": 16,
+        "OOD_LEN": 16,
+        "NUM_TRAIN_SAMPLES": 300000,
+        "NUM_TEST_SAMPLES": 256,
+        "FRESH_TEST_PER_EVAL": true,
+        "EVAL_INTERVAL": 1,
+        "BATCH_SIZE": 1024,
+        "LR": 0.0003,
+        "WEIGHT_DECAY": 1,
+        "DROPOUT": 0.0,
+        "D_MODEL": 2048,
+        "N_LAYER": 2,
+        "N_HEAD": 8,
+        "MLP_RATIO": 4,
+        "MISSING_PROB": 0.0,
+        "EARLY_STOP_ACCURACY": 0.99,
+        "MAX_TRAIN_HOURS": 10,
+        "RANDOM_SEED": 17997
+      }
+    },
+    {
+      "name": "gapnox_g1_single_o3_d1024_P128_gf2n_a16b28c101_seed17997",
+      "task": "single",
+      "config": {
+        "P": 128,
+        "ORDER": 3,
+        "RULES": [
+          [
+            16,
+            28,
+            101
+          ]
+        ],
+        "D_MODEL": 1024,
+        "N_LAYER": 2,
+        "N_HEAD": 4,
+        "MLP_RATIO": 4,
+        "TRAIN_LEN": 16,
+        "OOD_LEN": 16,
+        "BATCH_SIZE": 512,
+        "LR": 0.0003,
+        "WEIGHT_DECAY": 1,
+        "GRAD_CLIP_NORM": 1.0,
+        "EVAL_INTERVAL": 1,
+        "MISSING_PROB": 0.0,
+        "RANDOM_SEED": 17997,
+        "MAX_TRAIN_HOURS": 8,
+        "EARLY_STOP_NO_IMPROVE": 3000,
+        "EARLY_STOP_ACCURACY": 0.99,
+        "FIELD": "gf2n",
+        "IRREDUCIBLE_POLY": "x^7 + x + 1",
+        "NUM_TRAIN_SAMPLES": 300000
+      }
+    },
+    {
+      "name": "gapnox_g1_mixed_o3_d1024_P128_gf2n_a16b28c101__a98b99c22_seed17997",
+      "task": "mixed_abc",
+      "config": {
+        "P": 128,
+        "ABC_PAIRS": [
+          [
+            16,
+            28,
+            101
+          ],
+          [
+            98,
+            99,
+            22
+          ]
+        ],
+        "MIXED_AB_MAX_UNIQUE_RATIOS": [
+          0.1465,
+          0.1465
+        ],
+        "NUM_MASK": 2,
+        "D_MODEL": 1024,
+        "N_LAYER": 2,
+        "N_HEAD": 4,
+        "MLP_RATIO": 4,
+        "BATCH_SIZE": 512,
+        "LR": 0.0003,
+        "WEIGHT_DECAY": 1,
+        "DROPOUT": 0.0,
+        "TRAIN_LEN": 16,
+        "OOD_LEN": 32,
+        "EVAL_INTERVAL": 1,
+        "EARLY_STOP_ACCURACY": 0.99,
+        "MAX_TRAIN_HOURS": 10,
+        "RANDOM_SEED": 17997,
+        "USE_AB_TAG": false,
+        "USE_CONDITIONAL_WTE": false,
+        "FIELD": "gf2n",
+        "IRREDUCIBLE_POLY": "x^7 + x + 1"
+      }
+    },
+    {
+      "name": "gapnox_g1_action_o3_d2048_P128_gf2n_a16b28c101__a98b99c22_seed17997",
+      "task": "action",
+      "config": {
+        "P": 128,
+        "ORDER": 3,
+        "RULES": [
+          [
+            16,
+            28,
+            101
+          ],
+          [
+            98,
+            99,
+            22
+          ]
+        ],
+        "TRAIN_LEN": 16,
+        "OOD_LEN": 16,
+        "NUM_TRAIN_SAMPLES": 300000,
+        "NUM_TEST_SAMPLES": 256,
+        "FRESH_TEST_PER_EVAL": true,
+        "EVAL_INTERVAL": 1,
+        "BATCH_SIZE": 1024,
+        "LR": 0.0003,
+        "WEIGHT_DECAY": 1,
+        "DROPOUT": 0.0,
+        "D_MODEL": 2048,
+        "N_LAYER": 2,
+        "N_HEAD": 8,
+        "MLP_RATIO": 4,
+        "MISSING_PROB": 0.0,
+        "EARLY_STOP_ACCURACY": 0.99,
+        "MAX_TRAIN_HOURS": 10,
+        "RANDOM_SEED": 17997,
+        "FIELD": "gf2n",
+        "IRREDUCIBLE_POLY": "x^7 + x + 1"
+      }
+    },
+    {
+      "name": "gapnox_g2_single_o2_d1024_P127_mod_a0b16_seed17998",
+      "task": "single",
+      "config": {
+        "P": 127,
+        "ORDER": 2,
+        "RULES": [
+          [
+            0,
+            16
+          ]
+        ],
+        "D_MODEL": 1024,
+        "N_LAYER": 2,
+        "N_HEAD": 4,
+        "MLP_RATIO": 4,
+        "TRAIN_LEN": 16,
+        "OOD_LEN": 16,
+        "BATCH_SIZE": 512,
+        "LR": 0.0003,
+        "WEIGHT_DECAY": 1,
+        "GRAD_CLIP_NORM": 1.0,
+        "EVAL_INTERVAL": 1,
+        "MISSING_PROB": 0.0,
+        "RANDOM_SEED": 17998,
+        "MAX_TRAIN_HOURS": 8,
+        "EARLY_STOP_NO_IMPROVE": 3000,
+        "EARLY_STOP_ACCURACY": 0.99,
+        "DATA_MODE": "sampled_fresh_test",
+        "FRESH_TEST_PER_EVAL": true,
+        "NUM_TRAIN_SAMPLES": 10000,
+        "NUM_TEST_SAMPLES": 256
+      }
+    },
+    {
+      "name": "gapnox_g2_mixed_o2_d1024_P127_mod_a0b16__a4b124_seed17998",
+      "task": "mixed_ab",
+      "config": {
+        "P": 127,
+        "AB_PAIRS": [
+          [
+            0,
+            16
+          ],
+          [
+            4,
+            124
+          ]
+        ],
+        "MIXED_AB_MAX_UNIQUE_RATIOS": [
+          0.1465,
+          0.1465
+        ],
+        "NUM_MASK": 1,
+        "D_MODEL": 1024,
+        "N_LAYER": 2,
+        "N_HEAD": 4,
+        "MLP_RATIO": 4,
+        "BATCH_SIZE": 512,
+        "LR": 0.0003,
+        "WEIGHT_DECAY": 1,
+        "DROPOUT": 0.0,
+        "TRAIN_LEN": 16,
+        "OOD_LEN": 32,
+        "EVAL_INTERVAL": 1,
+        "EARLY_STOP_ACCURACY": 0.99,
+        "MAX_TRAIN_HOURS": 10,
+        "RANDOM_SEED": 17998,
+        "USE_AB_TAG": false,
+        "USE_CONDITIONAL_WTE": false
+      }
+    },
+    {
+      "name": "gapnox_g2_action_o2_d2048_P127_mod_a0b16__a4b124_seed17998",
+      "task": "action",
+      "config": {
+        "P": 127,
+        "ORDER": 2,
+        "RULES": [
+          [
+            0,
+            16
+          ],
+          [
+            4,
+            124
+          ]
+        ],
+        "TRAIN_LEN": 16,
+        "OOD_LEN": 16,
+        "NUM_TRAIN_SAMPLES": 300000,
+        "NUM_TEST_SAMPLES": 256,
+        "FRESH_TEST_PER_EVAL": true,
+        "EVAL_INTERVAL": 1,
+        "BATCH_SIZE": 1024,
+        "LR": 0.0003,
+        "WEIGHT_DECAY": 1,
+        "DROPOUT": 0.0,
+        "D_MODEL": 2048,
+        "N_LAYER": 2,
+        "N_HEAD": 8,
+        "MLP_RATIO": 4,
+        "MISSING_PROB": 0.0,
+        "EARLY_STOP_ACCURACY": 0.99,
+        "MAX_TRAIN_HOURS": 10,
+        "RANDOM_SEED": 17998
+      }
+    },
+    {
+      "name": "gapnox_g2_single_o2_d1024_P128_gf2n_a0b16_seed17998",
+      "task": "single",
+      "config": {
+        "P": 128,
+        "ORDER": 2,
+        "RULES": [
+          [
+            0,
+            16
+          ]
+        ],
+        "D_MODEL": 1024,
+        "N_LAYER": 2,
+        "N_HEAD": 4,
+        "MLP_RATIO": 4,
+        "TRAIN_LEN": 16,
+        "OOD_LEN": 16,
+        "BATCH_SIZE": 512,
+        "LR": 0.0003,
+        "WEIGHT_DECAY": 1,
+        "GRAD_CLIP_NORM": 1.0,
+        "EVAL_INTERVAL": 1,
+        "MISSING_PROB": 0.0,
+        "RANDOM_SEED": 17998,
+        "MAX_TRAIN_HOURS": 8,
+        "EARLY_STOP_NO_IMPROVE": 3000,
+        "EARLY_STOP_ACCURACY": 0.99,
+        "FIELD": "gf2n",
+        "IRREDUCIBLE_POLY": "x^7 + x + 1",
+        "DATA_MODE": "sampled_fresh_test",
+        "FRESH_TEST_PER_EVAL": true,
+        "NUM_TRAIN_SAMPLES": 10000,
+        "NUM_TEST_SAMPLES": 256
+      }
+    },
+    {
+      "name": "gapnox_g2_mixed_o2_d1024_P128_gf2n_a0b16__a4b124_seed17998",
+      "task": "mixed_ab",
+      "config": {
+        "P": 128,
+        "AB_PAIRS": [
+          [
+            0,
+            16
+          ],
+          [
+            4,
+            124
+          ]
+        ],
+        "MIXED_AB_MAX_UNIQUE_RATIOS": [
+          0.1465,
+          0.1465
+        ],
+        "NUM_MASK": 1,
+        "D_MODEL": 1024,
+        "N_LAYER": 2,
+        "N_HEAD": 4,
+        "MLP_RATIO": 4,
+        "BATCH_SIZE": 512,
+        "LR": 0.0003,
+        "WEIGHT_DECAY": 1,
+        "DROPOUT": 0.0,
+        "TRAIN_LEN": 16,
+        "OOD_LEN": 32,
+        "EVAL_INTERVAL": 1,
+        "EARLY_STOP_ACCURACY": 0.99,
+        "MAX_TRAIN_HOURS": 10,
+        "RANDOM_SEED": 17998,
+        "USE_AB_TAG": false,
+        "USE_CONDITIONAL_WTE": false,
+        "FIELD": "gf2n",
+        "IRREDUCIBLE_POLY": "x^7 + x + 1"
+      }
+    },
+    {
+      "name": "gapnox_g2_action_o2_d2048_P128_gf2n_a0b16__a4b124_seed17998",
+      "task": "action",
+      "config": {
+        "P": 128,
+        "ORDER": 2,
+        "RULES": [
+          [
+            0,
+            16
+          ],
+          [
+            4,
+            124
+          ]
+        ],
+        "TRAIN_LEN": 16,
+        "OOD_LEN": 16,
+        "NUM_TRAIN_SAMPLES": 300000,
+        "NUM_TEST_SAMPLES": 256,
+        "FRESH_TEST_PER_EVAL": true,
+        "EVAL_INTERVAL": 1,
+        "BATCH_SIZE": 1024,
+        "LR": 0.0003,
+        "WEIGHT_DECAY": 1,
+        "DROPOUT": 0.0,
+        "D_MODEL": 2048,
+        "N_LAYER": 2,
+        "N_HEAD": 8,
+        "MLP_RATIO": 4,
+        "MISSING_PROB": 0.0,
+        "EARLY_STOP_ACCURACY": 0.99,
+        "MAX_TRAIN_HOURS": 10,
+        "RANDOM_SEED": 17998,
+        "FIELD": "gf2n",
+        "IRREDUCIBLE_POLY": "x^7 + x + 1"
+      }
+    },
+    {
+      "name": "gapnox_g2_single_o3_d1024_P127_mod_a17b4c78_seed17998",
+      "task": "single",
+      "config": {
+        "P": 127,
+        "ORDER": 3,
+        "RULES": [
+          [
+            17,
+            4,
+            78
+          ]
+        ],
+        "D_MODEL": 1024,
+        "N_LAYER": 2,
+        "N_HEAD": 4,
+        "MLP_RATIO": 4,
+        "TRAIN_LEN": 16,
+        "OOD_LEN": 16,
+        "BATCH_SIZE": 512,
+        "LR": 0.0003,
+        "WEIGHT_DECAY": 1,
+        "GRAD_CLIP_NORM": 1.0,
+        "EVAL_INTERVAL": 1,
+        "MISSING_PROB": 0.0,
+        "RANDOM_SEED": 17998,
+        "MAX_TRAIN_HOURS": 8,
+        "EARLY_STOP_NO_IMPROVE": 3000,
+        "EARLY_STOP_ACCURACY": 0.99,
+        "NUM_TRAIN_SAMPLES": 300000
+      }
+    },
+    {
+      "name": "gapnox_g2_mixed_o3_d1024_P127_mod_a17b4c78__a117b50c64_seed17998",
+      "task": "mixed_abc",
+      "config": {
+        "P": 127,
+        "ABC_PAIRS": [
+          [
+            17,
+            4,
+            78
+          ],
+          [
+            117,
+            50,
+            64
+          ]
+        ],
+        "MIXED_AB_MAX_UNIQUE_RATIOS": [
+          0.1465,
+          0.1465
+        ],
+        "NUM_MASK": 2,
+        "D_MODEL": 1024,
+        "N_LAYER": 2,
+        "N_HEAD": 4,
+        "MLP_RATIO": 4,
+        "BATCH_SIZE": 512,
+        "LR": 0.0003,
+        "WEIGHT_DECAY": 1,
+        "DROPOUT": 0.0,
+        "TRAIN_LEN": 16,
+        "OOD_LEN": 32,
+        "EVAL_INTERVAL": 1,
+        "EARLY_STOP_ACCURACY": 0.99,
+        "MAX_TRAIN_HOURS": 10,
+        "RANDOM_SEED": 17998,
+        "USE_AB_TAG": false,
+        "USE_CONDITIONAL_WTE": false
+      }
+    },
+    {
+      "name": "gapnox_g2_action_o3_d2048_P127_mod_a17b4c78__a117b50c64_seed17998",
+      "task": "action",
+      "config": {
+        "P": 127,
+        "ORDER": 3,
+        "RULES": [
+          [
+            17,
+            4,
+            78
+          ],
+          [
+            117,
+            50,
+            64
+          ]
+        ],
+        "TRAIN_LEN": 16,
+        "OOD_LEN": 16,
+        "NUM_TRAIN_SAMPLES": 300000,
+        "NUM_TEST_SAMPLES": 256,
+        "FRESH_TEST_PER_EVAL": true,
+        "EVAL_INTERVAL": 1,
+        "BATCH_SIZE": 1024,
+        "LR": 0.0003,
+        "WEIGHT_DECAY": 1,
+        "DROPOUT": 0.0,
+        "D_MODEL": 2048,
+        "N_LAYER": 2,
+        "N_HEAD": 8,
+        "MLP_RATIO": 4,
+        "MISSING_PROB": 0.0,
+        "EARLY_STOP_ACCURACY": 0.99,
+        "MAX_TRAIN_HOURS": 10,
+        "RANDOM_SEED": 17998
+      }
+    },
+    {
+      "name": "gapnox_g2_single_o3_d1024_P128_gf2n_a17b4c78_seed17998",
+      "task": "single",
+      "config": {
+        "P": 128,
+        "ORDER": 3,
+        "RULES": [
+          [
+            17,
+            4,
+            78
+          ]
+        ],
+        "D_MODEL": 1024,
+        "N_LAYER": 2,
+        "N_HEAD": 4,
+        "MLP_RATIO": 4,
+        "TRAIN_LEN": 16,
+        "OOD_LEN": 16,
+        "BATCH_SIZE": 512,
+        "LR": 0.0003,
+        "WEIGHT_DECAY": 1,
+        "GRAD_CLIP_NORM": 1.0,
+        "EVAL_INTERVAL": 1,
+        "MISSING_PROB": 0.0,
+        "RANDOM_SEED": 17998,
+        "MAX_TRAIN_HOURS": 8,
+        "EARLY_STOP_NO_IMPROVE": 3000,
+        "EARLY_STOP_ACCURACY": 0.99,
+        "FIELD": "gf2n",
+        "IRREDUCIBLE_POLY": "x^7 + x + 1",
+        "NUM_TRAIN_SAMPLES": 300000
+      }
+    },
+    {
+      "name": "gapnox_g2_mixed_o3_d1024_P128_gf2n_a17b4c78__a117b50c64_seed17998",
+      "task": "mixed_abc",
+      "config": {
+        "P": 128,
+        "ABC_PAIRS": [
+          [
+            17,
+            4,
+            78
+          ],
+          [
+            117,
+            50,
+            64
+          ]
+        ],
+        "MIXED_AB_MAX_UNIQUE_RATIOS": [
+          0.1465,
+          0.1465
+        ],
+        "NUM_MASK": 2,
+        "D_MODEL": 1024,
+        "N_LAYER": 2,
+        "N_HEAD": 4,
+        "MLP_RATIO": 4,
+        "BATCH_SIZE": 512,
+        "LR": 0.0003,
+        "WEIGHT_DECAY": 1,
+        "DROPOUT": 0.0,
+        "TRAIN_LEN": 16,
+        "OOD_LEN": 32,
+        "EVAL_INTERVAL": 1,
+        "EARLY_STOP_ACCURACY": 0.99,
+        "MAX_TRAIN_HOURS": 10,
+        "RANDOM_SEED": 17998,
+        "USE_AB_TAG": false,
+        "USE_CONDITIONAL_WTE": false,
+        "FIELD": "gf2n",
+        "IRREDUCIBLE_POLY": "x^7 + x + 1"
+      }
+    },
+    {
+      "name": "gapnox_g2_action_o3_d2048_P128_gf2n_a17b4c78__a117b50c64_seed17998",
+      "task": "action",
+      "config": {
+        "P": 128,
+        "ORDER": 3,
+        "RULES": [
+          [
+            17,
+            4,
+            78
+          ],
+          [
+            117,
+            50,
+            64
+          ]
+        ],
+        "TRAIN_LEN": 16,
+        "OOD_LEN": 16,
+        "NUM_TRAIN_SAMPLES": 300000,
+        "NUM_TEST_SAMPLES": 256,
+        "FRESH_TEST_PER_EVAL": true,
+        "EVAL_INTERVAL": 1,
+        "BATCH_SIZE": 1024,
+        "LR": 0.0003,
+        "WEIGHT_DECAY": 1,
+        "DROPOUT": 0.0,
+        "D_MODEL": 2048,
+        "N_LAYER": 2,
+        "N_HEAD": 8,
+        "MLP_RATIO": 4,
+        "MISSING_PROB": 0.0,
+        "EARLY_STOP_ACCURACY": 0.99,
+        "MAX_TRAIN_HOURS": 10,
+        "RANDOM_SEED": 17998,
+        "FIELD": "gf2n",
+        "IRREDUCIBLE_POLY": "x^7 + x + 1"
+      }
+    }
+  ],
+  "_human": {
+    "intent": "F127 vs F128 gap; same coeffs; o2/o3; reject GF(2^n) XOR-degenerate coeffs",
+    "reject": "nonzero coeffs all in {1} (e.g. [1,1] = XOR of lags on F128); require max(coeff)>=2",
+    "n_experiments": 36,
+    "groups": [
+      {
+        "group": 0,
+        "train_seed": 17996,
+        "rules_o2": [
+          [
+            2,
+            87
+          ],
+          [
+            101,
+            30
+          ]
+        ],
+        "rules_o3": [
+          [
+            49,
+            87,
+            63
+          ],
+          [
+            79,
+            44,
+            52
+          ]
+        ]
+      },
+      {
+        "group": 1,
+        "train_seed": 17997,
+        "rules_o2": [
+          [
+            77,
+            50
+          ],
+          [
+            44,
+            118
+          ]
+        ],
+        "rules_o3": [
+          [
+            16,
+            28,
+            101
+          ],
+          [
+            98,
+            99,
+            22
+          ]
+        ]
+      },
+      {
+        "group": 2,
+        "train_seed": 17998,
+        "rules_o2": [
+          [
+            0,
+            16
+          ],
+          [
+            4,
+            124
+          ]
+        ],
+        "rules_o3": [
+          [
+            17,
+            4,
+            78
+          ],
+          [
+            117,
+            50,
+            64
+          ]
+        ]
+      }
+    ]
+  }
+}
