@@ -1,0 +1,1 @@
+{"action":"score","lr":0.0003,"wd":2,"size":"d512l4","move":{"axis":"wd","direction":1},"reason":"wd=1 明显退化，回到当前最佳 lr=0.0003 向上精扫 wd，检验更强正则能否补齐最后系数。"}

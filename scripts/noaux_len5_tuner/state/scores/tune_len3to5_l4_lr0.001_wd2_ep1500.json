@@ -1,0 +1,62 @@
+{
+ "lr": 0.001,
+ "wd": 2,
+ "epochs": 1500,
+ "per_coef": {
+  "a25b56": {
+   "best": 90.4,
+   "conv_epoch": null,
+   "conv_epoch_full": null,
+   "acc_at": 90.1,
+   "nan": false,
+   "last_epoch": 1499
+  },
+  "a62b59": {
+   "best": 82.6,
+   "conv_epoch": null,
+   "conv_epoch_full": null,
+   "acc_at": 81.5,
+   "nan": false,
+   "last_epoch": 1499
+  },
+  "a56b93": {
+   "best": 72.4,
+   "conv_epoch": null,
+   "conv_epoch_full": null,
+   "acc_at": 71.4,
+   "nan": false,
+   "last_epoch": 1499
+  },
+  "a5b3": {
+   "best": 33.0,
+   "conv_epoch": null,
+   "conv_epoch_full": null,
+   "acc_at": 31.6,
+   "nan": false,
+   "last_epoch": 1499
+  },
+  "a67b65": {
+   "best": 53.7,
+   "conv_epoch": null,
+   "conv_epoch_full": null,
+   "acc_at": 52.9,
+   "nan": false,
+   "last_epoch": 1499
+  },
+  "a44b59": {
+   "best": 1.0,
+   "conv_epoch": null,
+   "conv_epoch_full": null,
+   "acc_at": 0.3,
+   "nan": false,
+   "last_epoch": 1499
+  }
+ },
+ "mean_acc": 54.63333333333333,
+ "n_converged": 0,
+ "n_nan": 0,
+ "worst_two": [
+  0.3,
+  31.6
+ ]
+}

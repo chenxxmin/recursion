@@ -1,0 +1,258 @@
+{
+ "from_scratch_len5": {
+  "a25b56": {
+   "total_epochs": 3000,
+   "best": 76.0,
+   "converged": false
+  },
+  "a62b59": {
+   "total_epochs": 3000,
+   "best": 95.0,
+   "converged": false
+  },
+  "a56b93": {
+   "total_epochs": 3000,
+   "best": 68.5,
+   "converged": false
+  },
+  "a5b3": {
+   "total_epochs": 3000,
+   "best": 70.1,
+   "converged": false
+  },
+  "a67b65": {
+   "total_epochs": 1501,
+   "best": 99.1,
+   "converged": false
+  },
+  "a44b59": {
+   "total_epochs": 1886,
+   "best": 99.1,
+   "converged": false
+  }
+ },
+ "fixlast_init": {
+  "a25b56": {
+   "total_epochs": 1066,
+   "best": 74.3,
+   "converged": false
+  },
+  "a62b59": {
+   "total_epochs": 1116,
+   "best": 87.3,
+   "converged": false
+  },
+  "a56b93": {
+   "total_epochs": 1166,
+   "best": 96.6,
+   "converged": false
+  },
+  "a5b3": {
+   "total_epochs": 1106,
+   "best": 81.5,
+   "converged": false
+  },
+  "a67b65": {
+   "total_epochs": 0,
+   "best": null,
+   "converged": false
+  },
+  "a44b59": {
+   "total_epochs": 0,
+   "best": null,
+   "converged": false
+  }
+ },
+ "last2_init": {
+  "a25b56": {
+   "total_epochs": 396,
+   "best": 99.0,
+   "converged": false
+  },
+  "a62b59": {
+   "total_epochs": 1081,
+   "best": 99.0,
+   "converged": false
+  },
+  "a56b93": {
+   "total_epochs": 3000,
+   "best": 97.1,
+   "converged": false
+  },
+  "a5b3": {
+   "total_epochs": 2936,
+   "best": 62.0,
+   "converged": false
+  },
+  "a67b65": {
+   "total_epochs": 791,
+   "best": 99.0,
+   "converged": false
+  },
+  "a44b59": {
+   "total_epochs": 2291,
+   "best": 99.1,
+   "converged": false
+  }
+ },
+ "pos04_init": {
+  "a25b56": {
+   "total_epochs": 1626,
+   "best": 99.1,
+   "converged": false
+  },
+  "a62b59": {
+   "total_epochs": 2651,
+   "best": 48.0,
+   "converged": false
+  },
+  "a56b93": {
+   "total_epochs": 1761,
+   "best": 99.2,
+   "converged": false
+  },
+  "a5b3": {
+   "total_epochs": 1081,
+   "best": 99.0,
+   "converged": false
+  },
+  "a67b65": {
+   "total_epochs": 646,
+   "best": 99.1,
+   "converged": false
+  },
+  "a44b59": {
+   "total_epochs": 3000,
+   "best": 39.9,
+   "converged": false
+  }
+ },
+ "pos024_init": {
+  "a25b56": {
+   "total_epochs": 31,
+   "best": 99.3,
+   "converged": false
+  },
+  "a62b59": {
+   "total_epochs": 46,
+   "best": 99.3,
+   "converged": false
+  },
+  "a56b93": {
+   "total_epochs": 51,
+   "best": 99.1,
+   "converged": false
+  },
+  "a5b3": {
+   "total_epochs": 71,
+   "best": 99.5,
+   "converged": false
+  },
+  "a67b65": {
+   "total_epochs": 41,
+   "best": 99.4,
+   "converged": false
+  },
+  "a44b59": {
+   "total_epochs": 51,
+   "best": 99.0,
+   "converged": false
+  }
+ },
+ "pos_progressive_len5": {
+  "a25b56": {
+   "total_epochs": 5264,
+   "best": 22.9,
+   "converged": false
+  },
+  "a62b59": {
+   "total_epochs": 2094,
+   "best": 99.2,
+   "converged": false
+  },
+  "a56b93": {
+   "total_epochs": 2514,
+   "best": 99.1,
+   "converged": false
+  },
+  "a5b3": {
+   "total_epochs": 1429,
+   "best": 99.0,
+   "converged": false
+  },
+  "a67b65": {
+   "total_epochs": 1954,
+   "best": 99.0,
+   "converged": false
+  },
+  "a44b59": {
+   "total_epochs": 1299,
+   "best": 99.0,
+   "converged": false
+  }
+ },
+ "len_progressive": {
+  "a25b56": {
+   "total_epochs": 0,
+   "best": null,
+   "converged": false
+  },
+  "a62b59": {
+   "total_epochs": 0,
+   "best": null,
+   "converged": false
+  },
+  "a56b93": {
+   "total_epochs": 0,
+   "best": null,
+   "converged": false
+  },
+  "a5b3": {
+   "total_epochs": 0,
+   "best": null,
+   "converged": false
+  },
+  "a67b65": {
+   "total_epochs": 0,
+   "best": null,
+   "converged": false
+  },
+  "a44b59": {
+   "total_epochs": 0,
+   "best": null,
+   "converged": false
+  }
+ },
+ "pos_progressive_len8": {
+  "a25b56": {
+   "total_epochs": 0,
+   "best": null,
+   "converged": false
+  },
+  "a62b59": {
+   "total_epochs": 0,
+   "best": null,
+   "converged": false
+  },
+  "a56b93": {
+   "total_epochs": 0,
+   "best": null,
+   "converged": false
+  },
+  "a5b3": {
+   "total_epochs": 0,
+   "best": null,
+   "converged": false
+  },
+  "a67b65": {
+   "total_epochs": 0,
+   "best": null,
+   "converged": false
+  },
+  "a44b59": {
+   "total_epochs": 0,
+   "best": null,
+   "converged": false
+  }
+ }
+}

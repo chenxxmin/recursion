@@ -1,0 +1,10 @@
+[
+ "experiments/variant_o2_corruptfix_valueonly_d512l4_P127_len9_initLen8.json",
+ "experiments/variant_o2_corruptfix_valueonly_d512l4_P127_len10_initLen9.json",
+ "experiments/variant_o2_corruptfix_valueonly_d512l4_P127_len11_initLen10.json",
+ "experiments/variant_o2_corruptfix_valueonly_d512l4_P127_len12_initLen11.json",
+ "experiments/variant_o2_corruptfix_valueonly_d512l4_P127_len13_initLen12.json",
+ "experiments/variant_o2_corruptfix_valueonly_d512l4_P127_len14_initLen13.json",
+ "experiments/variant_o2_corruptfix_valueonly_d512l4_P127_len15_initLen14.json",
+ "experiments/variant_o2_corruptfix_valueonly_d512l4_P127_len16_initLen15.json"
+]

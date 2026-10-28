@@ -1,0 +1,62 @@
+{
+ "lr": 0.0003,
+ "wd": 2,
+ "epochs": 1500,
+ "per_coef": {
+  "a25b56": {
+   "best": 99.7,
+   "conv_epoch": 710,
+   "conv_epoch_full": 710,
+   "acc_at": 99.7,
+   "nan": false,
+   "last_epoch": 710
+  },
+  "a62b59": {
+   "best": 99.4,
+   "conv_epoch": 475,
+   "conv_epoch_full": 475,
+   "acc_at": 99.4,
+   "nan": false,
+   "last_epoch": 475
+  },
+  "a56b93": {
+   "best": 99.2,
+   "conv_epoch": 285,
+   "conv_epoch_full": 285,
+   "acc_at": 99.2,
+   "nan": false,
+   "last_epoch": 285
+  },
+  "a5b3": {
+   "best": 99.5,
+   "conv_epoch": 805,
+   "conv_epoch_full": 805,
+   "acc_at": 99.5,
+   "nan": false,
+   "last_epoch": 805
+  },
+  "a67b65": {
+   "best": 99.4,
+   "conv_epoch": 980,
+   "conv_epoch_full": 980,
+   "acc_at": 99.4,
+   "nan": false,
+   "last_epoch": 980
+  },
+  "a44b59": {
+   "best": 99.3,
+   "conv_epoch": 695,
+   "conv_epoch_full": 695,
+   "acc_at": 99.3,
+   "nan": false,
+   "last_epoch": 695
+  }
+ },
+ "mean_acc": 99.41666666666667,
+ "n_converged": 6,
+ "n_nan": 0,
+ "worst_two": [
+  99.2,
+  99.3
+ ]
+}

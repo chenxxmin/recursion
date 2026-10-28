@@ -1,0 +1,30 @@
+{
+  "task": "binary_mod_arithmetic",
+  "model_kind": "mlp",
+  "p": 127,
+  "rules": [
+    [
+      5,
+      3
+    ]
+  ],
+  "seed": 17996,
+  "split_seed": 42,
+  "split": "full_split",
+  "train_ratio": 0.7,
+  "train_count": 11290,
+  "test_count": 4839,
+  "d_model": 128,
+  "n_layer": 2,
+  "n_head": 4,
+  "mlp_ratio": 8,
+  "epochs": 1000,
+  "learning_rate": 0.0003,
+  "weight_decay": 1.0,
+  "batch_size": 512,
+  "num_mask": 1,
+  "input_order": "[q0,q1]",
+  "target": "(a*q1+b*q0)%p",
+  "shared_embedding": true,
+  "tied_output_embedding": true
+}

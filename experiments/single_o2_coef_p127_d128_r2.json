@@ -1,0 +1,29 @@
+{
+  "concurrency": 2,
+  "experiments": [
+    {"name": "single_o2_a20b48_d128l2r8h4_P127_seed17996", "task": "single",
+     "config": {"P": 127, "ORDER": 2, "RULES": [[20, 48]], "D_MODEL": 128, "N_LAYER": 2,
+                "EPOCHS": 1000, "EVAL_INTERVAL": 1, "MAX_TRAIN_HOURS": 1, "RANDOM_SEED": 17996}},
+    {"name": "single_o2_a100b7_d128l2r8h4_P127_seed17996", "task": "single",
+     "config": {"P": 127, "ORDER": 2, "RULES": [[100, 7]], "D_MODEL": 128, "N_LAYER": 2,
+                "EPOCHS": 1000, "EVAL_INTERVAL": 1, "MAX_TRAIN_HOURS": 1, "RANDOM_SEED": 17996}},
+    {"name": "single_o2_a121b55_d128l2r8h4_P127_seed17996", "task": "single",
+     "config": {"P": 127, "ORDER": 2, "RULES": [[121, 55]], "D_MODEL": 128, "N_LAYER": 2,
+                "EPOCHS": 1000, "EVAL_INTERVAL": 1, "MAX_TRAIN_HOURS": 1, "RANDOM_SEED": 17996}},
+    {"name": "single_o2_a14b24_d128l2r8h4_P127_seed17996", "task": "single",
+     "config": {"P": 127, "ORDER": 2, "RULES": [[14, 24]], "D_MODEL": 128, "N_LAYER": 2,
+                "EPOCHS": 1000, "EVAL_INTERVAL": 1, "MAX_TRAIN_HOURS": 1, "RANDOM_SEED": 17996}},
+    {"name": "single_o2_a20b48_d128l2r8h4_P127_seed18318", "task": "single",
+     "config": {"P": 127, "ORDER": 2, "RULES": [[20, 48]], "D_MODEL": 128, "N_LAYER": 2,
+                "EPOCHS": 1000, "EVAL_INTERVAL": 1, "MAX_TRAIN_HOURS": 1, "RANDOM_SEED": 18318}},
+    {"name": "single_o2_a100b7_d128l2r8h4_P127_seed18318", "task": "single",
+     "config": {"P": 127, "ORDER": 2, "RULES": [[100, 7]], "D_MODEL": 128, "N_LAYER": 2,
+                "EPOCHS": 1000, "EVAL_INTERVAL": 1, "MAX_TRAIN_HOURS": 1, "RANDOM_SEED": 18318}},
+    {"name": "single_o2_a121b55_d128l2r8h4_P127_seed18318", "task": "single",
+     "config": {"P": 127, "ORDER": 2, "RULES": [[121, 55]], "D_MODEL": 128, "N_LAYER": 2,
+                "EPOCHS": 1000, "EVAL_INTERVAL": 1, "MAX_TRAIN_HOURS": 1, "RANDOM_SEED": 18318}},
+    {"name": "single_o2_a14b24_d128l2r8h4_P127_seed18318", "task": "single",
+     "config": {"P": 127, "ORDER": 2, "RULES": [[14, 24]], "D_MODEL": 128, "N_LAYER": 2,
+                "EPOCHS": 1000, "EVAL_INTERVAL": 1, "MAX_TRAIN_HOURS": 1, "RANDOM_SEED": 18318}}
+  ]
+}

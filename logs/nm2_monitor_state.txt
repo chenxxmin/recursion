@@ -1,0 +1,8 @@
+experiments/nm2_shards/gpu0/mixed_o2_coef78_nm2_p127_d512.json
+experiments/nm2_shards/gpu1/mixed_o2_coef78_nm2_p127_d512.json
+experiments/nm2_shards/gpu2/mixed_o2_coef78_nm2_p127_d512.json
+experiments/nm2_shards/gpu3/mixed_o2_coef78_nm2_p127_d512.json
+experiments/nm2_shards/gpu4/mixed_o2_coef78_nm2_p127_d512.json
+experiments/nm2_shards/gpu5/mixed_o2_coef78_nm2_p127_d512.json
+experiments/nm2_shards/gpu6/mixed_o2_coef78_nm2_p127_d512.json
+experiments/nm2_shards/gpu7/mixed_o2_coef78_nm2_p127_d512.json

@@ -1,0 +1,65 @@
+{
+  "concurrency": 2,
+  "experiments": [
+    {
+      "name": "single_o2_a5b3_d128l2r8h4_P127_seed18318",
+      "task": "single",
+      "config": {
+        "P": 127,
+        "ORDER": 2,
+        "RULES": [[5, 3]],
+        "D_MODEL": 128,
+        "N_LAYER": 2,
+        "EPOCHS": 1000,
+        "EVAL_INTERVAL": 1,
+        "MAX_TRAIN_HOURS": 1,
+        "RANDOM_SEED": 18318
+      }
+    },
+    {
+      "name": "single_o2_a25b56_d128l2r8h4_P127_seed18318",
+      "task": "single",
+      "config": {
+        "P": 127,
+        "ORDER": 2,
+        "RULES": [[25, 56]],
+        "D_MODEL": 128,
+        "N_LAYER": 2,
+        "EPOCHS": 1000,
+        "EVAL_INTERVAL": 1,
+        "MAX_TRAIN_HOURS": 1,
+        "RANDOM_SEED": 18318
+      }
+    },
+    {
+      "name": "single_o2_a62b59_d128l2r8h4_P127_seed18318",
+      "task": "single",
+      "config": {
+        "P": 127,
+        "ORDER": 2,
+        "RULES": [[62, 59]],
+        "D_MODEL": 128,
+        "N_LAYER": 2,
+        "EPOCHS": 1000,
+        "EVAL_INTERVAL": 1,
+        "MAX_TRAIN_HOURS": 1,
+        "RANDOM_SEED": 18318
+      }
+    },
+    {
+      "name": "single_o2_a67b65_d128l2r8h4_P127_seed18318",
+      "task": "single",
+      "config": {
+        "P": 127,
+        "ORDER": 2,
+        "RULES": [[67, 65]],
+        "D_MODEL": 128,
+        "N_LAYER": 2,
+        "EPOCHS": 1000,
+        "EVAL_INTERVAL": 1,
+        "MAX_TRAIN_HOURS": 1,
+        "RANDOM_SEED": 18318
+      }
+    }
+  ]
+}

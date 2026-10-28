@@ -1,0 +1,98 @@
+{
+ "concurrency": 3,
+ "experiments": [
+  {
+   "name": "single_o2_fillblank_a5b3_d512l4r8h4_P127_len8_randpos_noaux_lr0.0003_wd2_initLen35r_seed42",
+   "task": "single",
+   "config": {
+    "TASK": "single",
+    "TASK_VARIANT": "fill_blank",
+    "ORDER": 2,
+    "P": 127,
+    "D_MODEL": 512,
+    "N_LAYER": 4,
+    "N_HEAD": 4,
+    "MLP_RATIO": 8,
+    "BODY_SUPERVISION": false,
+    "EPOCHS": 3000,
+    "EVAL_INTERVAL": 5,
+    "MAX_TRAIN_HOURS": 1.0,
+    "RANDOM_SEED": 42,
+    "LR": 0.0003,
+    "WEIGHT_DECAY": 2.0,
+    "RULES": [
+     [
+      5,
+      3
+     ]
+    ],
+    "TRAIN_LEN": 8,
+    "OOD_LEN": 8,
+    "SAVE_CHECKPOINTS": true,
+    "INIT_FROM": "/data/cxm/models/variant_o2_fillblank_noaux_randpos_d512l4_P127_len3to5_wd2_ckpt_rest/single_o2_fillblank_a5b3_d512l4r8h4_P127_len3to5_randpos_noaux_lr0.0003_wd2_ckpt_seed42_best.pth"
+   }
+  },
+  {
+   "name": "single_o2_fillblank_a67b65_d512l4r8h4_P127_len8_randpos_noaux_lr0.0003_wd2_initLen35r_seed42",
+   "task": "single",
+   "config": {
+    "TASK": "single",
+    "TASK_VARIANT": "fill_blank",
+    "ORDER": 2,
+    "P": 127,
+    "D_MODEL": 512,
+    "N_LAYER": 4,
+    "N_HEAD": 4,
+    "MLP_RATIO": 8,
+    "BODY_SUPERVISION": false,
+    "EPOCHS": 3000,
+    "EVAL_INTERVAL": 5,
+    "MAX_TRAIN_HOURS": 1.0,
+    "RANDOM_SEED": 42,
+    "LR": 0.0003,
+    "WEIGHT_DECAY": 2.0,
+    "RULES": [
+     [
+      67,
+      65
+     ]
+    ],
+    "TRAIN_LEN": 8,
+    "OOD_LEN": 8,
+    "SAVE_CHECKPOINTS": true,
+    "INIT_FROM": "/data/cxm/models/variant_o2_fillblank_noaux_randpos_d512l4_P127_len3to5_wd2_ckpt_rest/single_o2_fillblank_a67b65_d512l4r8h4_P127_len3to5_randpos_noaux_lr0.0003_wd2_ckpt_seed42_best.pth"
+   }
+  },
+  {
+   "name": "single_o2_fillblank_a44b59_d512l4r8h4_P127_len8_randpos_noaux_lr0.0003_wd2_initLen35r_seed42",
+   "task": "single",
+   "config": {
+    "TASK": "single",
+    "TASK_VARIANT": "fill_blank",
+    "ORDER": 2,
+    "P": 127,
+    "D_MODEL": 512,
+    "N_LAYER": 4,
+    "N_HEAD": 4,
+    "MLP_RATIO": 8,
+    "BODY_SUPERVISION": false,
+    "EPOCHS": 3000,
+    "EVAL_INTERVAL": 5,
+    "MAX_TRAIN_HOURS": 1.0,
+    "RANDOM_SEED": 42,
+    "LR": 0.0003,
+    "WEIGHT_DECAY": 2.0,
+    "RULES": [
+     [
+      44,
+      59
+     ]
+    ],
+    "TRAIN_LEN": 8,
+    "OOD_LEN": 8,
+    "SAVE_CHECKPOINTS": true,
+    "INIT_FROM": "/data/cxm/models/variant_o2_fillblank_noaux_randpos_d512l4_P127_len3to5_wd2_ckpt_rest/single_o2_fillblank_a44b59_d512l4r8h4_P127_len3to5_randpos_noaux_lr0.0003_wd2_ckpt_seed42_best.pth"
+   }
+  }
+ ]
+}

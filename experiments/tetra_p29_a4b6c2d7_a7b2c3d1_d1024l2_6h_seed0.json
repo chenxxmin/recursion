@@ -1,0 +1,49 @@
+{
+ "concurrency": 2,
+ "experiments": [
+  {
+   "name": "tetranacci_a4b6c2d7_p29_d1024l2r4h4_300k_seed0",
+   "task": "tetranacci",
+   "config": {
+    "RANDOM_SEED": 0,
+    "P": 29,
+    "A": 4,
+    "B": 6,
+    "C": 2,
+    "D": 7,
+    "NUM_MASK": 3,
+    "D_MODEL": 1024,
+    "N_LAYER": 2,
+    "N_HEAD": 4,
+    "MLP_RATIO": 4,
+    "NUM_TRAIN_SAMPLES": 300000,
+    "NUM_TEST_SAMPLES": 256,
+    "FRESH_TEST_PER_EVAL": true,
+    "EVAL_INTERVAL": 1,
+    "MAX_TRAIN_HOURS": 6
+   }
+  },
+  {
+   "name": "tetranacci_a7b2c3d1_p29_d1024l2r4h4_300k_seed0",
+   "task": "tetranacci",
+   "config": {
+    "RANDOM_SEED": 0,
+    "P": 29,
+    "A": 7,
+    "B": 2,
+    "C": 3,
+    "D": 1,
+    "NUM_MASK": 3,
+    "D_MODEL": 1024,
+    "N_LAYER": 2,
+    "N_HEAD": 4,
+    "MLP_RATIO": 4,
+    "NUM_TRAIN_SAMPLES": 300000,
+    "NUM_TEST_SAMPLES": 256,
+    "FRESH_TEST_PER_EVAL": true,
+    "EVAL_INTERVAL": 1,
+    "MAX_TRAIN_HOURS": 6
+   }
+  }
+ ]
+}

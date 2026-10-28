@@ -1,0 +1,62 @@
+{
+ "lr": 0.0001,
+ "wd": 8,
+ "epochs": 1500,
+ "per_coef": {
+  "a25b56": {
+   "best": 1.5,
+   "conv_epoch": null,
+   "conv_epoch_full": null,
+   "acc_at": 1.1,
+   "nan": false,
+   "last_epoch": 1499
+  },
+  "a62b59": {
+   "best": 6.5,
+   "conv_epoch": null,
+   "conv_epoch_full": null,
+   "acc_at": 5.7,
+   "nan": false,
+   "last_epoch": 1499
+  },
+  "a56b93": {
+   "best": 14.1,
+   "conv_epoch": null,
+   "conv_epoch_full": null,
+   "acc_at": 7.1,
+   "nan": false,
+   "last_epoch": 1499
+  },
+  "a5b3": {
+   "best": 4.9,
+   "conv_epoch": null,
+   "conv_epoch_full": null,
+   "acc_at": 4.0,
+   "nan": false,
+   "last_epoch": 1499
+  },
+  "a67b65": {
+   "best": 3.9,
+   "conv_epoch": null,
+   "conv_epoch_full": null,
+   "acc_at": 3.6,
+   "nan": false,
+   "last_epoch": 1499
+  },
+  "a44b59": {
+   "best": 1.6,
+   "conv_epoch": null,
+   "conv_epoch_full": null,
+   "acc_at": 1.6,
+   "nan": false,
+   "last_epoch": 1499
+  }
+ },
+ "mean_acc": 3.85,
+ "n_converged": 0,
+ "n_nan": 0,
+ "worst_two": [
+  1.1,
+  1.6
+ ]
+}

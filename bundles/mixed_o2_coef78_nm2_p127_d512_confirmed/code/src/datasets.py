@@ -1,0 +1,913 @@
+"""Datasets, samplers and collate functions for the recurrence experiments.
+
+Extracted from core.py (core.py split, step 2). MixedRecurrenceDataset was
+merged in from the legacy mixed-rule dataset module, which eliminated the
+circular import between that module and core. core.py re-exports the
+externally referenced symbols defined here, so existing `from core import
+...` users (analysis scripts, tests) are unaffected.
+"""
+import random
+from enum import IntEnum
+
+import torch
+from torch.utils.data import Dataset, Sampler
+
+
+# ==================== Data Generation ====================
+class RecurrenceDataset(Dataset):
+    def __init__(self, p=127, recurrence_fn=None, recurrence_name="X(k)=?", init_len=2, num_samples=1000, length=10,
+                 verbose=True, missing_prob=0.0, num_mask=0, first_task_weight=1.0,
+                 missing_token=None, miss_len=1, state_cap=None):
+        self.length = length
+        self.p = p
+        self.recurrence_fn = recurrence_fn
+        self.recurrence_name = recurrence_name
+        self.init_len = init_len
+        self.num_samples = num_samples
+        self.verbose = verbose
+        # MISSING_PROB: when > 0, corruption is applied ON THE FLY in the
+        # collate (make_missing_collate): windows are stored CLEAN here, and
+        # every batch gets fresh random missing positions, so each epoch (and
+        # each eval) sees a different corruption pattern. The fields below are
+        # still used by _corrupt (the single implementation, shared by the
+        # collate factories and the corrupt_window analysis helper).
+        # num_mask/first_task_weight feed the loss-mask prefix in _corrupt.
+        assert miss_len >= 1, f"miss_len must be >= 1, got {miss_len}"
+        self.missing_prob = missing_prob
+        self.num_mask = num_mask
+        self.first_task_weight = first_task_weight
+        self.missing_token = p if missing_token is None else missing_token
+        self.miss_len = miss_len
+        # STATE_SPACE_CAP: when p**init_len exceeds this, subsample state_cap
+        # distinct initial states uniformly (one window per state, rolled out
+        # step by step) instead of full cycle traversal; the train/test quota
+        # split is unchanged (first num_samples sampled states -> train).
+        self.state_cap = state_cap
+        self.train_samples = []
+        self.test_samples = []
+        self.seen_indices = set()
+        self.split = 'train'
+        
+    def index_to_values(self, index):
+        vals = []
+        for _ in range(self.init_len):
+            vals.insert(0, index % self.p)
+            index //= self.p
+        return vals
+    
+    def values_to_index(self, vals):
+        assert(len(vals) == self.init_len)
+        index = 0
+        w = 1
+        for val in vals:
+            index += val * w
+            w *= self.p
+        return index
+    
+    def generate_cycle(self, start_idx):
+        cycle_vals = self.index_to_values(start_idx)
+        while True:
+            next_val = self.recurrence_fn(cycle_vals[-self.init_len:], self.p)
+            current_state_idx = 0
+            for val in cycle_vals[-self.init_len:]:
+                current_state_idx = current_state_idx * self.p + val
+            next_idx = (current_state_idx % (self.p ** (self.init_len - 1))) * self.p + next_val
+
+            # Break when the trajectory closes back to the start state (a pure
+            # cycle; array_len = cycle_len + (state_len-1)), or when it runs
+            # into an already-seen state. The latter happens for transient
+            # states (e.g. states containing 0 under multiplication, whose
+            # recurrence is not bijective): the trajectory flows into a
+            # previously processed cycle, and without this check the loop
+            # would never terminate.
+            if next_idx == start_idx or next_idx in self.seen_indices:
+                break
+
+            self.seen_indices.add(next_idx)
+            cycle_vals.append(next_val)
+        # Return the full trajectory (init_len seed values + one value per step).
+        # The number of NEW states on it is len(vals) - (init_len - 1); the
+        # trailing init_len-1 values are needed as seed context for extending.
+        return cycle_vals
+
+    def _rollout_window(self, start_idx, length=None):
+        """Roll one initial state forward to a fixed-length clean window."""
+        target_len = self.length if length is None else length
+        seq = self.index_to_values(start_idx)
+        while len(seq) < target_len:
+            seq.append(self.recurrence_fn(seq[-self.init_len:], self.p))
+        return torch.tensor(seq[:target_len], dtype=torch.long)
+
+    def run_full_split(self):
+        """FULL_SPLIT mode: traverse the whole state space and split states.
+
+        This preserves the trajectory-aware behavior of the original uncapped
+        path: complete trajectories are traversed, one sliding window is made
+        per newly visited state, and only a boundary trajectory can straddle
+        the train/test quota.
+        """
+        state_space = self.p ** self.init_len
+        all_indices = list(range(state_space))
+        random.shuffle(all_indices)
+
+        self.train_samples = []
+        self.test_samples = []
+        self.seen_indices = set()
+
+        for start_idx in all_indices:
+            if start_idx in self.seen_indices:
+                continue
+
+            n_before = len(self.seen_indices)
+            self.seen_indices.add(start_idx)
+            seq = self.generate_cycle(start_idx)
+            num_inits = len(seq) - (self.init_len - 1)
+
+            while len(seq) < num_inits + self.length - 1:
+                seq.append(self.recurrence_fn(seq[-self.init_len:], self.p))
+
+            for i in range(num_inits):
+                is_train = n_before + i < self.num_samples
+                target = self.train_samples if is_train else self.test_samples
+                target.append(torch.tensor(seq[i:i + self.length], dtype=torch.long))
+
+        random.shuffle(self.train_samples)
+
+        if self.verbose:
+            cov = len(self.train_samples) / state_space
+            print(f"[Dataset][full_split] {len(self.train_samples)} train + "
+                  f"{len(self.test_samples)} test samples, length {self.length}, mod {self.p}")
+            print(f"  - Initial state coverage: {len(self.train_samples)}/{state_space} "
+                  f"({cov*100:.1f}%)")
+            print(f"Recurrence: {self.recurrence_name}")
+            print("-" * 50)
+            print("-" * 50)
+
+    @staticmethod
+    def _sample_unique_indices(state_space, n, rng):
+        """Uniformly sample n distinct integers from range(state_space).
+
+        Floyd's algorithm uses exactly n iterations and O(n) memory, without
+        materializing the full state space and without rejection loops whose
+        cost grows with sampling coverage.
+        """
+        chosen = set()
+        for j in range(state_space - n, state_space):
+            t = rng.randrange(j + 1)
+            chosen.add(j if t in chosen else t)
+        return chosen
+
+    def sample_unique_train(self, num_samples=None, rng=None):
+        """SAMPLED_FRESH_TEST train path: sample unique initial states.
+
+        Uses Floyd sampling: O(n) iterations and O(n) memory, independent of
+        the fraction of the state space covered. Each initial state contributes
+        exactly one clean rollout window.
+        """
+        rng = random if rng is None else rng
+        state_space = self.p ** self.init_len
+        n = self.num_samples if num_samples is None else int(num_samples)
+        if n < 0 or n > state_space:
+            raise ValueError(
+                f"unique train sample count {n} must be in [0, {state_space}]")
+
+        self.train_samples = []
+        self.test_samples = []
+        chosen = self._sample_unique_indices(state_space, n, rng)
+
+        self.train_samples = [self._rollout_window(idx) for idx in chosen]
+        rng.shuffle(self.train_samples)
+        self.seen_indices = set(chosen)
+
+        if self.verbose:
+            cov = len(self.train_samples) / state_space
+            print(f"[Dataset][sampled_fresh_test] {len(self.train_samples)} unique train samples, "
+                  f"length {self.length}, mod {self.p}")
+            print(f"  - Initial state coverage: {len(self.train_samples)}/{state_space} "
+                  f"({cov*100:.3f}%)")
+            print("  - Unique sampling: Floyd algorithm (no rejection loop)")
+            print("  - Static test set: disabled (fresh test samples are generated per eval)")
+            print(f"Recurrence: {self.recurrence_name}")
+            print("-" * 50)
+            print("-" * 50)
+
+        return self.train_samples
+
+    def sample_random_windows(self, num_samples, length=None, rng=None):
+        """Sample clean windows with replacement from the full state space.
+
+        No duplicate check is intentional: fresh evaluation samples are
+        independent draws and may overlap with one another or with training.
+        """
+        rng = random if rng is None else rng
+        state_space = self.p ** self.init_len
+        return [
+            self._rollout_window(rng.randrange(state_space), length=length)
+            for _ in range(int(num_samples))
+        ]
+
+    def run(self):
+        state_space = self.p ** self.init_len
+        capped = self.state_cap is not None and state_space > self.state_cap
+
+        if capped:
+            # random.sample on a range has a fast path (no full enumeration)
+            # and returns its picks in random order, so no extra shuffle.
+            all_indices = random.sample(range(state_space), self.state_cap)
+        else:
+            # Randomly shuffle all state indices
+            all_indices = list(range(state_space))
+            random.shuffle(all_indices)
+
+        for idx_pos, start_idx in enumerate(all_indices):
+            if capped:
+                n_before = idx_pos
+                # One window per sampled state, rolled out step by step.
+                seq = self.index_to_values(start_idx)
+                num_inits = 1
+                while len(seq) < self.length:
+                    seq.append(self.recurrence_fn(seq[-self.init_len:], self.p))
+            else:
+                if start_idx in self.seen_indices:
+                    continue
+
+                # MAX_UNIQUE_RATIO is the proportion of initial states exposed to training.
+                # The first num_samples states (in shuffled order) go to train, the rest to test.
+                # The quota is enforced PER STATE (not per cycle): n_before is the number
+                # of states processed before this traversal, and window i comes from the
+                # (n_before + i)-th processed state. This keeps the exposed fraction exact
+                # even when one cycle spans a large part of the state space.
+                n_before = len(self.seen_indices)
+
+                # Traverse the entire cycle
+                self.seen_indices.add(start_idx)
+                seq = self.generate_cycle(start_idx)
+
+                # One training window per new state on the trajectory.
+                num_inits = len(seq) - (self.init_len - 1)
+
+                # Extend the sequence to num_inits + length - 1 values by continuing
+                # the recurrence step by step. (Periodic doubling would be equivalent
+                # for pure cycles, but wrong for transient trajectories truncated at
+                # an already-seen state: the tail is not periodic.)
+                while len(seq) < num_inits + self.length - 1:
+                    seq.append(self.recurrence_fn(seq[-self.init_len:], self.p))
+
+            # Append to train/test set. Windows are always stored CLEAN;
+            # missing-value corruption is applied on the fly per batch in the
+            # collate (make_missing_collate), never baked in here.
+            for i in range(num_inits):
+                is_train = n_before + i < self.num_samples
+                target = self.train_samples if is_train else self.test_samples
+                target.append(torch.tensor(seq[i:i + self.length], dtype=torch.long))
+
+        # Shuffle sample order
+        random.shuffle(self.train_samples)
+
+        if self.verbose:
+            cov = len(self.train_samples) / state_space
+            print(f"[Dataset] Cycle traverse + sliding window: {len(self.train_samples)} + {len(self.test_samples)} samples, length {self.length}, mod {self.p}")
+            print(f"  - Initial state coverage: {len(self.train_samples)}/{state_space} ({cov*100:.1f}%)")
+            if capped:
+                print(f"  - State space subsampled (STATE_SPACE_CAP): {self.state_cap}/{state_space} initial states, one window per state")
+            if self.missing_prob > 0:
+                print(f"  - Missing-value corruption: ON THE FLY in collate (fresh randomness per "
+                      f"batch), prob={self.missing_prob}, miss_len={self.miss_len}, "
+                      f"positions >= {self.init_len}, token id {self.missing_token}")
+            print(f"Recurrence: {self.recurrence_name}")
+            print("-" * 50)
+            print("-" * 50)
+
+    def _corrupt(self, window, is_train):
+        """Return the per-position loss mask for a window, corrupting it in place.
+
+        Corruption applies to train AND test windows alike (is_train is kept
+        only for signature compatibility): the metric of interest is bridging
+        over missing tokens, which must be measurable on held-out states.
+        The mask reproduces the train_epoch default (zeros up to num_mask, ones
+        after, first_task_weight at num_mask); a corrupted token at position pos
+        additionally zeroes its prediction target at index pos-1.
+
+        Corruption model: scanning starts at init_len. During the scan each
+        position independently hits with probability missing_prob; a hit
+        corrupts a RUN of random length in [1, miss_len], the position right
+        after a run is always left clean, and scanning resumes from the
+        position after that. A run may be truncated at the end of the window.
+        If no random run in the window reaches length miss_len, the whole
+        random scan is redone until it does.
+        """
+        mask = torch.zeros(self.length - 1, dtype=torch.float)
+        if self.length - 1 > self.num_mask:
+            mask[self.num_mask:] = 1.0
+            if self.first_task_weight != 1.0:
+                mask[self.num_mask] = self.first_task_weight
+        pos = self.init_len
+        # random scan; redo until the longest random run equals miss_len
+        retries = 0
+        while True:
+            trial_w = window.clone()
+            trial_m = mask.clone()
+            max_run = 0
+            scan = pos
+            while scan < self.length:
+                if random.random() < self.missing_prob:
+                    run = random.randint(1, self.miss_len)
+                    end = min(scan + run, self.length)
+                    for q in range(scan, end):
+                        trial_w[q] = self.missing_token
+                        trial_m[q - 1] = 0.0
+                    max_run = max(max_run, end - scan)
+                    scan = end + 1  # the position right after a run stays clean
+                else:
+                    scan += 1
+            if max_run in (0, self.miss_len) or retries >= 1000:
+                window.copy_(trial_w)
+                mask.copy_(trial_m)
+                if retries >= 1000:
+                    print(f"WARNING: _corrupt gave up matching max run length "
+                          f"{self.miss_len} after {retries} retries")
+                break
+            retries += 1
+        return mask
+
+    def __len__(self):
+        data = self.train_samples if self.split == 'train' else self.test_samples
+        return len(data)
+
+    def __getitem__(self, idx):
+        data = self.train_samples if self.split == 'train' else self.test_samples
+        return data[idx]
+
+
+def corrupt_window(window, is_train, *, p, init_len, missing_prob, miss_len=1,
+                   missing_token=None):
+    """Corrupt `window` (LongTensor) in place with the dataset's missing-value
+    rule, without constructing a full dataset. Returns the missing token id.
+
+    Single source for analysis scripts that need the same corruption the
+    training data went through (see RecurrenceDataset._corrupt).
+    """
+    token = p if missing_token is None else missing_token
+    helper = RecurrenceDataset(p=p, init_len=init_len, length=len(window), verbose=False,
+                               missing_prob=missing_prob, miss_len=miss_len,
+                               missing_token=token)
+    helper._corrupt(window, is_train)
+    return token
+
+# ==================== BucketBatchSampler (group by same length) ====================
+class BucketBatchSampler(Sampler):
+    def __init__(self, dataset, batch_size, shuffle=True, reshuffle_each_epoch=False):
+        self.batch_size = batch_size
+        self.shuffle = shuffle
+        self.reshuffle_each_epoch = reshuffle_each_epoch
+        
+        # Group sample indices by sequence length
+        length_to_indices = {}
+        for i in range(len(dataset)):
+            item = dataset[i]
+            if isinstance(item, (list, tuple)):
+                length = len(item[0])
+            else:
+                length = len(item)
+            if length not in length_to_indices:
+                length_to_indices[length] = []
+            length_to_indices[length].append(i)
+        
+        # Keep immutable membership for rebuilding batches each epoch. The
+        # legacy constructor shuffle below is intentionally unchanged: toggling
+        # this option must not perturb initialization or old fixed-order runs.
+        self._length_to_indices = {length: tuple(indices)
+                                   for length, indices in length_to_indices.items()}
+        self.batches = []
+        for indices in length_to_indices.values():
+            if self.shuffle:
+                random.shuffle(indices)
+            for i in range(0, len(indices), batch_size):
+                self.batches.append(indices[i:i+batch_size])
+        
+        if self.shuffle:
+            random.shuffle(self.batches)
+
+    def __iter__(self):
+        batches = self.batches
+        if self.shuffle and self.reshuffle_each_epoch:
+            batches = []
+            for original_indices in self._length_to_indices.values():
+                indices = list(original_indices)
+                random.shuffle(indices)
+                batches.extend(indices[i:i + self.batch_size]
+                               for i in range(0, len(indices), self.batch_size))
+            random.shuffle(batches)
+        # Python's RNG is already captured by the full resume checkpoint, so
+        # resuming at an epoch boundary reproduces the next permutation.
+        for batch in batches:
+            yield batch
+
+    def __len__(self):
+        return len(self.batches)
+
+# Every collate_fn returns (x, tag, *payload); the tag tells consumers how to
+# interpret the payload. See _unpack_batch for the layout of each tag.
+# Routing is EXPLICIT: the prepare functions select the collate that matches
+# the dataset's item layout (plain tensor / (seq, mask) / (view, clean) etc.);
+# collates never guess from item types.
+class BatchTag(IntEnum):
+    MIXED_AB = 0       # payload: (ab_indices,)  -- per-sample rule index
+    LOSS_MASK = 1      # payload: (loss_mask,)   -- per-position loss mask
+    PLAIN = 2          # payload: ()             -- sequences only
+    PLAIN_TARGET = 4     # payload: (clean_seqs,) -- clean sequences; targets = clean[:, 1:]
+    MIXED_AB_TARGET = 5  # payload: (ab_indices, clean_seqs) -- rule index + clean sequences
+    ACTION_MISS = 6    # payload: (clean_seqs, loss_mask) -- action + missing (predict mode)
+    CORRUPT_FIX = 7    # payload: (target_seqs, loss_mask) -- corrupt_fix 变体；targets = target_seqs[:, 1:]，mask 仅位置/值两个输出位
+    FILL_BLANK = 8     # payload: (target_seqs, loss_mask) -- fill_blank 变体；mask 仅 EOS 槽一个输出位
+
+
+def collate_fn(batch):
+    """Plain tensor samples -> PLAIN."""
+    return torch.stack(batch, dim=0), BatchTag.PLAIN
+
+
+def _corrupt_helper(p, init_len, length, missing_prob, miss_len,
+                    num_mask=0, first_task_weight=1.0, missing_token=None):
+    """A RecurrenceDataset instance used only for its _corrupt implementation."""
+    return RecurrenceDataset(p=p, init_len=init_len, length=length, verbose=False,
+                             missing_prob=missing_prob, miss_len=miss_len,
+                             missing_token=missing_token,
+                             num_mask=num_mask, first_task_weight=first_task_weight)
+
+
+def make_missing_collate(*, p, init_len, missing_prob, miss_len=1, missing_token=None):
+    """Collate with ON-THE-FLY missing-value corruption (predict regime).
+
+    Input: a batch of CLEAN windows (plain LongTensors). Every call corrupts
+    with fresh randomness. Always predict mode: (views, PLAIN_TARGET, cleans)
+    — the loss/accuracy targets are the clean values, so corrupted positions
+    must be filled in. num_mask/first_task_weight are applied by the training
+    loop's _default_loss_mask, not here.
+    """
+    token = p if missing_token is None else missing_token
+
+    def collate(batch):
+        helper = _corrupt_helper(p, init_len, len(batch[0]), missing_prob,
+                                 miss_len, missing_token=token)
+        views, cleans = [], []
+        for seq in batch:
+            view = seq.clone()
+            helper._corrupt(view, True)
+            views.append(view)
+            cleans.append(seq)
+        return torch.stack(views), BatchTag.PLAIN_TARGET, torch.stack(cleans)
+
+    return collate
+
+
+def make_corrupt_fix_collate(*, p, eos_id, pos_base, parallel=False,
+                             body_supervision=False, body_from=0,
+                             paired_clean=False, mask_around=False,
+                             pos_weight=1.0):
+    """Collate for the corrupt_fix task variant (TASK_VARIANT='corrupt_fix').
+
+    Input: a batch of CLEAN windows (plain LongTensors, any length L), or
+    (seq, k) tuples carrying the corruption position (probe/eval use).
+    Every call corrupts with fresh randomness (train and test alike): exactly
+    ONE uniformly chosen position k in [0, L) — initial values included — is
+    replaced by a uniformly random WRONG value in [0, p) \\ {original} (a real
+    wrong value, not the missing token).
+
+    Output batch: (x, CORRUPT_FIX, target_seqs, loss_mask) with
+
+        x           = [c'(0..L-1), EOS, pos_tok(k)]      # length L+2
+        target_seqs = [c'(0..L-1), EOS, pos_tok(k), v]   # length L+3
+        loss_mask   = 1 only at the last two target positions
+
+    Under the standard targets_override convention (targets =
+    target_seqs[:, 1:]), the model predicts the position token at the EOS
+    slot and then the correct value v after the fed-back position token
+    (teacher forcing). The training loop's loss/accuracy need no changes.
+
+    parallel=True（CORRUPT_FIX_PARALLEL）：值预测看不到位置答案——输入的
+    最后一个 token 换成第二个 EOS（而非真实位置 token），位置与值两个
+    预测在同一前缀上并行产生。targets/loss_mask 与 teacher forcing 版
+    完全相同（只有 x 的末位不同）。
+
+    body_supervision=True（BODY_SUPERVISION，变体默认）：除输出位外，递推
+    主体也计入监督——target 前缀改用干净序列（predict 口径），loss_mask
+    在 [body_from, L-1) 主体区间（前 order-1 个不可预测位除外）与输出位
+    同时为 1。body_from = order-1。
+
+    paired_clean=True（CORRUPT_FIX_PAIRED_CLEAN）：配对双样本。每个裸窗口
+    产出两行：
+      ① 干净续写行：x = [clean窗]，tgt = [clean窗, EOS]，mask = 主体
+         [body_from, L-1) + EOS 槽——正确值全程暴露，续写不被污损值下毒；
+      ② 污损答题行：与标准 corrupt_fix 相同，但 mask 只留 pos/val 两槽
+         （主体监督由①承担）。
+    (seq, k) 元组（探针/逐位置评估）只产 ② 一行，保持按 k 统计语义。
+    配对模式下行长不一（L+1 vs L+3），批内统一右补齐（pad 位 mask=0，
+    对因果预测无影响）。
+
+    mask_around=True（CORRUPT_FIX_MASK_AROUND）：动态主体 mask——污损位 k
+    牵连的三个预测位 j∈{k-1, k, k+1}（分别预测 x_k / x_{k+1} / x_{k+2}，
+    输入或目标含污损值）从主体监督中剔除，续写只学干净规则。pos/val
+    两槽不受影响；训练/评估同一 collate，指标口径同步变干净（移除了
+    前缀含污损的不可约槽位，0.99 早停恢复可达）。paired_clean 下污损行
+    本无主体监督，此键无作用。
+
+    pos_weight（CORRUPT_FIX_POS_WEIGHT，默认 1.0）：pos 槽（EOS 位预测位置
+    token）的 loss 权重——mask[L]=pos_weight，加权计入 loss（acc 统计不受
+    影响，mask>0 即计入一次）。用于加大检测头的训练压力。
+    """
+    def _corrupt_row(seq, k):
+        """污损答题行（标准 corrupt_fix；paired 模式下只留 pos/val 两槽）。"""
+        L = seq.numel()
+        orig = int(seq[k])
+        wrong = random.randrange(p - 1)
+        if wrong >= orig:
+            wrong += 1  # uniform over [0, p) \ {orig}
+        view = seq.clone()
+        view[k] = wrong
+        last = eos_id if parallel else pos_base + k
+        x = torch.cat([view, torch.tensor([eos_id, last], dtype=torch.long)])
+        # targets 前缀：body_supervision 时用干净序列（主体也监督），
+        # 否则保持污损视图（历史行为，主体不进 loss 反正无所谓）。
+        sup_body = body_supervision and not paired_clean
+        base = seq if sup_body else view
+        tgt = torch.cat([base, torch.tensor([eos_id, pos_base + k, orig],
+                                            dtype=torch.long)])
+        mask = torch.zeros(L + 2, dtype=torch.float)  # aligns with tgt[:, 1:]
+        if sup_body:
+            mask[body_from:L - 1] = 1.0  # 递推主体（target i 预测 clean x_{i+1}）
+            if mask_around:
+                # 剔除污损牵连位：j 预测 x_{j+1}，j∈{k-1,k,k+1}
+                # 分别对应预测 x_k / x_{k+1} / x_{k+2}
+                for j in (k - 1, k, k + 1):
+                    if body_from <= j <= L - 2:
+                        mask[j] = 0.0
+        mask[L] = pos_weight  # EOS slot -> position token（可加权）
+        mask[L + 1] = 1.0  # position-token slot -> correct value
+        return x, tgt, mask
+
+    def _clean_row(seq):
+        """干净续写行（paired 模式专用）：无污损无答题，纯主体续写监督。"""
+        L = seq.numel()
+        tgt = torch.cat([seq, torch.tensor([eos_id], dtype=torch.long)])
+        x = tgt[:-1]
+        mask = torch.zeros(L, dtype=torch.float)  # aligns with tgt[:, 1:]
+        if body_supervision:
+            mask[body_from:L - 1] = 1.0
+        mask[L - 1] = 1.0  # EOS 槽
+        return x, tgt, mask
+
+    def collate(batch):
+        xs, targets, masks = [], [], []
+        for item in batch:
+            if isinstance(item, (list, tuple)):
+                seq, k = item[0], int(item[1])
+                xs_t = _corrupt_row(seq, k)  # 探针/评估：只产污损答题行
+                rows = [xs_t]
+            elif paired_clean:
+                k = random.randrange(item.numel())
+                rows = [_clean_row(item), _corrupt_row(item, k)]
+            else:
+                rows = [_corrupt_row(item, random.randrange(item.numel()))]
+            for x, tgt, mask in rows:
+                xs.append(x)
+                targets.append(tgt)
+                masks.append(mask)
+        if paired_clean:
+            # 行长不一（干净行 L+1 / 污损行 L+3），右补齐到批内最长；
+            # pad 在末尾且 mask=0，不影响任何真实位置的因果预测。
+            max_t = max(t.numel() for t in targets)
+
+            def _pad(t, n, val):
+                return torch.cat([t, torch.full((n - t.numel(),), val,
+                                                dtype=t.dtype)])
+            xs = [_pad(x, max_t - 1, eos_id) for x in xs]
+            targets = [_pad(t, max_t, 0) for t in targets]
+            masks = [_pad(m, max_t - 1, 0.0) for m in masks]
+        return (torch.stack(xs), BatchTag.CORRUPT_FIX,
+                torch.stack(targets), torch.stack(masks))
+
+    return collate
+
+
+def make_fill_blank_collate(*, p, eos_id, blank_id=None,
+                            body_supervision=False, body_from=0):
+    """Collate for the fill_blank task variant (TASK_VARIANT='fill_blank').
+
+    Same online single-position corruption as corrupt_fix, but the position
+    is replaced by the BLANK token (id = p, the missing token) instead of a
+    random wrong value, and the model only outputs the correct VALUE — no
+    position token (the blank marks itself).
+
+    Input items: plain LongTensors (blank position k drawn uniformly at
+    random per call) or (seq, k) tuples (k carried by the sample, used
+    verbatim — FILL_BLANK_ALL_POSITIONS mode, where the dataset enumerates
+    every position of every window).
+
+    Output batch: (x, FILL_BLANK, target_seqs, loss_mask) with
+
+        x           = [c'(0..L-1), EOS]        # length L+1
+        target_seqs = [c'(0..L-1), EOS, v]     # length L+2
+        loss_mask   = 1 only at the EOS slot (predict the correct value v)
+    """
+    blank = p if blank_id is None else blank_id
+
+    def collate(batch):
+        xs, targets, masks = [], [], []
+        for item in batch:
+            if isinstance(item, (list, tuple)):
+                seq, k = item[0], int(item[1])
+            else:
+                seq = item
+                k = random.randrange(seq.numel())
+            L = seq.numel()
+            orig = int(seq[k])
+            view = seq.clone()
+            view[k] = blank
+            x = torch.cat([view, torch.tensor([eos_id], dtype=torch.long)])
+            base = seq if body_supervision else view
+            tgt = torch.cat([base, torch.tensor([eos_id, orig], dtype=torch.long)])
+            mask = torch.zeros(L + 1, dtype=torch.float)  # aligns with tgt[:, 1:]
+            if body_supervision:
+                mask[body_from:L - 1] = 1.0  # 递推主体
+            mask[L] = 1.0  # EOS slot -> correct value
+            xs.append(x)
+            targets.append(tgt)
+            masks.append(mask)
+        return (torch.stack(xs), BatchTag.FILL_BLANK,
+                torch.stack(targets), torch.stack(masks))
+
+    return collate
+
+
+# ==================== Mixed AB Experiment (mixed training with multiple recurrence params) ====================
+
+def mixed_ab_collate_fn(batch):
+    """(seq, rule_idx) samples -> MIXED_AB."""
+    sequences = [item[0] for item in batch]
+    ab_indices = torch.tensor([item[1] for item in batch], dtype=torch.long)
+    return torch.stack(sequences, dim=0), BatchTag.MIXED_AB, ab_indices
+
+
+def make_mixed_missing_collate(*, p, order, n_rules, missing_prob, miss_len=1):
+    """Mixed-rule on-the-fly corruption (predict regime): (clean_seq, rule_idx)
+    batches -> (views, MIXED_AB_TARGET, labels, cleans). Tag mode is gone, so
+    the missing token is always plain p."""
+    token = p
+
+    def collate(batch):
+        seqs = [item[0] for item in batch]
+        labels = torch.tensor([item[1] for item in batch], dtype=torch.long)
+        helper = _corrupt_helper(p, order, len(seqs[0]), missing_prob, miss_len,
+                                 missing_token=token)
+        views, cleans = [], []
+        for seq in seqs:
+            view = seq.clone()
+            helper._corrupt(view, True)
+            views.append(view)
+            cleans.append(seq)
+        return (torch.stack(views), BatchTag.MIXED_AB_TARGET, labels,
+                torch.stack(cleans))
+
+    return collate
+
+
+def generate_action_sample(p, ab_pairs, flag_start_id, length, rng, order=2):
+    """Generate one action sequence [x1..x_order, flag, x_{order+1}, ..., flag, x_L].
+
+    rng: a random.Random instance owned by the caller (seeding decides the
+    sequence). Shared by ActionDataset and the attention analysis.
+
+    order: recurrence order (number of initial values / coefficients per
+    rule). Coefficient convention (ACTION FAMILY, opposite of
+    LinearRecurrenceRule): the first coefficient multiplies the OLDEST
+    value, i.e. x_next = sum(c_i * values[-order + i]) % p; for order=2
+    that is a*values[-2] + b*values[-1].
+    """
+    values = [rng.randrange(p) for _ in range(order)]
+    seq = list(values)
+    for _ in range(order, length):
+        rule_idx = rng.randrange(len(ab_pairs))
+        coeffs = ab_pairs[rule_idx]
+        x_next = sum(c * v for c, v in zip(coeffs, values[-order:])) % p
+        seq.append(flag_start_id + rule_idx)
+        seq.append(x_next)
+        values.append(x_next)
+
+    # Sanity check: flag positions should be >= flag_start_id, value positions < p.
+    # Layout: indices 0..order-1 are initial values, then alternating flag/value.
+    for i, tok in enumerate(seq):
+        if i >= order and (i - order) % 2 == 0:
+            assert tok >= flag_start_id, \
+                f"Position {i} should be a flag token (>= {flag_start_id}), got {tok}"
+        else:
+            assert tok < p, \
+                f"Position {i} should be a value token (< {p}), got {tok}"
+    return seq
+
+
+class ActionDataset(Dataset):
+    """Dataset where the recurrence rule can change at every step.
+
+    Input format: [x1..x_order, flag, x_{order+1}, flag, x_{order+2}, ...]
+    where flag_k indicates which rule is used to generate x_k.
+    Loss is computed only on x_{order+1}..x_L; initial values and all flags
+    are masked.
+
+    With missing_prob > 0, corruption is applied ON THE FLY in
+    make_action_missing_collate (fresh randomness per batch): samples are
+    always stored CLEAN as (seq, loss_mask) pairs.
+    """
+
+    def __init__(self, p, ab_pairs, num_samples, length, seed=0, order=2):
+        super().__init__()
+        self.p = p
+        self.ab_pairs = [tuple(pair) for pair in ab_pairs]
+        for pair in self.ab_pairs:
+            assert len(pair) == order, \
+                f"rule {pair} must have exactly order={order} coefficients"
+        self.num_ab_pairs = len(self.ab_pairs)
+        self.num_samples = num_samples
+        self.length = length
+        self.order = order
+        self.pad_token_id = p
+        self.flag_start_id = p + 1
+        self.rng = random.Random(seed)
+        self.samples = [self._generate_sample() for _ in range(num_samples)]
+
+    def _generate_sample(self):
+        """Generate one CLEAN sequence with per-step random rules.
+
+        Loss is computed only on generated values; initial values and all
+        flags are masked. Missing-value corruption happens on the fly in
+        make_action_missing_collate, never here.
+        """
+        seq = generate_action_sample(self.p, self.ab_pairs, self.flag_start_id,
+                                      self.length, self.rng, order=self.order)
+
+        # Build loss mask aligned to targets = seq[1:]. Value x_j (j >=
+        # order+1) sits at seq index 2*j - order - 1, i.e. target index
+        # 2*j - order - 2. With k = j - 1 in [order, length): 2*k - order.
+        loss_mask = torch.zeros(len(seq) - 1, dtype=torch.float)
+        for k in range(self.order, self.length):
+            target_idx = 2 * k - self.order
+            loss_mask[target_idx] = 1.0
+
+        return torch.tensor(seq, dtype=torch.long), loss_mask
+
+    def __len__(self):
+        return len(self.samples)
+
+    def __getitem__(self, idx):
+        return self.samples[idx]
+
+
+def corrupt_action_view(view, *, p, missing_prob, miss_len, order=2):
+    """Corrupt generated value positions of an action sequence in place with
+    the missing token p (flags are never corrupted). Same run model as the
+    legacy ActionDataset._corrupt_values (scan from x_{order+1}; a hit
+    corrupts a run of random length in [1, miss_len]; the value right after
+    a run stays clean; redo until the longest run equals miss_len), but
+    with fresh global randomness per call (on-the-fly regime).
+    """
+    L = (len(view) + order) // 2  # number of values: seq has order + 2*(L-order) tokens
+    retries = 0
+    while True:
+        trial = view.clone()
+        max_run = 0
+        k = order + 1
+        while k <= L:
+            if random.random() < missing_prob:
+                run = random.randint(1, miss_len)
+                end = min(k + run, L + 1)  # exclusive value index
+                for q in range(k, end):
+                    trial[2 * q - order - 1] = p
+                max_run = max(max_run, end - k)
+                k = end + 1  # the value right after a run stays clean
+            else:
+                k += 1
+        if max_run in (0, miss_len) or retries >= 1000:
+            view.copy_(trial)
+            if retries >= 1000:
+                print(f"WARNING: corrupt_action_view gave up matching max run length "
+                      f"{miss_len} after {retries} retries")
+            return
+        retries += 1
+
+
+def action_collate_fn(batch):
+    sequences = [item[0] for item in batch]
+    loss_masks = [item[1] for item in batch]
+    return torch.stack(sequences, dim=0), BatchTag.LOSS_MASK, torch.stack(loss_masks, dim=0)
+
+
+def make_action_missing_collate(*, p, missing_prob, miss_len=1, order=2):
+    """Action on-the-fly corruption: items are (clean_seq, loss_mask); every
+    batch gets fresh corruption of value positions -> (views, ACTION_MISS,
+    cleans, masks). Predict mode: loss/accuracy targets are the clean values.
+    """
+    def collate(batch):
+        seqs = [item[0] for item in batch]
+        loss_masks = torch.stack([item[1] for item in batch], dim=0)
+        views = []
+        for seq in seqs:
+            view = seq.clone()
+            corrupt_action_view(view, p=p, missing_prob=missing_prob,
+                                miss_len=miss_len, order=order)
+            views.append(view)
+        return (torch.stack(views, dim=0), BatchTag.ACTION_MISS,
+                torch.stack(seqs, dim=0), loss_masks)
+
+    return collate
+
+
+# ==================== MixedRecurrenceDataset (merged from the legacy
+# mixed-rule dataset module; its module docstring follows verbatim)
+#
+# Mixed-rule recurrence dataset.
+#
+# Generates data for several LinearRecurrenceRule rules (same modulus p, same
+# order), each with its own RecurrenceDataset cycle traversal, then concatenates
+# the per-rule samples and tags every sample with its rule index. Mirrors the
+# legacy MixedABDataset pipeline step for step (same global-random call
+# sequence), so given the same rules and the same seed the produced samples are
+# identical to the legacy implementation (kept in tests/test_mixed_ab_compat.py
+# as the golden master).
+class MixedRecurrenceDataset(Dataset):
+    """Dataset mixed from several linear recurrence rules over Z/pZ.
+
+    Samples are CLEAN (seq, rule_idx) pairs in the basic layout (no leading
+    rule flag token). The prepare function
+    (experiment._prepare_mixed_recurrence) selects the collate:
+    mixed_ab_collate_fn, or make_mixed_missing_collate when MISSING_PROB > 0
+    (on-the-fly corruption per batch; missing token id is p).
+    """
+
+    def __init__(self, rules, num_samples=1000, length=10, verbose=True):
+        assert len(rules) >= 1, "MixedRecurrenceDataset needs at least one rule"
+        self.p = rules[0].p
+        self.order = rules[0].order
+        for rule in rules:
+            assert rule.p == self.p, "all rules must share the same modulus p"
+            assert rule.order == self.order, "all rules must share the same order"
+        coeffs_list = [rule.coeffs for rule in rules]
+        assert len(set(coeffs_list)) == len(coeffs_list), \
+            "duplicate rule coeffs are not allowed"
+        self.rules = list(rules)
+        self.length = length
+        self.split = 'train'
+
+        if isinstance(num_samples, (list, tuple)):
+            num_samples_list = list(num_samples)
+        else:
+            num_samples_list = [num_samples] * len(self.rules)
+        assert len(num_samples_list) == len(self.rules), \
+            f"num_samples list length ({len(num_samples_list)}) must equal number of rules ({len(self.rules)})"
+
+        all_train, all_test = [], []
+        all_labels_train, all_labels_test = [], []
+        per_rule_stats = []
+        for idx, rule in enumerate(self.rules):
+            ds = RecurrenceDataset(
+                p=self.p, recurrence_fn=rule.next_fn(),
+                recurrence_name=rule.name, init_len=rule.order,
+                num_samples=num_samples_list[idx], length=length,
+                verbose=False,
+            )
+            ds.run()
+            train_seqs, test_seqs = ds.train_samples, ds.test_samples
+            all_train.extend(train_seqs)
+            all_test.extend(test_seqs)
+            all_labels_train.extend([idx] * len(train_seqs))
+            all_labels_test.extend([idx] * len(test_seqs))
+            per_rule_stats.append((rule, len(train_seqs), len(test_seqs)))
+
+        # One global shuffle of train (seq, rule_idx) pairs (same seed semantics
+        # as the legacy MixedABDataset).
+        train_pairs = list(zip(all_train, all_labels_train))
+        random.shuffle(train_pairs)
+        self.train_samples = [s for s, _ in train_pairs]
+        self.rule_labels_train = [l for _, l in train_pairs]
+        self.test_samples = all_test
+        self.rule_labels_test = all_labels_test
+
+        # Flat lists that can be fed directly to DataLoader / BucketBatchSampler
+        self.train_data = list(zip(self.train_samples, self.rule_labels_train))
+        self.test_data = list(zip(self.test_samples, self.rule_labels_test))
+
+        if verbose:
+            total_states = self.p ** self.order
+            print(f"[Dataset] Mixed mode: generated {len(self.train_samples)} + {len(self.test_samples)} samples, length {length}")
+            print(f"Rules: {[r.name for r in self.rules]}")
+            for rule, n_train, n_test in per_rule_stats:
+                print(f"  - {rule.name} {rule.coeffs}: train {n_train} | test {n_test} | exposed ~{n_train/total_states*100:.1f}%")
+            print("-" * 50)
+
+    def __len__(self):
+        seqs = self.train_samples if self.split == 'train' else self.test_samples
+        return len(seqs)
+
+    def __getitem__(self, idx):
+        if self.split == 'train':
+            return self.train_samples[idx], self.rule_labels_train[idx]
+        return self.test_samples[idx], self.rule_labels_test[idx]

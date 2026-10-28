@@ -1,0 +1,197 @@
+{
+ "concurrency": 1,
+ "experiments": [
+  {
+   "name": "single_o2_corruptfix_a25b56_d512l4r8h4_P127_len12_initLen11_seed42",
+   "task": "single",
+   "config": {
+    "TASK": "single",
+    "TASK_VARIANT": "corrupt_fix",
+    "ORDER": 2,
+    "P": 127,
+    "D_MODEL": 512,
+    "N_LAYER": 4,
+    "N_HEAD": 4,
+    "MLP_RATIO": 8,
+    "TRAIN_LEN": 12,
+    "OOD_LEN": 12,
+    "BODY_SUPERVISION": false,
+    "CORRUPT_FIX_VALUE_ONLY": true,
+    "INIT_FROM": "/data/cxm/models/variant_o2_corruptfix_valueonly_d512l4_P127_len11_initLen10/single_o2_corruptfix_a25b56_d512l4r8h4_P127_len11_initLen10_seed42_best.pth",
+    "EPOCHS": 3000,
+    "EVAL_INTERVAL": 5,
+    "MAX_TRAIN_HOURS": 1.0,
+    "SAVE_CHECKPOINTS": true,
+    "RANDOM_SEED": 42,
+    "LR": 0.0003,
+    "WEIGHT_DECAY": 2.0,
+    "RULES": [
+     [
+      25,
+      56
+     ]
+    ]
+   }
+  },
+  {
+   "name": "single_o2_corruptfix_a62b59_d512l4r8h4_P127_len12_initLen11_seed42",
+   "task": "single",
+   "config": {
+    "TASK": "single",
+    "TASK_VARIANT": "corrupt_fix",
+    "ORDER": 2,
+    "P": 127,
+    "D_MODEL": 512,
+    "N_LAYER": 4,
+    "N_HEAD": 4,
+    "MLP_RATIO": 8,
+    "TRAIN_LEN": 12,
+    "OOD_LEN": 12,
+    "BODY_SUPERVISION": false,
+    "CORRUPT_FIX_VALUE_ONLY": true,
+    "INIT_FROM": "/data/cxm/models/variant_o2_corruptfix_valueonly_d512l4_P127_len11_initLen10/single_o2_corruptfix_a62b59_d512l4r8h4_P127_len11_initLen10_seed42_best.pth",
+    "EPOCHS": 3000,
+    "EVAL_INTERVAL": 5,
+    "MAX_TRAIN_HOURS": 1.0,
+    "SAVE_CHECKPOINTS": true,
+    "RANDOM_SEED": 42,
+    "LR": 0.0003,
+    "WEIGHT_DECAY": 2.0,
+    "RULES": [
+     [
+      62,
+      59
+     ]
+    ]
+   }
+  },
+  {
+   "name": "single_o2_corruptfix_a56b93_d512l4r8h4_P127_len12_initLen11_seed42",
+   "task": "single",
+   "config": {
+    "TASK": "single",
+    "TASK_VARIANT": "corrupt_fix",
+    "ORDER": 2,
+    "P": 127,
+    "D_MODEL": 512,
+    "N_LAYER": 4,
+    "N_HEAD": 4,
+    "MLP_RATIO": 8,
+    "TRAIN_LEN": 12,
+    "OOD_LEN": 12,
+    "BODY_SUPERVISION": false,
+    "CORRUPT_FIX_VALUE_ONLY": true,
+    "INIT_FROM": "/data/cxm/models/variant_o2_corruptfix_valueonly_d512l4_P127_len11_initLen10/single_o2_corruptfix_a56b93_d512l4r8h4_P127_len11_initLen10_seed42_best.pth",
+    "EPOCHS": 3000,
+    "EVAL_INTERVAL": 5,
+    "MAX_TRAIN_HOURS": 1.0,
+    "SAVE_CHECKPOINTS": true,
+    "RANDOM_SEED": 42,
+    "LR": 0.0003,
+    "WEIGHT_DECAY": 2.0,
+    "RULES": [
+     [
+      56,
+      93
+     ]
+    ]
+   }
+  },
+  {
+   "name": "single_o2_corruptfix_a5b3_d512l4r8h4_P127_len12_initLen11_seed42",
+   "task": "single",
+   "config": {
+    "TASK": "single",
+    "TASK_VARIANT": "corrupt_fix",
+    "ORDER": 2,
+    "P": 127,
+    "D_MODEL": 512,
+    "N_LAYER": 4,
+    "N_HEAD": 4,
+    "MLP_RATIO": 8,
+    "TRAIN_LEN": 12,
+    "OOD_LEN": 12,
+    "BODY_SUPERVISION": false,
+    "CORRUPT_FIX_VALUE_ONLY": true,
+    "INIT_FROM": "/data/cxm/models/variant_o2_corruptfix_valueonly_d512l4_P127_len11_initLen10/single_o2_corruptfix_a5b3_d512l4r8h4_P127_len11_initLen10_seed42_best.pth",
+    "EPOCHS": 3000,
+    "EVAL_INTERVAL": 5,
+    "MAX_TRAIN_HOURS": 1.0,
+    "SAVE_CHECKPOINTS": true,
+    "RANDOM_SEED": 42,
+    "LR": 0.0003,
+    "WEIGHT_DECAY": 2.0,
+    "RULES": [
+     [
+      5,
+      3
+     ]
+    ]
+   }
+  },
+  {
+   "name": "single_o2_corruptfix_a67b65_d512l4r8h4_P127_len12_initLen11_seed42",
+   "task": "single",
+   "config": {
+    "TASK": "single",
+    "TASK_VARIANT": "corrupt_fix",
+    "ORDER": 2,
+    "P": 127,
+    "D_MODEL": 512,
+    "N_LAYER": 4,
+    "N_HEAD": 4,
+    "MLP_RATIO": 8,
+    "TRAIN_LEN": 12,
+    "OOD_LEN": 12,
+    "BODY_SUPERVISION": false,
+    "CORRUPT_FIX_VALUE_ONLY": true,
+    "INIT_FROM": "/data/cxm/models/variant_o2_corruptfix_valueonly_d512l4_P127_len11_initLen10/single_o2_corruptfix_a67b65_d512l4r8h4_P127_len11_initLen10_seed42_best.pth",
+    "EPOCHS": 3000,
+    "EVAL_INTERVAL": 5,
+    "MAX_TRAIN_HOURS": 1.0,
+    "SAVE_CHECKPOINTS": true,
+    "RANDOM_SEED": 42,
+    "LR": 0.0003,
+    "WEIGHT_DECAY": 2.0,
+    "RULES": [
+     [
+      67,
+      65
+     ]
+    ]
+   }
+  },
+  {
+   "name": "single_o2_corruptfix_a44b59_d512l4r8h4_P127_len12_initLen11_seed42",
+   "task": "single",
+   "config": {
+    "TASK": "single",
+    "TASK_VARIANT": "corrupt_fix",
+    "ORDER": 2,
+    "P": 127,
+    "D_MODEL": 512,
+    "N_LAYER": 4,
+    "N_HEAD": 4,
+    "MLP_RATIO": 8,
+    "TRAIN_LEN": 12,
+    "OOD_LEN": 12,
+    "BODY_SUPERVISION": false,
+    "CORRUPT_FIX_VALUE_ONLY": true,
+    "INIT_FROM": "/data/cxm/models/variant_o2_corruptfix_valueonly_d512l4_P127_len11_initLen10/single_o2_corruptfix_a44b59_d512l4r8h4_P127_len11_initLen10_seed42_best.pth",
+    "EPOCHS": 3000,
+    "EVAL_INTERVAL": 5,
+    "MAX_TRAIN_HOURS": 1.0,
+    "SAVE_CHECKPOINTS": true,
+    "RANDOM_SEED": 42,
+    "LR": 0.0003,
+    "WEIGHT_DECAY": 2.0,
+    "RULES": [
+     [
+      44,
+      59
+     ]
+    ]
+   }
+  }
+ ]
+}
