@@ -263,7 +263,114 @@ def test_run_experiment_fixed_pos_smoke():
         assert latest['config']['fixed_pos'] == -1
 
 
+def test_collate_corrupt_value_only():
+    # corrupt=True：BLANK 换成随机错误值，版面与 fill_blank 完全一致
+    p, eos_id, L = 7, 8, 5
+    seqs = _addition_windows(p=p, n=16, length=L)
+    clean = torch.stack(seqs)
+    for fixed in (None, -1):
+        collate = make_fill_blank_collate(p=p, eos_id=eos_id, corrupt=True,
+                                          fixed_k=fixed)
+        x, tag, targets, mask = collate(seqs)
+        assert tag == BatchTag.FILL_BLANK
+        assert x.shape == (16, L + 1) and targets.shape == (16, L + 2)
+        for i in range(16):
+            diff = (x[i, :L] != clean[i]).nonzero().flatten().tolist()
+            assert len(diff) == 1
+            k = diff[0]
+            if fixed == -1:
+                assert k == L - 1
+            wrong = int(x[i, k])
+            assert wrong != int(clean[i, k]), "corrupt value must differ from orig"
+            assert 0 <= wrong < p
+            assert int(targets[i, L + 1]) == int(clean[i, k])
+            assert mask[i].nonzero().flatten().tolist() == [L]
+
+
+def test_value_only_smoke_and_gates():
+    with tempfile.TemporaryDirectory() as tmpdir:
+        out, save_path = _run_experiment(tmpdir, {
+            'TASK_VARIANT': 'corrupt_fix', 'P': 17, 'ORDER': 1,
+            'RULES': [[1]], 'CONST': 1, 'TRAIN_LEN': 4, 'OOD_LEN': 4,
+            'CORRUPT_FIX_VALUE_ONLY': True, 'CORRUPT_FIX_FIXED_POS': -1})
+        assert os.path.exists(save_path)
+        assert 'CORRUPT_FIX_VALUE_ONLY' in out
+        latest = torch.load(os.path.splitext(save_path)[0] + '_latest.pth',
+                            weights_only=False)
+        assert latest['config']['value_only'] is True
+        assert latest['config']['fixed_pos'] == -1
+    with tempfile.TemporaryDirectory() as tmpdir:
+        try:
+            _run_experiment(tmpdir, {'TASK_VARIANT': 'corrupt_fix',
+                                     'CORRUPT_FIX_FIXED_POS': -1})
+            assert False, 'FIXED_POS without VALUE_ONLY should fail'
+        except SystemExit:
+            pass
+    with tempfile.TemporaryDirectory() as tmpdir:
+        try:
+            _run_experiment(tmpdir, {'TASK_VARIANT': 'fill_blank',
+                                     'CORRUPT_FIX_VALUE_ONLY': True})
+            assert False, 'VALUE_ONLY on fill_blank should fail'
+        except SystemExit:
+            pass
+
+
+def test_collate_last_n():
+    # last_n=2：在线污损位置只落在最后两位
+    p, eos_id, L = 7, 8, 5
+    seqs = _addition_windows(p=p, n=64, length=L)
+    collate = make_fill_blank_collate(p=p, eos_id=eos_id, corrupt=True, last_n=2)
+    clean = torch.stack(seqs)
+    seen = set()
+    for _ in range(8):
+        x, _, _, _ = collate(seqs)
+        for i in range(len(seqs)):
+            diff = (x[i, :L] != clean[i]).nonzero().flatten().tolist()
+            assert len(diff) == 1
+            k = diff[0]
+            assert k in (L - 2, L - 1), f"k={k} out of last-2 range"
+            seen.add(k)
+    assert seen == {L - 2, L - 1}
+    # 与 FIXED_POS 互斥的门
+    with tempfile.TemporaryDirectory() as tmpdir:
+        try:
+            _run_experiment(tmpdir, {'TASK_VARIANT': 'corrupt_fix',
+                                     'CORRUPT_FIX_VALUE_ONLY': True,
+                                     'CORRUPT_FIX_FIXED_POS': -1,
+                                     'CORRUPT_FIX_LAST_N': 2})
+            assert False, 'FIXED_POS + LAST_N should fail'
+        except SystemExit:
+            pass
+
+
+def test_collate_pos_set():
+    # pos_set=[0,2,4]：污损位置只在给定集合内
+    p, eos_id, L = 7, 8, 5
+    seqs = _addition_windows(p=p, n=64, length=L)
+    collate = make_fill_blank_collate(p=p, eos_id=eos_id, corrupt=True,
+                                      pos_set=[0, 2, 4])
+    clean = torch.stack(seqs)
+    seen = set()
+    for _ in range(8):
+        x, _, _, _ = collate(seqs)
+        for i in range(len(seqs)):
+            diff = (x[i, :L] != clean[i]).nonzero().flatten().tolist()
+            assert len(diff) == 1
+            k = diff[0]
+            assert k in (0, 2, 4), f"k={k} not in pos_set"
+            seen.add(k)
+    assert seen == {0, 2, 4}
+
+
 if __name__ == '__main__':
+    test_collate_pos_set()
+    print('PASS test_collate_pos_set')
+    test_collate_last_n()
+    print('PASS test_collate_last_n')
+    test_collate_corrupt_value_only()
+    print('PASS test_collate_corrupt_value_only')
+    test_value_only_smoke_and_gates()
+    print('PASS test_value_only_smoke_and_gates')
     test_collate_fixed_k()
     print('PASS test_collate_fixed_k')
     test_fixed_pos_gates()

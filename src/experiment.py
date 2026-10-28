@@ -768,7 +768,26 @@ def _prepare_single_variant(config, norm):
     body_sup = cfg.get('BODY_SUPERVISION', True)
     body_from = init_len - 1
     eos_id = P + 1
-    if variant == 'corrupt_fix':
+    if variant == 'corrupt_fix' and cfg.get('CORRUPT_FIX_VALUE_ONLY', False):
+        # VALUE_ONLY：不输出位置、只监督 EOS 真值槽（fill_blank 版面 + 污损）
+        fixed_pos = cfg.get('CORRUPT_FIX_FIXED_POS')
+        if fixed_pos is not None:
+            fixed_pos = int(fixed_pos)
+            print(f"[Variant] CORRUPT_FIX_FIXED_POS={fixed_pos}: 污损位置固定")
+        print('[Variant] CORRUPT_FIX_VALUE_ONLY: 不告知/不预测位置，'
+              '只监督 EOS 正确值（自行检测污损）')
+        collate = make_fill_blank_collate(p=P, eos_id=eos_id,
+                                          body_supervision=body_sup,
+                                          body_from=body_from,
+                                          fixed_k=fixed_pos, corrupt=True,
+                                          last_n=cfg.get('CORRUPT_FIX_LAST_N'),
+                                          pos_set=cfg.get('CORRUPT_FIX_POS_SET'))
+        vocab_size = P + 2
+        variant_save = {'eos_token_id': eos_id, 'value_only': True,
+                        'fixed_pos': fixed_pos,
+                        'last_n': cfg.get('CORRUPT_FIX_LAST_N'),
+                        'pos_set': cfg.get('CORRUPT_FIX_POS_SET')}
+    elif variant == 'corrupt_fix':
         # CORRUPT_FIX_PARALLEL：并行解码，值预测看不到位置答案（双 EOS 槽）
         parallel = cfg.get('CORRUPT_FIX_PARALLEL', False)
         # CORRUPT_FIX_PAIRED_CLEAN：配对双样本（干净窗续写 + 污损窗只答题）

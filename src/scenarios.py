@@ -154,6 +154,43 @@ def _normalize_variant(scenario, cfg):
         raise ValueError(
             "CORRUPT_FIX_PARALLEL 仅 TASK_VARIANT='corrupt_fix' 支持"
             "（并行解码：值预测看不到位置答案）")
+    if cfg.get('CORRUPT_FIX_VALUE_ONLY'):
+        if raw != 'corrupt_fix':
+            raise ValueError(
+                "CORRUPT_FIX_VALUE_ONLY 仅 TASK_VARIANT='corrupt_fix' 支持"
+                "（不输出位置，只监督 EOS 真值槽）")
+        for key in ('CORRUPT_FIX_PARALLEL', 'CORRUPT_FIX_PAIRED_CLEAN',
+                    'CORRUPT_FIX_MASK_AROUND'):
+            if cfg.get(key):
+                raise ValueError(f"{key} 与 CORRUPT_FIX_VALUE_ONLY 互斥")
+        if cfg.get('CORRUPT_FIX_POS_WEIGHT', 1.0) != 1.0:
+            raise ValueError("CORRUPT_FIX_VALUE_ONLY 无位置槽，POS_WEIGHT 无意义")
+    if cfg.get('CORRUPT_FIX_FIXED_POS') is not None:
+        if not cfg.get('CORRUPT_FIX_VALUE_ONLY'):
+            raise ValueError(
+                "CORRUPT_FIX_FIXED_POS 仅 CORRUPT_FIX_VALUE_ONLY 下支持"
+                "（固定污损位置，-1 = 最后一位）")
+    if cfg.get('CORRUPT_FIX_LAST_N') is not None:
+        if not cfg.get('CORRUPT_FIX_VALUE_ONLY'):
+            raise ValueError(
+                "CORRUPT_FIX_LAST_N 仅 CORRUPT_FIX_VALUE_ONLY 下支持"
+                "（污损位置限制在最后 N 位）")
+        if cfg.get('CORRUPT_FIX_FIXED_POS') is not None:
+            raise ValueError(
+                "CORRUPT_FIX_LAST_N 与 CORRUPT_FIX_FIXED_POS 互斥")
+        if int(cfg['CORRUPT_FIX_LAST_N']) < 1:
+            raise ValueError("CORRUPT_FIX_LAST_N 必须 >= 1")
+    if cfg.get('CORRUPT_FIX_POS_SET') is not None:
+        if not cfg.get('CORRUPT_FIX_VALUE_ONLY'):
+            raise ValueError(
+                "CORRUPT_FIX_POS_SET 仅 CORRUPT_FIX_VALUE_ONLY 下支持"
+                "（污损位置限定为给定列表）")
+        if (cfg.get('CORRUPT_FIX_FIXED_POS') is not None
+                or cfg.get('CORRUPT_FIX_LAST_N') is not None):
+            raise ValueError(
+                "CORRUPT_FIX_POS_SET 与 FIXED_POS / LAST_N 互斥")
+        if not cfg['CORRUPT_FIX_POS_SET']:
+            raise ValueError("CORRUPT_FIX_POS_SET 不能为空列表")
     if cfg.get('CORRUPT_FIX_PAIRED_CLEAN'):
         if raw != 'corrupt_fix':
             raise ValueError(

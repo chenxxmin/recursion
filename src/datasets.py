@@ -591,7 +591,8 @@ def make_corrupt_fix_collate(*, p, eos_id, pos_base, parallel=False,
 
 
 def make_fill_blank_collate(*, p, eos_id, blank_id=None,
-                            body_supervision=False, body_from=0, fixed_k=None):
+                            body_supervision=False, body_from=0, fixed_k=None,
+                            corrupt=False, last_n=None, pos_set=None):
     """Collate for the fill_blank task variant (TASK_VARIANT='fill_blank').
 
     Same online single-position corruption as corrupt_fix, but the position
@@ -610,6 +611,10 @@ def make_fill_blank_collate(*, p, eos_id, blank_id=None,
         x           = [c'(0..L-1), EOS]        # length L+1
         target_seqs = [c'(0..L-1), EOS, v]     # length L+2
         loss_mask   = 1 only at the EOS slot (predict the correct value v)
+
+    corrupt=True 时（CORRUPT_FIX_VALUE_ONLY）：把 BLANK 替换为一个随机错误值
+    （≠ 真值），不告知错误位置、也不输出位置 token；版面与填空完全一致，
+    模型需自行检测污损并给出正确值。
     """
     blank = p if blank_id is None else blank_id
 
@@ -622,14 +627,23 @@ def make_fill_blank_collate(*, p, eos_id, blank_id=None,
                 seq = item
                 L0 = seq.numel()
                 if fixed_k is None:
-                    k = random.randrange(L0)
+                    if pos_set is not None:
+                        k = pos_set[random.randrange(len(pos_set))]
+                        assert 0 <= k < L0, f"pos_set {pos_set} 含越界位置 (L={L0})"
+                    elif last_n is not None:
+                        k = random.randrange(max(0, L0 - last_n), L0)
+                    else:
+                        k = random.randrange(L0)
                 else:
                     k = fixed_k if fixed_k >= 0 else L0 + fixed_k
                     assert 0 <= k < L0, f"fixed_k={fixed_k} out of range for L={L0}"
             L = seq.numel()
             orig = int(seq[k])
             view = seq.clone()
-            view[k] = blank
+            if corrupt:
+                view[k] = (orig + 1 + random.randrange(p - 1)) % p
+            else:
+                view[k] = blank
             x = torch.cat([view, torch.tensor([eos_id], dtype=torch.long)])
             base = seq if body_supervision else view
             tgt = torch.cat([base, torch.tensor([eos_id, orig], dtype=torch.long)])
