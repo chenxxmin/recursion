@@ -35,36 +35,23 @@ def series(logdir, coef):
     return eps, accs
 
 
-fig, axes = plt.subplots(2, 3, figsize=(18, 8), sharex=True, sharey=True)
+fig, axes = plt.subplots(1, 5, figsize=(22, 4.2), sharex=False, sharey=True)
 axes = axes.flatten()
 for i, (title, logdir) in enumerate(GROUPS):
     ax = axes[i]
     for coef, color in zip(COEFS, COLORS):
         eps, accs = series(logdir, coef)
-        if title.startswith('len5~8 warm'):
-            # 全部在 epoch 0 附近收敛，用 stem 分开显示 6 个系数
-            x = COEFS.index(coef) * 2
-            acc = accs[-1] if accs else 0.0
-            ax.stem([x], [acc], linefmt=color, markerfmt='o', basefmt=' ')
-            ax.text(x, acc - 6, coef, rotation=90, fontsize=8,
-                    color=color, ha='center')
-        else:
-            ax.plot(eps, accs, color=color, lw=1.1, marker='.', ms=2.5, label=coef)
-    if title.startswith('len5~8 warm'):
-        ax.set_xlim(-2, 12)
-        ax.set_xticks([])
+        ax.plot(eps, accs, color=color, lw=1.1, marker='.', ms=3, label=coef)
     ax.set_title(title, fontsize=11)
     ax.set_ylim(0, 102)
     ax.grid(alpha=0.3)
-    if i % 3 == 0:
+    if i == 0:
         ax.set_ylabel('test acc (%)')
-    if i >= 3:
-        ax.set_xlabel('epoch')
-axes[5].axis('off')
+    ax.set_xlabel('epoch')
 handles, labels = axes[0].get_legend_handles_labels()
 fig.legend(handles, labels, loc='center right', fontsize=10, title='coefficients')
 fig.suptitle('fill_blank: test accuracy by coefficient (6 groups)', fontsize=14)
 fig.tight_layout(rect=(0, 0, 0.93, 0.96))
-out = 'plots/fillblank_5groups_testacc.png'
+out = 'plots/fillblank_5groups_testacc_v2.png'
 fig.savefig(out, dpi=150)
 print('saved', out)
