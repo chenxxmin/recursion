@@ -1,0 +1,397 @@
+静态实验计划:
+  L= 8: blanks=8, blank-relative=26, baseline=1024, perturbations=6656, ckpt=/data/cxm/models/variant_o2_fillblank_noaux_randpos_d512l4_P127_len8_wd2_initLen35/single_o2_fillblank_a25b56_d512l4r8h4_P127_len8_randpos_noaux_lr0.0003_wd2_initLen35_seed42_best.pth
+  L=16: blanks=16, blank-relative=58, baseline=2048, perturbations=14848, ckpt=/data/cxm/models/variant_o2_fillblank_noaux_randpos_d512l4_P127_len16_wd2_initLen15/single_o2_fillblank_a25b56_d512l4r8h4_P127_len16_randpos_noaux_lr0.0003_wd2_initLen15_seed42_best.pth
+  L=24: blanks=24, blank-relative=90, baseline=3072, perturbations=23040, ckpt=/data/cxm/models/variant_o2_fillblank_noaux_randpos_d512l4_P127_len24_wd2_initLen23/single_o2_fillblank_a25b56_d512l4r8h4_P127_len24_randpos_noaux_lr0.0003_wd2_initLen23_seed42_best.pth
+  L=32: blanks=32, blank-relative=122, baseline=4096, perturbations=31232, ckpt=/data/cxm/models/variant_o2_fillblank_noaux_randpos_d512l4_P127_len32_wd2_initLen31/single_o2_fillblank_a25b56_d512l4r8h4_P127_len32_randpos_noaux_lr0.0003_wd2_initLen31_seed42_best.pth
+  L=40: blanks=40, blank-relative=154, baseline=5120, perturbations=39424, ckpt=/data/cxm/models/variant_o2_fillblank_noaux_randpos_d512l4_P127_len40_wd2_initLen39/single_o2_fillblank_a25b56_d512l4r8h4_P127_len40_randpos_noaux_lr0.0003_wd2_initLen39_seed42_best.pth
+  L=48: blanks=48, blank-relative=186, baseline=6144, perturbations=47616, ckpt=/data/cxm/models/variant_o2_fillblank_noaux_randpos_d512l4_P127_len48_wd2_initLen47/single_o2_fillblank_a25b56_d512l4r8h4_P127_len48_randpos_noaux_lr0.0003_wd2_initLen47_seed42_best.pth
+  L=56: blanks=56, blank-relative=218, baseline=7168, perturbations=55808, ckpt=/data/cxm/models/variant_o2_fillblank_noaux_randpos_d512l4_P127_len56_wd2_initLen55/single_o2_fillblank_a25b56_d512l4r8h4_P127_len56_randpos_noaux_lr0.0003_wd2_initLen55_seed42_best.pth
+  L=64: blanks=64, blank-relative=250, baseline=8192, perturbations=64000, ckpt=/data/cxm/models/variant_o2_fillblank_noaux_randpos_d512l4_P127_len64_wd2_initLen63/single_o2_fillblank_a25b56_d512l4r8h4_P127_len64_randpos_noaux_lr0.0003_wd2_initLen63_seed42_best.pth
+  合计: {'n_lengths': 8, 'n_blanks': 288, 'n_blank_relative': 1104, 'n_baseline_predictions': 36864, 'n_perturbations': 282624}
+
+==============================================================================
+[L=8] 加载 /data/cxm/models/variant_o2_fillblank_noaux_randpos_d512l4_P127_len8_wd2_initLen35/single_o2_fillblank_a25b56_d512l4r8h4_P127_len8_randpos_noaux_lr0.0003_wd2_initLen35_seed42_best.pth
+[L=8] held-out=4839, 固定窗口=128, candidates={'b': 56, 'a': 25, "-a'b": 13, "a'": 61, "-b'a": 88, "b'": 93, '0': 0}
+  L=8 k= 0 left_boundary   baseline=116/128, eligible=116, bases=32, relatives=2
+  L=8 k= 1 left_inner      baseline=126/128, eligible=126, bases=32, relatives=3
+  L=8 k= 2 interior        baseline=128/128, eligible=128, bases=32, relatives=4
+  L=8 k= 3 interior        baseline=128/128, eligible=128, bases=32, relatives=4
+  L=8 k= 4 interior        baseline=128/128, eligible=128, bases=32, relatives=4
+  L=8 k= 5 interior        baseline=128/128, eligible=128, bases=32, relatives=4
+  L=8 k= 6 right_inner     baseline=128/128, eligible=128, bases=32, relatives=3
+  L=8 k= 7 right_boundary  baseline=127/128, eligible=127, bases=32, relatives=2
+[L=8] 完成；释放模型。
+
+==============================================================================
+[L=16] 加载 /data/cxm/models/variant_o2_fillblank_noaux_randpos_d512l4_P127_len16_wd2_initLen15/single_o2_fillblank_a25b56_d512l4r8h4_P127_len16_randpos_noaux_lr0.0003_wd2_initLen15_seed42_best.pth
+[L=16] held-out=4839, 固定窗口=128, candidates={'b': 56, 'a': 25, "-a'b": 13, "a'": 61, "-b'a": 88, "b'": 93, '0': 0}
+  L=16 k= 0 left_boundary   baseline=125/128, eligible=125, bases=32, relatives=2
+  L=16 k= 1 left_inner      baseline=127/128, eligible=127, bases=32, relatives=3
+  L=16 k= 2 interior        baseline=128/128, eligible=128, bases=32, relatives=4
+  L=16 k= 3 interior        baseline=128/128, eligible=128, bases=32, relatives=4
+  L=16 k= 4 interior        baseline=128/128, eligible=128, bases=32, relatives=4
+  L=16 k= 5 interior        baseline=128/128, eligible=128, bases=32, relatives=4
+  L=16 k= 6 interior        baseline=128/128, eligible=128, bases=32, relatives=4
+  L=16 k= 7 interior        baseline=128/128, eligible=128, bases=32, relatives=4
+  L=16 k= 8 interior        baseline=128/128, eligible=128, bases=32, relatives=4
+  L=16 k= 9 interior        baseline=128/128, eligible=128, bases=32, relatives=4
+  L=16 k=10 interior        baseline=128/128, eligible=128, bases=32, relatives=4
+  L=16 k=11 interior        baseline=128/128, eligible=128, bases=32, relatives=4
+  L=16 k=12 interior        baseline=128/128, eligible=128, bases=32, relatives=4
+  L=16 k=13 interior        baseline=128/128, eligible=128, bases=32, relatives=4
+  L=16 k=14 right_inner     baseline=128/128, eligible=128, bases=32, relatives=3
+  L=16 k=15 right_boundary  baseline=127/128, eligible=127, bases=32, relatives=2
+[L=16] 完成；释放模型。
+
+==============================================================================
+[L=24] 加载 /data/cxm/models/variant_o2_fillblank_noaux_randpos_d512l4_P127_len24_wd2_initLen23/single_o2_fillblank_a25b56_d512l4r8h4_P127_len24_randpos_noaux_lr0.0003_wd2_initLen23_seed42_best.pth
+[L=24] held-out=4839, 固定窗口=128, candidates={'b': 56, 'a': 25, "-a'b": 13, "a'": 61, "-b'a": 88, "b'": 93, '0': 0}
+  L=24 k= 0 left_boundary   baseline=121/128, eligible=121, bases=32, relatives=2
+  L=24 k= 1 left_inner      baseline=127/128, eligible=127, bases=32, relatives=3
+  L=24 k= 2 interior        baseline=128/128, eligible=128, bases=32, relatives=4
+  L=24 k= 3 interior        baseline=128/128, eligible=128, bases=32, relatives=4
+  L=24 k= 4 interior        baseline=128/128, eligible=128, bases=32, relatives=4
+  L=24 k= 5 interior        baseline=128/128, eligible=128, bases=32, relatives=4
+  L=24 k= 6 interior        baseline=128/128, eligible=128, bases=32, relatives=4
+  L=24 k= 7 interior        baseline=128/128, eligible=128, bases=32, relatives=4
+  L=24 k= 8 interior        baseline=128/128, eligible=128, bases=32, relatives=4
+  L=24 k= 9 interior        baseline=128/128, eligible=128, bases=32, relatives=4
+  L=24 k=10 interior        baseline=128/128, eligible=128, bases=32, relatives=4
+  L=24 k=11 interior        baseline=128/128, eligible=128, bases=32, relatives=4
+  L=24 k=12 interior        baseline=128/128, eligible=128, bases=32, relatives=4
+  L=24 k=13 interior        baseline=128/128, eligible=128, bases=32, relatives=4
+  L=24 k=14 interior        baseline=128/128, eligible=128, bases=32, relatives=4
+  L=24 k=15 interior        baseline=128/128, eligible=128, bases=32, relatives=4
+  L=24 k=16 interior        baseline=128/128, eligible=128, bases=32, relatives=4
+  L=24 k=17 interior        baseline=128/128, eligible=128, bases=32, relatives=4
+  L=24 k=18 interior        baseline=128/128, eligible=128, bases=32, relatives=4
+  L=24 k=19 interior        baseline=128/128, eligible=128, bases=32, relatives=4
+  L=24 k=20 interior        baseline=128/128, eligible=128, bases=32, relatives=4
+  L=24 k=21 interior        baseline=128/128, eligible=128, bases=32, relatives=4
+  L=24 k=22 right_inner     baseline=127/128, eligible=127, bases=32, relatives=3
+  L=24 k=23 right_boundary  baseline=125/128, eligible=125, bases=32, relatives=2
+[L=24] 完成；释放模型。
+
+==============================================================================
+[L=32] 加载 /data/cxm/models/variant_o2_fillblank_noaux_randpos_d512l4_P127_len32_wd2_initLen31/single_o2_fillblank_a25b56_d512l4r8h4_P127_len32_randpos_noaux_lr0.0003_wd2_initLen31_seed42_best.pth
+[L=32] held-out=4839, 固定窗口=128, candidates={'b': 56, 'a': 25, "-a'b": 13, "a'": 61, "-b'a": 88, "b'": 93, '0': 0}
+  L=32 k= 0 left_boundary   baseline=120/128, eligible=120, bases=32, relatives=2
+  L=32 k= 1 left_inner      baseline=127/128, eligible=127, bases=32, relatives=3
+  L=32 k= 2 interior        baseline=128/128, eligible=128, bases=32, relatives=4
+  L=32 k= 3 interior        baseline=128/128, eligible=128, bases=32, relatives=4
+  L=32 k= 4 interior        baseline=128/128, eligible=128, bases=32, relatives=4
+  L=32 k= 5 interior        baseline=128/128, eligible=128, bases=32, relatives=4
+  L=32 k= 6 interior        baseline=128/128, eligible=128, bases=32, relatives=4
+  L=32 k= 7 interior        baseline=128/128, eligible=128, bases=32, relatives=4
+  L=32 k= 8 interior        baseline=128/128, eligible=128, bases=32, relatives=4
+  L=32 k= 9 interior        baseline=128/128, eligible=128, bases=32, relatives=4
+  L=32 k=10 interior        baseline=128/128, eligible=128, bases=32, relatives=4
+  L=32 k=11 interior        baseline=128/128, eligible=128, bases=32, relatives=4
+  L=32 k=12 interior        baseline=128/128, eligible=128, bases=32, relatives=4
+  L=32 k=13 interior        baseline=128/128, eligible=128, bases=32, relatives=4
+  L=32 k=14 interior        baseline=128/128, eligible=128, bases=32, relatives=4
+  L=32 k=15 interior        baseline=128/128, eligible=128, bases=32, relatives=4
+  L=32 k=16 interior        baseline=128/128, eligible=128, bases=32, relatives=4
+  L=32 k=17 interior        baseline=128/128, eligible=128, bases=32, relatives=4
+  L=32 k=18 interior        baseline=128/128, eligible=128, bases=32, relatives=4
+  L=32 k=19 interior        baseline=128/128, eligible=128, bases=32, relatives=4
+  L=32 k=20 interior        baseline=128/128, eligible=128, bases=32, relatives=4
+  L=32 k=21 interior        baseline=128/128, eligible=128, bases=32, relatives=4
+  L=32 k=22 interior        baseline=128/128, eligible=128, bases=32, relatives=4
+  L=32 k=23 interior        baseline=128/128, eligible=128, bases=32, relatives=4
+  L=32 k=24 interior        baseline=128/128, eligible=128, bases=32, relatives=4
+  L=32 k=25 interior        baseline=128/128, eligible=128, bases=32, relatives=4
+  L=32 k=26 interior        baseline=128/128, eligible=128, bases=32, relatives=4
+  L=32 k=27 interior        baseline=128/128, eligible=128, bases=32, relatives=4
+  L=32 k=28 interior        baseline=128/128, eligible=128, bases=32, relatives=4
+  L=32 k=29 interior        baseline=128/128, eligible=128, bases=32, relatives=4
+  L=32 k=30 right_inner     baseline=128/128, eligible=128, bases=32, relatives=3
+  L=32 k=31 right_boundary  baseline=128/128, eligible=128, bases=32, relatives=2
+[L=32] 完成；释放模型。
+
+==============================================================================
+[L=40] 加载 /data/cxm/models/variant_o2_fillblank_noaux_randpos_d512l4_P127_len40_wd2_initLen39/single_o2_fillblank_a25b56_d512l4r8h4_P127_len40_randpos_noaux_lr0.0003_wd2_initLen39_seed42_best.pth
+[L=40] held-out=4839, 固定窗口=128, candidates={'b': 56, 'a': 25, "-a'b": 13, "a'": 61, "-b'a": 88, "b'": 93, '0': 0}
+  L=40 k= 0 left_boundary   baseline=120/128, eligible=120, bases=32, relatives=2
+  L=40 k= 1 left_inner      baseline=127/128, eligible=127, bases=32, relatives=3
+  L=40 k= 2 interior        baseline=128/128, eligible=128, bases=32, relatives=4
+  L=40 k= 3 interior        baseline=128/128, eligible=128, bases=32, relatives=4
+  L=40 k= 4 interior        baseline=128/128, eligible=128, bases=32, relatives=4
+  L=40 k= 5 interior        baseline=128/128, eligible=128, bases=32, relatives=4
+  L=40 k= 6 interior        baseline=128/128, eligible=128, bases=32, relatives=4
+  L=40 k= 7 interior        baseline=128/128, eligible=128, bases=32, relatives=4
+  L=40 k= 8 interior        baseline=128/128, eligible=128, bases=32, relatives=4
+  L=40 k= 9 interior        baseline=128/128, eligible=128, bases=32, relatives=4
+  L=40 k=10 interior        baseline=128/128, eligible=128, bases=32, relatives=4
+  L=40 k=11 interior        baseline=128/128, eligible=128, bases=32, relatives=4
+  L=40 k=12 interior        baseline=128/128, eligible=128, bases=32, relatives=4
+  L=40 k=13 interior        baseline=128/128, eligible=128, bases=32, relatives=4
+  L=40 k=14 interior        baseline=128/128, eligible=128, bases=32, relatives=4
+  L=40 k=15 interior        baseline=128/128, eligible=128, bases=32, relatives=4
+  L=40 k=16 interior        baseline=128/128, eligible=128, bases=32, relatives=4
+  L=40 k=17 interior        baseline=128/128, eligible=128, bases=32, relatives=4
+  L=40 k=18 interior        baseline=128/128, eligible=128, bases=32, relatives=4
+  L=40 k=19 interior        baseline=128/128, eligible=128, bases=32, relatives=4
+  L=40 k=20 interior        baseline=128/128, eligible=128, bases=32, relatives=4
+  L=40 k=21 interior        baseline=128/128, eligible=128, bases=32, relatives=4
+  L=40 k=22 interior        baseline=128/128, eligible=128, bases=32, relatives=4
+  L=40 k=23 interior        baseline=128/128, eligible=128, bases=32, relatives=4
+  L=40 k=24 interior        baseline=128/128, eligible=128, bases=32, relatives=4
+  L=40 k=25 interior        baseline=128/128, eligible=128, bases=32, relatives=4
+  L=40 k=26 interior        baseline=128/128, eligible=128, bases=32, relatives=4
+  L=40 k=27 interior        baseline=128/128, eligible=128, bases=32, relatives=4
+  L=40 k=28 interior        baseline=128/128, eligible=128, bases=32, relatives=4
+  L=40 k=29 interior        baseline=128/128, eligible=128, bases=32, relatives=4
+  L=40 k=30 interior        baseline=128/128, eligible=128, bases=32, relatives=4
+  L=40 k=31 interior        baseline=128/128, eligible=128, bases=32, relatives=4
+  L=40 k=32 interior        baseline=128/128, eligible=128, bases=32, relatives=4
+  L=40 k=33 interior        baseline=128/128, eligible=128, bases=32, relatives=4
+  L=40 k=34 interior        baseline=128/128, eligible=128, bases=32, relatives=4
+  L=40 k=35 interior        baseline=128/128, eligible=128, bases=32, relatives=4
+  L=40 k=36 interior        baseline=128/128, eligible=128, bases=32, relatives=4
+  L=40 k=37 interior        baseline=128/128, eligible=128, bases=32, relatives=4
+  L=40 k=38 right_inner     baseline=128/128, eligible=128, bases=32, relatives=3
+  L=40 k=39 right_boundary  baseline=127/128, eligible=127, bases=32, relatives=2
+[L=40] 完成；释放模型。
+
+==============================================================================
+[L=48] 加载 /data/cxm/models/variant_o2_fillblank_noaux_randpos_d512l4_P127_len48_wd2_initLen47/single_o2_fillblank_a25b56_d512l4r8h4_P127_len48_randpos_noaux_lr0.0003_wd2_initLen47_seed42_best.pth
+[L=48] held-out=4839, 固定窗口=128, candidates={'b': 56, 'a': 25, "-a'b": 13, "a'": 61, "-b'a": 88, "b'": 93, '0': 0}
+  L=48 k= 0 left_boundary   baseline=113/128, eligible=113, bases=32, relatives=2
+  L=48 k= 1 left_inner      baseline=127/128, eligible=127, bases=32, relatives=3
+  L=48 k= 2 interior        baseline=128/128, eligible=128, bases=32, relatives=4
+  L=48 k= 3 interior        baseline=128/128, eligible=128, bases=32, relatives=4
+  L=48 k= 4 interior        baseline=128/128, eligible=128, bases=32, relatives=4
+  L=48 k= 5 interior        baseline=128/128, eligible=128, bases=32, relatives=4
+  L=48 k= 6 interior        baseline=128/128, eligible=128, bases=32, relatives=4
+  L=48 k= 7 interior        baseline=128/128, eligible=128, bases=32, relatives=4
+  L=48 k= 8 interior        baseline=128/128, eligible=128, bases=32, relatives=4
+  L=48 k= 9 interior        baseline=128/128, eligible=128, bases=32, relatives=4
+  L=48 k=10 interior        baseline=128/128, eligible=128, bases=32, relatives=4
+  L=48 k=11 interior        baseline=128/128, eligible=128, bases=32, relatives=4
+  L=48 k=12 interior        baseline=128/128, eligible=128, bases=32, relatives=4
+  L=48 k=13 interior        baseline=128/128, eligible=128, bases=32, relatives=4
+  L=48 k=14 interior        baseline=128/128, eligible=128, bases=32, relatives=4
+  L=48 k=15 interior        baseline=128/128, eligible=128, bases=32, relatives=4
+  L=48 k=16 interior        baseline=128/128, eligible=128, bases=32, relatives=4
+  L=48 k=17 interior        baseline=128/128, eligible=128, bases=32, relatives=4
+  L=48 k=18 interior        baseline=128/128, eligible=128, bases=32, relatives=4
+  L=48 k=19 interior        baseline=128/128, eligible=128, bases=32, relatives=4
+  L=48 k=20 interior        baseline=128/128, eligible=128, bases=32, relatives=4
+  L=48 k=21 interior        baseline=128/128, eligible=128, bases=32, relatives=4
+  L=48 k=22 interior        baseline=128/128, eligible=128, bases=32, relatives=4
+  L=48 k=23 interior        baseline=128/128, eligible=128, bases=32, relatives=4
+  L=48 k=24 interior        baseline=128/128, eligible=128, bases=32, relatives=4
+  L=48 k=25 interior        baseline=128/128, eligible=128, bases=32, relatives=4
+  L=48 k=26 interior        baseline=128/128, eligible=128, bases=32, relatives=4
+  L=48 k=27 interior        baseline=128/128, eligible=128, bases=32, relatives=4
+  L=48 k=28 interior        baseline=128/128, eligible=128, bases=32, relatives=4
+  L=48 k=29 interior        baseline=128/128, eligible=128, bases=32, relatives=4
+  L=48 k=30 interior        baseline=128/128, eligible=128, bases=32, relatives=4
+  L=48 k=31 interior        baseline=128/128, eligible=128, bases=32, relatives=4
+  L=48 k=32 interior        baseline=128/128, eligible=128, bases=32, relatives=4
+  L=48 k=33 interior        baseline=128/128, eligible=128, bases=32, relatives=4
+  L=48 k=34 interior        baseline=128/128, eligible=128, bases=32, relatives=4
+  L=48 k=35 interior        baseline=128/128, eligible=128, bases=32, relatives=4
+  L=48 k=36 interior        baseline=128/128, eligible=128, bases=32, relatives=4
+  L=48 k=37 interior        baseline=128/128, eligible=128, bases=32, relatives=4
+  L=48 k=38 interior        baseline=128/128, eligible=128, bases=32, relatives=4
+  L=48 k=39 interior        baseline=128/128, eligible=128, bases=32, relatives=4
+  L=48 k=40 interior        baseline=128/128, eligible=128, bases=32, relatives=4
+  L=48 k=41 interior        baseline=128/128, eligible=128, bases=32, relatives=4
+  L=48 k=42 interior        baseline=128/128, eligible=128, bases=32, relatives=4
+  L=48 k=43 interior        baseline=128/128, eligible=128, bases=32, relatives=4
+  L=48 k=44 interior        baseline=128/128, eligible=128, bases=32, relatives=4
+  L=48 k=45 interior        baseline=128/128, eligible=128, bases=32, relatives=4
+  L=48 k=46 right_inner     baseline=128/128, eligible=128, bases=32, relatives=3
+  L=48 k=47 right_boundary  baseline=127/128, eligible=127, bases=32, relatives=2
+[L=48] 完成；释放模型。
+
+==============================================================================
+[L=56] 加载 /data/cxm/models/variant_o2_fillblank_noaux_randpos_d512l4_P127_len56_wd2_initLen55/single_o2_fillblank_a25b56_d512l4r8h4_P127_len56_randpos_noaux_lr0.0003_wd2_initLen55_seed42_best.pth
+[L=56] held-out=4839, 固定窗口=128, candidates={'b': 56, 'a': 25, "-a'b": 13, "a'": 61, "-b'a": 88, "b'": 93, '0': 0}
+  L=56 k= 0 left_boundary   baseline=107/128, eligible=107, bases=32, relatives=2
+  L=56 k= 1 left_inner      baseline=127/128, eligible=127, bases=32, relatives=3
+  L=56 k= 2 interior        baseline=128/128, eligible=128, bases=32, relatives=4
+  L=56 k= 3 interior        baseline=128/128, eligible=128, bases=32, relatives=4
+  L=56 k= 4 interior        baseline=128/128, eligible=128, bases=32, relatives=4
+  L=56 k= 5 interior        baseline=128/128, eligible=128, bases=32, relatives=4
+  L=56 k= 6 interior        baseline=128/128, eligible=128, bases=32, relatives=4
+  L=56 k= 7 interior        baseline=128/128, eligible=128, bases=32, relatives=4
+  L=56 k= 8 interior        baseline=128/128, eligible=128, bases=32, relatives=4
+  L=56 k= 9 interior        baseline=128/128, eligible=128, bases=32, relatives=4
+  L=56 k=10 interior        baseline=128/128, eligible=128, bases=32, relatives=4
+  L=56 k=11 interior        baseline=128/128, eligible=128, bases=32, relatives=4
+  L=56 k=12 interior        baseline=128/128, eligible=128, bases=32, relatives=4
+  L=56 k=13 interior        baseline=128/128, eligible=128, bases=32, relatives=4
+  L=56 k=14 interior        baseline=128/128, eligible=128, bases=32, relatives=4
+  L=56 k=15 interior        baseline=128/128, eligible=128, bases=32, relatives=4
+  L=56 k=16 interior        baseline=128/128, eligible=128, bases=32, relatives=4
+  L=56 k=17 interior        baseline=128/128, eligible=128, bases=32, relatives=4
+  L=56 k=18 interior        baseline=128/128, eligible=128, bases=32, relatives=4
+  L=56 k=19 interior        baseline=128/128, eligible=128, bases=32, relatives=4
+  L=56 k=20 interior        baseline=128/128, eligible=128, bases=32, relatives=4
+  L=56 k=21 interior        baseline=128/128, eligible=128, bases=32, relatives=4
+  L=56 k=22 interior        baseline=128/128, eligible=128, bases=32, relatives=4
+  L=56 k=23 interior        baseline=128/128, eligible=128, bases=32, relatives=4
+  L=56 k=24 interior        baseline=128/128, eligible=128, bases=32, relatives=4
+  L=56 k=25 interior        baseline=128/128, eligible=128, bases=32, relatives=4
+  L=56 k=26 interior        baseline=128/128, eligible=128, bases=32, relatives=4
+  L=56 k=27 interior        baseline=128/128, eligible=128, bases=32, relatives=4
+  L=56 k=28 interior        baseline=128/128, eligible=128, bases=32, relatives=4
+  L=56 k=29 interior        baseline=128/128, eligible=128, bases=32, relatives=4
+  L=56 k=30 interior        baseline=128/128, eligible=128, bases=32, relatives=4
+  L=56 k=31 interior        baseline=128/128, eligible=128, bases=32, relatives=4
+  L=56 k=32 interior        baseline=128/128, eligible=128, bases=32, relatives=4
+  L=56 k=33 interior        baseline=128/128, eligible=128, bases=32, relatives=4
+  L=56 k=34 interior        baseline=128/128, eligible=128, bases=32, relatives=4
+  L=56 k=35 interior        baseline=128/128, eligible=128, bases=32, relatives=4
+  L=56 k=36 interior        baseline=128/128, eligible=128, bases=32, relatives=4
+  L=56 k=37 interior        baseline=128/128, eligible=128, bases=32, relatives=4
+  L=56 k=38 interior        baseline=128/128, eligible=128, bases=32, relatives=4
+  L=56 k=39 interior        baseline=128/128, eligible=128, bases=32, relatives=4
+  L=56 k=40 interior        baseline=128/128, eligible=128, bases=32, relatives=4
+  L=56 k=41 interior        baseline=128/128, eligible=128, bases=32, relatives=4
+  L=56 k=42 interior        baseline=128/128, eligible=128, bases=32, relatives=4
+  L=56 k=43 interior        baseline=128/128, eligible=128, bases=32, relatives=4
+  L=56 k=44 interior        baseline=128/128, eligible=128, bases=32, relatives=4
+  L=56 k=45 interior        baseline=128/128, eligible=128, bases=32, relatives=4
+  L=56 k=46 interior        baseline=128/128, eligible=128, bases=32, relatives=4
+  L=56 k=47 interior        baseline=128/128, eligible=128, bases=32, relatives=4
+  L=56 k=48 interior        baseline=128/128, eligible=128, bases=32, relatives=4
+  L=56 k=49 interior        baseline=128/128, eligible=128, bases=32, relatives=4
+  L=56 k=50 interior        baseline=128/128, eligible=128, bases=32, relatives=4
+  L=56 k=51 interior        baseline=128/128, eligible=128, bases=32, relatives=4
+  L=56 k=52 interior        baseline=128/128, eligible=128, bases=32, relatives=4
+  L=56 k=53 interior        baseline=128/128, eligible=128, bases=32, relatives=4
+  L=56 k=54 right_inner     baseline=128/128, eligible=128, bases=32, relatives=3
+  L=56 k=55 right_boundary  baseline=128/128, eligible=128, bases=32, relatives=2
+[L=56] 完成；释放模型。
+
+==============================================================================
+[L=64] 加载 /data/cxm/models/variant_o2_fillblank_noaux_randpos_d512l4_P127_len64_wd2_initLen63/single_o2_fillblank_a25b56_d512l4r8h4_P127_len64_randpos_noaux_lr0.0003_wd2_initLen63_seed42_best.pth
+[L=64] held-out=4839, 固定窗口=128, candidates={'b': 56, 'a': 25, "-a'b": 13, "a'": 61, "-b'a": 88, "b'": 93, '0': 0}
+  L=64 k= 0 left_boundary   baseline=117/128, eligible=117, bases=32, relatives=2
+  L=64 k= 1 left_inner      baseline=127/128, eligible=127, bases=32, relatives=3
+  L=64 k= 2 interior        baseline=128/128, eligible=128, bases=32, relatives=4
+  L=64 k= 3 interior        baseline=128/128, eligible=128, bases=32, relatives=4
+  L=64 k= 4 interior        baseline=128/128, eligible=128, bases=32, relatives=4
+  L=64 k= 5 interior        baseline=128/128, eligible=128, bases=32, relatives=4
+  L=64 k= 6 interior        baseline=128/128, eligible=128, bases=32, relatives=4
+  L=64 k= 7 interior        baseline=128/128, eligible=128, bases=32, relatives=4
+  L=64 k= 8 interior        baseline=128/128, eligible=128, bases=32, relatives=4
+  L=64 k= 9 interior        baseline=128/128, eligible=128, bases=32, relatives=4
+  L=64 k=10 interior        baseline=128/128, eligible=128, bases=32, relatives=4
+  L=64 k=11 interior        baseline=128/128, eligible=128, bases=32, relatives=4
+  L=64 k=12 interior        baseline=128/128, eligible=128, bases=32, relatives=4
+  L=64 k=13 interior        baseline=128/128, eligible=128, bases=32, relatives=4
+  L=64 k=14 interior        baseline=128/128, eligible=128, bases=32, relatives=4
+  L=64 k=15 interior        baseline=128/128, eligible=128, bases=32, relatives=4
+  L=64 k=16 interior        baseline=128/128, eligible=128, bases=32, relatives=4
+  L=64 k=17 interior        baseline=128/128, eligible=128, bases=32, relatives=4
+  L=64 k=18 interior        baseline=128/128, eligible=128, bases=32, relatives=4
+  L=64 k=19 interior        baseline=128/128, eligible=128, bases=32, relatives=4
+  L=64 k=20 interior        baseline=128/128, eligible=128, bases=32, relatives=4
+  L=64 k=21 interior        baseline=128/128, eligible=128, bases=32, relatives=4
+  L=64 k=22 interior        baseline=128/128, eligible=128, bases=32, relatives=4
+  L=64 k=23 interior        baseline=128/128, eligible=128, bases=32, relatives=4
+  L=64 k=24 interior        baseline=128/128, eligible=128, bases=32, relatives=4
+  L=64 k=25 interior        baseline=128/128, eligible=128, bases=32, relatives=4
+  L=64 k=26 interior        baseline=128/128, eligible=128, bases=32, relatives=4
+  L=64 k=27 interior        baseline=128/128, eligible=128, bases=32, relatives=4
+  L=64 k=28 interior        baseline=128/128, eligible=128, bases=32, relatives=4
+  L=64 k=29 interior        baseline=128/128, eligible=128, bases=32, relatives=4
+  L=64 k=30 interior        baseline=128/128, eligible=128, bases=32, relatives=4
+  L=64 k=31 interior        baseline=128/128, eligible=128, bases=32, relatives=4
+  L=64 k=32 interior        baseline=128/128, eligible=128, bases=32, relatives=4
+  L=64 k=33 interior        baseline=128/128, eligible=128, bases=32, relatives=4
+  L=64 k=34 interior        baseline=128/128, eligible=128, bases=32, relatives=4
+  L=64 k=35 interior        baseline=128/128, eligible=128, bases=32, relatives=4
+  L=64 k=36 interior        baseline=128/128, eligible=128, bases=32, relatives=4
+  L=64 k=37 interior        baseline=128/128, eligible=128, bases=32, relatives=4
+  L=64 k=38 interior        baseline=128/128, eligible=128, bases=32, relatives=4
+  L=64 k=39 interior        baseline=128/128, eligible=128, bases=32, relatives=4
+  L=64 k=40 interior        baseline=128/128, eligible=128, bases=32, relatives=4
+  L=64 k=41 interior        baseline=128/128, eligible=128, bases=32, relatives=4
+  L=64 k=42 interior        baseline=128/128, eligible=128, bases=32, relatives=4
+  L=64 k=43 interior        baseline=128/128, eligible=128, bases=32, relatives=4
+  L=64 k=44 interior        baseline=128/128, eligible=128, bases=32, relatives=4
+  L=64 k=45 interior        baseline=128/128, eligible=128, bases=32, relatives=4
+  L=64 k=46 interior        baseline=128/128, eligible=128, bases=32, relatives=4
+  L=64 k=47 interior        baseline=128/128, eligible=128, bases=32, relatives=4
+  L=64 k=48 interior        baseline=128/128, eligible=128, bases=32, relatives=4
+  L=64 k=49 interior        baseline=128/128, eligible=128, bases=32, relatives=4
+  L=64 k=50 interior        baseline=128/128, eligible=128, bases=32, relatives=4
+  L=64 k=51 interior        baseline=128/128, eligible=128, bases=32, relatives=4
+  L=64 k=52 interior        baseline=128/128, eligible=128, bases=32, relatives=4
+  L=64 k=53 interior        baseline=128/128, eligible=128, bases=32, relatives=4
+  L=64 k=54 interior        baseline=128/128, eligible=128, bases=32, relatives=4
+  L=64 k=55 interior        baseline=128/128, eligible=128, bases=32, relatives=4
+  L=64 k=56 interior        baseline=128/128, eligible=128, bases=32, relatives=4
+  L=64 k=57 interior        baseline=128/128, eligible=128, bases=32, relatives=4
+  L=64 k=58 interior        baseline=128/128, eligible=128, bases=32, relatives=4
+  L=64 k=59 interior        baseline=128/128, eligible=128, bases=32, relatives=4
+  L=64 k=60 interior        baseline=128/128, eligible=128, bases=32, relatives=4
+  L=64 k=61 interior        baseline=128/128, eligible=128, bases=32, relatives=4
+  L=64 k=62 right_inner     baseline=128/128, eligible=128, bases=32, relatives=3
+  L=64 k=63 right_boundary  baseline=127/128, eligible=127, bases=32, relatives=2
+[L=64] 完成；释放模型。
+
+==============================================================================
+最终比较（len5 vs len8..64；MAE 单位为百分点）
+L=8: dominant=12/14, mean_mae_pp=2.0656
+  left_boundary   dominant=2/2, mean_mae_pp=0.5208
+  left_inner      dominant=2/3, mean_mae_pp=2.2711
+  interior        dominant=3/4, mean_mae_pp=4.6127
+  right_inner     dominant=3/3, mean_mae_pp=0.7886
+  right_boundary  dominant=2/2, mean_mae_pp=0.1236
+L=16: dominant=13/14, mean_mae_pp=2.1780
+  left_boundary   dominant=2/2, mean_mae_pp=0.3255
+  left_inner      dominant=2/3, mean_mae_pp=6.3654
+  interior        dominant=4/4, mean_mae_pp=2.3884
+  right_inner     dominant=3/3, mean_mae_pp=0.3862
+  right_boundary  dominant=2/2, mean_mae_pp=0.0159
+L=24: dominant=13/14, mean_mae_pp=2.6627
+  left_boundary   dominant=2/2, mean_mae_pp=0.6289
+  left_inner      dominant=2/3, mean_mae_pp=7.1656
+  interior        dominant=4/4, mean_mae_pp=2.8168
+  right_inner     dominant=3/3, mean_mae_pp=0.8167
+  right_boundary  dominant=2/2, mean_mae_pp=0.4026
+L=32: dominant=12/14, mean_mae_pp=2.2313
+  left_boundary   dominant=2/2, mean_mae_pp=0.7161
+  left_inner      dominant=2/3, mean_mae_pp=6.7127
+  interior        dominant=3/4, mean_mae_pp=2.1943
+  right_inner     dominant=3/3, mean_mae_pp=0.2840
+  right_boundary  dominant=2/2, mean_mae_pp=0.0190
+L=40: dominant=13/14, mean_mae_pp=2.1003
+  left_boundary   dominant=2/2, mean_mae_pp=0.4092
+  left_inner      dominant=2/3, mean_mae_pp=5.3450
+  interior        dominant=4/4, mean_mae_pp=2.1119
+  right_inner     dominant=3/3, mean_mae_pp=1.2295
+  right_boundary  dominant=2/2, mean_mae_pp=0.2073
+L=48: dominant=12/14, mean_mae_pp=2.9783
+  left_boundary   dominant=2/2, mean_mae_pp=1.4101
+  left_inner      dominant=2/3, mean_mae_pp=8.0582
+  interior        dominant=3/4, mean_mae_pp=3.1808
+  right_inner     dominant=3/3, mean_mae_pp=0.5397
+  right_boundary  dominant=2/2, mean_mae_pp=0.1794
+L=56: dominant=12/14, mean_mae_pp=3.7304
+  left_boundary   dominant=2/2, mean_mae_pp=1.7450
+  left_inner      dominant=2/3, mean_mae_pp=7.2931
+  interior        dominant=3/4, mean_mae_pp=5.8237
+  right_inner     dominant=3/3, mean_mae_pp=1.1763
+  right_boundary  dominant=2/2, mean_mae_pp=0.0159
+L=64: dominant=12/14, mean_mae_pp=2.5810
+  left_boundary   dominant=2/2, mean_mae_pp=1.4380
+  left_inner      dominant=2/3, mean_mae_pp=4.7929
+  interior        dominant=3/4, mean_mae_pp=4.0637
+  right_inner     dominant=3/3, mean_mae_pp=0.7367
+  right_boundary  dominant=2/2, mean_mae_pp=0.2073
+L=all: dominant=12/14, mean_mae_pp=2.4235
+  left_boundary   dominant=2/2, mean_mae_pp=0.8939
+  left_inner      dominant=2/3, mean_mae_pp=5.8767
+  interior        dominant=3/4, mean_mae_pp=3.2263
+  right_inner     dominant=3/3, mean_mae_pp=0.4435
+  right_boundary  dominant=2/2, mean_mae_pp=0.1375
+
+[完成] raw、聚合、len5 参考与比较已写入: /home/cxm/recursion/reports/data/fillblank_len8to64_stride8_random_a25b56.json
