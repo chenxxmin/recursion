@@ -1,0 +1,13 @@
+[1/4] Loading held-out base windows (no resampling)
+[2/4] Loading checkpoint with probe_fillblank_last_blank_linear.load_model
+  d_model=512, layers=4, P=127, vocab=129, device=cpu
+[3/4] Running manual block-by-block Logit Lens
+  x0: 4 positions x 4 layers x 32 bases complete
+  x1: 5 positions x 4 layers x 32 bases complete
+  x2: 6 positions x 4 layers x 32 bases complete
+  x3: 5 positions x 4 layers x 32 bases complete
+  x4: 4 positions x 4 layers x 32 bases complete
+  JSON: reports/data/fillblank_len5_logit_lens_a25b56.json (3072 raw records, 96 cells)
+[4/4] Drawing mean-probability heatmaps
+  Plot: plots/fillblank_len5_logit_lens_a25b56.png
+Done. Final EOS allclose=True; max_abs_diff=0; base outputs match.
