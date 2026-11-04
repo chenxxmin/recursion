@@ -5,6 +5,7 @@
 ## 0. 必读的现有文档
 
 - `.agents/skills/recursion-experiment-runner/SKILL.md`：实验运行全流程 + 四个工具脚本（逐卡队列状态、全量汇总、存档点停止、临时定时）。**跑实验前必读**。
+- `.agents/skills/analyze-logit-lens/SKILL.md`：最终答案/中间量的逐层 Logit Lens 解码流程，含 full-vocab 概率/rank/margin、多目标共享 forward、逐 input 稀有信号与复制控制、最早位置及 forward 校验。**做逐层解码分析前必读**。
 - `docs/recursion_model_and_training_settings.md`：所有配置键的完整说明（TRAIN_LEN/MISSING_PROB/NUM_MASK/MAX_TRAIN_HOURS/...），改配置语义后必须同步它。
 - `docs/AMP_PRECISION_NOTES.md`：精度教训——结论性实验必须 fp32（默认），bf16 只能粗筛。
 

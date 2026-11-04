@@ -4,6 +4,7 @@
 - 模型：len3～5 训练的 a25b56 best checkpoint，四层 Transformer
 - 基底：复用此前每个空格位置的同一组 32 个 held-out 正确窗口
 - 范围：空格 `k=0..4`，每层 `L1..L4`，输入位置 `x[k-2]..x[k+2]` 及 EOS
+- 中间量补充：`reports/circuit_analysis/FILLBLANK_LEN5_INTERMEDIATE_LOGIT_LENS.md`
 
 ## 结论摘要
 

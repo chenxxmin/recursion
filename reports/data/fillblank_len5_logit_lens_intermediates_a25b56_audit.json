@@ -1,0 +1,31 @@
+{
+  "audited_file": "reports/data/fillblank_len5_logit_lens_intermediates_a25b56.json",
+  "audit_time_utc": "2026-11-04T11:40:13.179522+00:00",
+  "independent_of_probe_helpers": true,
+  "raw_records": 15744,
+  "aggregate_cells": 492,
+  "unique_raw_keys": 15744,
+  "target_values_recomputed": 15744,
+  "aggregate_metrics_recomputed": 492,
+  "max_abs_metric_diff": 0.0,
+  "aggregate_primary_clear_targets": 0,
+  "aggregate_strict_clear_targets": 0,
+  "single_base_primary_cells": 11,
+  "single_base_primary_base_targets": 6,
+  "single_base_strict_cells": 0,
+  "primary_cells_direct_copy_at_position": 11,
+  "primary_cells_target_in_visible_inputs": 11,
+  "primary_cells_after_direct_copy_control": 0,
+  "primary_cells_after_visible_input_control": 0,
+  "forward_validation": {
+    "rtol": 1e-05,
+    "atol": 1e-06,
+    "allclose": true,
+    "max_abs_diff": 0.0,
+    "n_batches": 5,
+    "n_eos_logits_compared": 20640,
+    "model_eos_predictions_match_base_outputs": true,
+    "manual_eos_predictions_match_base_outputs": true,
+    "base_output_mismatches": []
+  }
+}
