@@ -8,11 +8,11 @@
 
 | 挖空位置 | PNG |
 |---|---|
-| `x0` | `plots/fillblank_len5_attention_a25b56_blank_x0.png` |
-| `x1` | `plots/fillblank_len5_attention_a25b56_blank_x1.png` |
-| `x2` | `plots/fillblank_len5_attention_a25b56_blank_x2.png` |
-| `x3` | `plots/fillblank_len5_attention_a25b56_blank_x3.png` |
-| `x4` | `plots/fillblank_len5_attention_a25b56_blank_x4.png` |
+| `x0` | `reports/circuit_analysis/plots/fillblank_len5_attention_a25b56_blank_x0.png` |
+| `x1` | `reports/circuit_analysis/plots/fillblank_len5_attention_a25b56_blank_x1.png` |
+| `x2` | `reports/circuit_analysis/plots/fillblank_len5_attention_a25b56_blank_x2.png` |
+| `x3` | `reports/circuit_analysis/plots/fillblank_len5_attention_a25b56_blank_x3.png` |
+| `x4` | `reports/circuit_analysis/plots/fillblank_len5_attention_a25b56_blank_x4.png` |
 
 每张图均为 **4 行层（L1～L4）×4 列头（H1～H4）**。每个面板保留完整的 **6×6** 注意力矩阵，颜色统一为 viridis 渐变，固定 `vmin=0, vmax=1`。
 

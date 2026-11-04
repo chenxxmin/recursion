@@ -31,7 +31,7 @@ REPLAY_RTOL = 1e-5
 REPLAY_ATOL = 1e-6
 ATTENTION_ATOL = 1e-6
 DEFAULT_OUT = 'reports/data/fillblank_len5_attention_a25b56.json'
-DEFAULT_PLOT_PREFIX = 'plots/fillblank_len5_attention_a25b56'
+DEFAULT_PLOT_PREFIX = 'reports/circuit_analysis/plots/fillblank_len5_attention_a25b56'
 
 
 def token_labels(k):

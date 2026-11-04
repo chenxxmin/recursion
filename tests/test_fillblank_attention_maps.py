@@ -177,7 +177,7 @@ def test_cli_defaults_and_dry_run_plan():
     assert args.device == 'cpu' and args.threads == 16 and args.batch_size == 32
     assert args.ckpt == probe.DEFAULT_CKPT and args.base_data == probe.DEFAULT_BASE_DATA
     assert args.out == 'reports/data/fillblank_len5_attention_a25b56.json'
-    assert args.plot_prefix == 'plots/fillblank_len5_attention_a25b56'
+    assert args.plot_prefix == 'reports/circuit_analysis/plots/fillblank_len5_attention_a25b56'
     output = io.StringIO()
     with contextlib.redirect_stdout(output):
         probe.print_dry_run(args)

@@ -10,11 +10,11 @@
   x3: N=32, attention=(4,4,6,6), replay max_abs_diff=1.79e-07, EOS predictions and causal checks passed
   x4: N=32, attention=(4,4,6,6), replay max_abs_diff=1.79e-07, EOS predictions and causal checks passed
 [3/4] Drawing five 4-layer x 4-head full-attention figures
-  PNG: plots/fillblank_len5_attention_a25b56_blank_x0.png
-  PNG: plots/fillblank_len5_attention_a25b56_blank_x1.png
-  PNG: plots/fillblank_len5_attention_a25b56_blank_x2.png
-  PNG: plots/fillblank_len5_attention_a25b56_blank_x3.png
-  PNG: plots/fillblank_len5_attention_a25b56_blank_x4.png
+  PNG: reports/circuit_analysis/plots/fillblank_len5_attention_a25b56_blank_x0.png
+  PNG: reports/circuit_analysis/plots/fillblank_len5_attention_a25b56_blank_x1.png
+  PNG: reports/circuit_analysis/plots/fillblank_len5_attention_a25b56_blank_x2.png
+  PNG: reports/circuit_analysis/plots/fillblank_len5_attention_a25b56_blank_x3.png
+  PNG: reports/circuit_analysis/plots/fillblank_len5_attention_a25b56_blank_x4.png
 [4/4] Writing matrices and all validation records
   JSON: reports/data/fillblank_len5_attention_a25b56.json
 Done. all_checks_passed=True; replay max_abs_diff=2.38e-07; EOS matches=160/160.

@@ -6315,10 +6315,10 @@
     "n_blank_groups": 5
   },
   "plots": [
-    "/home/cxm/recursion/plots/fillblank_len5_attention_a25b56_blank_x0.png",
-    "/home/cxm/recursion/plots/fillblank_len5_attention_a25b56_blank_x1.png",
-    "/home/cxm/recursion/plots/fillblank_len5_attention_a25b56_blank_x2.png",
-    "/home/cxm/recursion/plots/fillblank_len5_attention_a25b56_blank_x3.png",
-    "/home/cxm/recursion/plots/fillblank_len5_attention_a25b56_blank_x4.png"
+    "/home/cxm/recursion/reports/circuit_analysis/plots/fillblank_len5_attention_a25b56_blank_x0.png",
+    "/home/cxm/recursion/reports/circuit_analysis/plots/fillblank_len5_attention_a25b56_blank_x1.png",
+    "/home/cxm/recursion/reports/circuit_analysis/plots/fillblank_len5_attention_a25b56_blank_x2.png",
+    "/home/cxm/recursion/reports/circuit_analysis/plots/fillblank_len5_attention_a25b56_blank_x3.png",
+    "/home/cxm/recursion/reports/circuit_analysis/plots/fillblank_len5_attention_a25b56_blank_x4.png"
   ]
 }
