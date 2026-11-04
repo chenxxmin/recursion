@@ -1,0 +1,20 @@
+[1/4] Loading held-out base data and shared checkpoint
+  ckpt: /data/cxm/models/variant_o2_fillblank_noaux_randpos_d512l4_P127_len3to5_wd2_ckpt/single_o2_fillblank_a25b56_d512l4r8h4_P127_len3to5_randpos_noaux_lr0.0003_wd2_ckpt_seed42_best.pth
+  base data: /home/cxm/recursion/reports/data/fillblank_len5_all_blank_linear_a25b56.json
+  model: d_model=512, layers=4, heads=4, P=127, vocab=129
+  device=cpu, threads=16, batch_size=32
+[2/4] Capturing original-forward attention and independent replays
+  x0: N=32, attention=(4,4,6,6), replay max_abs_diff=1.79e-07, EOS predictions and causal checks passed
+  x1: N=32, attention=(4,4,6,6), replay max_abs_diff=2.38e-07, EOS predictions and causal checks passed
+  x2: N=32, attention=(4,4,6,6), replay max_abs_diff=1.79e-07, EOS predictions and causal checks passed
+  x3: N=32, attention=(4,4,6,6), replay max_abs_diff=1.79e-07, EOS predictions and causal checks passed
+  x4: N=32, attention=(4,4,6,6), replay max_abs_diff=1.79e-07, EOS predictions and causal checks passed
+[3/4] Drawing five 4-layer x 4-head full-attention figures
+  PNG: plots/fillblank_len5_attention_a25b56_blank_x0.png
+  PNG: plots/fillblank_len5_attention_a25b56_blank_x1.png
+  PNG: plots/fillblank_len5_attention_a25b56_blank_x2.png
+  PNG: plots/fillblank_len5_attention_a25b56_blank_x3.png
+  PNG: plots/fillblank_len5_attention_a25b56_blank_x4.png
+[4/4] Writing matrices and all validation records
+  JSON: reports/data/fillblank_len5_attention_a25b56.json
+Done. all_checks_passed=True; replay max_abs_diff=2.38e-07; EOS matches=160/160.
