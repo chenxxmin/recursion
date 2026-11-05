@@ -1,0 +1,73 @@
+{
+  "audited_file": "reports/data/fillblank_x0_activation_patch_a25b56.json.gz",
+  "audit_time_utc": "2026-11-04T17:07:46.088408+00:00",
+  "independent_of_probe_helpers": true,
+  "clean_N": 32,
+  "corrupted_N": 8064,
+  "patched_raw_N": 80640,
+  "unique_patched_keys": 80640,
+  "corrupted_all_outputs_changed_and_numeric": true,
+  "baseline_changed_checks": {
+    "baseline_changed_N": 8064,
+    "baseline_unchanged_N": 0,
+    "definition_checked_against_full_vocab_target": true,
+    "patched_rows_aligned_with_corrupted_baseline": true
+  },
+  "matched_routes_checks_passed": true,
+  "target_D_and_route_checks_passed": true,
+  "aggregate_cells_recomputed": 20,
+  "per_base_cells_recomputed": 640,
+  "max_abs_aggregate_metric_diff": 0.0,
+  "changed_aggregate_checks": {
+    "all_cells_changed_N_equals_N": true,
+    "changed_restore_equals_legacy_restore_full": true,
+    "all_cells_unchanged_N": 0,
+    "all_cells_unchanged_preserved_is_null": true,
+    "per_base_changed_aggregation_recomputed": true
+  },
+  "all_patched_outputs_numeric": true,
+  "controls": {
+    "emb_ceiling": {
+      "N": 8064,
+      "restore_full_count": 8064,
+      "max_abs_delta_logit": 12.44241714477539,
+      "max_abs_delta_margin": 19.441791534423828,
+      "stored_max_abs_diff": 0.0
+    },
+    "emb_identity": {
+      "N": 8064,
+      "restore_full_count": 0,
+      "max_abs_delta_logit": 0.0,
+      "max_abs_delta_margin": 0.0,
+      "stored_max_abs_diff": 0.0
+    },
+    "causal_noop": {
+      "N": 20160,
+      "restore_full_count": 0,
+      "max_abs_delta_logit": 0.0,
+      "max_abs_delta_margin": 0.0,
+      "stored_max_abs_diff": 0.0
+    },
+    "final_resid_noop": {
+      "N": 16128,
+      "restore_full_count": 0,
+      "max_abs_delta_logit": 0.0,
+      "max_abs_delta_margin": 0.0,
+      "stored_max_abs_diff": 0.0
+    }
+  },
+  "final_resid_noop_checks": {
+    "aggregate_cells": 4,
+    "all_changed_restore_full_zero": true,
+    "all_raw_outputs_and_deltas_match_corrupted_baseline": true
+  },
+  "dynamic_x0_regression": {
+    "reference": ".chain_tmp/fillblank_x0_activation_patch_pre_dynamic_regression_summary.json",
+    "raw_legacy_sha256": "39ecf6fc6c3ae555f88eb3ee56b9a3a35ce93a1655178416d61e333086dcb06d",
+    "baseline_legacy_sha256": "682b5af10d08647365e8206366a9f9096055fc6c0656cadf96e9269768f1eccc",
+    "raw_legacy_exact_match": true,
+    "baseline_legacy_exact_match": true,
+    "max_abs_legacy_aggregate_metric_diff": 0.0,
+    "restore_plot_values_unchanged": true
+  }
+}

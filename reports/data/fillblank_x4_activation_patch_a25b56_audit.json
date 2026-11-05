@@ -1,0 +1,57 @@
+{
+  "audited_file": "reports/data/fillblank_x4_activation_patch_a25b56.json.gz",
+  "audit_time_utc": "2026-11-04T19:08:00.038608+00:00",
+  "independent_of_probe_helpers": true,
+  "clean_N": 32,
+  "corrupted_N": 8064,
+  "patched_raw_N": 80640,
+  "unique_corrupted_keys": 8064,
+  "unique_patched_keys": 80640,
+  "upstream_output_D_checks_passed": true,
+  "matched_routes_checks_passed": true,
+  "baseline_changed_checks_passed": true,
+  "baseline_changed_N": 8064,
+  "baseline_unchanged_N": 0,
+  "aggregate_cells_recomputed": 20,
+  "per_base_cells_recomputed": 640,
+  "max_abs_aggregate_metric_diff": 0.0,
+  "all_patched_outputs_numeric": true,
+  "controls": {
+    "emb_ceiling": {
+      "N": 8064,
+      "restore_full_count": 8064,
+      "changed_N": 8064,
+      "changed_restore_full_count": 8064,
+      "max_abs_delta_logit": 12.888886451721191,
+      "max_abs_delta_margin": 19.93935775756836,
+      "stored_max_abs_diff": 0.0
+    },
+    "emb_identity": {
+      "N": 8064,
+      "restore_full_count": 0,
+      "changed_N": 8064,
+      "changed_restore_full_count": 0,
+      "max_abs_delta_logit": 0.0,
+      "max_abs_delta_margin": 0.0,
+      "stored_max_abs_diff": 0.0
+    },
+    "causal_noop": {
+      "N": 20160,
+      "restore_full_count": 0,
+      "changed_N": 20160,
+      "changed_restore_full_count": 0,
+      "max_abs_delta_logit": 0.0,
+      "max_abs_delta_margin": 0.0,
+      "stored_max_abs_diff": 0.0
+    },
+    "final_resid_noop": {
+      "N": 16128,
+      "restore_full_count": 0,
+      "changed_N": 16128,
+      "changed_restore_full_count": 0,
+      "max_abs_delta_logit": 0.0,
+      "max_abs_delta_margin": 0.0,
+      "stored_max_abs_diff": 0.0
+    }
+  }
+}

@@ -1,0 +1,59 @@
+[1/5] Loading fixed by_blank.x1 base data
+[2/5] Loading the a25b56 best checkpoint
+  device=cpu; dtype=torch.float32; rules=[[25, 56]]; P=127
+[3/5] Validating clean and all selected corrupted baselines, then patching
+  validated blank=x1 base_row=0: 3 sources x 126 d values
+  validated blank=x1 base_row=1: 3 sources x 126 d values
+  validated blank=x1 base_row=2: 3 sources x 126 d values
+  validated blank=x1 base_row=3: 3 sources x 126 d values
+  validated blank=x1 base_row=4: 3 sources x 126 d values
+  validated blank=x1 base_row=5: 3 sources x 126 d values
+  validated blank=x1 base_row=6: 3 sources x 126 d values
+  validated blank=x1 base_row=7: 3 sources x 126 d values
+  validated blank=x1 base_row=8: 3 sources x 126 d values
+  validated blank=x1 base_row=9: 3 sources x 126 d values
+  validated blank=x1 base_row=10: 3 sources x 126 d values
+  validated blank=x1 base_row=11: 3 sources x 126 d values
+  validated blank=x1 base_row=12: 3 sources x 126 d values
+  validated blank=x1 base_row=13: 3 sources x 126 d values
+  validated blank=x1 base_row=14: 3 sources x 126 d values
+  validated blank=x1 base_row=15: 3 sources x 126 d values
+  validated blank=x1 base_row=16: 3 sources x 126 d values
+  validated blank=x1 base_row=17: 3 sources x 126 d values
+  validated blank=x1 base_row=18: 3 sources x 126 d values
+  validated blank=x1 base_row=19: 3 sources x 126 d values
+  validated blank=x1 base_row=20: 3 sources x 126 d values
+  validated blank=x1 base_row=21: 3 sources x 126 d values
+  validated blank=x1 base_row=22: 3 sources x 126 d values
+  validated blank=x1 base_row=23: 3 sources x 126 d values
+  validated blank=x1 base_row=24: 3 sources x 126 d values
+  validated blank=x1 base_row=25: 3 sources x 126 d values
+  validated blank=x1 base_row=26: 3 sources x 126 d values
+  validated blank=x1 base_row=27: 3 sources x 126 d values
+  validated blank=x1 base_row=28: 3 sources x 126 d values
+  validated blank=x1 base_row=29: 3 sources x 126 d values
+  validated blank=x1 base_row=30: 3 sources x 126 d values
+  validated blank=x1 base_row=31: 3 sources x 126 d values
+  patched 10/96 chunks
+  patched 20/96 chunks
+  patched 30/96 chunks
+  patched 40/96 chunks
+  patched 50/96 chunks
+  patched 60/96 chunks
+  patched 70/96 chunks
+  patched 80/96 chunks
+  patched 90/96 chunks
+  patched 96/96 chunks
+[4/5] Writing JSON with exact raw counts
+  JSON: reports/data/fillblank_x1_activation_patch_a25b56.json.gz (181440 patched raw rows)
+[5/5] Drawing 6 residual heatmaps
+  Plot: reports/circuit_analysis/plots/fillblank_x1_activation_patch_a25b56_x0_restore_full.png
+  Plot: reports/circuit_analysis/plots/fillblank_x1_activation_patch_a25b56_x0_delta_margin.png
+  Plot: reports/circuit_analysis/plots/fillblank_x1_activation_patch_a25b56_x2_restore_full.png
+  Plot: reports/circuit_analysis/plots/fillblank_x1_activation_patch_a25b56_x2_delta_margin.png
+  Plot: reports/circuit_analysis/plots/fillblank_x1_activation_patch_a25b56_x3_restore_full.png
+  Plot: reports/circuit_analysis/plots/fillblank_x1_activation_patch_a25b56_x3_delta_margin.png
+Done. All baseline validations and mandatory controls passed.
+real 50.04
+user 629.41
+sys 78.45
