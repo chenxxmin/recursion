@@ -3,7 +3,7 @@
 Extracted from core.py (core.py split, step 4). run_experiment is a slim
 orchestrator: parse config -> normalize_task_config -> scenario dispatch
 (_prepare_single_recurrence / _prepare_mixed_recurrence / _prepare_action
-/ _prepare_single_variant（corrupt_fix/fill_blank）)
+/ _prepare_single_variant（corrupt_fix/fill_blank/clean_value_set）)
 -> run_training_engine. The stage-3 final generation test (final_eval.py)
 was removed 2026-10-08; result reporting is the training log's best acc
 plus scripts/eval_clean_action.py. Depends on
@@ -15,6 +15,7 @@ import json
 import os
 import random
 import sys
+from itertools import combinations
 
 import torch
 import torch.nn as nn
@@ -29,7 +30,8 @@ from datasets import (RecurrenceDataset, MixedRecurrenceDataset,
                       collate_fn, make_missing_collate,
                       mixed_ab_collate_fn, make_mixed_missing_collate,
                       action_collate_fn, make_action_missing_collate,
-                      make_corrupt_fix_collate, make_fill_blank_collate)
+                      make_corrupt_fix_collate, make_fill_blank_collate,
+                      make_clean_value_set_collate)
 from training import run_training_engine, resume_checkpoint_path, evaluate
 
 
@@ -88,6 +90,36 @@ def _round_up_pow2(n):
     return 2 ** (n - 1).bit_length()
 
 
+def _normalize_experiment_config(task, cfg):
+    """Normalize configs, including the experiment-local clean_value_set variant.
+
+    The shared legacy normalization layer intentionally remains untouched;
+    clean_value_set is normalized here and then uses the common single-variant
+    preparation path.  All other variants retain the exact legacy behavior.
+    """
+    if cfg.get('TASK_VARIANT') != 'clean_value_set':
+        if 'CLEAN_VALUE_SET_CORRUPT_RATIO' in cfg:
+            raise ValueError("CLEAN_VALUE_SET_CORRUPT_RATIO 仅 "
+                             "TASK_VARIANT='clean_value_set' 支持")
+        return normalize_task_config(task, cfg)
+    ratio = cfg.get('CLEAN_VALUE_SET_CORRUPT_RATIO', 0.0)
+    if not isinstance(ratio, (int, float)) or not 0.0 <= float(ratio) <= 1.0:
+        raise ValueError("CLEAN_VALUE_SET_CORRUPT_RATIO 必须在 [0, 1] 内")
+    if cfg.get('MISSING_PROB'):
+        raise ValueError("clean_value_set uses clean windows and is incompatible "
+                         "with MISSING_PROB")
+    base_cfg = dict(cfg)
+    base_cfg['TASK_VARIANT'] = None
+    # clean_value_set shares the variant BODY_SUPERVISION switch.  The legacy
+    # normalizer only knows the older variants, so validate it without this key.
+    base_cfg.pop('BODY_SUPERVISION', None)
+    norm = normalize_task_config(task, base_cfg)
+    if norm['scenario'] != 'single':
+        raise ValueError("TASK_VARIANT='clean_value_set' is supported only for single")
+    norm['variant'] = 'clean_value_set'
+    return norm
+
+
 def _make_loaders(train_dataset, test_dataset, batch_size, collate_fn, reshuffle_each_epoch=False):
     """Build train/test DataLoaders with length-grouped batch sampling."""
     train_sampler = BucketBatchSampler(train_dataset, batch_size=batch_size, shuffle=True,
@@ -111,73 +143,148 @@ def _print_task_banner(block_size, train_len, number_theory_msg):
     print()
 
 
-def _make_pos_probe(windows, collate, batch_size):
-    """POS_PROBE: 固定探针窗口集上按挖空/污损位置 k 分桶的评估钩子。
-
-    返回 fn(model, device) -> list[str]（每 eval 点由引擎打印）。
-    逐 (长度 l, 位置 k) 用 (seq, k) 元组固定挖空位置跑 evaluate，再按 k 对
-    各长度加权聚合（不定长窗口兼容）。fill_blank 只有值槽（target[l]）；
-    corrupt_fix 有位置槽 target[l] 和值槽 target[l+1]，分两行打印。
-    corrupt_fix 的错误值仍逐次随机（位置 acc 对错值不敏感）；fill_blank
-    探针完全确定。
-    """
+def _make_pos_probe(windows, collate, batch_size, variant, blank_lens=None,
+                    blank_counts=None, value_only=False):
+    """固定窗口上的逐位置探针；扩展填空按段长或空格数分桶。"""
+    blank_lens = [1] if blank_lens is None else list(blank_lens)
+    blank_counts = [1] if blank_counts is None else list(blank_counts)
+    multi_blank = variant == 'fill_blank' and blank_lens != [1]
+    multi_count = variant == 'fill_blank' and blank_counts != [1]
     by_len = {}
     for w in windows:
         by_len.setdefault(w.numel(), []).append(w)
 
+    REL_ORDER = ['first', 'second', 'mid', 'last2', 'last']
+
+    def _rel_class(k, length):
+        if k == 0:
+            return 'first'
+        if k == 1:
+            return 'second'
+        if k == length - 1:
+            return 'last'
+        if k == length - 2:
+            return 'last2'
+        return 'mid'
+
+    def fmt(c, t):
+        return ' '.join(f"k{k:02d}={c[k] / t[k] * 100:.1f}" for k in sorted(t))
+
+    def fmt_rel(c, t):
+        return ' '.join(f"{r}={c[r] / t[r] * 100:.1f}" for r in REL_ORDER if r in t)
+
+    def _add(c, t, key, correct, total):
+        c[key] = c.get(key, 0.0) + correct
+        t[key] = t.get(key, 0) + total
+
+    def multi_count_probe(model, device):
+        names = ('val_c', 'val_t', 'val_rel_c', 'val_rel_t')
+        stats = {count: {name: {} for name in names} for count in blank_counts}
+        with torch.no_grad():
+            for window_len, ws in sorted(by_len.items()):
+                for count in blank_counts:
+                    if count > window_len:
+                        raise ValueError(
+                            f"blank count {count} exceeds probe window {window_len}")
+                    s = stats[count]
+                    for positions in combinations(range(window_len), count):
+                        batch = [(seq, positions) for seq in ws]
+                        loader = DataLoader(batch, batch_size=batch_size,
+                                            collate_fn=collate)
+                        _, _, per_pos, _ = evaluate(
+                            model, loader, device, num_mask=0)
+                        output_pos = list(range(window_len, window_len + count))
+                        missing = [pos for pos in output_pos if pos not in per_pos]
+                        if missing:
+                            raise RuntimeError(
+                                f"multi-count probe missing output positions {missing}")
+                        n = len(ws)
+                        for output, original_pos in zip(output_pos, positions):
+                            rc = _rel_class(original_pos, window_len)
+                            _add(s['val_c'], s['val_t'], original_pos,
+                                 per_pos[output] * n, n)
+                            _add(s['val_rel_c'], s['val_rel_t'], rc,
+                                 per_pos[output] * n, n)
+        lines = []
+        for count in blank_counts:
+            s = stats[count]
+            lines.extend([
+                f"  PosProbe val_n{count}| " + fmt(s['val_c'], s['val_t']),
+                f"  PosProbe valR_n{count}| " + fmt_rel(s['val_rel_c'], s['val_rel_t']),
+            ])
+        return lines
+
+    def multi_probe(model, device):
+        names = ('val_c', 'val_t', 'val_rel_c', 'val_rel_t')
+        stats = {blank_l: {name: {} for name in names} for blank_l in blank_lens}
+        with torch.no_grad():
+            for window_len, ws in sorted(by_len.items()):
+                for blank_l in blank_lens:
+                    m = window_len - blank_l + 1
+                    if m < 1:
+                        raise ValueError(
+                            f"blank length {blank_l} exceeds probe window {window_len}")
+                    s = stats[blank_l]
+                    for k in range(m):
+                        batch = [(seq, k, blank_l) for seq in ws]
+                        loader = DataLoader(batch, batch_size=batch_size,
+                                            collate_fn=collate)
+                        _, _, per_pos, _ = evaluate(
+                            model, loader, device, num_mask=0)
+                        output_pos = list(range(m, m + blank_l))
+                        missing = [pos for pos in output_pos if pos not in per_pos]
+                        if missing:
+                            raise RuntimeError(
+                                f"multi-blank probe missing output positions {missing}")
+                        n = len(ws)
+                        rc = _rel_class(k, window_len)
+                        # EOS(l) 已给定段长；所有值槽逐槽累加为 token 微平均。
+                        for pos in output_pos:
+                            _add(s['val_c'], s['val_t'], k, per_pos[pos] * n, n)
+                            _add(s['val_rel_c'], s['val_rel_t'], rc,
+                                 per_pos[pos] * n, n)
+        lines = []
+        for blank_l in blank_lens:
+            s = stats[blank_l]
+            lines.extend([
+                f"  PosProbe val_l{blank_l}| " + fmt(s['val_c'], s['val_t']),
+                f"  PosProbe valR_l{blank_l}| " + fmt_rel(s['val_rel_c'], s['val_rel_t']),
+            ])
+        return lines
+
     def probe(model, device):
         model.eval()
+        if multi_count:
+            return multi_count_probe(model, device)
+        if multi_blank:
+            return multi_probe(model, device)
         first_c, first_t, second_c, second_t = {}, {}, {}, {}
-        # 相对位置五桶：first(k=0) / second(k=1) / mid(2..l-3) / last2(k=l-2) / last(k=l-1)
-        rel_c1, rel_t1 = {}, {}
-        rel_c2, rel_t2 = {}, {}
-
-        def _rel_class(k, l):
-            if k == 0:
-                return 'first'
-            if k == 1:
-                return 'second'
-            if k == l - 1:
-                return 'last'
-            if k == l - 2:
-                return 'last2'
-            return 'mid'
-
+        rel_c1, rel_t1, rel_c2, rel_t2 = {}, {}, {}, {}
         with torch.no_grad():
-            for l, ws in sorted(by_len.items()):
-                for k in range(l):
+            for length, ws in sorted(by_len.items()):
+                for k in range(length):
                     batch = [(seq, k) for seq in ws]
                     loader = DataLoader(batch, batch_size=batch_size,
                                         collate_fn=collate)
                     _, _, per_pos, _ = evaluate(model, loader, device, num_mask=0)
                     n = len(ws)
-                    rc = _rel_class(k, l)
-                    if l in per_pos:
-                        first_c[k] = first_c.get(k, 0.0) + per_pos[l] * n
-                        first_t[k] = first_t.get(k, 0) + n
-                        rel_c1[rc] = rel_c1.get(rc, 0.0) + per_pos[l] * n
-                        rel_t1[rc] = rel_t1.get(rc, 0) + n
-                    if l + 1 in per_pos:
-                        second_c[k] = second_c.get(k, 0.0) + per_pos[l + 1] * n
-                        second_t[k] = second_t.get(k, 0) + n
-                        rel_c2[rc] = rel_c2.get(rc, 0.0) + per_pos[l + 1] * n
-                        rel_t2[rc] = rel_t2.get(rc, 0) + n
+                    rc = _rel_class(k, length)
+                    if length in per_pos:
+                        _add(first_c, first_t, k, per_pos[length] * n, n)
+                        _add(rel_c1, rel_t1, rc, per_pos[length] * n, n)
+                    if length + 1 in per_pos:
+                        _add(second_c, second_t, k, per_pos[length + 1] * n, n)
+                        _add(rel_c2, rel_t2, rc, per_pos[length + 1] * n, n)
 
-        def fmt(c, t):
-            return ' '.join(f"k{k:02d}={c[k] / t[k] * 100:.1f}" for k in sorted(t))
-
-        REL_ORDER = ['first', 'second', 'mid', 'last2', 'last']
-
-        def fmt_rel(c, t):
-            return ' '.join(f"{r}={c[r] / t[r] * 100:.1f}" for r in REL_ORDER if r in t)
-
-        if second_t:
+        if variant == 'corrupt_fix' and not value_only:
             return ['  PosProbe pos| ' + fmt(first_c, first_t),
                     '  PosProbe val| ' + fmt(second_c, second_t),
                     '  PosProbe posR| ' + fmt_rel(rel_c1, rel_t1),
                     '  PosProbe valR| ' + fmt_rel(rel_c2, rel_t2)]
-        return ['  PosProbe val| ' + fmt(first_c, first_t),
-                '  PosProbe valR| ' + fmt_rel(rel_c1, rel_t1)]
+        if variant == 'fill_blank' or value_only:
+            return ['  PosProbe val| ' + fmt(first_c, first_t),
+                    '  PosProbe valR| ' + fmt_rel(rel_c1, rel_t1)]
+        raise ValueError(f"POS_PROBE does not support variant={variant!r}")
 
     return probe
 
@@ -617,7 +724,7 @@ def _prepare_single_recurrence(config, norm):
 
 def _prepare_single_variant(config, norm):
     """Prepare single-scenario task variants (TASK_VARIANT ∈
-    {'corrupt_fix', 'fill_blank'}; see scenarios.TASK_VARIANTS).
+    {'corrupt_fix', 'fill_blank', 'clean_value_set'}).
 
     The data pipeline is identical to _prepare_single_recurrence's single
     branch (RecurrenceDataset + full_split/sampled_fresh_test, same exposure
@@ -628,12 +735,14 @@ def _prepare_single_variant(config, norm):
         [.., pos_token, correct value], loss on the last two positions.
         vocab = values [0..P-1] | missing P (unused) | EOS P+1 |
         position tokens P+2+k, k < max(TRAIN_LEN, OOD_LEN).
-      - fill_blank: collate replaces exactly ONE position with the blank
-        token (id = P); x = [corrupted window, EOS], targets = [.., correct
-        value], loss on the EOS slot only. vocab = values | blank P |
-        EOS P+1, i.e. vocab_size = P + 2.
+      - fill_blank: BLANK_LENS compresses one contiguous segment and EOS(l)
+        encodes its length. BLANK_COUNTS selects independent unit positions;
+        EOS(k) encodes their count and the tail contains their values in
+        increasing position order. Extended vocab = P+1+max(length/count).
+      - clean_value_set: no corruption; body CE plus a unique-window-value
+        set objective at the EOS input slot. vocab = P + 2 (P is unused).
 
-    num_mask = 0 in both: the loss mask comes from the collate.
+    num_mask = 0 in all variants: the loss mask comes from the collate.
     """
     variant = norm['variant']
     cfg = dict(config.get('main', {}))
@@ -652,10 +761,15 @@ def _prepare_single_variant(config, norm):
     seq_min = cfg.get('SEQ_LEN_MIN')
     seq_max = cfg.get('SEQ_LEN_MAX')
     var_len = seq_min is not None
+    blank_lens = list(cfg.get('BLANK_LENS', [1]))
+    blank_counts = list(cfg.get('BLANK_COUNTS', [1]))
+    multi_blank = variant == 'fill_blank' and blank_lens != [1]
+    multi_count = variant == 'fill_blank' and blank_counts != [1]
 
     max_len = seq_max if var_len else max(TRAIN_LEN, OOD_LEN)
-    # corrupt_fix: 输入 = 窗口 + EOS + 位置 token；fill_blank: 窗口 + EOS
-    tail_tokens = 2 if variant == 'corrupt_fix' else 1
+    # corrupt_fix：窗口 + EOS + 位置 token；fill_blank：窗口 + EOS(l/k) + 值前缀
+    tail_tokens = (2 if variant == 'corrupt_fix' else
+                   max(blank_counts) if multi_count else 1)
     BLOCK_SIZE = _round_up_pow2(max_len + tail_tokens)
 
     init_len, recurrence_fn, recurrence_name = single_rule_from_task(
@@ -723,16 +837,23 @@ def _prepare_single_variant(config, norm):
             test_dataset = _cut(test_dataset)
         print(f"[Variant] variable length: windows cut to [{seq_min}, {seq_max}]")
 
-    # FILL_BLANK_ALL_POSITIONS（仅 fill_blank）：每条序列的每个位置挖空各成
-    # 一条样本，样本数 × 窗口长度；空白位置由样本携带（(seq, k) 元组），
-    # collate 不再随机选位（空白替换仍由 collate 完成）。
+    # 枚举连续段起点，或按空格数枚举全部独立位置组合。
+    def _enumerate_blanks(samples):
+        if multi_count:
+            return [(seq, positions) for seq in samples for k in blank_counts
+                    for positions in combinations(range(len(seq)), k)]
+        if multi_blank:
+            return [(seq, k, l) for seq in samples for l in blank_lens
+                    for k in range(len(seq) - l + 1)]
+        return [(seq, k) for seq in samples for k in range(len(seq))]
+
     blank_all = (variant == 'fill_blank'
                  and cfg.get('FILL_BLANK_ALL_POSITIONS', False))
     if blank_all:
         n_base = len(train_dataset)
-        train_dataset = [(seq, k) for seq in train_dataset for k in range(len(seq))]
+        train_dataset = _enumerate_blanks(train_dataset)
         if data_mode == 'full_split':
-            test_dataset = [(seq, k) for seq in test_dataset for k in range(len(seq))]
+            test_dataset = _enumerate_blanks(test_dataset)
         print(f"[Variant] FILL_BLANK_ALL_POSITIONS: {n_base} windows -> "
               f"{len(train_dataset)} train samples")
     # CORRUPT_FIX_ALL_POSITIONS（仅 corrupt_fix）：每条序列的每个位置各污损
@@ -759,7 +880,7 @@ def _prepare_single_variant(config, norm):
         if cap is not None and len(test_windows) > cap:
             sub_rng = random.Random(cfg.get('RANDOM_SEED', 42) + 77)
             test_windows = sub_rng.sample(test_windows, cap)
-        test_dataset = [(seq, k) for seq in test_windows for k in range(len(seq))]
+        test_dataset = _enumerate_blanks(test_windows)
         print(f"[Variant] TEST_ALL_POSITIONS: {len(test_windows)} windows -> "
               f"{len(test_dataset)} deterministic test samples")
 
@@ -768,7 +889,18 @@ def _prepare_single_variant(config, norm):
     body_sup = cfg.get('BODY_SUPERVISION', True)
     body_from = init_len - 1
     eos_id = P + 1
-    if variant == 'corrupt_fix' and cfg.get('CORRUPT_FIX_VALUE_ONLY', False):
+    if variant == 'clean_value_set':
+        corrupt_ratio = float(cfg.get('CLEAN_VALUE_SET_CORRUPT_RATIO', 0.0))
+        if corrupt_ratio:
+            print(f'[Variant] CLEAN_VALUE_SET_CORRUPT_RATIO={corrupt_ratio}: '
+                  '每 batch 随机混合干净集合预测行与单点纠错行')
+        collate = make_clean_value_set_collate(
+            p=P, eos_id=eos_id, body_from=body_from,
+            body_supervision=body_sup, corrupt_ratio=corrupt_ratio)
+        vocab_size = P + 2
+        variant_save = {'eos_token_id': eos_id, 'body_from': body_from,
+                        'corrupt_ratio': corrupt_ratio}
+    elif variant == 'corrupt_fix' and cfg.get('CORRUPT_FIX_VALUE_ONLY', False):
         # VALUE_ONLY：不输出位置、只监督 EOS 真值槽（fill_blank 版面 + 污损）
         fixed_pos = cfg.get('CORRUPT_FIX_FIXED_POS')
         if fixed_pos is not None:
@@ -816,13 +948,27 @@ def _prepare_single_variant(config, norm):
             fixed_pos = int(fixed_pos)
             print(f"[Variant] FILL_BLANK_FIXED_POS={fixed_pos}: 挖空位置固定"
                   f"（负数从末尾数，-1 = 最后一位）")
+        if multi_count:
+            print(f"[Variant] BLANK_COUNTS={blank_counts}: 独立位置各留一个 BLANK，"
+                  "EOS(k) 编码空格数，随后按位置升序输出 k 个原值")
+        elif multi_blank:
+            print(f"[Variant] BLANK_LENS={blank_lens}: 连续段压缩为单个 BLANK，"
+                  "EOS(l) 在输入中编码段长，随后输出被挖值序列")
         collate = make_fill_blank_collate(p=P, eos_id=eos_id,
                                           body_supervision=body_sup,
                                           body_from=body_from,
-                                          fixed_k=fixed_pos)
-        vocab_size = P + 2
+                                          fixed_k=fixed_pos,
+                                          blank_lens=blank_lens,
+                                          blank_counts=blank_counts)
+        max_eos_variant = (max(blank_counts) if multi_count else
+                           max(blank_lens) if multi_blank else 1)
+        vocab_size = P + 1 + max_eos_variant
         variant_save = {'eos_token_id': eos_id, 'blank_token_id': P,
-                        'fixed_pos': fixed_pos}
+                        'fixed_pos': fixed_pos, 'blank_lens': blank_lens,
+                        'blank_counts': blank_counts,
+                        'blank_mode': ('multi_single' if multi_count else
+                                       'contiguous' if multi_blank else 'single'),
+                        'eos_variant_base': eos_id if multi_blank or multi_count else None}
     if variant == 'corrupt_fix' and cfg.get('CORRUPT_FIX_PAIRED_CLEAN', False):
         print('[Variant] CORRUPT_FIX_PAIRED_CLEAN: 干净续写行 + 污损答题行'
               '（主体监督由干净行承担，污损行只留 pos/val 两槽）')
@@ -857,7 +1003,9 @@ def _prepare_single_variant(config, norm):
                 cut = random.Random(fresh_seed + 1)
                 fresh_samples = [s[:cut.randint(seq_min, seq_max)]
                                  for s in fresh_samples]
-            if blank_all or test_all or corrupt_all:
+            if blank_all or test_all:
+                fresh_samples = _enumerate_blanks(fresh_samples)
+            elif corrupt_all:
                 fresh_samples = [(seq, k) for seq in fresh_samples
                                  for k in range(len(seq))]
             print(f"[FreshTest] sampled with replacement: "
@@ -868,11 +1016,17 @@ def _prepare_single_variant(config, norm):
     # 每个 eval 点按挖空/污损位置 k 分桶统计 acc 并打进日志（逐位置热力图
     # 的数据源）。探针集固定，跨 epoch 可比。
     probe_fn = None
-    if cfg.get('POS_PROBE', True):
+    if variant != 'clean_value_set' and cfg.get('POS_PROBE', True):
         probe_n = min(256, cfg.get('NUM_TEST_SAMPLES', 256) * 16)
         if data_mode == 'full_split':
-            pool = [item[0] if isinstance(item, (list, tuple)) else item
-                    for item in test_dataset]
+            # 枚举数据集会对同一 tensor 对象重复引用；先按对象身份去重，
+            # 避免探针重复 forward 及不定长窗口被组合数额外加权。
+            pool, seen_windows = [], set()
+            for item in test_dataset:
+                window = item[0] if isinstance(item, (list, tuple)) else item
+                if id(window) not in seen_windows:
+                    seen_windows.add(id(window))
+                    pool.append(window)
             probe_windows = random.Random(cfg.get('RANDOM_SEED', 42) + 55).sample(
                 pool, min(probe_n, len(pool)))
         else:
@@ -881,7 +1035,10 @@ def _prepare_single_variant(config, norm):
                 rng=random.Random(cfg.get('RANDOM_SEED', 42) + 56))
             if var_len:
                 probe_windows = _cut(probe_windows)
-        probe_fn = _make_pos_probe(probe_windows, collate, BATCH_SIZE)
+        probe_fn = _make_pos_probe(
+            probe_windows, collate, BATCH_SIZE, variant=variant,
+            blank_lens=blank_lens, blank_counts=blank_counts,
+            value_only=bool(cfg.get('CORRUPT_FIX_VALUE_ONLY', False)))
         probe_lens = sorted({w.numel() for w in probe_windows})
         print(f"[Probe] POS_PROBE: {len(probe_windows)} windows, "
               f"lengths={probe_lens}, fixed across evals")
@@ -976,12 +1133,12 @@ def run_experiment(config_path=None):
     # Stage 1: Scenario dispatch -- prepare dataset, model, loaders
     # ========================================================================
     try:
-        norm = normalize_task_config(TASK, cfg_main)
+        norm = _normalize_experiment_config(TASK, cfg_main)
     except ValueError as exc:
         print(f"[Error] {exc}")
         sys.exit(2)  # non-zero so batch_run records failure instead of a silent "success"
     scenario = norm['scenario']
-    if norm.get('variant') in ('corrupt_fix', 'fill_blank'):
+    if norm.get('variant') in ('corrupt_fix', 'fill_blank', 'clean_value_set'):
         # scenarios._normalize_variant already rejects non-single scenarios;
         # re-check defensively so a future variant never falls through silently.
         if scenario != 'single':

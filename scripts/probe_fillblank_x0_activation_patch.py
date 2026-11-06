@@ -3,8 +3,8 @@
 
 For blank K, the clean input is the len5 window with xK replaced by BLANK and
 EOS appended.  Each local F/M/R operand is shifted by +d mod P; clean residual
-activations are patched at the same dynamic operand positions and EOS is
-compared with the original windows[:,K].
+activations are patched at every token position 0..4 (including BLANK, excluding
+EOS) and EOS is compared with the original windows[:,K].
 """
 import argparse
 import gzip
@@ -65,6 +65,12 @@ def operand_positions(k):
     return positions[k]
 
 
+def patch_positions(k):
+    """Restore grid positions: all five tokens, including BLANK but not EOS."""
+    operand_positions(k)  # shared 0..4 validation
+    return list(range(SEQ_LEN))
+
+
 def clean_input_label(k):
     labels = [f'x{j}' if j != k else 'BLANK' for j in range(SEQ_LEN)]
     return '[' + ','.join(labels + ['EOS']) + ']'
@@ -79,6 +85,10 @@ def site_label(site):
 
 def position_label(position):
     return 'EOS' if position == EOS_POSITION else f'x{position}'
+
+
+def patch_position_label(position, blank):
+    return f'BLANK(x{blank})' if position == blank else position_label(position)
 
 
 def _rule_coefficients(cfg):
@@ -253,11 +263,16 @@ def _check_control(name, patched, reference, targets=None):
 def patch_chunk(model, corrupted_inputs, clean_cache, clean_logits,
                 corrupted_logits, targets, base_row, d_values, source_position,
                 route_exact, d_response, p=P, patch_positions=None,
-                baseline_changed=None):
+                baseline_changed=None, blank=None):
     """Patch one base/d chunk at all sites and dynamic patch positions."""
     if patch_positions is None:
-        patch_positions = operand_positions(0)
+        patch_positions = list(range(SEQ_LEN))
     batch_size = len(corrupted_inputs)
+    if blank is None:
+        blank_slots = (corrupted_inputs[0, :SEQ_LEN] == p).nonzero().flatten()
+        if len(blank_slots) != 1:
+            raise ValueError('could not infer the unique BLANK position')
+        blank = int(blank_slots[0])
     if baseline_changed is None:
         baseline_changed = (corrupted_logits[:, EOS_POSITION].argmax(dim=-1)
                             != targets).tolist()
@@ -299,7 +314,7 @@ def patch_chunk(model, corrupted_inputs, clean_cache, clean_logits,
                     'site': list(site),
                     'site_label': site_label(site),
                     'position': int(patch_position),
-                    'position_label': position_label(patch_position),
+                    'position_label': patch_position_label(patch_position, blank),
                     'target': int(targets[row]),
                     'D': int(d_response[row]),
                     'route_exact': bool(route_exact[row]),
@@ -466,7 +481,8 @@ def _baseline_rows(model, inputs, targets, base_row, d_values, source_position,
 @torch.inference_mode()
 def analyze(model, cfg, base_data, base_rows, d_values, batch_size, device, blank=0):
     """Validate every selected clean/corrupt baseline before any patching."""
-    positions = operand_positions(blank)
+    source_positions = operand_positions(blank)
+    restore_positions = patch_positions(blank)
     entry = base_data['by_blank'][f'x{blank}']
     windows = _as_long_tensor(entry['base_clean_windows'])
     base_outputs = _as_long_tensor(entry['base_outputs'])
@@ -505,13 +521,13 @@ def analyze(model, cfg, base_data, base_rows, d_values, batch_size, device, blan
     routes = route_slopes(cfg, blank)
     raw_indices = {
         position: _raw_record_index(entry['raw_records'][f'x{position}'])
-        for position in positions
+        for position in source_positions
     }
     corrupted_raw = []
     pending = []
     # Phase 1: all selected (source,base,d) outputs must match before phase 2.
     for base_row in base_rows:
-        for source_position in positions:
+        for source_position in source_positions:
             for start in range(0, len(d_values), batch_size):
                 chunk_d = d_values[start:start + batch_size]
                 expected_rows = []
@@ -540,8 +556,8 @@ def analyze(model, cfg, base_data, base_rows, d_values, batch_size, device, blan
                     'D': d_response,
                 })
         print(f'  validated blank=x{blank} base_row={base_row}: '
-              f'{len(positions)} sources x {len(d_values)} d values', flush=True)
-    expected_corrupted = len(base_rows) * len(positions) * len(d_values)
+              f'{len(source_positions)} sources x {len(d_values)} d values', flush=True)
+    expected_corrupted = len(base_rows) * len(source_positions) * len(d_values)
     if len(corrupted_raw) != expected_corrupted:
         raise AssertionError('corrupted baseline count mismatch')
 
@@ -553,13 +569,14 @@ def analyze(model, cfg, base_data, base_rows, d_values, batch_size, device, blan
             model, chunk['inputs'], clean_cache, clean_logits, chunk['logits'],
             chunk['targets'], chunk['base_row'], chunk['d_values'],
             chunk['source_position'], chunk['route_exact'], chunk['D'], cfg['p'],
-            patch_positions=positions, baseline_changed=chunk['baseline_changed'])
+            patch_positions=restore_positions, baseline_changed=chunk['baseline_changed'],
+            blank=blank)
         patched_raw.extend(rows)
         for name in control_max:
             control_max[name] = max(control_max[name], chunk_max[name])
         if chunk_index % 10 == 0 or chunk_index == len(pending):
             print(f'  patched {chunk_index}/{len(pending)} chunks', flush=True)
-    expected_patched = expected_corrupted * len(SITES) * len(positions)
+    expected_patched = expected_corrupted * len(SITES) * len(restore_positions)
     if len(patched_raw) != expected_patched:
         raise AssertionError(
             f'expected {expected_patched} patched rows, got {len(patched_raw)}')
@@ -576,7 +593,7 @@ def analyze(model, cfg, base_data, base_rows, d_values, batch_size, device, blan
         'corrupted': {
             'N': len(corrupted_raw),
             'expected_N': expected_corrupted,
-            'full_sweep_N': N_BASES * len(positions) * (int(cfg['p']) - 1),
+            'full_sweep_N': N_BASES * len(source_positions) * (int(cfg['p']) - 1),
             'full_vocab_match_count': len(corrupted_raw),
             'numeric_match_count': len(corrupted_raw),
             'baseline_output_match_count': len(corrupted_raw),
@@ -589,9 +606,9 @@ def analyze(model, cfg, base_data, base_rows, d_values, batch_size, device, blan
     controls = {
         'definitions': {
             'emb_ceiling': 'emb@corrupted source must reproduce all clean logits and Restore_full=1; a sanity ceiling, not a circuit finding',
-            'emb_identity': 'emb@any other operand position must be allclose to corrupted logits',
+            'emb_identity': 'emb@any other token position (including BLANK) must be allclose to corrupted logits',
             'causal_noop': 'when source_position > patch_position, every site must preserve EOS logits (an earlier position cannot see a future source)',
-            'final_resid_noop': 'after L4 only position-wise ln_f+lm_head remains; no operand-position patch can change EOS logits',
+            'final_resid_noop': 'after L4 only position-wise ln_f+lm_head remains; no token-position patch can change EOS logits',
         },
         'allclose_rtol': CONTROL_RTOL,
         'allclose_atol': CONTROL_ATOL,
@@ -615,27 +632,28 @@ def _matrix(aggregates, source_position, metric, blank=0):
     }
     return [
         [lookup[(source_position, site, position)][metric]
-         for position in operand_positions(blank)]
+         for position in patch_positions(blank)]
         for site in SITES
     ]
 
 
 def make_plots(aggregates, path_prefix, n_bases, n_d, blank=0):
-    """Two true-data 5 x len(operand_positions) heatmaps per source."""
+    """Two true-data 5 residual rows x 5 token-position columns per source."""
     import matplotlib
     matplotlib.use('Agg')
     import matplotlib.pyplot as plt
     from matplotlib.colors import TwoSlopeNorm
 
-    positions = operand_positions(blank)
+    source_positions = operand_positions(blank)
+    restore_positions = patch_positions(blank)
     paths = []
-    for source_position in positions:
+    for source_position in source_positions:
         source = f'x{source_position}'
         for metric, suffix in (('changed_restore_full', 'restore_full'),
                                ('mean_delta_margin', 'delta_margin')):
             matrix = _matrix(aggregates, source_position, metric, blank)
             flat_values = [value for row in matrix for value in row]
-            fig, ax = plt.subplots(figsize=(4 + 1.4 * len(positions), 10),
+            fig, ax = plt.subplots(figsize=(4 + 1.4 * len(restore_positions), 10),
                                    constrained_layout=True)
             if metric == 'changed_restore_full':
                 numeric_matrix = [[float('nan') if value is None else value
@@ -651,12 +669,14 @@ def make_plots(aggregates, path_prefix, n_bases, n_d, blank=0):
                                       vcenter=0.0,
                                       vmax=max(1.0, max(abs(value) for value in flat_values))))
                 colorbar_label = 'Mean delta target margin (patched - corrupted)'
-            ax.set_xticks(range(len(positions)), [f'patch x{p}' for p in positions])
+            ax.set_xticks(
+                range(len(restore_positions)),
+                [f'patch {patch_position_label(p, blank)}' for p in restore_positions])
             ax.set_yticks(range(5), SITE_LABELS)
             ax.set_xlabel('Patch position')
             ax.set_ylabel('Residual boundary')
             for row in range(5):
-                for column in range(len(positions)):
+                for column in range(len(restore_positions)):
                     value = matrix[row][column]
                     if value is None:
                         text, color = 'n/a', 'black'
@@ -736,15 +756,16 @@ def parse_args(argv=None):
 
 
 def plan_counts(base_rows, d_values, blank=0):
-    positions = operand_positions(blank)
-    corrupted = len(base_rows) * len(positions) * len(d_values)
+    n_sources = len(operand_positions(blank))
+    n_patch_positions = len(patch_positions(blank))
+    corrupted = len(base_rows) * n_sources * len(d_values)
     return {
         'clean': N_BASES,
         'corrupted': corrupted,
-        'patched': corrupted * len(SITES) * len(positions),
-        'aggregate_cells': len(positions) * len(SITES) * len(positions),
-        'per_base_cells': (len(base_rows) * len(positions)
-                           * len(SITES) * len(positions)),
+        'patched': corrupted * len(SITES) * n_patch_positions,
+        'aggregate_cells': n_sources * len(SITES) * n_patch_positions,
+        'per_base_cells': (len(base_rows) * n_sources
+                           * len(SITES) * n_patch_positions),
     }
 
 
@@ -753,7 +774,8 @@ def print_dry_run(args):
     full_counts = plan_counts(range(N_BASES), range(1, P), args.blank)
     full = (args.base_rows == list(range(N_BASES))
             and args.d_values == list(range(1, P)))
-    positions = operand_positions(args.blank)
+    source_positions = operand_positions(args.blank)
+    restore_positions = patch_positions(args.blank)
     print(f'DRY RUN: blank x{args.blank} fill_blank clean->corrupted activation patching')
     print(f'  ckpt: {args.ckpt}')
     print(f'  base data: {args.base_data} (by_blank.x{args.blank})')
@@ -765,7 +787,8 @@ def print_dry_run(args):
     print(f'  full default sweep: {full}')
     print(f'  clean: {clean_input_label(args.blank)}, target=windows[:,{args.blank}]; '
           'one cache for all 32 bases')
-    print(f'  corruption sources and patch positions: {positions}')
+    print(f'  corruption sources (operands only): {source_positions}')
+    print(f'  restore patch positions (includes BLANK, excludes EOS): {restore_positions}')
     for site in SITES:
         print(f'    {site}: {site_label(site)}')
     print(f'  counts: clean={counts["clean"]}; corrupted={counts["corrupted"]}; '
@@ -776,8 +799,9 @@ def print_dry_run(args):
           f'aggregate cells={full_counts["aggregate_cells"]}; '
           f'per-base cells={full_counts["per_base_cells"]}')
     print('  hard controls: emb@source clean ceiling + Restore_full=1; '
-          'emb@other identity; source>patch causal EOS no-op; final-residual EOS no-op')
-    print(f'  {2 * len(positions)} plots: each source x '
+          'emb@other identity (including BLANK); source>patch causal EOS no-op; '
+          'final-residual EOS no-op')
+    print(f'  {2 * len(source_positions)} plots: each source x 5 residual rows x 5 patch columns; '
           '{changed Restore_full, mean delta margin}')
 
 
@@ -819,7 +843,7 @@ def main(argv=None):
             'base_rows': args.base_rows,
             'd_values': args.d_values,
             'source_positions': operand_positions(args.blank),
-            'patch_positions': operand_positions(args.blank),
+            'patch_positions': patch_positions(args.blank),
             'sites': [list(site) for site in SITES],
             'site_labels': SITE_LABELS,
             'eos_position': EOS_POSITION,
@@ -865,7 +889,8 @@ def main(argv=None):
         with open(args.out, 'w', encoding='utf-8') as handle:
             json.dump(report, handle, indent=2)
     print(f'  JSON: {args.out} ({len(patched_raw)} patched raw rows)', flush=True)
-    print(f'[5/5] Drawing {2 * len(operand_positions(args.blank))} residual heatmaps',
+    print(f'[5/5] Drawing {2 * len(operand_positions(args.blank))} residual heatmaps '
+          '(5x5 full-position grid)',
           flush=True)
     paths = make_plots(aggregates, args.plot_prefix,
                        len(args.base_rows), len(args.d_values), args.blank)

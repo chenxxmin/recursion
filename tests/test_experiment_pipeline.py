@@ -257,11 +257,128 @@ def test_effective_data_counts():
     assert e['config']['FRESH_TEST_PER_EVAL'] is False
 
 
+def test_effective_multi_blank_counts_and_layout():
+    sys.path.insert(0, str(REPO / 'src'))
+    from experiment import _prepare_single_variant
+    from scenarios import normalize_task_config
+
+    def prepare_actual(spec):
+        experiment = pipeline.prepare(spec)['experiments'][0]
+        with contextlib.redirect_stdout(io.StringIO()):
+            actual = _prepare_single_variant(
+                {'main': experiment['config']},
+                normalize_task_config('addition', experiment['config']))
+        return experiment, actual
+
+    spec = request()
+    spec['common']['DATA_MODE'] = 'full_split'
+    spec['experiments'] = [dict(name='multi_blank_static', task='addition', config=dict(
+        TASK_VARIANT='fill_blank', BLANK_LENS=[1, 2], NUM_MASK=None,
+        FILL_BLANK_ALL_POSITIONS=True))]
+    e, actual = prepare_actual(spec)
+    # L=6 -> 6+5=11 segments/window; 32 train and 17 test base windows.
+    assert e['effective']['actual_train_samples']['total'] == 352
+    assert len(actual['train_dataset']) == 352
+    assert e['effective']['actual_test_samples']['total'] == 187
+    assert len(actual['test_dataset']) == 187
+    assert e['effective']['train_sequence_tokens'] == 7
+    assert e['effective']['eval_sequence_tokens'] == 7
+    assert e['effective']['block_size'] == 16
+    assert e['effective']['vocab_size'] == 10
+    assert actual['save_config']['blank_lens'] == [1, 2]
+    assert actual['save_config']['eos_variant_base'] == 8
+    assert 'length_token_base' not in actual['save_config']
+
+    spec = request()
+    spec['experiments'] = [dict(name='multi_blank_fresh', task='addition', config=dict(
+        TASK_VARIANT='fill_blank', BLANK_LENS=[1, 2], NUM_MASK=None,
+        FILL_BLANK_ALL_POSITIONS=True, NUM_TEST_SAMPLES=7))]
+    e, actual = prepare_actual(spec)
+    with contextlib.redirect_stdout(io.StringIO()):
+        loader = actual['test_loader_fn']()
+    # Fresh OOD_LEN=8 -> 8+7=15 segments/window.
+    assert e['effective']['actual_test_samples']['total'] == 105
+    assert len(loader.dataset) == 105
+    assert e['effective']['eval_sequence_tokens'] == 9
+
+    spec = request()
+    spec['common']['DATA_MODE'] = 'full_split'
+    spec['experiments'] = [dict(name='multi_blank_test_all', task='addition', config=dict(
+        TASK_VARIANT='fill_blank', BLANK_LENS=[1, 2], NUM_MASK=None,
+        TEST_ALL_POSITIONS=True))]
+    e, actual = prepare_actual(spec)
+    # 静态 NUM_TEST_SAMPLES=16 是窗口上限；训练侧不枚举。
+    assert len(actual['train_dataset']) == 32
+    assert e['effective']['actual_test_samples']['total'] == 176
+    assert len(actual['test_dataset']) == 176
+
+    spec = request()
+    spec['experiments'] = [dict(name='multi_blank_var_len', task='addition', config=dict(
+        TASK_VARIANT='fill_blank', BLANK_LENS=[1, 2, 3], NUM_MASK=None,
+        SEQ_LEN_MIN=3, SEQ_LEN_MAX=5))]
+    e, actual = prepare_actual(spec)
+    with contextlib.redirect_stdout(io.StringIO()):
+        loader = actual['test_loader_fn']()
+    assert all(3 <= len(window) <= 5 for window in loader.dataset)
+    assert e['effective']['eval_base_length'] == '3..5'
+    assert e['effective']['eval_sequence_tokens'] == '4..6'
+    assert e['effective']['block_size'] == 8
+    assert e['effective']['vocab_size'] == 11
+
+
+def test_effective_multi_count_counts_and_layout():
+    sys.path.insert(0, str(REPO / 'src'))
+    from experiment import _prepare_single_variant
+    from scenarios import normalize_task_config
+
+    spec = request()
+    spec['common']['DATA_MODE'] = 'full_split'
+    spec['experiments'] = [dict(name='multi_count_static', task='addition', config=dict(
+        TASK_VARIANT='fill_blank', BLANK_COUNTS=[1, 2], NUM_MASK=None,
+        FILL_BLANK_ALL_POSITIONS=True))]
+    experiment = pipeline.prepare(spec)['experiments'][0]
+    with contextlib.redirect_stdout(io.StringIO()):
+        actual = _prepare_single_variant(
+            {'main': experiment['config']},
+            normalize_task_config('addition', experiment['config']))
+    # L=6 -> comb(6,1)+comb(6,2)=21 position subsets/window.
+    assert experiment['effective']['actual_train_samples']['total'] == 672
+    assert len(actual['train_dataset']) == 672
+    assert experiment['effective']['actual_test_samples']['total'] == 357
+    assert len(actual['test_dataset']) == 357
+    assert experiment['effective']['train_sequence_tokens'] == '7..8'
+    assert experiment['effective']['eval_sequence_tokens'] == '7..8'
+    assert experiment['effective']['block_size'] == 16
+    assert experiment['effective']['vocab_size'] == 10
+    assert actual['save_config']['blank_counts'] == [1, 2]
+    assert actual['save_config']['blank_mode'] == 'multi_single'
+
+    spec = request()
+    spec['experiments'] = [dict(name='multi_count_var_len', task='addition', config=dict(
+        TASK_VARIANT='fill_blank', BLANK_COUNTS=[1, 2, 3], NUM_MASK=None,
+        SEQ_LEN_MIN=3, SEQ_LEN_MAX=5))]
+    experiment = pipeline.prepare(spec)['experiments'][0]
+    with contextlib.redirect_stdout(io.StringIO()):
+        actual = _prepare_single_variant(
+            {'main': experiment['config']},
+            normalize_task_config('addition', experiment['config']))
+        loader = actual['test_loader_fn']()
+    assert all(3 <= len(window) <= 5 for window in loader.dataset)
+    assert experiment['effective']['eval_base_length'] == '3..5'
+    assert experiment['effective']['eval_sequence_tokens'] == '4..8'
+    assert experiment['effective']['block_size'] == 8
+    assert experiment['effective']['vocab_size'] == 11
+
+
 if __name__ == '__main__':
     with tempfile.TemporaryDirectory(prefix='experiment_pipeline_') as temporary:
         root = Path(temporary)
         test_effective_data_counts()
         print('PASS effective mixed/single counts match actual datasets', flush=True)
+        test_effective_multi_blank_counts_and_layout()
+        print('PASS effective multi-blank counts/layout match actual datasets', flush=True)
+        test_effective_multi_count_counts_and_layout()
+        print('PASS effective multi-count counts/layout match actual datasets', flush=True)
         bundle = test_review_and_freeze(root)
         print('PASS review, confirmation, integrity, packaging', flush=True)
         if BUNDLE_RUNNER_OK:

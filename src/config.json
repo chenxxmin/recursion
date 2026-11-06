@@ -3,6 +3,8 @@
     "P": 53,
     "TASK": "addition",
     "TASK_VARIANT": null,
+    "BLANK_LENS": [1],
+    "BLANK_COUNTS": [1],
     "CONST": 0,
     "NUM_MASK": null,
     "D_MODEL": 64,

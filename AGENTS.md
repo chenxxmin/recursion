@@ -4,8 +4,10 @@
 
 ## 0. 必读的现有文档
 
-- `.agents/skills/recursion-experiment-runner/SKILL.md`：实验运行全流程 + 四个工具脚本（逐卡队列状态、全量汇总、存档点停止、临时定时）。**跑实验前必读**。
+- `.agents/skills/recursion-experiment-runner/SKILL.md`：实验运行全流程 + 五个工具技能（逐卡队列状态、全量汇总、存档点停止、临时定时、找空卡并钉 N 卡启动）。**跑实验前必读**。
+- `.agents/skills/analyze-circuit-perturbations/SKILL.md`：填空/纠错的因果扰动与电路分析流程，含候选斜率、clean-hit、len5/长窗口/远位置脚本索引和未解释样本分布提取。**做电路扰动分析前必读**。
 - `.agents/skills/analyze-logit-lens/SKILL.md`：最终答案/中间量的逐层 Logit Lens 解码流程，含 full-vocab 概率/rank/margin、多目标共享 forward、逐 input 稀有信号与复制控制、最早位置及 forward 校验。**做逐层解码分析前必读**。
+- `.agents/skills/analyze-attention-maps/SKILL.md`：逐层逐头注意力提取与热图流程，含 batch/逐 input 口径、RoPE+causal attention、独立 forward 对拍、0~1 图和规范输出目录。**做 attention 分析前必读**。
 - `docs/recursion_model_and_training_settings.md`：所有配置键的完整说明（TRAIN_LEN/MISSING_PROB/NUM_MASK/MAX_TRAIN_HOURS/...），改配置语义后必须同步它。
 - `docs/AMP_PRECISION_NOTES.md`：精度教训——结论性实验必须 fp32（默认），bf16 只能粗筛。
 
@@ -49,8 +51,12 @@
 17. **CORRUPT_FIX_MASK_AROUND**（2026-10-21，仅 corrupt_fix）：动态主体 mask——污损位 k 牵连的预测位 {k-1,k,k+1}（预测 x_k/x_{k+1}/x_{k+2}）不计主体 loss/acc；pos/val 槽不动；评估同口径（0.99 早停恢复可达）。paired_clean 下无作用。
 18. **CORRUPT_FIX_ALL_POSITIONS**（2026-10-21，仅 corrupt_fix，与 PAIRED_CLEAN 互斥）：逐位置枚举污损（(seq,k) 元组，错误值仍在线随机），样本数×窗口长度，与 FILL_BLANK_ALL_POSITIONS 同构。save_config 记 `all_positions`。
 19. **CORRUPT_FIX_POS_WEIGHT**（2026-10-21，仅 corrupt_fix，默认 1.0=不启用）：pos 槽 loss 权重（mask[L]=w，acc 统计不受影响）。另：PosProbe 同日新增相对位置五桶行 `posR|/valR|`（first/second/mid/last2/last），仅评估侧改动。
+20. **clean_value_set 混合纠错**（2026-11-04）：`clean_value_set` 支持 `BODY_SUPERVISION` 与 `CLEAN_VALUE_SET_CORRUPT_RATIO`（默认 0）；按比例每 batch 随机混入单点含错、EOS 普通 CE 输出正确值的行，干净行仍用集合 loss/membership acc。`BODY_SUPERVISION=false` 时两类行都只监督 EOS，50% 混合在 loss/overall 上也是逐样本 50/50；新增 `corrupt_value_acc` 分组日志，save_config 记 `corrupt_ratio`。默认 clean_value_set 行为不变。规格见 settings §1.9。
+21. **BLANK_LENS 多长度连续填空**（2026-11-05，仅 fill_blank）：默认 `[1]` 完整保留旧单空布局；集合含 `l>1` 时先均匀抽 l、再抽连续段起点 k∈[0,L-l]，整段只留一个 BLANK，`x=[压缩窗口,EOS(l),被挖值[:-1]]`、target 尾部为 `EOS(l)+l个被挖值`，teacher forcing。`EOS(l)=P+1+l-1` 在输入中直接编码长度（EOS(1)=旧 EOS），EOS 槽立即输出首值，无独立长度预测；扩展词表 `P+1+max(BLANK_LENS)`，block 按 `max_len+1`。ALL/TEST_ALL 枚举 `(seq,k,l)`；PosProbe 按 l 输出 `val_l*` 及 R 行；overall 是 token 微平均而非 exact-match。save_config 记 `blank_lens`/`eos_variant_base`；旧 attention/logit-lens/电路分析脚本不能直接用于扩展布局。规格见 settings §1.8。
 
-15. **SAVE_CHECKPOINTS**（2026-10-19，默认 true）：false 时训练全程不落任何存档（`_best`/`_latest`/`_resume`/最终 `model.pth` 都不写），仅日志，用于大批量粗扫省磁盘；超时/停掉的实验不可续跑，attention 后处理自动跳过。文档：settings §训练循环与早停。
+22. **BLANK_COUNTS 多个独立单值空格**（2026-11-06，仅 fill_blank）：默认 `[1]` 保留旧布局；非默认时先抽空格数 k，再无重复抽取 k 个位置，每位置一个 BLANK，窗口不压缩。`EOS(k)=P+1+(k-1)` 编码空格数，尾部按位置升序 teacher forcing 输出 k 个原值；k=1 与旧单空一致。不同 k 批内右补齐，词表 `P+1+max(BLANK_COUNTS)`，block 按 `max_len+max(BLANK_COUNTS)`。与非默认 `BLANK_LENS` 和 `FILL_BLANK_FIXED_POS` 互斥；ALL/TEST_ALL 枚举 `(seq,positions)` 位置组合（每窗口 `sum_k comb(L,k)`），PosProbe 输出 `val_n*`/`valR_n*`。save_config 记 `blank_counts`/`blank_mode='multi_single'`。每个空格独立变长尚未开放配置；旧分析脚本不能直接使用。规格见 settings §1.8。
+
+23. **SAVE_CHECKPOINTS**（2026-10-19，默认 true）：false 时训练全程不落任何存档（`_best`/`_latest`/`_resume`/最终 `model.pth` 都不写），仅日志，用于大批量粗扫省磁盘；超时/停掉的实验不可续跑，attention 后处理自动跳过。文档：settings §训练循环与早停。
 
 ## 4. 本机环境的坑（反复踩过）
 

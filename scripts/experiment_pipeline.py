@@ -103,6 +103,10 @@ def normalize(task, cfg, origins):
     norm = normalize_task_config(task, cfg)
     scenario = norm['scenario']
     variant = norm.get('variant')  # None | 'corrupt_fix' | 'fill_blank'（场景下一级的任务变体）
+    blank_lens = list(cfg.get('BLANK_LENS', [1]))
+    blank_counts = list(cfg.get('BLANK_COUNTS', [1]))
+    multi_blank = variant == 'fill_blank' and blank_lens != [1]
+    multi_count = variant == 'fill_blank' and blank_counts != [1]
     order = norm['order']
     notes = []
     positive_int(cfg['NUM_TEST_SAMPLES'], 'NUM_TEST_SAMPLES')
@@ -137,30 +141,61 @@ def normalize(task, cfg, origins):
         convention = '第一个系数乘最新值' if isinstance(rules, list) else '由 task 固定的非线性公式；A/B 不参与'
         test_count = cfg['NUM_TEST_SAMPLES'] if cfg['FRESH_TEST_PER_EVAL'] else cfg['P'] ** order - count
         exposure = count / cfg['P'] ** order
-        # fill_blank 逐位置枚举挖空：每窗口 × 窗口长度 条样本（train/test 同样）
+        # fill_blank 逐位置/逐段枚举挖空。
+        def blank_combos(window_len):
+            if multi_count:
+                return sum(math.comb(window_len, k) for k in blank_counts)
+            return sum(window_len - blank_l + 1 for blank_l in blank_lens)
+
+        var_len = cfg.get('SEQ_LEN_MAX') is not None
         if variant == 'fill_blank' and cfg.get('FILL_BLANK_ALL_POSITIONS'):
             eval_win_len = cfg['OOD_LEN'] if cfg['FRESH_TEST_PER_EVAL'] else cfg['TRAIN_LEN']
-            notes.append('FILL_BLANK_ALL_POSITIONS：每个位置挖空各成一条样本，'
-                         '训练样本数 = 窗口数 × TRAIN_LEN（test 同乘以窗口长度）。')
-            count = {'windows': count, 'total': count * cfg['TRAIN_LEN']}
-            test_count = {'windows': test_count, 'total': test_count * eval_win_len}
+            if multi_count:
+                notes.append('FILL_BLANK_ALL_POSITIONS：按空格数枚举全部位置组合，'
+                             '每窗口样本数 = sum_k comb(L,k)；在线模式仍先抽 k 再抽位置子集。')
+            elif multi_blank:
+                notes.append('FILL_BLANK_ALL_POSITIONS：枚举全部 (k,l)，每窗口样本数 = '
+                             'sum_l(L-l+1)；在线非枚举模式仍先均匀抽 l 再抽 k。')
+            else:
+                notes.append('FILL_BLANK_ALL_POSITIONS：每个位置挖空各成一条样本，'
+                             '训练样本数 = 窗口数 × TRAIN_LEN（test 同乘以窗口长度）。')
+            if (multi_blank or multi_count) and var_len:
+                total = ('逐窗口求和 sum_k comb(len(window),k)' if multi_count else
+                         '逐窗口求和 sum_l(len(window)-l+1)')
+                count = {'windows': count, 'total': total}
+                test_count = {'windows': test_count, 'total': total}
+            else:
+                count = {'windows': count,
+                         'total': count * blank_combos(cfg['TRAIN_LEN'])}
+                test_count = {'windows': test_count,
+                              'total': test_count * blank_combos(eval_win_len)}
         elif variant == 'fill_blank' and cfg.get('TEST_ALL_POSITIONS'):
             eval_win_len = cfg['OOD_LEN'] if cfg['FRESH_TEST_PER_EVAL'] else cfg['TRAIN_LEN']
             if not cfg['FRESH_TEST_PER_EVAL']:
                 # 静态切分下 NUM_TEST_SAMPLES 是测试窗口数上限
                 test_count = min(test_count, cfg['NUM_TEST_SAMPLES'])
-            notes.append('TEST_ALL_POSITIONS：测试集逐位置枚举挖空（确定性评估），'
-                         'test 样本数 = 窗口数 × 窗口长度（静态切分下窗口数上限 = NUM_TEST_SAMPLES）；'
-                         '训练侧保持在线随机挖空。')
-            test_count = {'windows': test_count, 'total': test_count * eval_win_len}
+            notes.append('TEST_ALL_POSITIONS：测试集枚举全部合法挖空段（确定性评估），'
+                         '静态切分下窗口数上限 = NUM_TEST_SAMPLES；训练侧保持在线随机挖空。')
+            if (multi_blank or multi_count) and var_len:
+                total = ('逐窗口求和 sum_k comb(len(window),k)' if multi_count else
+                         '逐窗口求和 sum_l(len(window)-l+1)')
+                test_count = {'windows': test_count, 'total': total}
+            else:
+                test_count = {'windows': test_count,
+                              'total': test_count * blank_combos(eval_win_len)}
         data_mode = mode
-        # 变体尾部 token：corrupt_fix = EOS + 位置 token；fill_blank = EOS
-        tail = {'corrupt_fix': 2, 'fill_blank': 1}.get(variant, 0)
+        # corrupt_fix 有 EOS + 位置 token；fill_blank 的 EOS(l) 同时编码段长。
+        tail = 2 if variant == 'corrupt_fix' else (1 if variant == 'fill_blank' else 0)
         train_tokens = cfg['TRAIN_LEN'] + tail
+        if multi_count:
+            train_tokens = (f"{cfg['TRAIN_LEN'] + min(blank_counts)}.."
+                            f"{cfg['TRAIN_LEN'] + max(blank_counts)}")
         if variant and cfg.get('SEQ_LEN_MAX') is not None:
             notes.append(f"不定长窗口：SEQ_LEN {cfg['SEQ_LEN_MIN']}-{cfg['SEQ_LEN_MAX']}"
                          f"（逐样本随机截断）；词表/block 按最大长度。")
-            train_tokens = f"{cfg['SEQ_LEN_MIN']}..{cfg['SEQ_LEN_MAX']}+{tail}"
+            train_tokens = (f"{cfg['SEQ_LEN_MIN'] + min(blank_counts)}.."
+                            f"{cfg['SEQ_LEN_MAX'] + max(blank_counts)}" if multi_count else
+                            f"{cfg['SEQ_LEN_MIN']}..{cfg['SEQ_LEN_MAX']}+{tail}")
     elif scenario == 'mixed':
         rules = norm['rules']
         require(isinstance(rules, list) and rules, 'RULES must contain rules')
@@ -212,8 +247,17 @@ def normalize(task, cfg, origins):
         notes.append('每条实验独立计时，从训练循环开始；每 ' + str(cfg['EVAL_INTERVAL']) +
                      ' epoch 的评估点检查，到时保存完整存档退出，可能超过名义时限；不改变 cosine horizon。')
     eval_len = cfg['OOD_LEN'] if cfg['FRESH_TEST_PER_EVAL'] or scenario == 'action' else cfg['TRAIN_LEN']
-    tail_tokens = {'corrupt_fix': 2, 'fill_blank': 1}.get(variant, 0)
+    tail_tokens = (2 if variant == 'corrupt_fix' else
+                   max(blank_counts) if multi_count else
+                   1 if variant == 'fill_blank' else 0)
     eval_tokens = 2 * eval_len - order if scenario == 'action' else eval_len + tail_tokens
+    if multi_count:
+        eval_tokens = f"{eval_len + min(blank_counts)}..{eval_len + max(blank_counts)}"
+    if variant and cfg.get('SEQ_LEN_MAX') is not None:
+        eval_len = f"{cfg['SEQ_LEN_MIN']}..{cfg['SEQ_LEN_MAX']}"
+        eval_tokens = (f"{cfg['SEQ_LEN_MIN'] + min(blank_counts)}.."
+                       f"{cfg['SEQ_LEN_MAX'] + max(blank_counts)}" if multi_count else
+                       f"{cfg['SEQ_LEN_MIN'] + tail_tokens}..{cfg['SEQ_LEN_MAX'] + tail_tokens}")
     max_len_for_block = (cfg['SEQ_LEN_MAX'] if variant and cfg.get('SEQ_LEN_MAX') is not None
                          else max(cfg['TRAIN_LEN'], cfg['OOD_LEN']))
     max_tokens = (2 * max(cfg['TRAIN_LEN'], cfg['OOD_LEN']) - order if scenario == 'action' else
@@ -222,8 +266,17 @@ def normalize(task, cfg, origins):
         notes.append('corrupt_fix：污损是任务内生的（恰好一位改成随机错误值），无 clean/total 之分，'
                      '结果口径 = 训练日志 best acc；输出 = 位置 token + 正确值两个 token。')
     elif variant == 'fill_blank':
-        notes.append('fill_blank：污损是任务内生的（恰好一位替换成空白 token id=P），无 clean/total 之分，'
-                     '结果口径 = 训练日志 best acc；输出 = 正确值一个 token。')
+        if multi_count:
+            notes.append(f'fill_blank：BLANK_COUNTS={blank_counts}，每个空格长度均为 1；'
+                         'EOS(k)=P+1+(k-1) 编码空格数，随后按位置升序 teacher forcing 输出 k 个原值。'
+                         '不同 k 的行右补齐；overall 是值/可选主体 token 的微平均。')
+        elif multi_blank:
+            notes.append(f'fill_blank：BLANK_LENS={blank_lens}，连续 l 个值压缩为一个 BLANK；'
+                         'EOS(l)=P+1+(l-1) 在输入中编码段长，随后 teacher forcing 输出 l 个正确值。'
+                         'overall 是值/可选主体 token 的微平均，不是整题 exact-match。')
+        else:
+            notes.append('fill_blank：污损是任务内生的（恰好一位替换成空白 token id=P），无 clean/total 之分，'
+                         '结果口径 = 训练日志 best acc；输出 = 正确值一个 token。')
     notes.append('静态测试在达到 EARLY_STOP_ACCURACY 时停止；fresh test 在最近 10 次评估均值超过阈值时停止。EARLY_STOP_EXTRA_EPOCHS 已废弃，不生效。')
     notes.append('训练结束不再跑 final generation test（2026-10-08 删除）；结果口径 = 训练日志 best acc + eval_clean_action.py。正常完成后跑 attention 分析；存档退出码 42 跳过后处理。')
     return dict(actual_train_samples=count, actual_test_samples=test_count,
@@ -234,7 +287,9 @@ def normalize(task, cfg, origins):
                 actual_num_mask=('collate loss_mask（不参与）' if variant in ('corrupt_fix', 'fill_blank')
                                  else '数据集 loss_mask' if scenario == 'action' else cfg['NUM_MASK']),
                 **({'vocab_size': (cfg['P'] + 2 + max(cfg['TRAIN_LEN'], cfg['OOD_LEN'])
-                                   if variant == 'corrupt_fix' else cfg['P'] + 2)}
+                                   if variant == 'corrupt_fix' else
+                                   cfg['P'] + 1 + (max(blank_counts) if multi_count else
+                                                   max(blank_lens) if multi_blank else 1))}
                    if variant in ('corrupt_fix', 'fill_blank') else {}),
                 initialization='resume' if cfg.get('RESUME_FROM') else 'weights_only' if cfg.get('INIT_FROM') else 'fresh',
                 optimizer='AdamW', scheduler='CosineAnnealingLR', scheduler_T_max=cfg['EPOCHS'],

@@ -143,7 +143,7 @@ loss_mask    = 仅最后两个 target 位为 1（EOS 槽预测位置 token，位
 
 ### 1.8 fill_blank 任务变体（2026-10-14）
 
-与 corrupt_fix 同族（`TASK_VARIANT='fill_blank'`，仅 single），差别仅在污损方式与输出：
+与 corrupt_fix 同族（`TASK_VARIANT='fill_blank'`，仅 single）。以下先是 `BLANK_LENS=[1]` 的默认旧布局；连续多值挖空见本节后面的 `BLANK_LENS`：
 
 1. 恰好一个位置 k（均匀选自 [0, L)，含初值位）被替换成**空白 token**（id = P，即现有 missing token），不是随机错误值；
 2. 尾部接 EOS（id = P+1），模型只输出**一个 token：空白处的正确值**（空白位置不言自明，不用答位置）；
@@ -159,9 +159,47 @@ loss_mask    = 仅 EOS 槽一位为 1（acc 只有 target[L] 一个输出位）
 
 约束、评估口径、早停、结果口径均与 corrupt_fix 相同（§1.7）。collate：`make_fill_blank_collate`；BatchTag：`FILL_BLANK`；checkpoint save_config 记 `variant`/`eos_token_id`/`blank_token_id`/`vocab_size`。
 
-**`FILL_BLANK_ALL_POSITIONS`**（2026-10-14，默认 false，仅 fill_blank）：true 时数据侧枚举式挖空——每条序列的每个位置挖空各成一条样本（`(seq, k)` 元组，样本数 × 窗口长度，train/test 同样），collate 使用样本携带的位置不再随机选位。适合小状态空间任务（如等差数列）保证位置覆盖。
+**`BLANK_LENS` 连续多值挖空**（2026-11-05，仅 fill_blank，默认 `[1]`）：配置非空、不重复的正整数集合。默认 `[1]` 完整保留上述旧布局、旧词表和旧 checkpoint 行为；集合含 `l>1` 时启用 `EOS(l)` 变体，混合集合中的 `l=1` 样本也仍与旧布局一致。普通样本先从集合均匀抽 `l`，再从合法起点 `k∈[0,L-l]` 均匀抽连续段，允许段尾贴住窗口末尾；整段在可见窗口中只留一个 BLANK。`H=seq[k:k+l]`、压缩视图 `V=seq[:k]+[BLANK]+seq[k+l:]`、`M=L-l+1`，则：
+
+```text
+x           = [V, EOS(l), H[:-1]]            # 恒长 L+1
+target_seq  = [B, EOS(l), H]                 # 恒长 L+2
+EOS(l)      = P+1+(l-1)                      # EOS(1)=P+1，即旧 EOS
+loss_mask   = target[M:M+l] 为 1              # 仅 l 个值槽，不预测长度
+```
+
+训练仍用 `target_seq[:,1:]`：`EOS(l)` 在输入中直接给定期望长度，EOS 输入槽立即预测 `H[0]`，随后 teacher forcing 依次预测其余被挖值；最后一个真值只出现在 target，不进入模型输入。比如 `[x0,x1,x2,x3,x4]` 在 `k=2,l=2,BODY_SUPERVISION=false` 时，`x=[x0,x1,BLANK,x4,EOS(2),x2]`，`target_seq=[x0,x1,BLANK,x4,EOS(2),x2,x3]`。压缩视图与 teacher-forced 前缀的长度相互抵消，因此同一原始窗口长度的不同 `l` 具有相同张量形状，无需 padding。
+
+扩展模式词表为值 `0..P-1`、BLANK `P`、EOS 变体 `P+1..P+max(BLANK_LENS)`，故 `vocab_size=P+1+max(BLANK_LENS)`，`BLOCK_SIZE=round_up_pow2(max_len+1)`（不定长时 max_len=`SEQ_LEN_MAX`）。要求最大 `l` 不超过任何实际窗口长度。`FILL_BLANK_FIXED_POS` 固定的是段起点；负数从合法起点列表倒计数，`-1` 对应 `k=L-l`。
+
+`BODY_SUPERVISION=false` 时 `B=V`；true 时 `B=seq[:k+1]+seq[k+l:]`，即 BLANK 对应的 target 前缀槽放第一个被挖值，可见后缀保持干净，其余被挖值只在尾部监督。主体 mask 为 `[body_from,M-1)`，尾部 `l` 个值槽照常计入。overall/best/early-stop 是所有受监督 token 的微平均，**不是整条空缺全部填对的 exact-match，也不是自由生成准确率**。
+
+`FILL_BLANK_ALL_POSITIONS`/`TEST_ALL_POSITIONS` 在扩展模式下枚举所有 `(seq,k,l)`，每个 L 窗口的组合数为 `sum_l(L-l+1)`；这与在线模式“先均匀抽 l、再抽 k”的长度权重不完全相同。扩展 PosProbe 按 l 分开输出 `val_l*` 和 `valR_l*`，值 acc 是该 l 的全部值槽微平均；`EOS(l)` 是已知输入，不产生长度准确率。save_config 记 `blank_lens` 和 `eos_variant_base`。旧 attention/logit-lens/电路分析脚本仍按单空旧布局构造输入，不能直接套用到扩展 checkpoint。
+
+**`BLANK_COUNTS` 多个独立单值空格**（2026-11-06，仅 fill_blank，默认 `[1]`）：配置非空、不重复的正整数集合；与非默认 `BLANK_LENS` 互斥。普通样本先均匀抽空格数 `k`，再从 `[0,L)` 无重复均匀抽取 `k` 个位置，位置按升序记为 `q=(q_0,...,q_{k-1})`。每个位置各替换成一个 BLANK，不压缩可见窗口；`H=[seq[q_0],...,seq[q_{k-1}]]`，`EOS(k)=P+1+(k-1)` 在输入中编码**空格数量**，随后按位置升序输出 k 个原值：
+
+```text
+x           = [view_with_k_blanks(L), EOS(k), H[:-1]]  # L+k
+target_seq  = [B(L), EOS(k), H]                        # L+k+1
+loss_mask   = target[L:L+k] 为 1                        # k 个值槽，不预测数量
+```
+
+例如 `[x0,x1,x2,x3,x4]` 在位置 `(1,3)` 挖空时，`x=[x0,BLANK,x2,BLANK,x4,EOS(2),x1]`，`target_seq=[x0,BLANK,x2,BLANK,x4,EOS(2),x1,x3]`。k=1 的布局与旧单空完全一致。不同 k 产生不同行长，批内右侧 padding，padding 的 loss mask 为 0。词表为 `P+1+max(BLANK_COUNTS)`，`BLOCK_SIZE=round_up_pow2(max_len+max(BLANK_COUNTS))`。`BODY_SUPERVISION=true` 时 `B=seq`，否则 `B=view_with_k_blanks`；overall 仍是受监督 token 微平均，不是整题 exact-match。
+
+`FILL_BLANK_ALL_POSITIONS`/`TEST_ALL_POSITIONS` 在此模式枚举 `(seq,positions)` 的全部位置组合，每窗口样本数为 `sum_k comb(L,k)`，大 L/大 k 时组合数增长很快。PosProbe 按 k 输出 `val_n{k}`/`valR_n{k}`，并按原始位置聚合包含该位置的组合。`FILL_BLANK_FIXED_POS` 不支持此模式。save_config 记 `blank_counts`、`blank_mode='multi_single'` 和 `eos_variant_base`。当前尚未开放“每个空格各自不定长”的配置；内部枚举样本已携带完整位置元组，后续可在不混淆连续段模式的前提下扩展。旧 attention/logit-lens/电路分析脚本不能直接用于此布局。
+
+**`FILL_BLANK_ALL_POSITIONS`**（2026-10-14，默认 false，仅 fill_blank）：true 时数据侧枚举式挖空——每条序列的每个位置挖空各成一条样本（`(seq, k)` 元组，样本数 × 窗口长度，train/test 同样），collate 使用样本携带的位置不再随机选位。适合小状态空间任务（如等差数列）保证位置覆盖。多长度模式的 `(seq,k,l)` 枚举规则见上。
 
 **`TEST_ALL_POSITIONS`**（2026-10-14，默认 false，仅 fill_blank）：只把**测试集**改成逐位置枚举挖空（每窗口 × 窗口长度条确定性样本），训练侧保持在线随机挖空。消除位置抽样噪声，使 best acc/早停/横向通过率对比口径干净；代价是 eval 计算量 × 窗口长度。**静态切分制下 `NUM_TEST_SAMPLES` 变为测试窗口数上限**（默认 256，确定性子抽样），用于控制枚举后的 eval 规模，如 1000 窗口 × 16 位置 = 16000 条。与 `FILL_BLANK_ALL_POSITIONS` 同开时冗余（测试已枚举），警告提示。
+
+### 1.9 clean_value_set 与可选混合纠错（2026-11-04）
+
+`TASK_VARIANT='clean_value_set'`（仅 single）使用干净窗口，尾部接 EOS；EOS 槽输出窗口中任意一个出现过的值即可。EOS 的 set loss 为 `-log(sum_{v in unique(window)} p(v))`，acc 为 full-vocab argmax 是否属于该集合。词表为 `P+2`，与 corrupt_fix/value_only 相同，因此第二阶段可直接 `INIT_FROM`。
+
+- **`BODY_SUPERVISION`**：默认 true，递推主体也计入 CE/acc；设 false 时干净行只监督 EOS 集合输出一位。
+- **`CLEAN_VALUE_SET_CORRUPT_RATIO`**：默认 0。设为非零比例 r 后，每 batch 随机打乱行号并取 `round(B*r)` 行做单点纠错，其余行保持干净集合预测。纠错行恰好一位改成非原值的随机错误值，`value_sets[row]=None`，EOS 改用普通 CE/正确值 acc；位置和错误值逐 batch 新鲜随机。允许比例 ∈[0,1]，仅 clean_value_set 支持，与 `MISSING_PROB>0` 互斥。
+- **指标**：`set_acc` 只统计干净集合行；混合时新增 `corrupt_value_acc` 统计纠错行，`body_acc` 统计主体。overall 仍按有效监督位加权；当 `BODY_SUPERVISION=false` 时两类行都只有 EOS 一位，因此 50% 混合比例也对应 loss/overall 的逐样本 50/50。
+- checkpoint save_config 记 `corrupt_ratio`；日志混合时打印 `CorruptMix: ... corrupt_value_acc=...`。实现为 `make_clean_value_set_collate` 的可选参数，不改变默认 clean_value_set 行为。
 
 ---
 
@@ -179,7 +217,10 @@ loss_mask    = 仅 EOS 槽一位为 1（acc 只有 target[L] 一个输出位）
 | 配置项 | 说明 |
 |--------|------|
 | `TASK` | 场景名（`single`/`mixed`/`action`）或三个非线性例外 task 名；旧 task 名经归一化层兼容（见 §1.6），新实验一律用场景名 |
-| `TASK_VARIANT` | 场景下一级的任务变体（正交于 `TASK`，2026-10-14）。`null`（默认）= 标准 next-token 预测；`corrupt_fix` = 找错改值任务（恰好一位污损成随机错误值 + 尾部 EOS + 输出位置 token 与正确值，见 §1.7）；`fill_blank` = 填空白任务（恰好一位替换成空白 token id=P + 尾部 EOS + 只输出正确值，见 §1.8）。目前均仅 single 场景开放 |
+| `TASK_VARIANT` | 场景下一级的任务变体（正交于 `TASK`，2026-10-14）。`null`（默认）= 标准 next-token 预测；`corrupt_fix` = 找错改值任务（见 §1.7）；`fill_blank` = 填空白任务（见 §1.8）；`clean_value_set` = 干净窗口 EOS 集合预测，可选混合单点纠错（见 §1.9）。目前均仅 single 场景开放 |
+| `BLANK_LENS` | 仅 `fill_blank`，默认 `[1]` 保持旧单空布局；含 `l>1` 时启用连续段压缩挖空，先抽 l 再抽合法起点，输入 `EOS(l)` 编码段长，随后输出 l 个被挖值（§1.8） |
+| `BLANK_COUNTS` | 仅 `fill_blank`，默认 `[1]`；非默认时抽取 k 个独立位置，每位置一个 BLANK，`EOS(k)` 编码空格数，随后按位置升序输出 k 个原值。与非默认 `BLANK_LENS` 互斥（§1.8） |
+| `CLEAN_VALUE_SET_CORRUPT_RATIO` | 仅 `clean_value_set`，默认 0；每 batch 按该比例随机混入单点含错、EOS 输出正确值的样本。`BODY_SUPERVISION=false` 时干净/含错行均只监督 EOS 一位（§1.9） |
 | `P` | 模数 |
 | `ORDER` | 递推阶数，≥2 整数（single 允许 1，等比递推）；新格式必须显式写 |
 | `RULES` | 系数列表，canonical 方向（第一个系数乘最新的值）。`single` 恰好 1 条；`mixed`/`action` ≥1 条；每条长度 == `ORDER`，系数 ∈ [0, P) |
@@ -254,7 +295,7 @@ loss_mask    = 仅 EOS 槽一位为 1（acc 只有 target[L] 一个输出位）
 | 配置项 | 说明 |
 |--------|------|
 | `OPT_DIAG_INTERVAL` | 优化器诊断（裁剪前梯度范数等）打印间隔，0 = 关闭 |
-| `POS_PROBE` | **仅 corrupt_fix/fill_blank**（默认 **true**，2026-10-14 起）。每个 eval 点在固定探针窗口集（256 窗口，seed 固定）上按挖空/污损位置 k 分桶统计 acc，打 `PosProbe pos|/val|` 行到日志（corrupt_fix 两行 = 位置/值；fill_blank 一行 = 值）。是“epoch × 位置”热力图的数据源；静态切分取测试窗口子集，fresh test 模式取固定抽样子集 |
+| `POS_PROBE` | **仅 corrupt_fix/fill_blank**（默认 **true**，2026-10-14 起）。每个 eval 点在固定探针窗口集（256 窗口，seed 固定）上按挖空/污损位置 k 分桶统计 acc，打 `PosProbe pos|/val|` 行到日志（corrupt_fix = 位置/值；单空 fill_blank = 值），另有相对位置 R 行。连续多值填空按 l 输出 `val_l*`/`valR_l*`；多个独立单值空格按数量 k 输出 `val_n{k}`/`valR_n{k}`，聚合包含各原始位置的组合。EOS 变体已知，不评长度/数量准确率。静态切分取测试窗口子集，fresh test 模式取固定抽样子集 |
 
 **其他**
 
@@ -520,7 +561,8 @@ loss = masked_cross_entropy(logits, targets, loss_mask)
 | `BatchTag.MIXED_AB_TARGET` | `make_mixed_missing_collate` | `ab_indices` + 干净目标序列 |
 | `BatchTag.ACTION_MISS` | `make_action_missing_collate` | 干净目标序列 + `loss_mask` |
 | `BatchTag.CORRUPT_FIX` | `make_corrupt_fix_collate` | 目标序列（`targets = target_seqs[:, 1:]`）+ `loss_mask`（仅位置/值两个输出位） |
-| `BatchTag.FILL_BLANK` | `make_fill_blank_collate` | 目标序列 + `loss_mask`（仅 EOS 槽一个输出位） |
+| `BatchTag.FILL_BLANK` | `make_fill_blank_collate` | 目标序列 + `loss_mask`（连续段 EOS(l) 编码段长；独立多空格 EOS(k) 编码数量，监督对应值槽，均可选主体；不同 k 右补齐） |
+| `BatchTag.CLEAN_VALUE_SET` | `make_clean_value_set_collate` | 目标序列 + `loss_mask` + 逐行 `value_sets`（含错行为 None） |
 
 不再通过张量 `ndim` 推断 batch 类型。
 
@@ -532,6 +574,7 @@ loss = masked_cross_entropy(logits, targets, loss_mask)
 - 测试 overall accuracy
 - 每个预测位置（per-position）的准确率
 - `mixed` 场景额外输出每条规则的 per-rule accuracy
+- 多长度 fill_blank 的 overall 是全部值槽及可选主体槽的 token 微平均；长空缺天然占更多权重，不能解释为逐样本 exact-match
 - 保存模型前打印 `Training epochs: {epoch}`，供 `batch_run.py` 汇总表提取
 
 **训练结束后的 final generation test（Exposed/Unexposed × ID/OOD 表格）已于 2026-10-08 整体删除**（`src/final_eval.py` 移除）。结果口径 = 训练日志的 best test acc + `scripts/eval_clean_action.py`（clean acc 评估，已 order 参数化）。

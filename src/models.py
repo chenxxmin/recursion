@@ -104,21 +104,60 @@ class TransformerBlock(nn.Module):
         return x
 
 
-def _lm_loss(logits, targets, loss_mask):
-    """Masked next-token cross-entropy shared by both model forwards.
+def _lm_loss(logits, targets, loss_mask, value_sets=None):
+    """Masked next-token CE, with an optional final-slot value-set loss.
 
     logits/targets are truncated to their common length; positions with
     loss_mask == 0 are excluded and the loss is normalized by the mask mass
     (an all-zero mask yields a plain 0.0).
+
+    When ``value_sets`` is present, a row with a value set uses
+    ``-log(sum_{v in unique(set)} p(v))`` at the final target position instead
+    of ordinary CE.  A row with ``value_sets[row] = None`` (mixed corrupt
+    pretraining) keeps ordinary CE against its final true-value target.  CE
+    terms and final terms are normalized by their total effective position
+    count.  Placeholders are sanitized only on value-set rows.
     """
     b = logits.size(0)
     t_min = min(logits.size(1), targets.size(1))
     logits = logits[:, :t_min, :]
     targets = targets[:, :t_min]
 
+    if value_sets is not None:
+        if t_min < 1 or len(value_sets) != b:
+            raise ValueError("value_sets must contain one set or None per batch row")
+        targets = targets.clone()
+        for row, values in enumerate(value_sets):
+            if values is not None:
+                targets[row, -1] = 0  # clean-row placeholder never affects CE
+
     loss_all = F.cross_entropy(logits.reshape(-1, logits.size(-1)), targets.reshape(-1),
                                reduction='none')
     loss_all = loss_all.view(b, t_min)
+
+    if value_sets is not None:
+        ce_mask = (torch.ones_like(loss_all) if loss_mask is None
+                   else loss_mask.float()).clone()
+        ce_mask[:, -1] = 0.0
+        final_losses = []
+        normalizer = torch.logsumexp(logits[:, -1, :], dim=-1)
+        for row, values in enumerate(value_sets):
+            if values is None:
+                # Mixed corrupt row: ordinary CE against the preserved true value.
+                final_losses.append(loss_all[row, -1])
+                continue
+            unique_values = list(dict.fromkeys(int(v) for v in values))
+            if not unique_values:
+                raise ValueError("non-None value_sets entries must be non-empty")
+            value_ids = torch.tensor(unique_values, dtype=torch.long,
+                                     device=logits.device)
+            selected_logits = logits[row, -1, :].index_select(0, value_ids)
+            set_nll = normalizer[row] - torch.logsumexp(selected_logits, dim=-1)
+            final_losses.append(set_nll)
+        final_loss = torch.stack(final_losses)
+        numerator = (loss_all * ce_mask).sum() + final_loss.sum()
+        denominator = ce_mask.sum() + b
+        return numerator / denominator
 
     if loss_mask is not None:
         masked_loss = (loss_all * loss_mask.float()).sum()
@@ -191,7 +230,7 @@ class FibonacciTransformer(nn.Module):
         elif isinstance(module, nn.Embedding):
             torch.nn.init.normal_(module.weight, mean=0.0, std=0.02)
     
-    def forward(self, idx, targets=None, loss_mask=None, ab_labels=None):
+    def forward(self, idx, targets=None, loss_mask=None, ab_labels=None, value_sets=None):
         t = idx.size(1)
         tok_emb = self.transformer.wte(idx)
         
@@ -212,7 +251,7 @@ class FibonacciTransformer(nn.Module):
 
         loss = None
         if targets is not None:
-            loss = _lm_loss(logits, targets, loss_mask)
+            loss = _lm_loss(logits, targets, loss_mask, value_sets=value_sets)
             if rule_logits is not None:
                 B, num_pos, _ = rule_logits.shape
                 rule_logits_flat = rule_logits.reshape(-1, self.n_rules)

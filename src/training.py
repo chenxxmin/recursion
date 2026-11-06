@@ -41,6 +41,7 @@ def _unpack_batch(batch, device, extra_kwargs_fn):
       ACTION_MISS    -> (clean_seqs, loss_mask); targets_override = clean_seqs
       CORRUPT_FIX    -> (target_seqs, loss_mask); targets_override = target_seqs
       FILL_BLANK     -> (target_seqs, loss_mask); targets_override = target_seqs
+      CLEAN_VALUE_SET -> (target_seqs, loss_mask, value_sets); final-slot set loss
       PLAIN_TARGET   -> (clean_seqs,); targets_override = clean_seqs
       MIXED_AB_TARGET -> (ab_indices, clean_seqs)
     ab_indices are passed through extra_kwargs_fn and also returned as
@@ -84,6 +85,11 @@ def _unpack_batch(batch, device, extra_kwargs_fn):
         if len(batch) != 4:
             raise ValueError(f"FILL_BLANK batch must carry exactly (target_seqs, loss_mask), got {len(batch) - 2} payload item(s)")
         return x, batch[3].to(device), {}, None, batch[2].to(device)
+    if tag == BatchTag.CLEAN_VALUE_SET:
+        if len(batch) != 5:
+            raise ValueError(f"CLEAN_VALUE_SET batch must carry exactly (target_seqs, loss_mask, value_sets), got {len(batch) - 2} payload item(s)")
+        return (x, batch[3].to(device), {'value_sets': batch[4]}, None,
+                batch[2].to(device))
     if tag == BatchTag.MIXED_AB_TARGET:
         if len(batch) != 4:
             raise ValueError(f"MIXED_AB_TARGET batch must carry exactly (ab_indices, clean_seqs), got {len(batch) - 2} payload item(s)")
@@ -105,17 +111,34 @@ def _print_nan_diagnostics(x, logits, loss_mask, targets):
     print(f"  targets min/max: {targets.min().item()} / {targets.max().item()}", file=sys.stderr, flush=True)
 
 
-def _accumulate_accuracy(logits, targets, loss_mask, pos_correct, pos_total):
+def _accumulate_accuracy(logits, targets, loss_mask, pos_correct, pos_total,
+                         value_sets=None):
     """Accumulate per-position and overall accuracy counts for one batch.
 
     Updates pos_correct/pos_total in place. Returns (match, batch_correct,
     batch_samples); `match` is the per-position correctness matrix, also used
-    by evaluate() for per-group stats.
+    by evaluate() for per-group stats.  With ``value_sets``, clean rows score
+    the final slot by full-vocab argmax membership; rows whose set is None
+    (mixed corruption) keep ordinary true-value equality.
     """
     preds = logits.argmax(dim=-1)
     preds = preds[:, :targets.size(1)]  # Align length with targets
     valid_mask = loss_mask > 0
     match = ((preds == targets) & valid_mask).float()
+    if value_sets is not None:
+        if len(value_sets) != preds.size(0) or preds.size(1) < 1:
+            raise ValueError("value_sets must contain one set or None per batch row")
+        membership = torch.zeros((preds.size(0), logits.size(-1)),
+                                 dtype=torch.bool, device=logits.device)
+        for row, values in enumerate(value_sets):
+            if values is None:
+                continue  # corrupt row: retain ordinary target equality
+            unique_values = list(dict.fromkeys(int(v) for v in values))
+            if not unique_values:
+                raise ValueError("non-None value_sets entries must be non-empty")
+            membership[row, unique_values] = True
+            set_match = membership[row].gather(0, preds[row, -1])
+            match[row, -1] = (set_match & valid_mask[row, -1]).float()
     # One host sync for the whole batch instead of two .item() calls per
     # position; per-position syncs dominated epoch time on small models.
     match_per_pos = match.sum(dim=0).tolist()
@@ -152,6 +175,10 @@ def train_epoch(model, dataloader, optimizer, device, num_mask=1, extra_kwargs_f
     total_samples = 0
     pos_correct = {}
     pos_total = {}
+    value_set_seen = False
+    body_correct = body_total = 0.0
+    set_correct = set_total = 0.0
+    corrupt_correct = corrupt_total = 0.0
     n_batches = len(dataloader)
     # Optimizer diagnostics are accumulated on device and synchronized only at
     # epoch end (plus optional sparse step logs), so instrumentation does not
@@ -175,6 +202,7 @@ def train_epoch(model, dataloader, optimizer, device, num_mask=1, extra_kwargs_f
         if i % grad_accum_steps == 0:
             optimizer.zero_grad()
         logits, loss = model(x, targets, loss_mask, **kwargs)
+        value_sets = kwargs.get('value_sets')
 
         if loss is not None and torch.isnan(loss):
             # NaN diagnostic: print to stderr so it shows up in .err logs
@@ -210,10 +238,29 @@ def train_epoch(model, dataloader, optimizer, device, num_mask=1, extra_kwargs_f
                 optimizer.step()
         
         with torch.no_grad():
-            _, batch_correct, batch_samples = _accumulate_accuracy(
-                logits, targets, loss_mask, pos_correct, pos_total)
+            match, batch_correct, batch_samples = _accumulate_accuracy(
+                logits, targets, loss_mask, pos_correct, pos_total,
+                value_sets=value_sets)
             total_correct += batch_correct
             total_samples += batch_samples
+            if value_sets is not None:
+                value_set_seen = True
+                final_valid = loss_mask[:, -1] > 0
+                clean_rows = torch.tensor([values is not None for values in value_sets],
+                                          dtype=torch.bool, device=logits.device)
+                clean_valid = clean_rows & final_valid
+                corrupt_valid = (~clean_rows) & final_valid
+                counts = torch.stack([
+                    match[:, -1].sum(), final_valid.float().sum(),
+                    (match[:, -1] * clean_valid).sum(), clean_valid.float().sum(),
+                    (match[:, -1] * corrupt_valid).sum(), corrupt_valid.float().sum(),
+                ]).tolist()
+                set_correct += counts[2]
+                set_total += counts[3]
+                corrupt_correct += counts[4]
+                corrupt_total += counts[5]
+                body_correct += batch_correct - counts[0]
+                body_total += batch_samples - counts[1]
 
         total_loss += loss.item() if loss is not None and not torch.isnan(loss) else 0
     
@@ -233,6 +280,11 @@ def train_epoch(model, dataloader, optimizer, device, num_mask=1, extra_kwargs_f
             'preclip_mean': 0.0, 'preclip_max': 0.0, 'clip_freq': 0.0,
             'optimizer_steps': 0, 'lr': optimizer.param_groups[0]['lr'],
         }
+    if value_set_seen:
+        grad_stats['body_acc'] = body_correct / body_total if body_total > 0 else 0.0
+        grad_stats['set_acc'] = set_correct / set_total if set_total > 0 else 0.0
+        if corrupt_total > 0:
+            grad_stats['corrupt_value_acc'] = corrupt_correct / corrupt_total
     return total_loss / len(dataloader), overall_acc, per_pos_acc, grad_stats
 
 def evaluate(model, dataloader, device, num_mask=1, extra_kwargs_fn=None):
@@ -244,6 +296,10 @@ def evaluate(model, dataloader, device, num_mask=1, extra_kwargs_fn=None):
     pos_total = {}
     group_correct = {}
     group_total = {}
+    value_set_seen = False
+    body_correct = body_total = 0.0
+    set_correct = set_total = 0.0
+    corrupt_correct = corrupt_total = 0.0
     
     with torch.no_grad():
         for batch in dataloader:
@@ -259,12 +315,32 @@ def evaluate(model, dataloader, device, num_mask=1, extra_kwargs_fn=None):
                 loss_mask = _default_loss_mask(B, targets.size(1), num_mask, device=device)
             
             logits, loss = model(x, targets, loss_mask, **kwargs)
+            value_sets = kwargs.get('value_sets')
 
             match, batch_correct, batch_samples = _accumulate_accuracy(
-                logits, targets, loss_mask, pos_correct, pos_total)
+                logits, targets, loss_mask, pos_correct, pos_total,
+                value_sets=value_sets)
             total_correct += batch_correct
             total_samples += batch_samples
             total_loss += loss.item()
+            if value_sets is not None:
+                value_set_seen = True
+                final_valid = loss_mask[:, -1] > 0
+                clean_rows = torch.tensor([values is not None for values in value_sets],
+                                          dtype=torch.bool, device=logits.device)
+                clean_valid = clean_rows & final_valid
+                corrupt_valid = (~clean_rows) & final_valid
+                counts = torch.stack([
+                    match[:, -1].sum(), final_valid.float().sum(),
+                    (match[:, -1] * clean_valid).sum(), clean_valid.float().sum(),
+                    (match[:, -1] * corrupt_valid).sum(), corrupt_valid.float().sum(),
+                ]).tolist()
+                set_correct += counts[2]
+                set_total += counts[3]
+                corrupt_correct += counts[4]
+                corrupt_total += counts[5]
+                body_correct += batch_correct - counts[0]
+                body_total += batch_samples - counts[1]
             
             # Per-rule/group accuracy for mixed_ab
             if ab_labels is not None:
@@ -280,6 +356,15 @@ def evaluate(model, dataloader, device, num_mask=1, extra_kwargs_fn=None):
     overall_acc = total_correct / total_samples if total_samples > 0 else 0
     per_pos_acc = {pos: pos_correct[pos] / pos_total[pos] for pos in sorted(pos_total.keys())}
     group_acc = {g: group_correct[g] / group_total[g] for g in sorted(group_total.keys())}
+    if value_set_seen:
+        # Preserve evaluate's four-value interface: the fourth value is the
+        # auxiliary metric mapping (per-rule accuracy for mixed, body/set here).
+        group_acc = {
+            'body_acc': body_correct / body_total if body_total > 0 else 0.0,
+            'set_acc': set_correct / set_total if set_total > 0 else 0.0,
+        }
+        if corrupt_total > 0:
+            group_acc['corrupt_value_acc'] = corrupt_correct / corrupt_total
     return total_loss / len(dataloader), overall_acc, per_pos_acc, group_acc
 
 
@@ -424,6 +509,14 @@ def run_training_engine(model, train_loader, test_loader, optimizer, scheduler, 
             
             print(f"Epoch {epoch:3d} | Train: Loss={train_loss:.4f} Acc={train_acc:.1%} | "
                   f"Test: Acc={test_acc:.1%} | Best={best_acc:.1%}(@{best_epoch})")
+            if 'body_acc' in grad_stats:
+                print(f"  CleanValueSet: Train body_acc={grad_stats['body_acc']:.4f} "
+                      f"set_acc={grad_stats['set_acc']:.4f} | "
+                      f"Test body_acc={test_group_acc['body_acc']:.4f} "
+                      f"set_acc={test_group_acc['set_acc']:.4f}")
+            if 'corrupt_value_acc' in grad_stats:
+                print(f"  CorruptMix: Train corrupt_value_acc={grad_stats['corrupt_value_acc']:.4f} | "
+                      f"Test corrupt_value_acc={test_group_acc['corrupt_value_acc']:.4f}")
             print(f"  Opt: LR={grad_stats['lr']:.8g} | "
                   f"PreClipNorm mean={grad_stats['preclip_mean']:.4g} "
                   f"max={grad_stats['preclip_max']:.4g} | "
@@ -449,7 +542,7 @@ def run_training_engine(model, train_loader, test_loader, optimizer, scheduler, 
                     print(f"  from x{start_x}: {accs}")
             
             # Print per-rule/group accuracy for mixed_ab (compact single line)
-            if test_group_acc:
+            if test_group_acc and 'body_acc' not in test_group_acc:
                 accs = ' '.join(f"{test_group_acc[g]:.2f}" for g in sorted(test_group_acc.keys()))
                 print(f"  per-rule acc: {accs}")
             # Optional extra eval hook (e.g. POS_PROBE per-blank-position stats

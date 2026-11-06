@@ -263,6 +263,232 @@ def test_run_experiment_fixed_pos_smoke():
         assert latest['config']['fixed_pos'] == -1
 
 
+def test_collate_multi_blank_exact_layout():
+    # [x0..x4] 挖掉 [x2,x3]：单个 BLANK + 输入 EOS(2) + teacher forcing。
+    p, eos_id = 7, 8
+    seq = torch.tensor([0, 1, 2, 3, 4])
+    collate = make_fill_blank_collate(p=p, eos_id=eos_id, blank_lens=[2])
+    x, tag, targets, mask = collate([(seq, 2, 2)])
+    assert tag == BatchTag.FILL_BLANK
+    assert x.tolist() == [[0, 1, p, 4, eos_id + 1, 2]]
+    assert targets.tolist() == [[0, 1, p, 4, eos_id + 1, 2, 3]]
+    assert mask[0].nonzero().flatten().tolist() == [4, 5]
+    assert torch.equal(targets[:, :-1], x)
+    shifted = targets[:, 1:]
+    assert shifted[0, 4].item() == 2  # EOS(2) -> x2；长度由输入 EOS 已知
+    assert shifted[0, 5].item() == 3  # fed-back x2 -> x3
+
+    # 主体监督：BLANK 对应第一个被挖值，可见后缀保持干净。
+    body_collate = make_fill_blank_collate(
+        p=p, eos_id=eos_id, blank_lens=[2], body_supervision=True, body_from=1)
+    xb, _, tb, mb = body_collate([(seq, 2, 2)])
+    assert torch.equal(xb, x)
+    assert tb.tolist() == [[0, 1, 2, 4, eos_id + 1, 2, 3]]
+    assert mb[0].nonzero().flatten().tolist() == [1, 2, 4, 5]
+
+    # 段首/段尾和 l=L 均是合法边界；l=1 在混合集合中仍是旧 EOS 布局。
+    mixed = make_fill_blank_collate(p=p, eos_id=eos_id, blank_lens=[1, 2, 5])
+    for l in (1, 2, 5):
+        for k in ((0, seq.numel() - l) if l < seq.numel() else (0,)):
+            xe, _, te, me = mixed([(seq, k, l)])
+            m = seq.numel() - l + 1
+            expected_view = seq[:k].tolist() + [p] + seq[k + l:].tolist()
+            assert xe.shape == (1, seq.numel() + 1)
+            assert te.shape == (1, seq.numel() + 2)
+            assert xe[0, :m].tolist() == expected_view
+            assert xe[0, m].item() == eos_id + l - 1
+            assert te[0, m + 1:].tolist() == seq[k:k + l].tolist()
+            assert me[0].nonzero().flatten().tolist() == list(range(m, m + l))
+    legacy = make_fill_blank_collate(p=p, eos_id=eos_id)
+    mixed_single = mixed([(seq, 2, 1)])
+    legacy_single = legacy([(seq, 2)])
+    assert all(torch.equal(a, b) if torch.is_tensor(a) else a == b
+               for a, b in zip(mixed_single, legacy_single))
+
+
+def test_collate_multi_blank_sampling_fixed_and_evaluate():
+    p, eos_id, L = 7, 8, 5
+    seqs = _addition_windows(p=p, n=32, length=L)
+    collate = make_fill_blank_collate(p=p, eos_id=eos_id, blank_lens=[1, 2])
+    random.seed(1)
+    x1, _, t1, m1 = collate(seqs)
+    random.seed(2)
+    x2, _, _, _ = collate(seqs)
+    assert not torch.equal(x1, x2), "length/start sampling must be fresh"
+    assert x1.shape == (32, L + 1) and t1.shape == (32, L + 2)
+    seen_lens = set()
+    for row in x1:
+        eos_pos = ((row >= eos_id) & (row <= eos_id + 1)).nonzero().flatten().item()
+        blank_pos = (row[:eos_pos] == p).nonzero().flatten().item()
+        blank_l = int(row[eos_pos]) - eos_id + 1
+        seen_lens.add(blank_l)
+        assert blank_l in (1, 2)
+        assert eos_pos == L - blank_l + 1
+        assert 0 <= blank_pos <= L - blank_l
+    assert seen_lens == {1, 2}
+    assert m1.shape == (32, L + 1)
+
+    # 负数 fixed_k 从合法段起点倒计数：-1 表示段尾贴住窗口末尾。
+    fixed = make_fill_blank_collate(p=p, eos_id=eos_id, blank_lens=[2], fixed_k=-1)
+    xf, _, tf, mf = fixed(seqs)
+    for i, seq in enumerate(seqs):
+        assert xf[i, 3].item() == p and xf[i, 4].item() == eos_id + 1
+        assert tf[i, -2:].tolist() == seq[3:5].tolist()
+        assert mf[i].nonzero().flatten().tolist() == [4, 5]
+
+    # 训练引擎的 shift/masked CE/accuracy 无需特殊分支。
+    items = [(seq, i % (L - 1), 2) for i, seq in enumerate(seqs)]
+    fixed_items = make_fill_blank_collate(p=p, eos_id=eos_id, blank_lens=[1, 2])
+    batch = fixed_items(items)
+    x, loss_mask, kwargs, ab_labels, targets_override = _unpack_batch(batch, 'cpu', None)
+    assert kwargs == {} and ab_labels is None
+    assert torch.equal(targets_override[:, :-1], x)
+    torch.manual_seed(0)
+    model = FibonacciTransformer(p=p, d_model=32, n_head=1, n_layer=1,
+                                 block_size=8, dropout=0.0, vocab_size=p + 3)
+    loader = DataLoader(items, batch_size=8, collate_fn=fixed_items)
+    loss, acc, per_pos_acc, _ = evaluate(model, loader, 'cpu', num_mask=0)
+    assert math.isfinite(loss) and 0.0 <= acc <= 1.0
+    assert set(per_pos_acc) == {4, 5}
+
+
+def test_run_experiment_multi_blank_smoke():
+    with tempfile.TemporaryDirectory() as tmpdir:
+        out, save_path = _run_experiment(tmpdir, {
+            'TASK_VARIANT': 'fill_blank', 'BLANK_LENS': [1, 2]})
+        assert os.path.exists(save_path)
+        assert 'BLANK_LENS=[1, 2]' in out and 'nan' not in out.lower()
+        for blank_l, n_positions in ((1, 8), (2, 7)):
+            val_lines = [line for line in out.splitlines()
+                         if line.startswith(f'  PosProbe val_l{blank_l}|')]
+            assert val_lines, f'missing multi-blank probe l={blank_l}'
+            assert val_lines[0].count('k') == n_positions
+        assert not any(line.startswith('  PosProbe len_') for line in out.splitlines())
+        latest = torch.load(os.path.splitext(save_path)[0] + '_latest.pth',
+                            weights_only=False)
+        sc = latest['config']
+        assert sc['blank_lens'] == [1, 2] and sc['eos_variant_base'] == 8
+        assert 'length_token_base' not in sc
+        assert sc['vocab_size'] == 10       # P + 1 + max(BLANK_LENS)
+        assert sc['block_size'] == 16       # round_up_pow2(max(8,10) + 1)
+
+
+def test_run_experiment_multi_blank_enumeration():
+    common = {'TASK_VARIANT': 'fill_blank', 'BLANK_LENS': [1, 2],
+              'P': 17, 'ORDER': 1, 'RULES': [[1]], 'CONST': 1,
+              'TRAIN_LEN': 4, 'OOD_LEN': 4}
+    with tempfile.TemporaryDirectory() as tmpdir:
+        out, save_path = _run_experiment(tmpdir, {
+            **common, 'FILL_BLANK_ALL_POSITIONS': True})
+        assert os.path.exists(save_path)
+        # L=4: l=1 有 4 段，l=2 有 3 段；11 窗口 × 7 = 77。
+        assert '11 windows -> 77 train samples' in out
+        assert '[Probe] POS_PROBE: 6 windows' in out, "枚举引用必须先去重再探针"
+        out2, _ = _run_experiment(tmpdir, {**common, 'TEST_ALL_POSITIONS': True})
+        assert 'TEST_ALL_POSITIONS: 6 windows -> 42 deterministic test samples' in out2
+        assert '[Probe] POS_PROBE: 6 windows' in out2
+
+
+def test_run_experiment_multi_blank_var_len():
+    with tempfile.TemporaryDirectory() as tmpdir:
+        out, save_path = _run_experiment(tmpdir, {
+            'TASK_VARIANT': 'fill_blank', 'BLANK_LENS': [1, 2, 3],
+            'P': 17, 'ORDER': 1, 'RULES': [[1]], 'CONST': 1,
+            'SEQ_LEN_MIN': 3, 'SEQ_LEN_MAX': 5})
+        assert os.path.exists(save_path) and 'nan' not in out.lower()
+        assert 'variable length: windows cut to [3, 5]' in out
+        latest = torch.load(os.path.splitext(save_path)[0] + '_latest.pth',
+                            weights_only=False)
+        sc = latest['config']
+        assert sc['blank_lens'] == [1, 2, 3] and sc['block_size'] == 8
+        assert sc['vocab_size'] == 21       # P17 + 1 + max_l3
+
+
+def test_collate_multi_count_exact_layout():
+    p, eos_id = 7, 8
+    seq = torch.tensor([0, 1, 2, 3, 4])
+    collate = make_fill_blank_collate(p=p, eos_id=eos_id, blank_counts=[1, 2, 3])
+    x, tag, targets, mask = collate([(seq, (1, 3))])
+    assert tag == BatchTag.FILL_BLANK
+    assert x.tolist() == [[0, p, 2, p, 4, eos_id + 1, 1]]
+    assert targets.tolist() == [[0, p, 2, p, 4, eos_id + 1, 1, 3]]
+    assert mask[0].nonzero().flatten().tolist() == [5, 6]
+    assert torch.equal(targets[:, :-1], x)
+    assert targets[0, 6].item() == 1 and targets[0, 7].item() == 3
+
+    body = make_fill_blank_collate(
+        p=p, eos_id=eos_id, blank_counts=[1, 2], body_supervision=True, body_from=1)
+    xb, _, tb, mb = body([(seq, (1, 3))])
+    assert torch.equal(xb, x)
+    assert tb.tolist() == [[0, 1, 2, 3, 4, eos_id + 1, 1, 3]]
+    assert mb[0].nonzero().flatten().tolist() == [1, 2, 3, 5, 6]
+
+    legacy = make_fill_blank_collate(p=p, eos_id=eos_id)
+    single = collate([(seq, (2,))])
+    legacy_single = legacy([(seq, 2)])
+    assert all(torch.equal(a, b) if torch.is_tensor(a) else a == b
+               for a, b in zip(single, legacy_single))
+
+
+def test_collate_multi_count_sampling_padding_and_evaluate():
+    p, eos_id, L = 7, 8, 5
+    seqs = _addition_windows(p=p, n=48, length=L)
+    collate = make_fill_blank_collate(p=p, eos_id=eos_id, blank_counts=[1, 2, 3])
+    random.seed(1)
+    x1, _, t1, m1 = collate(seqs)
+    random.seed(2)
+    x2, _, _, _ = collate(seqs)
+    assert not torch.equal(x1, x2)
+    assert x1.shape == (48, L + 3) and t1.shape == (48, L + 4)
+    seen_counts = set()
+    for i, seq in enumerate(seqs):
+        k = int(x1[i, L]) - eos_id + 1
+        seen_counts.add(k)
+        positions = (x1[i, :L] == p).nonzero().flatten().tolist()
+        assert len(positions) == k
+        assert t1[i, L + 1:L + k + 1].tolist() == seq[positions].tolist()
+        assert m1[i].nonzero().flatten().tolist() == list(range(L, L + k))
+        assert not m1[i, L + k:].any()
+    assert seen_counts == {1, 2, 3}
+
+    items = [(seq, tuple(range(1 + i % 3))) for i, seq in enumerate(seqs)]
+    batch = collate(items)
+    x, loss_mask, kwargs, ab_labels, targets_override = _unpack_batch(batch, 'cpu', None)
+    assert kwargs == {} and ab_labels is None
+    torch.manual_seed(0)
+    model = FibonacciTransformer(p=p, d_model=32, n_head=1, n_layer=1,
+                                 block_size=8, dropout=0.0, vocab_size=p + 4)
+    loader = DataLoader(items, batch_size=8, collate_fn=collate)
+    loss, acc, per_pos_acc, _ = evaluate(model, loader, 'cpu', num_mask=0)
+    assert math.isfinite(loss) and 0.0 <= acc <= 1.0
+    assert set(per_pos_acc) == {5, 6, 7}
+
+
+def test_run_experiment_multi_count_smoke_and_enumeration():
+    common = {'TASK_VARIANT': 'fill_blank', 'BLANK_COUNTS': [1, 2],
+              'P': 17, 'ORDER': 1, 'RULES': [[1]], 'CONST': 1,
+              'TRAIN_LEN': 4, 'OOD_LEN': 4}
+    with tempfile.TemporaryDirectory() as tmpdir:
+        out, save_path = _run_experiment(tmpdir, common)
+        assert os.path.exists(save_path) and 'nan' not in out.lower()
+        assert 'BLANK_COUNTS=[1, 2]' in out
+        for count in (1, 2):
+            lines = [line for line in out.splitlines()
+                     if line.startswith(f'  PosProbe val_n{count}|')]
+            assert lines and lines[0].count('k') == 4
+        latest = torch.load(os.path.splitext(save_path)[0] + '_latest.pth',
+                            weights_only=False)
+        sc = latest['config']
+        assert sc['blank_counts'] == [1, 2] and sc['blank_mode'] == 'multi_single'
+        assert sc['vocab_size'] == 20 and sc['block_size'] == 8
+        assert sc['eos_variant_base'] == 18
+
+        out2, _ = _run_experiment(tmpdir, {
+            **common, 'FILL_BLANK_ALL_POSITIONS': True})
+        assert '11 windows -> 110 train samples' in out2
+        assert '[Probe] POS_PROBE: 6 windows' in out2
+
+
 def test_collate_corrupt_value_only():
     # corrupt=True：BLANK 换成随机错误值，版面与 fill_blank 完全一致
     p, eos_id, L = 7, 8, 5
@@ -363,6 +589,22 @@ def test_collate_pos_set():
 
 
 if __name__ == '__main__':
+    test_collate_multi_blank_exact_layout()
+    print('PASS test_collate_multi_blank_exact_layout')
+    test_collate_multi_blank_sampling_fixed_and_evaluate()
+    print('PASS test_collate_multi_blank_sampling_fixed_and_evaluate')
+    test_run_experiment_multi_blank_smoke()
+    print('PASS test_run_experiment_multi_blank_smoke')
+    test_run_experiment_multi_blank_enumeration()
+    print('PASS test_run_experiment_multi_blank_enumeration')
+    test_run_experiment_multi_blank_var_len()
+    print('PASS test_run_experiment_multi_blank_var_len')
+    test_collate_multi_count_exact_layout()
+    print('PASS test_collate_multi_count_exact_layout')
+    test_collate_multi_count_sampling_padding_and_evaluate()
+    print('PASS test_collate_multi_count_sampling_padding_and_evaluate')
+    test_run_experiment_multi_count_smoke_and_enumeration()
+    print('PASS test_run_experiment_multi_count_smoke_and_enumeration')
     test_collate_pos_set()
     print('PASS test_collate_pos_set')
     test_collate_last_n()

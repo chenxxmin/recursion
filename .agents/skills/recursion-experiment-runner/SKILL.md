@@ -1,6 +1,6 @@
 ---
 name: recursion-experiment-runner
-description: 在本仓库（/mnt/workspace/hujiachen/recursion，模运算递推/grokking 实验）批量运行训练实验的完整流程。当用户给出实验类型（JSON 里的 task，如 action/mixed_ab/addition 等）和超参（模型规模、规则数、污损概率、种子等）要求跑实验时使用。覆盖：生成实验配置 JSON、命名、用 batch_run.py/chain_rounds.sh 启动、日志与 checkpoint 落盘、画图、查进度（逐卡队列/全量汇总）、关停单个实验或整条链、给在跑实验设定时/取消定时、汇总结果到文档、结果库同步。触发词示例：跑一批实验/启动实验/排个队列/查进度/每张卡队列/汇总所有实验/停掉实验/停止某条实验/设定时/取消定时/汇总结果/同步结果库。
+description: 在本仓库（/mnt/workspace/hujiachen/recursion，模运算递推/grokking 实验）批量运行训练实验的完整流程。当用户给出实验类型和超参要求跑实验时使用。覆盖：生成配置、找空卡、等待并固定 N 张物理卡、用 batch_run.py/chain_rounds.sh 启动、日志与 checkpoint 落盘、查进度、关停实验/旧等待器、定时、汇总与结果库同步。触发词示例：跑一批实验/找空卡/用4卡并行/限制只用某几张卡/等待空卡启动/替换旧启动脚本/排个队列/查进度/停止实验/汇总结果/同步结果库。
 ---
 
 # Recursion 实验运行器
@@ -26,6 +26,28 @@ description: 在本仓库（/mnt/workspace/hujiachen/recursion，模运算递推
 - v1 制度：`{task}_d{D}l{L}r{R}h{H}_P{P}_tr{T}ood{O}_{N规则}_randmiss{prob}len{len}_seed{S}`
 - v2 命名（30万训练集/新鲜测试）：`action_v2_d{D}l{L}r{R}h{H}_P127_tr127_{N}_miss{prob}len{len}_seed{S}`（只是命名风格，输出目录与其他实验相同）
 
+### 1.1 多长度连续填空 `BLANK_LENS`（2026-11-05）
+
+`TASK_VARIANT='fill_blank'` 时可用 `BLANK_LENS` 配置连续挖空长度。默认 `[1]`，旧 JSON 无需修改；集合必须非空、元素为不重复正整数，且最大长度不能超过最短实际窗口（不定长时看 `SEQ_LEN_MIN`）。示例（`len3to5` 是窗口长度，`blank1to2` 是空缺长度，命名不要混淆）：
+
+```json
+{"concurrency": 1,
+ "experiments": [{
+   "name": "single_o2_fillblank_a25b56_d512l4r8h4_P127_len3to5_blank1to2_seed42",
+   "task": "single",
+   "config": {
+     "TASK_VARIANT": "fill_blank", "ORDER": 2, "RULES": [[25, 56]], "P": 127,
+     "TRAIN_LEN": 5, "OOD_LEN": 5, "SEQ_LEN_MIN": 3, "SEQ_LEN_MAX": 5,
+     "BLANK_LENS": [1, 2]
+   }
+ }]}
+```
+
+- 采样时先均匀抽 `l`，再均匀抽连续段起点 `k∈[0,L-l]`，整段只保留一个 BLANK。最终布局是 `x=[V,EOS(l),H[:-1]]`、`target_seq=[B,EOS(l),H]`，其中 `H` 为被挖值、`V` 为压缩窗口、`EOS(l)=P+1+(l-1)`。EOS(l) 在输入中直接给出长度，EOS 槽立即输出首值；**不要使用已废弃的独立 `LEN(l)` 输出方案**。
+- `EOS(1)` 就是旧 EOS；`[1]` 完整兼容旧实验，混合 `[1,2]` 中的 `l=1` 样本也保持旧布局。扩展词表为 `P+1+max(BLANK_LENS)`，block 按 `max_len+1`。
+- `FILL_BLANK_ALL_POSITIONS` / `TEST_ALL_POSITIONS` 在多长度时枚举 `(seq,k,l)`，每窗口样本数为 `sum_l(L-l+1)`；写 JSON 时注意评估规模。PosProbe 输出 `val_l*`/`valR_l*`，没有长度准确率。
+- **课程链暖启动限制**：从 `[1]` 到含 `l>1` 的配置会扩大词表。现有 `INIT_FROM` 只复制名称和形状都匹配的权重，形状变化的 `wte/lm_head` 会跳过并重新初始化；`RESUME_FROM` 不能跨词表使用。若要求完整保留旧嵌入，必须先实现并验证嵌入扩容/复制，不能在参数表中写成“完整暖启动”。相同 `[1]` 布局的旧 checkpoint 可直接加载。
+
 ## 2. 启动
 
 ```bash
@@ -39,6 +61,38 @@ setsid nohup bash scripts/chain_rounds.sh experiments/<批次>.json <gpus> <roun
 - GPU 分配：`BATCH_RUN_GPUS=0,1`（白名单）；`BATCH_RUN_IDLE_MEM_MB=4096`（共享卡时放宽空闲阈值，默认 100MB）。空闲 GPU 用 `nvidia-smi --query-gpu=index,memory.used --format=csv,noheader` 查。
 - 默认目录（本机）：`/mnt/workspace/hujiachen/recursion_results` + `/mnt/workspace/hujiachen/models`。本机 v2 隔离制度用 `--base-dir/--model-base-dir`（batch_run）或 `CHAIN_DATA_BASE/CHAIN_MODEL_BASE`（chain_rounds.sh），见 `reports/v2/README.md`。（云端机器 2026-09-11 起已废弃 v2 目录，一律用其默认 `/data/cxm/recursion` + `/data/cxm/models`。）
 - 并发上限 = min(concurrency, 空闲卡数)，一卡一实验。
+
+### 2.1 找空卡、钉 N 卡并启动（2026-11-04 固化）
+
+仅对已确认配置的实验执行。使用 `scripts/gpu_batch_launch.py`，默认 dry-run；它要求显式输出目录，避免误写默认的 `/mnt/workspace`：
+
+```bash
+CFG=experiments/<批次>.json
+N=4
+GPUS=2,3,4,5   # 有序候选池，也可以写 0,1,2,3,4,5,6,7
+python .agents/skills/recursion-experiment-runner/scripts/gpu_batch_launch.py \
+  "$CFG" --required "$N" --gpus "$GPUS" \
+  --base-dir /data/cxm/recursion --model-base-dir /data/cxm/models
+```
+
+空卡必须同时满足：显存 ≤100 MiB、利用率=0、没有 compute 进程。候选池空闲数达到 N 后，工具按候选顺序选择**恰好 N 张**，用 `BATCH_RUN_GPUS` 钉卡，并设置 `BATCH_RUN_REQUIRE_GPU=1` 禁止 CPU/cuda:0 回退。JSON 的 `concurrency` 大于 N 不会扩卡；实际 worker 数仍受钉卡数限制。
+
+确认 dry-run 后后台启动控制器（控制器先等卡，再启动 batch；`--execute` 不可省略）：
+
+```bash
+LOG=logs/run_<批次>_${N}gpu_controller_$(date +%Y%m%d_%H%M%S).log
+setsid nohup python .agents/skills/recursion-experiment-runner/scripts/gpu_batch_launch.py \
+  "$CFG" --required "$N" --gpus "$GPUS" \
+  --base-dir /data/cxm/recursion --model-base-dir /data/cxm/models \
+  --execute > "$LOG" 2>&1 < /dev/null &
+echo $! > logs/run_<批次>_${N}gpu_controller.pid
+```
+
+控制器日志给出 `[GPU] selected`、`[BATCH_PID]` 和独立 batch 日志路径。启动后必须继续核验，不能把“等待器存在”当成“训练已启动”：
+
+1. batch 日志的 `GPU whitelist` 只能包含所选卡，`Effective concurrency` 必须等于 N；
+2. `core.py` 进程和 `nvidia-smi` 显存/利用率与卡号一致；
+3. 至少看到首个 eval/`Start training...`，排除配置归一化错误；多阶段实验还要检查 gate，batch rc=0 不等于 gate 通过。
 
 ## 3. 关键运行行为（影响决策）
 
@@ -63,9 +117,10 @@ python .agents/skills/recursion-experiment-runner/scripts/check_progress.py <批
 - **手动关停且保存**：**先对训练进程（core.py）发 SIGTERM**，等日志出现 `[STOP] Checkpoint saved`（下一个 eval 点，EVAL_INTERVAL=1 时秒级），**再杀编排器**（chain_rounds.sh / batch_run）。顺序不能反！
 - **手动关停整条链**：先 `kill` 各个 `core.py config_tmp_<实验名>`（SIGTERM 存盘），确认存盘后 `pkill -f 'chain_rounds.sh experiments/<批次>'`。pkill 模式别写成能匹配到自己命令行的形式（会误杀 shell，用 `pgrep -af '[c]ore.py ...'` 括号写法或先核对 PID 再 kill）。
 - 2026-09-08 教训：旧版 batch_run 用管道转发 core.py 的 stdout，先杀编排器会让训练进程下次 print 时 BrokenPipeError 静默死掉、丢 checkpoint（trib/tetra 跑了 12h 的进度因此丢失）。已修复为直接重定向到文件（编排器死亡不再影响训练进程），但仍建议按上面的顺序操作。
+- **替换旧的等卡等待器**：先 `ps -o pid,ppid,pgid,sid,stat,args -p <PIDs>` 并检查子进程，确认只有 bash/python/tee、没有 batch/core 训练后，再 `kill -TERM -- -<PGID>` 关闭整个独立等待进程组。不要凭名字 `pkill -f`（会自匹配/误杀）；若已有训练，等待器可单独停，但 detached batch 会继续且后续 gate/阶段不会执行，训练本身仍须用 stop_experiment.sh 存盘停止。
 - **取消排队实验**：batch_run 把队列读进内存，改 JSON 不影响在跑的编排器。正确做法：直接杀编排器（训练进程因文件重定向不受影响，会继续跑完并正常存最终模型），不要让训练进程先退出——否则编排器会在 watcher 轮询间隙（秒级）内抢跑下一个实验（两次踩坑）。缺 plots 时用 `python -c "import batch_run; batch_run.generate_grouped_plots('<logs>', '<plots>')"` 手动补画。
 
-## 6. 四个常用技能（2026-09-09 固化，脚本在 scripts/ 下）
+## 6. 五个常用技能（2026-11-04 更新，脚本在 scripts/ 下）
 
 **技能 1 — 逐卡队列状态**（用户说“每张卡队列/在跑什么”）：
 ```bash
@@ -92,6 +147,14 @@ bash .agents/skills/recursion-experiment-runner/scripts/timer.sh cancel <子串>
 bash .agents/skills/recursion-experiment-runner/scripts/timer.sh list
 ```
 原理：后台 watcher（setsid 分离，状态文件在 logs/timers/）到点后按技能 3 发 SIGTERM。只适用于**正在运行**的实验；未开始的实验直接在 JSON 配 MAX_TRAIN_HOURS。
+
+**技能 5 — 找空卡并钉 N 卡启动**（用户说“找空卡/用 N 卡/只用这几张卡/等待空卡启动”）：
+```bash
+python .agents/skills/recursion-experiment-runner/scripts/gpu_batch_launch.py \
+  experiments/<批次>.json --required <N> --gpus <有序候选池> \
+  --base-dir /data/cxm/recursion --model-base-dir /data/cxm/models [--execute]
+```
+默认 dry-run；实际后台启动、日志核验和替换旧等待器的完整流程见 §2.1 与 §5。
 
 
 ## 7. 汇总与上传

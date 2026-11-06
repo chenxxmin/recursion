@@ -38,7 +38,7 @@ _LEGACY_SCENARIO = {
 
 # 合法 TASK_VARIANT 取值（场景下一级的任务变体；None = 标准 next-token 预测）。
 # corrupt_fix：恰好一位污损成随机错误值，尾部接 EOS，模型输出 [位置, 正确值]。
-# fill_blank：恰好一位污损成空白 token（id=P），尾部接 EOS，模型只输出正确值。
+# fill_blank：默认单空旧布局；BLANK_LENS 为连续段，BLANK_COUNTS 为多个独立单值空格。
 TASK_VARIANTS = ('corrupt_fix', 'fill_blank')
 
 # 合法 task 名全集（报错信息用）。注意 'action' 不在 _LEGACY_SCENARIO 里：
@@ -133,6 +133,30 @@ def _normalize_variant(scenario, cfg):
     变体目前仅 single 场景开放；mixed/action 留扩展位（报错信息里说明）。
     """
     raw = cfg.get('TASK_VARIANT')
+    blank_lens = cfg.get('BLANK_LENS', [1])
+    if not isinstance(blank_lens, (list, tuple)) or not blank_lens:
+        raise ValueError(f"BLANK_LENS 必须是非空正整数列表，got {blank_lens!r}")
+    blank_lens = list(blank_lens)
+    if any(isinstance(l, bool) or not isinstance(l, int) or l < 1
+           for l in blank_lens):
+        raise ValueError(f"BLANK_LENS 必须是非空正整数列表，got {blank_lens!r}")
+    if len(set(blank_lens)) != len(blank_lens):
+        raise ValueError(f"BLANK_LENS 不允许重复长度，got {blank_lens!r}")
+    blank_counts = cfg.get('BLANK_COUNTS', [1])
+    if not isinstance(blank_counts, (list, tuple)) or not blank_counts:
+        raise ValueError(f"BLANK_COUNTS 必须是非空正整数列表，got {blank_counts!r}")
+    blank_counts = list(blank_counts)
+    if any(isinstance(k, bool) or not isinstance(k, int) or k < 1
+           for k in blank_counts):
+        raise ValueError(f"BLANK_COUNTS 必须是非空正整数列表，got {blank_counts!r}")
+    if len(set(blank_counts)) != len(blank_counts):
+        raise ValueError(f"BLANK_COUNTS 不允许重复数量，got {blank_counts!r}")
+    if raw != 'fill_blank' and blank_lens != [1]:
+        raise ValueError("BLANK_LENS 仅 TASK_VARIANT='fill_blank' 支持（默认 [1]）")
+    if raw != 'fill_blank' and blank_counts != [1]:
+        raise ValueError("BLANK_COUNTS 仅 TASK_VARIANT='fill_blank' 支持（默认 [1]）")
+    if blank_lens != [1] and blank_counts != [1]:
+        raise ValueError("BLANK_LENS 与 BLANK_COUNTS 扩展模式互斥")
     if cfg.get('FILL_BLANK_ALL_POSITIONS') and raw != 'fill_blank':
         raise ValueError(
             "FILL_BLANK_ALL_POSITIONS 仅 TASK_VARIANT='fill_blank' 支持"
@@ -142,6 +166,8 @@ def _normalize_variant(scenario, cfg):
             raise ValueError(
                 "FILL_BLANK_FIXED_POS 仅 TASK_VARIANT='fill_blank' 支持"
                 "（固定挖空位置，负数从末尾数，-1 = 固定挖最后一位）")
+        if blank_counts != [1]:
+            raise ValueError("FILL_BLANK_FIXED_POS 不支持 BLANK_COUNTS 多空格模式")
         if cfg.get('FILL_BLANK_ALL_POSITIONS'):
             raise ValueError(
                 "FILL_BLANK_FIXED_POS 与 FILL_BLANK_ALL_POSITIONS 互斥"
@@ -226,6 +252,18 @@ def _normalize_variant(scenario, cfg):
         hi = cfg.get('SEQ_LEN_MAX')
         if not (isinstance(lo, int) and isinstance(hi, int) and 2 <= lo <= hi):
             raise ValueError(f"SEQ_LEN_MIN/MAX 必须是 2 <= min <= max 的整数，got {lo}, {hi}")
+    if raw == 'fill_blank':
+        if cfg.get('SEQ_LEN_MIN') is not None:
+            window_lens = [cfg['SEQ_LEN_MIN']]
+        else:
+            window_lens = [v for v in (cfg.get('TRAIN_LEN'), cfg.get('OOD_LEN'))
+                           if isinstance(v, int) and not isinstance(v, bool)]
+        max_blank = (max(blank_counts) if blank_counts != [1]
+                     else max(blank_lens))
+        if window_lens and max_blank > min(window_lens):
+            key = 'BLANK_COUNTS' if blank_counts != [1] else 'BLANK_LENS'
+            raise ValueError(
+                f"{key} 最大值 {max_blank} 超过最短窗口 {min(window_lens)}")
     if cfg.get('BODY_SUPERVISION') is not None and raw is None:
         raise ValueError("BODY_SUPERVISION 仅 TASK_VARIANT 变体支持"
                          "（变体默认 true；标准任务不需要）")

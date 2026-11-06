@@ -299,6 +299,61 @@ def test_task_variant_fill_blank():
         'MISSING_PROB')
 
 
+def test_blank_lens_gates():
+    base = {'P': 53, 'ORDER': 2, 'RULES': [[1, 1]],
+            'TASK_VARIANT': 'fill_blank', 'TRAIN_LEN': 5, 'OOD_LEN': 6}
+    norm = normalize_task_config('single', {**base, 'BLANK_LENS': [1, 2]})
+    assert norm['variant'] == 'fill_blank'
+    # 全局默认 [1] 可由非 fill 任务继承，不产生“显式启用”误判。
+    assert normalize_task_config(
+        'single', {'P': 53, 'ORDER': 2, 'RULES': [[1, 1]],
+                   'BLANK_LENS': [1]})['variant'] is None
+    for invalid in (None, [], [0], [-1], [True], [1.0], [1, 1], '1'):
+        _expect_error(lambda value=invalid: normalize_task_config(
+            'single', {**base, 'BLANK_LENS': value}), 'BLANK_LENS')
+    _expect_error(lambda: normalize_task_config(
+        'single', {'P': 53, 'ORDER': 2, 'RULES': [[1, 1]],
+                   'BLANK_LENS': [2]}), 'fill_blank')
+    _expect_error(lambda: normalize_task_config(
+        'single', {**base, 'TASK_VARIANT': 'corrupt_fix',
+                   'BLANK_LENS': [2]}), 'fill_blank')
+    _expect_error(lambda: normalize_task_config(
+        'single', {**base, 'BLANK_LENS': [6]}), '最短窗口')
+    _expect_error(lambda: normalize_task_config(
+        'single', {**base, 'BLANK_LENS': [5],
+                   'SEQ_LEN_MIN': 4, 'SEQ_LEN_MAX': 6}), '最短窗口')
+    norm = normalize_task_config(
+        'single', {**base, 'BLANK_LENS': [4],
+                   'SEQ_LEN_MIN': 4, 'SEQ_LEN_MAX': 6})
+    assert norm['variant'] == 'fill_blank'
+
+
+def test_blank_count_gates():
+    base = {'P': 53, 'ORDER': 2, 'RULES': [[1, 1]],
+            'TASK_VARIANT': 'fill_blank', 'TRAIN_LEN': 5, 'OOD_LEN': 6}
+    norm = normalize_task_config('single', {**base, 'BLANK_COUNTS': [1, 2, 4]})
+    assert norm['variant'] == 'fill_blank'
+    assert normalize_task_config(
+        'single', {'P': 53, 'ORDER': 2, 'RULES': [[1, 1]],
+                   'BLANK_COUNTS': [1]})['variant'] is None
+    for invalid in (None, [], [0], [-1], [True], [1.0], [1, 1], '1'):
+        _expect_error(lambda value=invalid: normalize_task_config(
+            'single', {**base, 'BLANK_COUNTS': value}), 'BLANK_COUNTS')
+    _expect_error(lambda: normalize_task_config(
+        'single', {'P': 53, 'ORDER': 2, 'RULES': [[1, 1]],
+                   'BLANK_COUNTS': [2]}), 'fill_blank')
+    _expect_error(lambda: normalize_task_config(
+        'single', {**base, 'BLANK_COUNTS': [2], 'BLANK_LENS': [2]}), '互斥')
+    _expect_error(lambda: normalize_task_config(
+        'single', {**base, 'BLANK_COUNTS': [2],
+                   'FILL_BLANK_FIXED_POS': 1}), 'FIXED_POS')
+    _expect_error(lambda: normalize_task_config(
+        'single', {**base, 'BLANK_COUNTS': [6]}), '最短窗口')
+    _expect_error(lambda: normalize_task_config(
+        'single', {**base, 'BLANK_COUNTS': [5],
+                   'SEQ_LEN_MIN': 4, 'SEQ_LEN_MAX': 6}), '最短窗口')
+
+
 def test_const_term():
     # 默认 0；single 非零合法（等差数列 = ORDER=1 + RULES=[[1]] + CONST=d）
     norm = normalize_task_config('single', {'P': 1009, 'ORDER': 1, 'RULES': [[1]],

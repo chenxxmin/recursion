@@ -45,23 +45,27 @@ def test_operand_positions_and_dynamic_plan_counts():
     }
     assert {k: probe.operand_positions(k) for k in range(5)} == expected
     full_expected = {
-        0: (8064, 80640, 20, 640),
-        1: (12096, 181440, 45, 1440),
-        2: (16128, 322560, 80, 2560),
-        3: (12096, 181440, 45, 1440),
-        4: (8064, 80640, 20, 640),
+        0: (8064, 201600, 50, 1600),
+        1: (12096, 302400, 75, 2400),
+        2: (16128, 403200, 100, 3200),
+        3: (12096, 302400, 75, 2400),
+        4: (8064, 201600, 50, 1600),
     }
     for k in range(5):
+        assert probe.patch_positions(k) == [0, 1, 2, 3, 4]
+        assert k not in probe.operand_positions(k)
+        assert k in probe.patch_positions(k)
         counts = probe.plan_counts(list(range(32)), list(range(1, 127)), k)
         assert counts['clean'] == 32
         actual = (counts['corrupted'], counts['patched'],
                   counts['aggregate_cells'], counts['per_base_cells'])
         assert actual == full_expected[k]
         smoke = probe.plan_counts([0, 1], [1, 126], k)
-        n_positions = len(expected[k])
-        assert smoke['corrupted'] == 4 * n_positions
-        assert smoke['patched'] == 20 * n_positions * n_positions
-        assert smoke['aggregate_cells'] == 5 * n_positions * n_positions
+        n_sources = len(expected[k])
+        assert smoke['corrupted'] == 4 * n_sources
+        assert smoke['patched'] == 100 * n_sources
+        assert smoke['aggregate_cells'] == 25 * n_sources
+        assert smoke['per_base_cells'] == 50 * n_sources
 
 
 def test_single_token_corruption_alignment_and_target_preservation():
@@ -81,6 +85,8 @@ def test_single_token_corruption_alignment_and_target_preservation():
         assert int(windows[0, k]) == int(original[0, k])
     assert torch.equal(windows, original)
     assert probe.clean_input_label(2) == '[x0,x1,BLANK,x3,x4,EOS]'
+    assert probe.patch_position_label(2, 2) == 'BLANK(x2)'
+    assert probe.patch_position_label(1, 2) == 'x1'
 
 
 def test_site_mapping():
@@ -141,7 +147,7 @@ def test_generalized_emb_causal_and_final_controls():
     torch.set_num_threads(1)
     model = make_model()
     blank = 2
-    positions = probe.operand_positions(blank)
+    full_positions = probe.patch_positions(blank)
     _, clean_inputs, clean_cache, clean_logits = clean_setup(model, blank)
     targets = clean_logits[:, 5].argmax(dim=-1)
     base_row = 1
@@ -156,12 +162,17 @@ def test_generalized_emb_causal_and_final_controls():
     raw, max_diff = probe.patch_chunk(
         model, corrupted, clean_cache, clean_logits, corrupted_logits,
         chunk_targets, base_row, d_values, source_position, [False, True], response,
-        patch_positions=positions)
-    assert len(raw) == 2 * 5 * 4
+        patch_positions=full_positions, blank=blank)
+    assert len(raw) == 2 * 5 * 5
+    keys = {(row['base_row'], row['d'], row['source_position'],
+             tuple(row['site']), row['position']) for row in raw}
+    assert len(keys) == len(raw)
+    assert {row['d'] for row in raw} == {1, 126}
+    assert {row['position'] for row in raw} == set(range(5))
     assert sum(row['emb_ceiling'] for row in raw) == 2
-    assert sum(row['emb_identity'] for row in raw) == 6
-    assert sum(row['causal_noop'] for row in raw) == 2 * 5 * 3
-    assert sum(row['final_resid_noop'] for row in raw) == 2 * 4
+    assert sum(row['emb_identity'] for row in raw) == 8
+    assert sum(row['causal_noop'] for row in raw) == 2 * 5 * 4
+    assert sum(row['final_resid_noop'] for row in raw) == 2 * 5
     assert all(row['restore_full'] for row in raw if row['emb_ceiling'])
     assert all(value <= probe.CONTROL_ATOL for value in max_diff.values())
     for row in raw:
@@ -169,14 +180,25 @@ def test_generalized_emb_causal_and_final_controls():
             row['corrupted_full_vocab_output'] != row['target'])
         if row['causal_noop'] or row['final_resid_noop']:
             assert row['patched_full_vocab_output'] == row['corrupted_full_vocab_output']
+        if row['position'] == blank:
+            assert row['position_label'] == 'BLANK(x2)'
+            assert row['causal_noop']  # source x4 is to the right of BLANK x2
+            if row['site'] == ['emb']:
+                assert row['emb_identity']
+
+    # The old operand-only result is an exact subset of the new full-position grid.
+    legacy_raw, _ = probe.patch_chunk(
+        model, corrupted, clean_cache, clean_logits, corrupted_logits,
+        chunk_targets, base_row, d_values, source_position, [False, True], response,
+        patch_positions=probe.operand_positions(blank), blank=blank)
+    assert [row for row in raw if row['position'] != blank] == legacy_raw
 
     source_cache = probe.slice_clean_cache(clean_cache, base_row, 2)
     for site in probe.SITES:
-        for patch_position in (0, 1, 3):
+        for patch_position in (0, 1, 2, 3):
             noop = patched_logits(model, corrupted, site, patch_position, source_cache)
             assert torch.allclose(noop[:, 5], corrupted_logits[:, 5],
                                   rtol=probe.CONTROL_RTOL, atol=probe.CONTROL_ATOL)
-    # Flag semantics are dynamic, not hard-coded to x2->x1.
     assert probe._control_flags(('resid', 0), 0, 1)['causal_noop']
     assert probe._control_flags(('resid', 0), 3, 4)['causal_noop']
     assert not probe._control_flags(('resid', 0), 4, 3)['causal_noop']
@@ -189,7 +211,7 @@ def test_last_resid_eos_noop_and_ceiling():
     corrupted = probe.make_corrupted_inputs(clean_inputs[1:2], 3, [7], 127)
     corrupted_logits, _ = model(corrupted)
     source_cache = probe.slice_clean_cache(clean_cache, 1, 1)
-    for position in probe.operand_positions(4):
+    for position in probe.patch_positions(4):
         noop = patched_logits(model, corrupted, ('resid', 3), position, source_cache)
         assert torch.equal(noop[:, 5], corrupted_logits[:, 5])
     patched = patched_logits(model, corrupted, ('resid', 3), 5, source_cache)
@@ -223,12 +245,12 @@ def test_cross_base_and_cross_d_cache_isolation():
         assert not torch.allclose(batched, wrong, rtol=0, atol=1e-6)
 
 
-def _synthetic_raw(base_row=0, restore=False, numeric=False, persistence=False,
+def _synthetic_raw(base_row=0, d=1, restore=False, numeric=False, persistence=False,
                    nonnumeric=False, other=False, route=False, changed=True,
                    prob=0.5, logit=2.0, rank=1, margin=1.0, delta_logit=0.5,
                    delta_margin=0.25):
     return {
-        'base_row': base_row, 'd': 1, 'source': 'x1', 'source_position': 1,
+        'base_row': base_row, 'd': d, 'source': 'x1', 'source_position': 1,
         'site': ['resid', 1], 'site_label': probe.site_label(('resid', 1)),
         'position': 2, 'position_label': 'x2', 'route_exact': route,
         'baseline_changed': changed,
@@ -292,6 +314,29 @@ def test_aggregation_changed_unchanged_counts_and_legacy_metrics():
     assert {(row['base_row'], row['N']) for row in per_base} == {(0, 4), (1, 1)}
 
 
+def test_per_base_unique_raw_keys_and_full_126d_coverage():
+    raw = [
+        _synthetic_raw(base_row=base, d=d, restore=(d % 2 == 0),
+                       numeric=True, changed=(d % 3 != 0))
+        for base in (0, 1) for d in range(1, 127)
+    ]
+    keys = {(row['base_row'], row['d'], row['source_position'],
+             tuple(row['site']), row['position']) for row in raw}
+    assert len(keys) == len(raw) == 2 * 126
+    per_base = probe.aggregate_raw(raw, per_base=True)
+    assert len(per_base) == 2
+    for cell in per_base:
+        rows = [row for row in raw if row['base_row'] == cell['base_row']]
+        assert {row['d'] for row in rows} == set(range(1, 127))
+        assert cell['N'] == 126
+        assert cell['changed_N'] == sum(row['baseline_changed'] for row in rows)
+        assert cell['restore_full_count'] == 63
+        assert cell['changed_restore_full_count'] == sum(
+            row['restore_full'] for row in rows if row['baseline_changed'])
+    overall = probe.aggregate_raw(raw)
+    assert len(overall) == 1 and overall[0]['N'] == 252
+
+
 def test_dynamic_cli_paths_counts_and_dry_run():
     args = probe.parse_args([
         '--dry-run', '--blank', '2', '--base-rows', '0,1',
@@ -302,13 +347,16 @@ def test_dynamic_cli_paths_counts_and_dry_run():
     assert args.out.endswith('fillblank_x2_activation_patch_a25b56.json.gz')
     assert args.plot_prefix.endswith('fillblank_x2_activation_patch_a25b56')
     counts = probe.plan_counts(args.base_rows, args.d_values, args.blank)
-    assert counts['corrupted'] == 16 and counts['patched'] == 320
+    assert counts['corrupted'] == 16 and counts['patched'] == 400
+    assert counts['aggregate_cells'] == 100 and counts['per_base_cells'] == 200
     output = io.StringIO()
     with contextlib.redirect_stdout(output):
         probe.print_dry_run(args)
     text = output.getvalue()
     assert 'blank x2' in text and 'by_blank.x2' in text
-    assert 'corrupted=16' in text and 'patched=320' in text
+    assert 'corrupted=16' in text and 'patched=400' in text
+    assert 'corruption sources (operands only): [0, 1, 3, 4]' in text
+    assert 'restore patch positions (includes BLANK, excludes EOS): [0, 1, 2, 3, 4]' in text
     assert '[x0,x1,BLANK,x3,x4,EOS]' in text
     assert 'source>patch causal EOS no-op' in text
     assert '8 plots' in text
@@ -322,8 +370,8 @@ def test_dynamic_cli_paths_counts_and_dry_run():
     assert defaults.out == probe.DEFAULT_OUT
     assert defaults.plot_prefix == probe.DEFAULT_PLOT_PREFIX
     explicit = probe.parse_args([
-        '--dry-run', '--blank', '3', '--out', 'custom.json', '--plot-prefix', 'custom'])
-    assert (explicit.out, explicit.plot_prefix) == ('custom.json', 'custom')
+        '--dry-run', '--blank', '3', '--out', 'custom.json.gz', '--plot-prefix', 'custom'])
+    assert (explicit.out, explicit.plot_prefix) == ('custom.json.gz', 'custom')
 
 
 def test_raw_index_alignment_and_mismatch_detection():

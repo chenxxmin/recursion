@@ -419,7 +419,8 @@ class BatchTag(IntEnum):
     MIXED_AB_TARGET = 5  # payload: (ab_indices, clean_seqs) -- rule index + clean sequences
     ACTION_MISS = 6    # payload: (clean_seqs, loss_mask) -- action + missing (predict mode)
     CORRUPT_FIX = 7    # payload: (target_seqs, loss_mask) -- corrupt_fix 变体；targets = target_seqs[:, 1:]，mask 仅位置/值两个输出位
-    FILL_BLANK = 8     # payload: (target_seqs, loss_mask) -- fill_blank 变体；mask 仅 EOS 槽一个输出位
+    FILL_BLANK = 8     # payload: (target_seqs, loss_mask) -- fill_blank；EOS(l) 编码段长，监督 l 个值槽
+    CLEAN_VALUE_SET = 9  # payload: (target_seqs, loss_mask, value_sets) -- 干净主体 + EOS 槽集合预测
 
 
 def collate_fn(batch):
@@ -592,70 +593,246 @@ def make_corrupt_fix_collate(*, p, eos_id, pos_base, parallel=False,
 
 def make_fill_blank_collate(*, p, eos_id, blank_id=None,
                             body_supervision=False, body_from=0, fixed_k=None,
-                            corrupt=False, last_n=None, pos_set=None):
-    """Collate for the fill_blank task variant (TASK_VARIANT='fill_blank').
+                            corrupt=False, last_n=None, pos_set=None,
+                            blank_lens=None, blank_counts=None):
+    """Collate for contiguous blanks or multiple independent unit blanks.
 
-    Same online single-position corruption as corrupt_fix, but the position
-    is replaced by the BLANK token (id = p, the missing token) instead of a
-    random wrong value, and the model only outputs the correct VALUE — no
-    position token (the blank marks itself).
+    The default ``blank_lens=[1]`` and ``blank_counts=[1]`` is the legacy
+    single-position layout. ``blank_lens`` compresses one contiguous segment
+    into one BLANK and uses EOS(l) for its length. ``blank_counts`` instead
+    selects multiple distinct positions, keeps one BLANK per position, and
+    uses EOS(k) for the number of positions. The two extended modes are
+    mutually exclusive.
 
-    Input items: plain LongTensors (blank position k drawn uniformly at
-    random per call, or fixed to `fixed_k` — negative counts from the end,
-    e.g. -1 = always blank the last position) or (seq, k) tuples (k carried
-    by the sample, used verbatim — FILL_BLANK_ALL_POSITIONS mode, where the
-    dataset enumerates every position of every window).
+    Independent blanks use ``(seq, positions)`` tuples for enumeration/probes;
+    plain tensors draw a fresh count and a uniform position subset. With the
+    positions sorted increasingly and H containing their original values::
 
-    Output batch: (x, FILL_BLANK, target_seqs, loss_mask) with
+        x           = [view_with_k_blanks, EOS(k), H[:-1]]  # L+k
+        target_seqs = [target_body, EOS(k), H]              # L+k+1
+        EOS(k)      = P + 1 + (k - 1)
 
-        x           = [c'(0..L-1), EOS]        # length L+1
-        target_seqs = [c'(0..L-1), EOS, v]     # length L+2
-        loss_mask   = 1 only at the EOS slot (predict the correct value v)
-
-    corrupt=True 时（CORRUPT_FIX_VALUE_ONLY）：把 BLANK 替换为一个随机错误值
-    （≠ 真值），不告知错误位置、也不输出位置 token；版面与填空完全一致，
-    模型需自行检测污损并给出正确值。
+    Different counts in one batch are right-padded with zero loss masks.
+    ``fixed_k`` only applies to the legacy/contiguous modes. ``corrupt=True``
+    is the legacy CORRUPT_FIX_VALUE_ONLY path and supports neither extension.
     """
     blank = p if blank_id is None else blank_id
+    blank_lens = [1] if blank_lens is None else list(blank_lens)
+    blank_counts = [1] if blank_counts is None else list(blank_counts)
+    if not blank_lens or any(isinstance(l, bool) or not isinstance(l, int) or l < 1
+                             for l in blank_lens):
+        raise ValueError(f"blank_lens must contain positive integers, got {blank_lens}")
+    if len(set(blank_lens)) != len(blank_lens):
+        raise ValueError(f"blank_lens must not contain duplicates, got {blank_lens}")
+    if not blank_counts or any(isinstance(k, bool) or not isinstance(k, int) or k < 1
+                               for k in blank_counts):
+        raise ValueError(f"blank_counts must contain positive integers, got {blank_counts}")
+    if len(set(blank_counts)) != len(blank_counts):
+        raise ValueError(f"blank_counts must not contain duplicates, got {blank_counts}")
+    extended = blank_lens != [1]
+    multi_count = blank_counts != [1]
+    if extended and multi_count:
+        raise ValueError("blank_lens and blank_counts extensions are mutually exclusive")
+    if corrupt and (extended or multi_count):
+        raise ValueError("CORRUPT_FIX_VALUE_ONLY only supports single legacy blanks")
+    if multi_count and fixed_k is not None:
+        raise ValueError("fixed_k does not support blank_counts; use (seq, positions) tuples")
+
+    def _extended_row(seq, k, l):
+        L = seq.numel()
+        if not 1 <= l <= L:
+            raise ValueError(f"blank length l={l} outside [1, {L}]")
+        if not 0 <= k <= L - l:
+            raise ValueError(f"blank start k={k} outside [0, {L - l}] for l={l}")
+        hidden = seq[k:k + l]
+        view = torch.cat([seq[:k], seq.new_full((1,), blank), seq[k + l:]])
+        m = view.numel()  # L-l+1: EOS(l) input index and first-value target index
+        eos_variant = seq.new_tensor([eos_id + l - 1])
+        x = torch.cat([view, eos_variant, hidden[:-1]])
+        if body_supervision:
+            base = torch.cat([seq[:k + 1], seq[k + l:]])
+        else:
+            base = view
+        tgt = torch.cat([base, eos_variant, hidden])
+        mask = torch.zeros(L + 1, dtype=torch.float)  # aligns with tgt[:, 1:]
+        if body_supervision:
+            mask[body_from:m - 1] = 1.0
+        mask[m:m + l] = 1.0  # EOS(l) slot starts the l hidden values
+        return x, tgt, mask
+
+    def _multi_count_row(seq, positions):
+        L = seq.numel()
+        positions = tuple(int(pos) for pos in positions)
+        k = len(positions)
+        if k not in blank_counts:
+            raise ValueError(f"blank count k={k} outside configured {blank_counts}")
+        if (len(set(positions)) != k
+                or any(pos < 0 or pos >= L for pos in positions)
+                or any(a >= b for a, b in zip(positions, positions[1:]))):
+            raise ValueError(f"positions must be unique, sorted, and within [0, {L}): {positions}")
+        view = seq.clone()
+        view[list(positions)] = blank
+        hidden = seq[list(positions)]
+        eos_variant = seq.new_tensor([eos_id + k - 1])
+        x = torch.cat([view, eos_variant, hidden[:-1]])
+        base = seq if body_supervision else view
+        tgt = torch.cat([base, eos_variant, hidden])
+        mask = torch.zeros(L + k, dtype=torch.float)
+        if body_supervision:
+            mask[body_from:L - 1] = 1.0
+        mask[L:L + k] = 1.0
+        return x, tgt, mask
 
     def collate(batch):
         xs, targets, masks = [], [], []
         for item in batch:
-            if isinstance(item, (list, tuple)):
-                seq, k = item[0], int(item[1])
-            else:
-                seq = item
-                L0 = seq.numel()
-                if fixed_k is None:
-                    if pos_set is not None:
-                        k = pos_set[random.randrange(len(pos_set))]
-                        assert 0 <= k < L0, f"pos_set {pos_set} 含越界位置 (L={L0})"
-                    elif last_n is not None:
-                        k = random.randrange(max(0, L0 - last_n), L0)
-                    else:
-                        k = random.randrange(L0)
+            if multi_count:
+                if isinstance(item, (list, tuple)):
+                    if len(item) != 2:
+                        raise ValueError("multi-count fill_blank expects (seq, positions) tuples")
+                    seq, positions = item
                 else:
-                    k = fixed_k if fixed_k >= 0 else L0 + fixed_k
-                    assert 0 <= k < L0, f"fixed_k={fixed_k} out of range for L={L0}"
-            L = seq.numel()
-            orig = int(seq[k])
-            view = seq.clone()
-            if corrupt:
-                view[k] = (orig + 1 + random.randrange(p - 1)) % p
+                    seq = item
+                    L0 = seq.numel()
+                    k = blank_counts[random.randrange(len(blank_counts))]
+                    if k > L0:
+                        raise ValueError(f"blank count k={k} exceeds window length {L0}")
+                    positions = sorted(random.sample(range(L0), k))
+                x, tgt, mask = _multi_count_row(seq, positions)
+            elif extended:
+                if isinstance(item, (list, tuple)):
+                    if len(item) != 3:
+                        raise ValueError("extended fill_blank expects (seq, k, l) tuples")
+                    seq, k, l = item[0], int(item[1]), int(item[2])
+                else:
+                    seq = item
+                    L0 = seq.numel()
+                    l = blank_lens[random.randrange(len(blank_lens))]
+                    if l > L0:
+                        raise ValueError(f"blank length l={l} exceeds window length {L0}")
+                    if fixed_k is None:
+                        k = random.randrange(L0 - l + 1)
+                    else:
+                        n_starts = L0 - l + 1
+                        k = fixed_k if fixed_k >= 0 else n_starts + fixed_k
+                        if not 0 <= k < n_starts:
+                            raise ValueError(
+                                f"fixed_k={fixed_k} out of range for L={L0}, l={l}")
+                x, tgt, mask = _extended_row(seq, k, l)
             else:
-                view[k] = blank
-            x = torch.cat([view, torch.tensor([eos_id], dtype=torch.long)])
-            base = seq if body_supervision else view
-            tgt = torch.cat([base, torch.tensor([eos_id, orig], dtype=torch.long)])
-            mask = torch.zeros(L + 1, dtype=torch.float)  # aligns with tgt[:, 1:]
-            if body_supervision:
-                mask[body_from:L - 1] = 1.0  # 递推主体
-            mask[L] = 1.0  # EOS slot -> correct value
+                if isinstance(item, (list, tuple)):
+                    seq, k = item[0], int(item[1])
+                else:
+                    seq = item
+                    L0 = seq.numel()
+                    if fixed_k is None:
+                        if pos_set is not None:
+                            k = pos_set[random.randrange(len(pos_set))]
+                            assert 0 <= k < L0, f"pos_set {pos_set} 含越界位置 (L={L0})"
+                        elif last_n is not None:
+                            k = random.randrange(max(0, L0 - last_n), L0)
+                        else:
+                            k = random.randrange(L0)
+                    else:
+                        k = fixed_k if fixed_k >= 0 else L0 + fixed_k
+                        assert 0 <= k < L0, f"fixed_k={fixed_k} out of range for L={L0}"
+                L = seq.numel()
+                orig = int(seq[k])
+                view = seq.clone()
+                if corrupt:
+                    view[k] = (orig + 1 + random.randrange(p - 1)) % p
+                else:
+                    view[k] = blank
+                x = torch.cat([view, torch.tensor([eos_id], dtype=torch.long)])
+                base = seq if body_supervision else view
+                tgt = torch.cat([base, torch.tensor([eos_id, orig], dtype=torch.long)])
+                mask = torch.zeros(L + 1, dtype=torch.float)  # aligns with tgt[:, 1:]
+                if body_supervision:
+                    mask[body_from:L - 1] = 1.0  # 递推主体
+                mask[L] = 1.0  # EOS slot -> correct value
             xs.append(x)
             targets.append(tgt)
             masks.append(mask)
+        if multi_count:
+            max_t = max(t.numel() for t in targets)
+
+            def _pad(t, n, val):
+                return torch.cat([t, torch.full((n - t.numel(),), val,
+                                                dtype=t.dtype)])
+
+            xs = [_pad(x, max_t - 1, eos_id) for x in xs]
+            targets = [_pad(t, max_t, 0) for t in targets]
+            masks = [_pad(m, max_t - 1, 0.0) for m in masks]
         return (torch.stack(xs), BatchTag.FILL_BLANK,
                 torch.stack(targets), torch.stack(masks))
+
+    return collate
+
+
+def make_clean_value_set_collate(*, p, eos_id, body_from,
+                                 body_supervision=True, corrupt_ratio=0.0):
+    """Collate for TASK_VARIANT='clean_value_set'.
+
+    Each plain clean window ``c`` of arbitrary length L produces
+
+        x           = [c0, ..., c{L-1}, EOS]
+        target_seqs = [c0, ..., c{L-1}, EOS, placeholder]
+        value_sets  = sorted(unique(c0, ..., c{L-1}))
+
+    With ``targets = target_seqs[:, 1:]``, ordinary CE optionally supervises
+    the recurrence body at target indices [body_from, L-1).  Target L (the
+    EOS input slot) uses set loss/membership accuracy instead of ordinary CE.
+
+    When ``corrupt_ratio`` is nonzero, each batch randomly assigns that
+    fraction of rows to single-position corruption.  Corrupt rows have the
+    same [window, EOS] layout but use ``value_sets[row] = None``: their EOS
+    slot is trained/scored by ordinary CE against the original value.  Clean
+    rows retain the value-set objective.  ``body_supervision=False`` makes
+    both row types supervise only the EOS slot.
+    """
+    if p <= 0:
+        raise ValueError(f"p must be positive, got {p}")
+    corrupt_ratio = float(corrupt_ratio)
+    if not 0.0 <= corrupt_ratio <= 1.0:
+        raise ValueError(f"corrupt_ratio must be in [0, 1], got {corrupt_ratio}")
+    if corrupt_ratio and p < 2:
+        raise ValueError("corrupt_ratio requires p >= 2")
+
+    def collate(batch):
+        corrupt_indices = list(range(len(batch)))
+        random.shuffle(corrupt_indices)
+        n_corrupt = int(round(len(batch) * corrupt_ratio))
+        corrupt_rows = set(corrupt_indices[:n_corrupt])
+        xs, targets, masks, value_sets = [], [], [], []
+        for row, seq in enumerate(batch):
+            if isinstance(seq, (list, tuple)):
+                raise ValueError("clean_value_set expects plain clean windows, not (seq, k) tuples")
+            L = seq.numel()
+            if L < 1 or not 0 <= body_from < L:
+                raise ValueError(f"body_from={body_from} is invalid for window length {L}")
+            if torch.any((seq < 0) | (seq >= p)):
+                raise ValueError(f"clean_value_set values must be in [0, {p})")
+
+            is_corrupt = row in corrupt_rows
+            view = seq.clone()
+            original = 0
+            if is_corrupt:
+                k = random.randrange(L)
+                original = int(seq[k])
+                view[k] = (original + 1 + random.randrange(p - 1)) % p
+            base = seq if body_supervision else view
+            tgt = torch.cat([base, torch.tensor([eos_id, original], dtype=torch.long)])
+            mask = torch.zeros(L + 1, dtype=torch.float)
+            if body_supervision:
+                mask[body_from:L - 1] = 1.0
+            mask[L] = 1.0
+            xs.append(torch.cat([view, torch.tensor([eos_id], dtype=torch.long)]))
+            targets.append(tgt)
+            masks.append(mask)
+            value_sets.append(None if is_corrupt else
+                              sorted(set(int(v) for v in seq.tolist())))
+        return (torch.stack(xs), BatchTag.CLEAN_VALUE_SET,
+                torch.stack(targets), torch.stack(masks), value_sets)
 
     return collate
 
