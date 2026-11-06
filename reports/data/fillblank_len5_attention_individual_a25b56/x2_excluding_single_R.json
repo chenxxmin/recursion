@@ -1,0 +1,41 @@
+{
+  "full": {
+    "informative": true,
+    "label_type": "best_fit_route (tentative, including weak fits)",
+    "n_same_pairs": 281,
+    "n_different_pairs": 184,
+    "same_route_mean_distance": 1.546143472027778,
+    "different_route_mean_distance": 1.586334832685326,
+    "different_minus_same": 0.040191360657547914,
+    "base_label_permutation_p_one_sided": 0.089,
+    "n_permutations": 1999,
+    "seed": 20261106,
+    "caution": "exploratory; labels are imperfect; no multiple-comparison correction"
+  },
+  "all_eos_queries": {
+    "informative": true,
+    "label_type": "best_fit_route (tentative, including weak fits)",
+    "n_same_pairs": 281,
+    "n_different_pairs": 184,
+    "same_route_mean_distance": 0.7690054183775307,
+    "different_route_mean_distance": 0.8820981586792781,
+    "different_minus_same": 0.11309274030174743,
+    "base_label_permutation_p_one_sided": 0.0005,
+    "n_permutations": 1999,
+    "seed": 20261106,
+    "caution": "exploratory; labels are imperfect; no multiple-comparison correction"
+  },
+  "last_layer_eos": {
+    "informative": true,
+    "label_type": "best_fit_route (tentative, including weak fits)",
+    "n_same_pairs": 281,
+    "n_different_pairs": 184,
+    "same_route_mean_distance": 0.4291134166989286,
+    "different_route_mean_distance": 0.5862433746215695,
+    "different_minus_same": 0.1571299579226409,
+    "base_label_permutation_p_one_sided": 0.0005,
+    "n_permutations": 1999,
+    "seed": 20261106,
+    "caution": "exploratory; labels are imperfect; no multiple-comparison correction"
+  }
+}

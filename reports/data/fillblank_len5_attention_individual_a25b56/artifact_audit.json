@@ -1,0 +1,20 @@
+{
+  "n_base_json": 160,
+  "n_individual_png": 160,
+  "n_total_png": 181,
+  "links_passed": true,
+  "git_head": "c3dd62ec79d02eed669127c403d600bd6bdbadaf",
+  "source_sha256": {
+    "scripts/probe_fillblank_attention_clusters.py": "fa39f554bec32d82fbe2da36fb7cfe3eea00f2805e31bcdcb0a1d77659704ff6",
+    "scripts/probe_fillblank_attention_maps.py": "bdb9f71688ed9f67c7fc1ce8ebc4e5ad67f0a2b4cbb3ff8452930f3d5bf6380d",
+    "scripts/probe_fillblank_attention.py": "ed77833501b66187913e2719b00414ba734a5a9faad595b262784e4c21e3bc5f",
+    "scripts/probe_fillblank_last_blank_linear.py": "25509758f94c5a72c2893deec5f516581136c135f9c401fc1a1da48c379b360c",
+    "scripts/probe_fillblank_logit_lens.py": "f504417fff6acebce9041b2a5b4f43c7bc49e0b8c0029682db4b728e9b1f75e2",
+    "src/analyze_attention.py": "2d072318320b00654ac7950367a139842b67d8f73ae8ae7a059801c0a181a718",
+    "src/models.py": "bed5e1191305bcead61b3c76eace7475229fd4c0cfa2069563afa9d779c72348",
+    "tests/test_fillblank_attention_clusters.py": "beeadd7e43673f8c2f075f0424527b6810ba0a308efd8c312a373db352dea3ca"
+  },
+  "python_version": "Python 3.10.12",
+  "historical_mean_comparison_max_abs_diff": 1.1920928955078125e-07,
+  "note": "Working tree has pre-existing modifications; source hashes identify analysis code."
+}

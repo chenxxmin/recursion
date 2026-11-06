@@ -1,0 +1,28 @@
+x0: capture validated; cluster sizes=[11, 16, 5], silhouette=0.07129503916032905; drawing 32 individual maps
+x0: maps 8/32 saved and re-opened
+x0: maps 16/32 saved and re-opened
+x0: maps 24/32 saved and re-opened
+x0: maps 32/32 saved and re-opened
+x1: capture validated; cluster sizes=[2, 30], silhouette=0.12989732813383556; drawing 32 individual maps
+x1: maps 8/32 saved and re-opened
+x1: maps 16/32 saved and re-opened
+x1: maps 24/32 saved and re-opened
+x1: maps 32/32 saved and re-opened
+x2: capture validated; cluster sizes=[2, 30], silhouette=0.13247638261628686; drawing 32 individual maps
+x2: maps 8/32 saved and re-opened
+x2: maps 16/32 saved and re-opened
+x2: maps 24/32 saved and re-opened
+x2: maps 32/32 saved and re-opened
+x3: capture validated; cluster sizes=[4, 3, 4, 5, 4, 4, 8], silhouette=0.07051435595407897; drawing 32 individual maps
+x3: maps 8/32 saved and re-opened
+x3: maps 16/32 saved and re-opened
+x3: maps 24/32 saved and re-opened
+x3: maps 32/32 saved and re-opened
+x4: capture validated; cluster sizes=[18, 14], silhouette=0.05614570195991368; drawing 32 individual maps
+x4: maps 8/32 saved and re-opened
+x4: maps 16/32 saved and re-opened
+x4: maps 24/32 saved and re-opened
+x4: maps 32/32 saved and re-opened
+DONE: /mnt/workspace/hujiachen/recursion/reports/data/fillblank_len5_attention_individual_a25b56/summary.json
+Gallery: /mnt/workspace/hujiachen/recursion/reports/circuit_analysis/plots/fillblank_len5_attention_individual_a25b56/index.html
+Supplementary plots and gallery regenerated from saved individual arrays.

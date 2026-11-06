@@ -213,8 +213,9 @@ def main():
 
     print('\n[步骤 3] 候选斜率（全部数值均在 mod P 剩余类中）')
     candidates = candidate_values(a, b, p)
-    print(f'  逆元校验: a\'={candidates["a\'"]}, a*a\'={(a * candidates["a\'"]) % p}; '
-          f'b\'={candidates["b\'"]}, b*b\'={(b * candidates["b\'"]) % p}')
+    ai, bi = candidates["a'"], candidates["b'"]
+    print(f"  逆元校验: a'={ai}, a*a'={(a * ai) % p}; "
+          f"b'={bi}, b*b'={(b * bi) % p}")
     print('  ' + '; '.join(f'{name}={candidates[name]}' for name in CANDIDATE_NAMES))
     print('  末位空格 x4 的局部公式为 x4=a*x3+b*x2，因此局部规则预期: '
           'x0->0, x1->0, x2->b, x3->a。')
