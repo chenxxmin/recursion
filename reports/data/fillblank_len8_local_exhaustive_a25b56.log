@@ -1,0 +1,38 @@
+LEN=8, a=25, b=56, P=127, s=1, blank_count=1; checkpoint=/mnt/workspace/hujiachen/circuit_analysis/checkpoints_len8_s1k1/single_o2_fillblank_a25b56_d512l4r8h4_P127_len8_randpos_noaux_lr0.0003_wd2_initLen35_seed42_best.pth
+32 historical correct bases/blank, d=1..126, 26 local cells, 104832 perturbations; baseline=8*128=1024
+device=cuda:0, CUDA_VISIBLE_DEVICES=2, fp32, AMP off, TF32 off, batch_size=512
+x0: baseline 116/128, all 32 selected base outputs match
+  r=+1: n=4032, old replay mismatches=0/256, elapsed=0.2s
+  r=+2: n=4032, old replay mismatches=0/256, elapsed=0.3s
+x1: baseline 126/128, all 32 selected base outputs match
+  r=-1: n=4032, old replay mismatches=0/256, elapsed=0.5s
+  r=+1: n=4032, old replay mismatches=0/256, elapsed=0.6s
+  r=+2: n=4032, old replay mismatches=0/256, elapsed=0.7s
+x2: baseline 128/128, all 32 selected base outputs match
+  r=-2: n=4032, old replay mismatches=0/256, elapsed=0.9s
+  r=-1: n=4032, old replay mismatches=0/256, elapsed=1.1s
+  r=+1: n=4032, old replay mismatches=0/256, elapsed=1.3s
+  r=+2: n=4032, old replay mismatches=0/256, elapsed=1.5s
+x3: baseline 128/128, all 32 selected base outputs match
+  r=-2: n=4032, old replay mismatches=0/256, elapsed=1.7s
+  r=-1: n=4032, old replay mismatches=0/256, elapsed=1.9s
+  r=+1: n=4032, old replay mismatches=0/256, elapsed=2.1s
+  r=+2: n=4032, old replay mismatches=0/256, elapsed=2.4s
+x4: baseline 128/128, all 32 selected base outputs match
+  r=-2: n=4032, old replay mismatches=0/256, elapsed=2.7s
+  r=-1: n=4032, old replay mismatches=0/256, elapsed=2.9s
+  r=+1: n=4032, old replay mismatches=0/256, elapsed=3.2s
+  r=+2: n=4032, old replay mismatches=0/256, elapsed=3.5s
+x5: baseline 128/128, all 32 selected base outputs match
+  r=-2: n=4032, old replay mismatches=0/256, elapsed=3.9s
+  r=-1: n=4032, old replay mismatches=0/256, elapsed=4.2s
+  r=+1: n=4032, old replay mismatches=0/256, elapsed=4.5s
+  r=+2: n=4032, old replay mismatches=0/256, elapsed=4.9s
+x6: baseline 128/128, all 32 selected base outputs match
+  r=-2: n=4032, old replay mismatches=0/256, elapsed=5.3s
+  r=-1: n=4032, old replay mismatches=0/256, elapsed=5.7s
+  r=+1: n=4032, old replay mismatches=0/256, elapsed=6.1s
+x7: baseline 127/128, all 32 selected base outputs match
+  r=-2: n=4032, old replay mismatches=0/256, elapsed=6.5s
+  r=-1: n=4032, old replay mismatches=0/256, elapsed=6.9s
+DONE /mnt/workspace/hujiachen/recursion/reports/data/fillblank_len8_local_exhaustive_a25b56.json; validation={'n_perturbations': 104832, 'n_historical_perturbations_compared': 6656, 'n_historical_mismatches': 0, 'clean_baselines_match_historical': True, 'exhaustive_delta_enumeration_passed': True, 'cpu_spotcheck_n': 104, 'cpu_spotcheck_predictions_match': True}

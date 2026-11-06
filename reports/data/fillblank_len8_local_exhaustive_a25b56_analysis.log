@@ -1,0 +1,14 @@
+len5 x0: union=98.9211%, best-fixed-formula/base median=99.2063%, best labels={'R': 32}
+len5 x1: union=73.3466%, best-fixed-formula/base median=42.9894%, best labels={'M': 15, 'R': 17}
+len5 x2: union=82.2235%, best-fixed-formula/base median=58.5317%, best labels={'M': 8, 'F': 23, 'R': 1}
+len5 x3: union=94.3039%, best-fixed-formula/base median=91.7989%, best labels={'F': 32}
+len5 x4: union=99.8884%, best-fixed-formula/base median=100.0000%, best labels={'F': 32}
+len8 x0: union=95.1141%, best-fixed-formula/base median=95.2381%, best labels={'R': 32}
+len8 x1: union=58.4573%, best-fixed-formula/base median=35.5820%, best labels={'R': 29, 'M': 3}
+len8 x2: union=75.4836%, best-fixed-formula/base median=57.7381%, best labels={'F': 27, 'M': 5}
+len8 x3: union=82.2297%, best-fixed-formula/base median=71.4286%, best labels={'F': 32}
+len8 x4: union=84.2820%, best-fixed-formula/base median=78.1746%, best labels={'F': 30, 'M': 2}
+len8 x5: union=91.1582%, best-fixed-formula/base median=89.7817%, best labels={'F': 32}
+len8 x6: union=95.5440%, best-fixed-formula/base median=96.5608%, best labels={'F': 32}
+len8 x7: union=99.3056%, best-fixed-formula/base median=99.2063%, best labels={'F': 32}
+DONE /mnt/workspace/hujiachen/recursion/reports/data/fillblank_len8_local_exhaustive_a25b56_analysis/summary.json; plots=/mnt/workspace/hujiachen/recursion/reports/circuit_analysis/plots/fillblank_len8_local_exhaustive_a25b56

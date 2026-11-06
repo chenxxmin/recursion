@@ -1,0 +1,24 @@
+{
+  "n_perturbations": 104832,
+  "n_png": 11,
+  "independent_union_counts_passed": true,
+  "all_report_links_exist": true,
+  "model_validation": {
+    "n_perturbations": 104832,
+    "n_historical_perturbations_compared": 6656,
+    "n_historical_mismatches": 0,
+    "clean_baselines_match_historical": true,
+    "exhaustive_delta_enumeration_passed": true,
+    "cpu_spotcheck_n": 104,
+    "cpu_spotcheck_predictions_match": true
+  },
+  "source_sha256": {
+    "scripts/probe_fillblank_len8_local_exhaustive.py": "ae10e6c4d5ee37fdcd1f8746dda52b9c232c462c30d979f380e72b0a3a2e3a06",
+    "scripts/analyze_fillblank_local_routes.py": "476ac2168dcce95d3cd8c9fb004a71240cf66a5780b8a0af1c84666f895bc4b5",
+    "tests/test_fillblank_local_routes.py": "e8e5548d19db32397e30916516e612efafaa08b3ec54f7c1e926dce82b31cb2d",
+    "scripts/probe_fillblank_len8to64_stride8_random.py": "69d869ad35489bf96b069282fd58164fdfd744ab4b406815a034f38d71d5ff2e",
+    "scripts/probe_fillblank_last_blank_linear.py": "25509758f94c5a72c2893deec5f516581136c135f9c401fc1a1da48c379b360c",
+    "src/models.py": "bed5e1191305bcead61b3c76eace7475229fd4c0cfa2069563afa9d779c72348"
+  },
+  "git_head_at_analysis": "99c7984c7d84e28284678f5e5908b608e28da0b2"
+}
