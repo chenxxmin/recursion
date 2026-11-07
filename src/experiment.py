@@ -26,7 +26,7 @@ from protocol import BATCH_RUN_MERGED_FLAG
 from scenarios import normalize_task_config
 from models import FibonacciTransformer
 from datasets import (RecurrenceDataset, MixedRecurrenceDataset,
-                      ActionDataset, BucketBatchSampler,
+                      ActionDataset, ActionOrbitView, BucketBatchSampler,
                       collate_fn, make_missing_collate,
                       mixed_ab_collate_fn, make_mixed_missing_collate,
                       action_collate_fn, make_action_missing_collate,
@@ -458,6 +458,8 @@ def _prepare_action(config, norm):
     cfg = dict(config.get('main', {}))
 
     order = norm['order']
+    action_sampling = dict(rule_mode=cfg.get('ACTION_RULE_MODE','per_step'),
+                           active_rule_ids=cfg.get('ACTION_ACTIVE_RULE_IDS'))
     AB_PAIRS = [tuple(reversed(r)) for r in norm['rules']]  # canonical -> action
     missing_prob = cfg.get('MISSING_PROB', 0.0)
     miss_len = cfg.get('MISS_LEN', 1)
@@ -477,15 +479,44 @@ def _prepare_action(config, norm):
     max_seq_len = 2 * max(TRAIN_LEN, OOD_LEN) - order
     BLOCK_SIZE = _round_up_pow2(max_seq_len)
 
-    train_dataset = ActionDataset(
-        p=P, ab_pairs=AB_PAIRS, num_samples=NUM_TRAIN_SAMPLES,
-        length=TRAIN_LEN, seed=cfg.get('RANDOM_SEED', 42), order=order
-    )
-    test_dataset = ActionDataset(
-        p=P, ab_pairs=AB_PAIRS, num_samples=NUM_TEST_SAMPLES,
-        length=OOD_LEN, seed=cfg.get('RANDOM_SEED', 42) + 1, order=order
-    )
-
+    orbit_mode = action_sampling['rule_mode'] == 'per_sequence_orbit'
+    if orbit_mode:
+        if TRAIN_LEN <= order or OOD_LEN <= order:
+            raise ValueError("action windows require TRAIN_LEN/OOD_LEN > ORDER")
+        if action_sampling['active_rule_ids'] is not None:
+            raise ValueError("per_sequence_orbit currently requires all RULES active")
+        orbit_rules = rules_from_config(norm['rules'], P)
+        counts = cfg.get('NUM_TRAIN_SAMPLES')
+        if counts is None:
+            counts = [max(1, int(P ** order * r)) for r in norm['exposure_ratios']]
+        elif isinstance(counts, (int, float)):
+            counts = [counts] * len(orbit_rules)
+        if len(counts) != len(orbit_rules) or any(
+                int(n) != n or not 0 <= n <= P ** order for n in counts):
+            raise ValueError("orbit NUM_TRAIN_SAMPLES must give a valid count per rule")
+        ds = MixedRecurrenceDataset(orbit_rules, num_samples=[int(n) for n in counts],
+                                    length=TRAIN_LEN)
+        train_dataset = ActionOrbitView(ds.train_data, P, order)
+        # Preserve held-out initial states when OOD windows have another length.
+        test_data = ds.test_data
+        if OOD_LEN != TRAIN_LEN:
+            test_data = []
+            for values, rule_id in ds.test_data:
+                window = values[:order].tolist()
+                next_fn = orbit_rules[rule_id].next_fn()
+                while len(window) < OOD_LEN:
+                    window.append(next_fn(window[-order:], P))
+                test_data.append((torch.tensor(window, dtype=torch.long), rule_id))
+        test_dataset = ActionOrbitView(test_data, P, order)
+    else:
+        train_dataset = ActionDataset(
+            p=P, ab_pairs=AB_PAIRS, num_samples=NUM_TRAIN_SAMPLES,
+            length=TRAIN_LEN, seed=cfg.get('RANDOM_SEED', 42), order=order, **action_sampling
+        )
+        test_dataset = ActionDataset(
+            p=P, ab_pairs=AB_PAIRS, num_samples=NUM_TEST_SAMPLES,
+            length=OOD_LEN, seed=cfg.get('RANDOM_SEED', 42) + 1, order=order, **action_sampling
+        )
     _print_task_banner(BLOCK_SIZE, TRAIN_LEN, f"Dynamic mixed rules: {AB_PAIRS}")
 
     # With MISSING_PROB, corruption is applied on the fly in the collate
@@ -504,10 +535,27 @@ def _prepare_action(config, norm):
 
         def test_loader_fn():  # noqa: F811 (intentional closure name)
             fresh_seed = fresh_rng.randrange(2 ** 31)
-            ds = ActionDataset(
-                p=P, ab_pairs=AB_PAIRS, num_samples=NUM_TEST_SAMPLES,
-                length=OOD_LEN, seed=fresh_seed, order=order)
-            print(f"[FreshTest] rebuilt test set: n={NUM_TEST_SAMPLES}, len={OOD_LEN}, seed={fresh_seed}")
+            if orbit_mode:
+                # Match mixed fresh-test semantics: NUM_TEST_SAMPLES per rule.
+                rng_state = random.getstate()
+                try:
+                    random.seed(fresh_seed)
+                    samples = []
+                    for idx, rule in enumerate(orbit_rules):
+                        fresh_ds = RecurrenceDataset(
+                            p=P, recurrence_fn=rule.next_fn(), init_len=order,
+                            num_samples=0, length=OOD_LEN, verbose=False,
+                            state_cap=NUM_TEST_SAMPLES)
+                        fresh_ds.run()
+                        samples.extend((seq, idx) for seq in fresh_ds.test_samples)
+                finally:
+                    random.setstate(rng_state)
+                ds = ActionOrbitView(samples, P, order)
+            else:
+                ds = ActionDataset(
+                    p=P, ab_pairs=AB_PAIRS, num_samples=NUM_TEST_SAMPLES,
+                    length=OOD_LEN, seed=fresh_seed, order=order, **action_sampling)
+            print(f"[FreshTest] rebuilt action test set: n={len(ds)}, len={OOD_LEN}, seed={fresh_seed}")
             return _make_test_loader(ds, BATCH_SIZE, collate)
 
     model = FibonacciTransformer(
@@ -525,6 +573,12 @@ def _prepare_action(config, norm):
             old_wte = model.transformer.wte
             new_wte = nn.Embedding(model.vocab_size, old_wte.embedding_dim)
             new_wte.weight.data[:old_wte.weight.size(0)] = old_wte.weight.data
+            # Scale only newly added rule rows; preserve RNG consumption and all
+            # other initial weights for a paired initialization comparison.
+            rule_init_std = float(cfg.get('ACTION_RULE_TOKEN_INIT_STD', 1.0))
+            if not 0 < rule_init_std < float('inf'):
+                raise ValueError('ACTION_RULE_TOKEN_INIT_STD must be finite and positive')
+            new_wte.weight.data[old_wte.weight.size(0):].mul_(rule_init_std)
             model.transformer.wte = new_wte
             # Tie lm_head to wte, matching FibonacciTransformer's original design
             model.lm_head = nn.Linear(old_head.in_features, model.vocab_size, bias=False)
@@ -544,6 +598,8 @@ def _prepare_action(config, norm):
         'vocab_size': model.vocab_size,
         'pad_token_id': model.pad_token_id,
         'recurrence': 'action',
+        'action_rule_mode': action_sampling['rule_mode'],
+        'action_active_rule_ids': action_sampling['active_rule_ids'],
         'train_len': TRAIN_LEN,
         'ood_len': OOD_LEN,
         'missing_prob': missing_prob,

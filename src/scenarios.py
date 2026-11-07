@@ -459,7 +459,11 @@ def normalize_task_config(task, cfg):
         legacy_exposure = _legacy_exposure(scenario, len(rules), cfg)
         if task == 'dynamic_mixed':
             warnings.warn("task 'dynamic_mixed' 已废弃，按 'action' 处理", stacklevel=2)
-    if scenario == 'action':
+    if scenario == 'action' and cfg.get('ACTION_RULE_MODE') == 'per_sequence_orbit':
+        exposure = _normalize_exposure('mixed', len(rules), cfg, None)
+        if exposure is None:
+            exposure = [DEFAULT_RATIO] * len(rules)
+    elif scenario == 'action':
         # action 收到任何形状的 EXPOSURE_RATIOS（含长度不匹配的列表）都 warn 后
         # 忽略，不做长度校验；exposure_ratios 恒 None（规则逐步随机选择，无曝光比例概念）。
         if cfg.get('EXPOSURE_RATIOS') is not None:

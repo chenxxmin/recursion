@@ -627,3 +627,21 @@ loss = masked_cross_entropy(logits, targets, loss_mask)
 - 可通过 `--base-dir` 和 `--model-base-dir` 参数修改这两个根目录，默认分别为 `/mnt/workspace/hujiachen/recursion_results` 和 `/mnt/workspace/hujiachen/models`。
 
 跨机定时运行包：每个常规 eval 保留 latest 完整状态；定时、手动停止、正常完成和早停均保存 resume 完整状态。保存先写临时文件，再原子替换，避免写失败覆盖旧存档。
+
+
+### action课程采样开关（2026-10-29）
+
+`ACTION_RULE_MODE` 默认 `per_step`：每次递推独立选择规则，保持旧采样随机序列；`per_sequence`：每条序列生成初值后随机选一条规则，之后所有递推使用它，但每步仍插入对应flag。训练、静态测试、fresh测试一致使用此模式。
+`ACTION_ACTIVE_RULE_IDS` 默认null（全部规则），或指定0起始规则下标，如[0]只生成规则1；RULES、词表和flag编号不改变，故可无损暖启动到全部规则。该开关用于action场景。样本有放回生成，不强制规则数量均衡。checkpoint记录两项。课程第二阶段迁移最终权重，不继承优化器和调度状态。
+
+### ACTION_RULE_TOKEN_INIT_STD（action新增规则token初始化）
+
+默认1.0，保持历史扩词表行为；设0.02使新增规则token与数字token使用相同正态标准差。只缩放新增Embedding行，不额外抽样，不改变其他权重或后续RNG状态；输入/输出继续共享权重，因此对应输出行同时改变。只影响从头初始化；INIT_FROM/RESUME_FROM加载的匹配权重会覆盖该初始化。必须为有限正数。
+
+### action 固定规则轨道采样（2026-11-07）
+
+`ACTION_RULE_MODE="per_sequence_orbit"`：复用 `MixedRecurrenceDataset`，逐规则完整遍历轨道、滑窗、按初始状态配额切分，再插入该规则的固定 token。去掉 token 后与同 seed、同规则和配额的 mixed 训练/测试样本及顺序一致。只监督递推值，沿用 action 模型和 collate；不启用 mixed 的 rule_head。
+
+此模式 `NUM_TRAIN_SAMPLES` 标量为**每规则**数量，列表逐规则指定；未指定时使用 `EXPOSURE_RATIOS`（默认每规则0.7）。训练配额不能超过每规则 `P^ORDER`。每条带规则标签的初始状态只出现一次，轨道可被配额边界切分。静态测试使用剩余初始状态，OOD_LEN 不同时从相同状态延长/截短。fresh 测试沿用 mixed：`NUM_TEST_SAMPLES` 为每规则数量，从全状态空间重新抽取，可与训练重叠；超过状态数时为全量。要求所有规则启用（`ACTION_ACTIVE_RULE_IDS=null`），TRAIN_LEN/OOD_LEN > ORDER。完整轨道路径会物化全状态空间，内存随规则数、P^ORDER 和窗口长度增长。
+
+原 `per_step` / `per_sequence` 有放回随机采样及其总样本数口径保持不变。新模式名记入 checkpoint 的 `action_rule_mode`。

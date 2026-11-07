@@ -869,7 +869,8 @@ def make_mixed_missing_collate(*, p, order, n_rules, missing_prob, miss_len=1):
     return collate
 
 
-def generate_action_sample(p, ab_pairs, flag_start_id, length, rng, order=2):
+def generate_action_sample(p, ab_pairs, flag_start_id, length, rng, order=2,
+                           rule_mode="per_step", active_rule_ids=None):
     """Generate one action sequence [x1..x_order, flag, x_{order+1}, ..., flag, x_L].
 
     rng: a random.Random instance owned by the caller (seeding decides the
@@ -881,10 +882,16 @@ def generate_action_sample(p, ab_pairs, flag_start_id, length, rng, order=2):
     value, i.e. x_next = sum(c_i * values[-order + i]) % p; for order=2
     that is a*values[-2] + b*values[-1].
     """
+    if rule_mode not in ('per_step','per_sequence'):
+        raise ValueError('Unknown action rule mode')
+    ids = list(range(len(ab_pairs))) if active_rule_ids is None else list(active_rule_ids)
+    if not ids or len(set(ids)) != len(ids) or any(type(i) is not int or not 0 <= i < len(ab_pairs) for i in ids):
+        raise ValueError('Invalid active rule IDs')
     values = [rng.randrange(p) for _ in range(order)]
     seq = list(values)
+    fixed = ids[rng.randrange(len(ids))] if rule_mode == 'per_sequence' else None
     for _ in range(order, length):
-        rule_idx = rng.randrange(len(ab_pairs))
+        rule_idx = fixed if fixed is not None else ids[rng.randrange(len(ids))]
         coeffs = ab_pairs[rule_idx]
         x_next = sum(c * v for c, v in zip(coeffs, values[-order:])) % p
         seq.append(flag_start_id + rule_idx)
@@ -903,6 +910,34 @@ def generate_action_sample(p, ab_pairs, flag_start_id, length, rng, order=2):
     return seq
 
 
+class ActionOrbitView(Dataset):
+    """Lazy action layout over mixed (clean values, global rule ID) samples.
+
+    No sampling/RNG here: underlying mixed split and ordering are preserved.
+    """
+
+    def __init__(self, samples, p, order):
+        self.samples = samples
+        self.p = p
+        self.order = order
+
+    def __len__(self):
+        return len(self.samples)
+
+    def __getitem__(self, idx):
+        values, rule_id = self.samples[idx]
+        order = self.order
+        if len(values) <= order:
+            raise ValueError("action windows require length > order")
+        seq = torch.empty(2 * len(values) - order, dtype=torch.long)
+        seq[:order] = values[:order]
+        seq[order::2] = self.p + 1 + rule_id
+        seq[order + 1::2] = values[order:]
+        mask = torch.zeros(len(seq) - 1, dtype=torch.float)
+        mask[order::2] = 1.0
+        return seq, mask
+
+
 class ActionDataset(Dataset):
     """Dataset where the recurrence rule can change at every step.
 
@@ -916,7 +951,8 @@ class ActionDataset(Dataset):
     always stored CLEAN as (seq, loss_mask) pairs.
     """
 
-    def __init__(self, p, ab_pairs, num_samples, length, seed=0, order=2):
+    def __init__(self, p, ab_pairs, num_samples, length, seed=0, order=2,
+                 rule_mode="per_step", active_rule_ids=None):
         super().__init__()
         self.p = p
         self.ab_pairs = [tuple(pair) for pair in ab_pairs]
@@ -930,6 +966,8 @@ class ActionDataset(Dataset):
         self.pad_token_id = p
         self.flag_start_id = p + 1
         self.rng = random.Random(seed)
+        self.rule_mode = rule_mode
+        self.active_rule_ids = active_rule_ids
         self.samples = [self._generate_sample() for _ in range(num_samples)]
 
     def _generate_sample(self):
@@ -940,7 +978,8 @@ class ActionDataset(Dataset):
         make_action_missing_collate, never here.
         """
         seq = generate_action_sample(self.p, self.ab_pairs, self.flag_start_id,
-                                      self.length, self.rng, order=self.order)
+                                      self.length, self.rng, order=self.order,
+                                      rule_mode=self.rule_mode, active_rule_ids=self.active_rule_ids)
 
         # Build loss mask aligned to targets = seq[1:]. Value x_j (j >=
         # order+1) sits at seq index 2*j - order - 1, i.e. target index
