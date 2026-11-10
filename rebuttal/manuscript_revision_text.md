@@ -6,7 +6,7 @@ Author note: these are prepared replacement/addition paragraphs. They have not b
 
 We study how Transformers learn sequential modular recurrences under multiple rules and incomplete observations. Three questions guide the experiments: how task structure changes the benefits of depth and width; which prediction formulas models use when intermediate values are unavailable; and how the availability and delay of algebraic shortcuts affect learning across positions. The setting supplies exact targets and alternative formulas that can be tested through input interventions. Its motivation comes from sequential state updates and context-dependent operations in language processing; the empirical conclusions concern the recurrence tasks studied here.
 
-For example, “Alice holds a red ball and Bob a blue ball; they swap; Alice gives her ball to Carol” requires updating object ownership to infer that Bob holds the red ball. Such examples motivate studying state updates and implicit intermediate information, without equating natural language with a finite-order linear recurrence. Inter-trajectory learning abstracts adaptation to persistent but implicit context, such as domain or style. Intra-trajectory learning abstracts explicitly instructed changes of operation, such as summarizing and then translating. These are complementary task organizations; their direct comparison does not isolate the effects of rule observability and switching.
+For example, “Alice holds a red ball and Bob a blue ball; they swap; Alice gives her ball to Carol” requires updating object ownership to infer that Bob holds the red ball. Such examples motivate studying state updates and implicit intermediate information, without equating natural language with a finite-order linear recurrence. Inter-trajectory learning abstracts adaptation to persistent but implicit context, such as domain or style: when continuing an unlabelled technical passage, a model must infer and maintain its linguistic conventions. Intra-trajectory learning abstracts explicitly instructed changes of operation, such as summarizing and then translating: the instruction identifies the operation, which the model must execute using the accumulated context. These are complementary task organizations, and we do not infer an intrinsic difficulty ordering from their direct comparison.
 
 ## Section 2.1: definitions
 
@@ -18,7 +18,7 @@ Thus $a_1$ multiplies the most recent value. For arguments ordered oldest to new
 
 $$f_{\mathbf a}(x_1,\ldots,x_k)=\left(\sum_{i=1}^k a_ix_{k+1-i}\right)\bmod p.$$
 
-The rule pool is $\mathcal A=\{\mathbf a^{(1)},\ldots,\mathbf a^{(N)}\}$. An intra-trajectory tag $c_t$ identifies the vector used at position $t$. For example, $p=7$, $\mathbf a=(1,1)$ and initial values $1,2$ give $1,2,3,5,1,6,\ldots$.
+The rule pool is $\mathcal A=\{\mathbf a^{(1)},\ldots,\mathbf a^{(N)}\}$. An intra-trajectory tag $c_t$ identifies the vector used at position $t$. Because the current rule is sampled independently, hiding its identity can leave the same observed prefix compatible with different next values. The tag makes this choice observable; it does not supply the numerical answer. For example, $p=7$, $\mathbf a=(1,1)$ and initial values $1,2$ give $1,2,3,5,1,6,\ldots$.
 
 ## Section 2.2: prediction and length
 
@@ -40,7 +40,11 @@ We vary rule count, missing observations, and recurrence order to characterize t
 
 ## Section 3.3: algebraic shortcut clarification
 
-An algebraic shortcut is an alternative linear prediction formula using fewer historical operands; it may require a larger maximum lag. For example, subtracting consecutive instances of $q_t=q_{t-1}+q_{t-2}+q_{t-3}$ gives $q_t=2q_{t-1}-q_{t-4}$ modulo $p$. This formula applies from $q_5$ but cannot predict the supervised target $q_4$. The distinction concerns the formula's information requirements and observed learning dynamics, not an inherent preference for one algebraically valid computation. Loss weighting tests how emphasizing early positions affects learning; a strategy combining formulas can also solve the task.
+An algebraic shortcut is an alternative linear prediction formula using fewer historical operands; it may require a larger maximum lag. For example, subtracting consecutive instances of $q_t=q_{t-1}+q_{t-2}+q_{t-3}$ gives $q_t=2q_{t-1}-q_{t-4}$ modulo $p$. This formula applies from $q_5$ but cannot predict the supervised target $q_4$. The distinction concerns the formula's information requirements and observed learning dynamics, not an inherent preference for one algebraically valid computation. Loss weighting tests how emphasizing early positions affects learning; a strategy combining formulas can also solve the task. Appendix D.3 reports models whose recovered formulas match the original recurrence at early positions and a sparse shortcut once sufficient history is available.
+
+## Section 5.3: why distinguish prediction strategies?
+
+Strategies that agree on valid trajectories can differ in their sensitivity to earlier context. We therefore test whether high prediction accuracy is accompanied by reliance on redundant history: while preserving sufficient information for local prediction, we perturb the earlier context and assess agreement with the current rule. This breaks global trajectory consistency and tests whether prediction remains possible from the information retained. In inter-trajectory tasks, the valid recent suffix must also provide rule information; in intra-trajectory tasks, the tag identifies the rule. These interventions characterize robustness to the tested contextual perturbations, without presupposing that one strategy is universally preferable.
 
 ## Conclusion: specific contribution and scope
 
