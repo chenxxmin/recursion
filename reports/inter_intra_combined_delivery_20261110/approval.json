@@ -1,0 +1,32 @@
+{
+  "date": "2026-11-10",
+  "user_message": "确认。但是刚才B组的num_mask要改成1，和C 对齐",
+  "approved_review": "reviews/inter_intra_aprime_n3_bc_n20_20261110_v2.md",
+  "approved_review_id": "9ab500bb8293e2e65b07",
+  "final_review": "reviews/inter_intra_aprime_n3_bc_n20_20261110_v3_confirmed.md",
+  "final_review_id": "4ccaaade9a9f91451930",
+  "explicit_user_amendments": [
+    {
+      "experiment": "inter_intra_b_o2_P127_N20_d1024l2h4r4_len16_seed34789",
+      "key": "NUM_MASK",
+      "old": null,
+      "new": 1
+    },
+    {
+      "experiment": "inter_intra_b_o2_P127_N20_d1024l2h4r4_len16_seed44536",
+      "key": "NUM_MASK",
+      "old": null,
+      "new": 1
+    },
+    {
+      "experiment": "inter_intra_b_o2_P127_N20_d1024l2h4r4_len16_seed66601",
+      "key": "NUM_MASK",
+      "old": null,
+      "new": 1
+    }
+  ],
+  "other_training_parameters_unchanged": true,
+  "source_files_unchanged_since_approved_review": true,
+  "upload_authorization": "本会话用户已要求上传，并随后要求将A′并入同一外机运行JSON。",
+  "action_mask_audit": "reports/inter_intra_combined_delivery_20261110/action_mask_audit.json"
+}

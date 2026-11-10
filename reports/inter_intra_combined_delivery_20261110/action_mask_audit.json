@@ -1,0 +1,89 @@
+{
+  "scope": "CPU semantics check only; no formal training and no optimizer updates",
+  "B_None_to_1_identical_input_mask_logits_loss": true,
+  "B_C_numeric_supervision_aligned": true,
+  "checks": [
+    {
+      "group": "B_before",
+      "config_num_mask": null,
+      "engine_num_mask": 0,
+      "numeric_targets": "q3..q16",
+      "targets_per_example": 14,
+      "query_indices_0_based": [
+        2,
+        4,
+        6,
+        8,
+        10,
+        12,
+        14,
+        16,
+        18,
+        20,
+        22,
+        24,
+        26,
+        28
+      ],
+      "number_of_rules": 20,
+      "input_tokens": 30,
+      "cpu_fixture_P": 43,
+      "cpu_fixture_D_MODEL": 16
+    },
+    {
+      "group": "B_after",
+      "config_num_mask": 1,
+      "engine_num_mask": 0,
+      "numeric_targets": "q3..q16",
+      "targets_per_example": 14,
+      "query_indices_0_based": [
+        2,
+        4,
+        6,
+        8,
+        10,
+        12,
+        14,
+        16,
+        18,
+        20,
+        22,
+        24,
+        26,
+        28
+      ],
+      "number_of_rules": 20,
+      "input_tokens": 30,
+      "cpu_fixture_P": 43,
+      "cpu_fixture_D_MODEL": 16
+    },
+    {
+      "group": "C",
+      "config_num_mask": null,
+      "engine_num_mask": 0,
+      "numeric_targets": "q3..q16",
+      "targets_per_example": 14,
+      "query_indices_0_based": [
+        2,
+        4,
+        6,
+        8,
+        10,
+        12,
+        14,
+        16,
+        18,
+        20,
+        22,
+        24,
+        26,
+        28
+      ],
+      "number_of_rules": 20,
+      "input_tokens": 30,
+      "cpu_fixture_P": 43,
+      "cpu_fixture_D_MODEL": 16
+    }
+  ],
+  "implementation": "src/experiment.py _prepare_action returns num_mask=0; dataset loss_mask takes precedence in src/training.py"
+}

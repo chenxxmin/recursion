@@ -1,0 +1,13 @@
+{
+  "batch": "inter_intra_aprime_n3_bc_n20_20261110_v3",
+  "review_id": "4ccaaade9a9f91451930",
+  "archive": "bundles/inter_intra_aprime_n3_bc_n20_20261110_v3.tar.gz",
+  "archive_sha256": "f2f2f12c8c39eaf6cb1b762006a39511435b672ac8d292cd389b2bb7b8a06401",
+  "archive_bytes": 224577,
+  "experiments_json": "experiments/inter_intra_aprime_n3_bc_n20_20261110_v3.json",
+  "experiments": 11,
+  "B_num_mask": 1,
+  "C_num_mask": null,
+  "Aprime_num_mask": 2,
+  "local_training_launched": false
+}

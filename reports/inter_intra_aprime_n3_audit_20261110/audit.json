@@ -1,0 +1,94 @@
+{
+  "historical_reference": "01feadd",
+  "historical_sources": {
+    "datasets.py": "3cda0bbe6751480f1c275c3ba049aa023975aec203fee5cf33de0845957443ae",
+    "models.py": "e13135e7f8aaf633aecbef45fe885bfaebcf0b5cc118ca0b081419f5ab73ba7c"
+  },
+  "limitation": "The committed historical implementation and logged samples agree; the original remote frozen code snapshot is unavailable.",
+  "seeds": [
+    {
+      "seed": 17996,
+      "log": "/mnt/workspace/hujiachen/recursion_results/mixed_ab/mixed_basic_d2048l2r8h8_P127_rules123_N3_e0.7/logs/mixed_basic_d2048l2r8h8_P127_rules123_N3_e0.7_seed17996.log",
+      "log_sha256": "1fa63a69b6f4ea3b79cd5925d3055db930451dd88ec297b3d2f4923c30161579",
+      "data_hashes": {
+        "train_data": "4ed44f409702b3248d0d0694f1c38194470431fd38d2bfaa0fa1656b77f566cf",
+        "test_data": "b8333e3a3c4bad0aebe772dd753de47898c139758e204cc72b398112f9dcd2e8"
+      },
+      "data_counts": {
+        "train": 33870,
+        "test": 14517
+      },
+      "historical_data_and_batches_match": true,
+      "logged_sample_match": true,
+      "batches_per_epoch": 67,
+      "numeric_targets_per_sample": 13,
+      "initialization_sha256": "1e6d5ea0d2824bb9ebf1526c90a728444ec5528deb3654c201b624e057cdf288",
+      "parameter_count": 170209283,
+      "historical_initialization_match": true,
+      "optimizer_steps_executed": 0
+    },
+    {
+      "seed": 18318,
+      "log": "/mnt/workspace/hujiachen/recursion_results/mixed_ab/mixed_basic_d2048l2r8h8_P127_rules123_N3_e0.7/logs/mixed_basic_d2048l2r8h8_P127_rules123_N3_e0.7_seed18318.log",
+      "log_sha256": "cf5208d2274f671ef9c88afd3e29d4807cf9083605624660fe27e95e190e89f3",
+      "data_hashes": {
+        "train_data": "c712139c675351587ab15b87eeea0d02c702d967cb933bd4a04e5d402bce713d",
+        "test_data": "1adbffa536fb4adc7a9dae9c7fa887ffb8e4b1669428bbed9a44fefa09f99975"
+      },
+      "data_counts": {
+        "train": 33870,
+        "test": 14517
+      },
+      "historical_data_and_batches_match": true,
+      "logged_sample_match": true,
+      "batches_per_epoch": 67,
+      "numeric_targets_per_sample": 13,
+      "initialization_sha256": "681c75cb42da702a77e04e298d1c959af602646b3f3f4bc711206a0cb6b81179",
+      "parameter_count": 170209283,
+      "historical_initialization_match": true,
+      "optimizer_steps_executed": 0
+    },
+    {
+      "seed": 34789,
+      "log": "/mnt/workspace/hujiachen/recursion_results/mixed_ab/mixed_basic_d2048l2r8h8_P127_rules123_N3_e0.7/logs/mixed_basic_d2048l2r8h8_P127_rules123_N3_e0.7_seed34789.log",
+      "log_sha256": "9fcabcc7b574719a1109fdde9837065c8ade316a45b03fe46f2d8d5665dddd41",
+      "data_hashes": {
+        "train_data": "a8edcbf58c10ec9137114595b7cf959ed962de58cf35dd2b951177ce55057926",
+        "test_data": "2ab87570035669218673d51471080d08976af912db708aab93e138f2eb4d7f08"
+      },
+      "data_counts": {
+        "train": 33870,
+        "test": 14517
+      },
+      "historical_data_and_batches_match": true,
+      "logged_sample_match": true,
+      "batches_per_epoch": 67,
+      "numeric_targets_per_sample": 13,
+      "initialization_sha256": "aafa6f4d8f3f3f9f3ad7785250e25f6f90d328bcf22c5ea9a1d1e2510376a5c3",
+      "parameter_count": 170209283,
+      "historical_initialization_match": true,
+      "optimizer_steps_executed": 0
+    },
+    {
+      "seed": 44536,
+      "log": "/mnt/workspace/hujiachen/recursion_results/mixed_ab/mixed_basic_d2048l2r8h8_P127_rules123_N3_e0.7/logs/mixed_basic_d2048l2r8h8_P127_rules123_N3_e0.7_seed44536.log",
+      "log_sha256": "f34854c42fb81874efec391d939df8cd37e878daa008ad505a6d3d265c5fa745",
+      "data_hashes": {
+        "train_data": "3ca3b5751314e5a6ee05545fe76a243a39333af454c63a63fe61e097f4c86843",
+        "test_data": "cfa003c9eb472d785cc12d3661abc994273055145464e7e354a4ada82631145b"
+      },
+      "data_counts": {
+        "train": 33870,
+        "test": 14517
+      },
+      "historical_data_and_batches_match": true,
+      "logged_sample_match": true,
+      "batches_per_epoch": 67,
+      "numeric_targets_per_sample": 13,
+      "initialization_sha256": "5447096fb0c3fb1963955b3a36c59445aaf700e8cdde6eeaecc9e327474dc5b2",
+      "parameter_count": 170209283,
+      "historical_initialization_match": true,
+      "optimizer_steps_executed": 0
+    }
+  ]
+}
