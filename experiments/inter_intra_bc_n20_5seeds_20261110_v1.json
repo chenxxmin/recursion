@@ -1,0 +1,1062 @@
+{
+  "concurrency": 2,
+  "experiments": [
+    {
+      "name": "inter_intra_b_o2_P127_N20_d1024l2h4r4_len16_seed34789",
+      "task": "action",
+      "config": {
+        "ACTION_ACTIVE_RULE_IDS": null,
+        "ACTION_RULE_MODE": "per_sequence_orbit",
+        "ACTION_RULE_TOKEN_INIT_STD": 1.0,
+        "ALLOW_TF32": true,
+        "BATCH_SIZE": 1024,
+        "BLANK_COUNTS": [
+          1
+        ],
+        "BLANK_LENS": [
+          1
+        ],
+        "CONST": 0,
+        "DATA_MODE": null,
+        "DROPOUT": 0.0,
+        "D_MODEL": 1024,
+        "EARLY_STOP_ACCURACY": 0.99,
+        "EARLY_STOP_EXTRA_EPOCHS": 0,
+        "EARLY_STOP_NO_IMPROVE": 3000,
+        "ENTROPY_PENALTY_WEIGHT": 0.0,
+        "EPOCHS": 6000,
+        "EVAL_INTERVAL": 1,
+        "EXPOSURE_RATIOS": 0.7,
+        "FIRST_TASK_WEIGHT": 1.0,
+        "FRESH_TEST_PER_EVAL": false,
+        "GRAD_ACCUM_STEPS": 1,
+        "GRAD_CLIP_NORM": 1.0,
+        "INIT_FROM": null,
+        "LR": 0.0003,
+        "LR_SCHEDULE": "cosine",
+        "MAX_TRAIN_HOURS": null,
+        "MISSING_PROB": 0.0,
+        "MISS_LEN": 1,
+        "MLP_RATIO": 4,
+        "NUM_MASK": null,
+        "NUM_TEST_SAMPLES": 256,
+        "NUM_TRAIN_SAMPLES": [
+          11290,
+          11290,
+          11290,
+          11290,
+          11290,
+          11290,
+          11290,
+          11290,
+          11290,
+          11290,
+          11290,
+          11290,
+          11290,
+          11290,
+          11290,
+          11290,
+          11290,
+          11290,
+          11290,
+          11290
+        ],
+        "N_HEAD": 4,
+        "N_LAYER": 2,
+        "OOD_LEN": 16,
+        "OPT_DIAG_INTERVAL": 0,
+        "ORDER": 2,
+        "P": 127,
+        "POS_PROBE": true,
+        "RANDOM_SEED": 34789,
+        "RESHUFFLE_EACH_EPOCH": false,
+        "RESUME_FROM": null,
+        "RULES": [
+          [
+            1,
+            1
+          ],
+          [
+            3,
+            2
+          ],
+          [
+            5,
+            3
+          ],
+          [
+            7,
+            4
+          ],
+          [
+            9,
+            5
+          ],
+          [
+            11,
+            6
+          ],
+          [
+            13,
+            7
+          ],
+          [
+            15,
+            8
+          ],
+          [
+            17,
+            9
+          ],
+          [
+            19,
+            10
+          ],
+          [
+            21,
+            11
+          ],
+          [
+            23,
+            12
+          ],
+          [
+            25,
+            13
+          ],
+          [
+            27,
+            14
+          ],
+          [
+            29,
+            15
+          ],
+          [
+            31,
+            16
+          ],
+          [
+            33,
+            17
+          ],
+          [
+            35,
+            18
+          ],
+          [
+            37,
+            19
+          ],
+          [
+            39,
+            20
+          ]
+        ],
+        "SAVE_CHECKPOINTS": true,
+        "STATE_SPACE_CAP": null,
+        "TASK": "action",
+        "TASK_VARIANT": null,
+        "TRAIN_LEN": 16,
+        "USE_AMP": false,
+        "USE_LEARNABLE_PE": false,
+        "WEIGHT_DECAY": 1.0
+      }
+    },
+    {
+      "name": "inter_intra_b_o2_P127_N20_d1024l2h4r4_len16_seed44536",
+      "task": "action",
+      "config": {
+        "ACTION_ACTIVE_RULE_IDS": null,
+        "ACTION_RULE_MODE": "per_sequence_orbit",
+        "ACTION_RULE_TOKEN_INIT_STD": 1.0,
+        "ALLOW_TF32": true,
+        "BATCH_SIZE": 1024,
+        "BLANK_COUNTS": [
+          1
+        ],
+        "BLANK_LENS": [
+          1
+        ],
+        "CONST": 0,
+        "DATA_MODE": null,
+        "DROPOUT": 0.0,
+        "D_MODEL": 1024,
+        "EARLY_STOP_ACCURACY": 0.99,
+        "EARLY_STOP_EXTRA_EPOCHS": 0,
+        "EARLY_STOP_NO_IMPROVE": 3000,
+        "ENTROPY_PENALTY_WEIGHT": 0.0,
+        "EPOCHS": 6000,
+        "EVAL_INTERVAL": 1,
+        "EXPOSURE_RATIOS": 0.7,
+        "FIRST_TASK_WEIGHT": 1.0,
+        "FRESH_TEST_PER_EVAL": false,
+        "GRAD_ACCUM_STEPS": 1,
+        "GRAD_CLIP_NORM": 1.0,
+        "INIT_FROM": null,
+        "LR": 0.0003,
+        "LR_SCHEDULE": "cosine",
+        "MAX_TRAIN_HOURS": null,
+        "MISSING_PROB": 0.0,
+        "MISS_LEN": 1,
+        "MLP_RATIO": 4,
+        "NUM_MASK": null,
+        "NUM_TEST_SAMPLES": 256,
+        "NUM_TRAIN_SAMPLES": [
+          11290,
+          11290,
+          11290,
+          11290,
+          11290,
+          11290,
+          11290,
+          11290,
+          11290,
+          11290,
+          11290,
+          11290,
+          11290,
+          11290,
+          11290,
+          11290,
+          11290,
+          11290,
+          11290,
+          11290
+        ],
+        "N_HEAD": 4,
+        "N_LAYER": 2,
+        "OOD_LEN": 16,
+        "OPT_DIAG_INTERVAL": 0,
+        "ORDER": 2,
+        "P": 127,
+        "POS_PROBE": true,
+        "RANDOM_SEED": 44536,
+        "RESHUFFLE_EACH_EPOCH": false,
+        "RESUME_FROM": null,
+        "RULES": [
+          [
+            1,
+            1
+          ],
+          [
+            3,
+            2
+          ],
+          [
+            5,
+            3
+          ],
+          [
+            7,
+            4
+          ],
+          [
+            9,
+            5
+          ],
+          [
+            11,
+            6
+          ],
+          [
+            13,
+            7
+          ],
+          [
+            15,
+            8
+          ],
+          [
+            17,
+            9
+          ],
+          [
+            19,
+            10
+          ],
+          [
+            21,
+            11
+          ],
+          [
+            23,
+            12
+          ],
+          [
+            25,
+            13
+          ],
+          [
+            27,
+            14
+          ],
+          [
+            29,
+            15
+          ],
+          [
+            31,
+            16
+          ],
+          [
+            33,
+            17
+          ],
+          [
+            35,
+            18
+          ],
+          [
+            37,
+            19
+          ],
+          [
+            39,
+            20
+          ]
+        ],
+        "SAVE_CHECKPOINTS": true,
+        "STATE_SPACE_CAP": null,
+        "TASK": "action",
+        "TASK_VARIANT": null,
+        "TRAIN_LEN": 16,
+        "USE_AMP": false,
+        "USE_LEARNABLE_PE": false,
+        "WEIGHT_DECAY": 1.0
+      }
+    },
+    {
+      "name": "inter_intra_b_o2_P127_N20_d1024l2h4r4_len16_seed66601",
+      "task": "action",
+      "config": {
+        "ACTION_ACTIVE_RULE_IDS": null,
+        "ACTION_RULE_MODE": "per_sequence_orbit",
+        "ACTION_RULE_TOKEN_INIT_STD": 1.0,
+        "ALLOW_TF32": true,
+        "BATCH_SIZE": 1024,
+        "BLANK_COUNTS": [
+          1
+        ],
+        "BLANK_LENS": [
+          1
+        ],
+        "CONST": 0,
+        "DATA_MODE": null,
+        "DROPOUT": 0.0,
+        "D_MODEL": 1024,
+        "EARLY_STOP_ACCURACY": 0.99,
+        "EARLY_STOP_EXTRA_EPOCHS": 0,
+        "EARLY_STOP_NO_IMPROVE": 3000,
+        "ENTROPY_PENALTY_WEIGHT": 0.0,
+        "EPOCHS": 6000,
+        "EVAL_INTERVAL": 1,
+        "EXPOSURE_RATIOS": 0.7,
+        "FIRST_TASK_WEIGHT": 1.0,
+        "FRESH_TEST_PER_EVAL": false,
+        "GRAD_ACCUM_STEPS": 1,
+        "GRAD_CLIP_NORM": 1.0,
+        "INIT_FROM": null,
+        "LR": 0.0003,
+        "LR_SCHEDULE": "cosine",
+        "MAX_TRAIN_HOURS": null,
+        "MISSING_PROB": 0.0,
+        "MISS_LEN": 1,
+        "MLP_RATIO": 4,
+        "NUM_MASK": null,
+        "NUM_TEST_SAMPLES": 256,
+        "NUM_TRAIN_SAMPLES": [
+          11290,
+          11290,
+          11290,
+          11290,
+          11290,
+          11290,
+          11290,
+          11290,
+          11290,
+          11290,
+          11290,
+          11290,
+          11290,
+          11290,
+          11290,
+          11290,
+          11290,
+          11290,
+          11290,
+          11290
+        ],
+        "N_HEAD": 4,
+        "N_LAYER": 2,
+        "OOD_LEN": 16,
+        "OPT_DIAG_INTERVAL": 0,
+        "ORDER": 2,
+        "P": 127,
+        "POS_PROBE": true,
+        "RANDOM_SEED": 66601,
+        "RESHUFFLE_EACH_EPOCH": false,
+        "RESUME_FROM": null,
+        "RULES": [
+          [
+            1,
+            1
+          ],
+          [
+            3,
+            2
+          ],
+          [
+            5,
+            3
+          ],
+          [
+            7,
+            4
+          ],
+          [
+            9,
+            5
+          ],
+          [
+            11,
+            6
+          ],
+          [
+            13,
+            7
+          ],
+          [
+            15,
+            8
+          ],
+          [
+            17,
+            9
+          ],
+          [
+            19,
+            10
+          ],
+          [
+            21,
+            11
+          ],
+          [
+            23,
+            12
+          ],
+          [
+            25,
+            13
+          ],
+          [
+            27,
+            14
+          ],
+          [
+            29,
+            15
+          ],
+          [
+            31,
+            16
+          ],
+          [
+            33,
+            17
+          ],
+          [
+            35,
+            18
+          ],
+          [
+            37,
+            19
+          ],
+          [
+            39,
+            20
+          ]
+        ],
+        "SAVE_CHECKPOINTS": true,
+        "STATE_SPACE_CAP": null,
+        "TASK": "action",
+        "TASK_VARIANT": null,
+        "TRAIN_LEN": 16,
+        "USE_AMP": false,
+        "USE_LEARNABLE_PE": false,
+        "WEIGHT_DECAY": 1.0
+      }
+    },
+    {
+      "name": "inter_intra_c_o2_P127_N20_d1024l2h4r4_len16_seed18318",
+      "task": "action",
+      "config": {
+        "ACTION_ACTIVE_RULE_IDS": null,
+        "ACTION_RULE_MODE": "per_step",
+        "ACTION_RULE_TOKEN_INIT_STD": 1.0,
+        "ALLOW_TF32": true,
+        "BATCH_SIZE": 1024,
+        "BLANK_COUNTS": [
+          1
+        ],
+        "BLANK_LENS": [
+          1
+        ],
+        "CONST": 0,
+        "DATA_MODE": null,
+        "DROPOUT": 0.0,
+        "D_MODEL": 1024,
+        "EARLY_STOP_ACCURACY": 0.99,
+        "EARLY_STOP_EXTRA_EPOCHS": 0,
+        "EARLY_STOP_NO_IMPROVE": 3000,
+        "ENTROPY_PENALTY_WEIGHT": 0.0,
+        "EPOCHS": 6000,
+        "EVAL_INTERVAL": 1,
+        "EXPOSURE_RATIOS": null,
+        "FIRST_TASK_WEIGHT": 1.0,
+        "FRESH_TEST_PER_EVAL": true,
+        "GRAD_ACCUM_STEPS": 1,
+        "GRAD_CLIP_NORM": 1.0,
+        "INIT_FROM": null,
+        "LR": 0.0003,
+        "LR_SCHEDULE": "cosine",
+        "MAX_TRAIN_HOURS": null,
+        "MISSING_PROB": 0.0,
+        "MISS_LEN": 1,
+        "MLP_RATIO": 4,
+        "NUM_MASK": null,
+        "NUM_TEST_SAMPLES": 256,
+        "NUM_TRAIN_SAMPLES": 300000,
+        "N_HEAD": 4,
+        "N_LAYER": 2,
+        "OOD_LEN": 16,
+        "OPT_DIAG_INTERVAL": 0,
+        "ORDER": 2,
+        "P": 127,
+        "POS_PROBE": true,
+        "RANDOM_SEED": 18318,
+        "RESHUFFLE_EACH_EPOCH": false,
+        "RESUME_FROM": null,
+        "RULES": [
+          [
+            1,
+            1
+          ],
+          [
+            3,
+            2
+          ],
+          [
+            5,
+            3
+          ],
+          [
+            7,
+            4
+          ],
+          [
+            9,
+            5
+          ],
+          [
+            11,
+            6
+          ],
+          [
+            13,
+            7
+          ],
+          [
+            15,
+            8
+          ],
+          [
+            17,
+            9
+          ],
+          [
+            19,
+            10
+          ],
+          [
+            21,
+            11
+          ],
+          [
+            23,
+            12
+          ],
+          [
+            25,
+            13
+          ],
+          [
+            27,
+            14
+          ],
+          [
+            29,
+            15
+          ],
+          [
+            31,
+            16
+          ],
+          [
+            33,
+            17
+          ],
+          [
+            35,
+            18
+          ],
+          [
+            37,
+            19
+          ],
+          [
+            39,
+            20
+          ]
+        ],
+        "SAVE_CHECKPOINTS": true,
+        "STATE_SPACE_CAP": null,
+        "TASK": "action",
+        "TASK_VARIANT": null,
+        "TRAIN_LEN": 16,
+        "USE_AMP": false,
+        "USE_LEARNABLE_PE": false,
+        "WEIGHT_DECAY": 1.0
+      }
+    },
+    {
+      "name": "inter_intra_c_o2_P127_N20_d1024l2h4r4_len16_seed34789",
+      "task": "action",
+      "config": {
+        "ACTION_ACTIVE_RULE_IDS": null,
+        "ACTION_RULE_MODE": "per_step",
+        "ACTION_RULE_TOKEN_INIT_STD": 1.0,
+        "ALLOW_TF32": true,
+        "BATCH_SIZE": 1024,
+        "BLANK_COUNTS": [
+          1
+        ],
+        "BLANK_LENS": [
+          1
+        ],
+        "CONST": 0,
+        "DATA_MODE": null,
+        "DROPOUT": 0.0,
+        "D_MODEL": 1024,
+        "EARLY_STOP_ACCURACY": 0.99,
+        "EARLY_STOP_EXTRA_EPOCHS": 0,
+        "EARLY_STOP_NO_IMPROVE": 3000,
+        "ENTROPY_PENALTY_WEIGHT": 0.0,
+        "EPOCHS": 6000,
+        "EVAL_INTERVAL": 1,
+        "EXPOSURE_RATIOS": null,
+        "FIRST_TASK_WEIGHT": 1.0,
+        "FRESH_TEST_PER_EVAL": true,
+        "GRAD_ACCUM_STEPS": 1,
+        "GRAD_CLIP_NORM": 1.0,
+        "INIT_FROM": null,
+        "LR": 0.0003,
+        "LR_SCHEDULE": "cosine",
+        "MAX_TRAIN_HOURS": null,
+        "MISSING_PROB": 0.0,
+        "MISS_LEN": 1,
+        "MLP_RATIO": 4,
+        "NUM_MASK": null,
+        "NUM_TEST_SAMPLES": 256,
+        "NUM_TRAIN_SAMPLES": 300000,
+        "N_HEAD": 4,
+        "N_LAYER": 2,
+        "OOD_LEN": 16,
+        "OPT_DIAG_INTERVAL": 0,
+        "ORDER": 2,
+        "P": 127,
+        "POS_PROBE": true,
+        "RANDOM_SEED": 34789,
+        "RESHUFFLE_EACH_EPOCH": false,
+        "RESUME_FROM": null,
+        "RULES": [
+          [
+            1,
+            1
+          ],
+          [
+            3,
+            2
+          ],
+          [
+            5,
+            3
+          ],
+          [
+            7,
+            4
+          ],
+          [
+            9,
+            5
+          ],
+          [
+            11,
+            6
+          ],
+          [
+            13,
+            7
+          ],
+          [
+            15,
+            8
+          ],
+          [
+            17,
+            9
+          ],
+          [
+            19,
+            10
+          ],
+          [
+            21,
+            11
+          ],
+          [
+            23,
+            12
+          ],
+          [
+            25,
+            13
+          ],
+          [
+            27,
+            14
+          ],
+          [
+            29,
+            15
+          ],
+          [
+            31,
+            16
+          ],
+          [
+            33,
+            17
+          ],
+          [
+            35,
+            18
+          ],
+          [
+            37,
+            19
+          ],
+          [
+            39,
+            20
+          ]
+        ],
+        "SAVE_CHECKPOINTS": true,
+        "STATE_SPACE_CAP": null,
+        "TASK": "action",
+        "TASK_VARIANT": null,
+        "TRAIN_LEN": 16,
+        "USE_AMP": false,
+        "USE_LEARNABLE_PE": false,
+        "WEIGHT_DECAY": 1.0
+      }
+    },
+    {
+      "name": "inter_intra_c_o2_P127_N20_d1024l2h4r4_len16_seed44536",
+      "task": "action",
+      "config": {
+        "ACTION_ACTIVE_RULE_IDS": null,
+        "ACTION_RULE_MODE": "per_step",
+        "ACTION_RULE_TOKEN_INIT_STD": 1.0,
+        "ALLOW_TF32": true,
+        "BATCH_SIZE": 1024,
+        "BLANK_COUNTS": [
+          1
+        ],
+        "BLANK_LENS": [
+          1
+        ],
+        "CONST": 0,
+        "DATA_MODE": null,
+        "DROPOUT": 0.0,
+        "D_MODEL": 1024,
+        "EARLY_STOP_ACCURACY": 0.99,
+        "EARLY_STOP_EXTRA_EPOCHS": 0,
+        "EARLY_STOP_NO_IMPROVE": 3000,
+        "ENTROPY_PENALTY_WEIGHT": 0.0,
+        "EPOCHS": 6000,
+        "EVAL_INTERVAL": 1,
+        "EXPOSURE_RATIOS": null,
+        "FIRST_TASK_WEIGHT": 1.0,
+        "FRESH_TEST_PER_EVAL": true,
+        "GRAD_ACCUM_STEPS": 1,
+        "GRAD_CLIP_NORM": 1.0,
+        "INIT_FROM": null,
+        "LR": 0.0003,
+        "LR_SCHEDULE": "cosine",
+        "MAX_TRAIN_HOURS": null,
+        "MISSING_PROB": 0.0,
+        "MISS_LEN": 1,
+        "MLP_RATIO": 4,
+        "NUM_MASK": null,
+        "NUM_TEST_SAMPLES": 256,
+        "NUM_TRAIN_SAMPLES": 300000,
+        "N_HEAD": 4,
+        "N_LAYER": 2,
+        "OOD_LEN": 16,
+        "OPT_DIAG_INTERVAL": 0,
+        "ORDER": 2,
+        "P": 127,
+        "POS_PROBE": true,
+        "RANDOM_SEED": 44536,
+        "RESHUFFLE_EACH_EPOCH": false,
+        "RESUME_FROM": null,
+        "RULES": [
+          [
+            1,
+            1
+          ],
+          [
+            3,
+            2
+          ],
+          [
+            5,
+            3
+          ],
+          [
+            7,
+            4
+          ],
+          [
+            9,
+            5
+          ],
+          [
+            11,
+            6
+          ],
+          [
+            13,
+            7
+          ],
+          [
+            15,
+            8
+          ],
+          [
+            17,
+            9
+          ],
+          [
+            19,
+            10
+          ],
+          [
+            21,
+            11
+          ],
+          [
+            23,
+            12
+          ],
+          [
+            25,
+            13
+          ],
+          [
+            27,
+            14
+          ],
+          [
+            29,
+            15
+          ],
+          [
+            31,
+            16
+          ],
+          [
+            33,
+            17
+          ],
+          [
+            35,
+            18
+          ],
+          [
+            37,
+            19
+          ],
+          [
+            39,
+            20
+          ]
+        ],
+        "SAVE_CHECKPOINTS": true,
+        "STATE_SPACE_CAP": null,
+        "TASK": "action",
+        "TASK_VARIANT": null,
+        "TRAIN_LEN": 16,
+        "USE_AMP": false,
+        "USE_LEARNABLE_PE": false,
+        "WEIGHT_DECAY": 1.0
+      }
+    },
+    {
+      "name": "inter_intra_c_o2_P127_N20_d1024l2h4r4_len16_seed66601",
+      "task": "action",
+      "config": {
+        "ACTION_ACTIVE_RULE_IDS": null,
+        "ACTION_RULE_MODE": "per_step",
+        "ACTION_RULE_TOKEN_INIT_STD": 1.0,
+        "ALLOW_TF32": true,
+        "BATCH_SIZE": 1024,
+        "BLANK_COUNTS": [
+          1
+        ],
+        "BLANK_LENS": [
+          1
+        ],
+        "CONST": 0,
+        "DATA_MODE": null,
+        "DROPOUT": 0.0,
+        "D_MODEL": 1024,
+        "EARLY_STOP_ACCURACY": 0.99,
+        "EARLY_STOP_EXTRA_EPOCHS": 0,
+        "EARLY_STOP_NO_IMPROVE": 3000,
+        "ENTROPY_PENALTY_WEIGHT": 0.0,
+        "EPOCHS": 6000,
+        "EVAL_INTERVAL": 1,
+        "EXPOSURE_RATIOS": null,
+        "FIRST_TASK_WEIGHT": 1.0,
+        "FRESH_TEST_PER_EVAL": true,
+        "GRAD_ACCUM_STEPS": 1,
+        "GRAD_CLIP_NORM": 1.0,
+        "INIT_FROM": null,
+        "LR": 0.0003,
+        "LR_SCHEDULE": "cosine",
+        "MAX_TRAIN_HOURS": null,
+        "MISSING_PROB": 0.0,
+        "MISS_LEN": 1,
+        "MLP_RATIO": 4,
+        "NUM_MASK": null,
+        "NUM_TEST_SAMPLES": 256,
+        "NUM_TRAIN_SAMPLES": 300000,
+        "N_HEAD": 4,
+        "N_LAYER": 2,
+        "OOD_LEN": 16,
+        "OPT_DIAG_INTERVAL": 0,
+        "ORDER": 2,
+        "P": 127,
+        "POS_PROBE": true,
+        "RANDOM_SEED": 66601,
+        "RESHUFFLE_EACH_EPOCH": false,
+        "RESUME_FROM": null,
+        "RULES": [
+          [
+            1,
+            1
+          ],
+          [
+            3,
+            2
+          ],
+          [
+            5,
+            3
+          ],
+          [
+            7,
+            4
+          ],
+          [
+            9,
+            5
+          ],
+          [
+            11,
+            6
+          ],
+          [
+            13,
+            7
+          ],
+          [
+            15,
+            8
+          ],
+          [
+            17,
+            9
+          ],
+          [
+            19,
+            10
+          ],
+          [
+            21,
+            11
+          ],
+          [
+            23,
+            12
+          ],
+          [
+            25,
+            13
+          ],
+          [
+            27,
+            14
+          ],
+          [
+            29,
+            15
+          ],
+          [
+            31,
+            16
+          ],
+          [
+            33,
+            17
+          ],
+          [
+            35,
+            18
+          ],
+          [
+            37,
+            19
+          ],
+          [
+            39,
+            20
+          ]
+        ],
+        "SAVE_CHECKPOINTS": true,
+        "STATE_SPACE_CAP": null,
+        "TASK": "action",
+        "TASK_VARIANT": null,
+        "TRAIN_LEN": 16,
+        "USE_AMP": false,
+        "USE_LEARNABLE_PE": false,
+        "WEIGHT_DECAY": 1.0
+      }
+    }
+  ]
+}
